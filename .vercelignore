@@ -1,0 +1,16 @@
+# Files never uploaded by `vercel deploy` (deploys from this machine).
+# Secrets: production env vars are pushed separately (scripts/push-env-to-vercel.mjs).
+.env
+.env.*
+.projects/
+# Agent tooling, docs, tests: not needed to build the app
+.agents/
+.claude/
+.cursor/
+.cursorignore
+docs/
+tests/
+skills-lock.json
+# Local build artifacts
+node_modules/
+.next/

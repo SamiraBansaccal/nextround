@@ -7,6 +7,9 @@ Cette documentation explique **comment** et **pourquoi** chaque partie du projet
 | Page | Contenu |
 |---|---|
 | [00-setup.md](00-setup.md) | Phase 0 : Stripe CLI, Stripe Projects, skills des agents, git, ce qui est (ou non) versionné |
+| [01-stack-auth-deploy.md](01-stack-auth-deploy.md) | Phase 1 : stack, fournisseurs, connexion GitHub, base de données, isolation des données et son test, déploiement |
+| [lovable-prompt.md](lovable-prompt.md) | Le prompt donné à Lovable pour le prototype d'interface |
+| [slides-prompt.md](slides-prompt.md) | Le prompt pour les slides du pitch |
 
 Une page sera ajoutée à chaque phase.
 
@@ -22,4 +25,8 @@ Une page sera ajoutée à chaque phase.
 | **Variable d'environnement** | Une valeur (souvent secrète : mot de passe, clé d'API) donnée à l'application au démarrage, hors du code. En local elles vivent dans `.env`. |
 | **Mode live / sandbox** | Stripe a un mode réel (*live*) et des copies de test (*sandbox*). Stripe Projects exige le mode live, car il gère de vrais comptes chez les fournisseurs. |
 | **Skill** | Un dossier d'instructions (`SKILL.md`) qu'un agent de code comme Claude Code lit pour savoir utiliser un outil correctement. |
+| **Migration** | Un fichier SQL qui crée ou modifie les tables. Généré à partir du schéma, versionné, appliqué à la base. |
+| **Proxy (Next.js 16)** | Code qui s'exécute avant chaque requête (anciennement « middleware ») : ici, il renvoie vers la connexion. |
+| **OAuth** | Le protocole derrière « Continuer avec GitHub » : GitHub confirme qui vous êtes, sans donner votre mot de passe à l'application. |
+| **Isolation des données** | Garantie qu'un utilisateur ne peut ni lire ni modifier les données d'un autre, même en changeant un identifiant dans une requête. |
 | **Remote (git)** | Le dépôt distant (ici sur GitHub) vers lequel on pousse (`git push`) les commits locaux. |

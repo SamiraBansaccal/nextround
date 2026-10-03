@@ -6,6 +6,8 @@ NextRound helps people apply to tech jobs, with a focus on **interview preparati
 
 Each user brings their own AI (paid or free).
 
+**Live app:** https://nextround-gamma.vercel.app
+
 ## The core promise: the AI never invents anything
 
 - Every generated sentence, and every claim in a practice answer, must trace back to a **validated profile fact**.
@@ -21,8 +23,8 @@ Built in one day for the Stripe Community hackathon, phase by phase.
 | Phase | Content | Status |
 |---|---|---|
 | 0 | Setup: Stripe CLI, Stripe Projects, agent skills, git | ✅ done |
-| 1 | Stack, providers, GitHub sign-in, data isolation, first deploy | ⏳ next |
-| 2 | "Bring your own AI" layer (OpenAI-compatible client, encrypted keys) | planned |
+| 1 | Stack, providers, GitHub sign-in, data isolation, first deploy | ✅ done |
+| 2 | "Bring your own AI" layer (OpenAI-compatible client, encrypted keys) | ⏳ next |
 | 3 | Profile: GitHub / Codewars / CV import, fact validation | planned |
 | 4 | Saved offers: scan by URL, verified quotes, match score | planned |
 | 5 | Interview simulation on the offer's stack (main feature) | planned |
@@ -36,17 +38,34 @@ Detailed documentation, written to explain *how and why* everything works, lives
 
 - [docs/README.md](docs/README.md): index and glossary
 - [docs/00-setup.md](docs/00-setup.md): Stripe CLI, Stripe Projects, agent skills, git, and what is (not) committed
+- [docs/01-stack-auth-deploy.md](docs/01-stack-auth-deploy.md): stack, providers, GitHub sign-in, database, data isolation and its test, deployment
 
-## Repository layout (so far)
+## Repository layout
 
 ```
-.claude/skills/      Agent skills used while building (Stripe, Vercel, shadcn, ElevenLabs…)
-.agents/, .cursor/   Same Stripe Projects skill for other coding agents (written by `stripe projects init`)
-.projects/state.json Stripe Projects shared state: which providers/services this app uses (no secrets)
-AGENTS.md, CLAUDE.md Instructions for coding agents
-docs/                How everything works, phase by phase
+app/                 Pages (Next.js App Router). (app)/ = signed-in area
+components/          UI only: components receive data as props
+lib/                 Logic: auth, env, database, data access (lib/data/), shared types
+lib/db/schema.ts     Database schema; every table has a user_id
+drizzle/             SQL migrations generated from the schema
+proxy.ts             Runs before every request: everything but the landing page requires sign-in
+tests/               Vitest tests, including the data isolation check (in-memory Postgres)
+scripts/             setup-env, push-env-to-vercel, deploy
+docs/                How everything works, phase by phase (French)
+.projects/state.json Stripe Projects: which providers/services the app uses (no secrets)
+```
+
+## Run it locally
+
+```bash
+npm install
+stripe projects env --pull                       # credentials -> .env (never committed)
+npm run setup:env -- --owner <your-github-login>  # Clerk keys, encryption key, owner
+npm run db:migrate                                # create the tables
+npm run dev                                       # http://localhost:3000
+npm test                                          # includes the data isolation test
 ```
 
 ## Built with Stripe Projects
 
-Third-party services (hosting, database, auth, LLM…) are provisioned with [Stripe Projects](https://docs.stripe.com/projects) from the terminal: `stripe projects add <provider>/<service>`, then `stripe projects env --pull` writes the credentials to a local `.env` that is never committed.
+Hosting (Vercel), Postgres (Neon), sign-in (Clerk), the instance AI (OpenRouter), page reading (Firecrawl) and voice (ElevenLabs) are provisioned, on free tiers, with [Stripe Projects](https://docs.stripe.com/projects) from the terminal: `stripe projects add <provider>/<service>`, then `stripe projects env --pull` writes the credentials to a local `.env` that is never committed.

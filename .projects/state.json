@@ -57,6 +57,12 @@
       "providerName": "Neon",
       "serviceId": "free"
     },
+    "nextround": {
+      "livemode": true,
+      "name": "nextround",
+      "providerName": "Vercel",
+      "serviceId": "project"
+    },
     "NextRound": {
       "livemode": true,
       "name": "NextRound",
@@ -106,6 +112,9 @@
         },
         {
           "resourceName": "neon-plan"
+        },
+        {
+          "resourceName": "nextround"
         },
         {
           "resourceName": "openrouter-api"
