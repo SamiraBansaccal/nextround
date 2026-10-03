@@ -23,6 +23,8 @@ export default async function InterviewPage({ params, searchParams }: PageProps<
   return (
     <InterviewSession
       interviewId={data.interview.id}
+      offerId={data.offer?.id ?? null}
+      me={{ name: account.fullName, imageUrl: account.imageUrl }}
       offerTitle={[data.offer?.title, data.offer?.company].filter(Boolean).join(" · ") || "Interview practice"}
       questions={data.questions.map((question) => {
         const answer = latest.get(question.id);

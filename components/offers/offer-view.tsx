@@ -173,7 +173,7 @@ export function OfferView({ offer, segments, requirements, contacts, score, inte
                       {current.facts.map((f) => (
                         <p key={f.id} className="rounded-md border px-2 py-1 text-xs">
                           {f.text}
-                          {f.sourceRef && (
+                          {f.sourceRef?.startsWith("http") && (
                             <a href={f.sourceRef} target="_blank" rel="noopener noreferrer" className="ml-1 inline-flex items-center underline">
                               <ExternalLink className="size-3" aria-hidden="true" />
                             </a>
