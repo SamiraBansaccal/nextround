@@ -27,7 +27,7 @@ Built in one day for the Stripe Community hackathon, phase by phase.
 | 2 | "Bring your own AI" layer (OpenAI-compatible client, encrypted keys) | ✅ done |
 | 3 | Profile: one-click GitHub import, validate / edit / reject facts, manual facts | ✅ done (Codewars, CV PDF and onboarding chat: not yet) |
 | 4 | Saved offers: scan by URL, verified quotes, match score | ✅ done (add by URL or pasted text, green/red view, apply panel) |
-| 5 | Interview simulation on the offer's stack (main feature) | ✅ text mode done (questions, verified feedback, retry, summary); voice: next |
+| 5 | Interview simulation on the offer's stack (main feature) | ✅ done: text + voice (ElevenLabs reads the question, browser dictation), verified feedback, retry, summary |
 | 6 | Tailored CV and cover letter with a sentence-level verifier | not started |
 | 7 | Dashboard (application pipeline) | not started |
 | 8 | Hardening, final README, submission | ✅ partial: see the security checklist below |
@@ -89,7 +89,7 @@ npm test       # 29 tests: data isolation, encryption, AI JSON retry, who pays, 
 2. **Profile → Import my repositories**: one project fact per public repo, linked to its URL. **Validate all** (or one by one), edit, reject, add a manual fact.
 3. **Offers → paste an offer link** (or its text) **→ Scan** (~10 s with the free model): the offer text comes back with each requirement highlighted **green (covered by a validated fact)** or **red (gap)**; click one to see the proving facts. The Apply panel shows only contacts found in the offer, the original posting and "I applied".
 4. **Practise an interview for this offer** (~20 s): 10 questions in the offer's language — 4 HR, 4 technical on the offer's stack, 2 on the gaps — each with its source quoted from the offer, and a hidden suggested answer built only from validated facts.
-5. Answer, **Get feedback**: STAR, relevance, evidence (each claim quoted from your answer, mapped to a fact or flagged "Not in your profile – add it as a fact if true, otherwise don't say it"), honesty + learning plan on gap questions, improved answer from facts only. Retry shows the previous answer; **See the summary** at the end.
+5. Answer by typing or by voice (**Read the question aloud** with ElevenLabs, **Answer by voice** with the browser's dictation), then **Get feedback**: STAR, relevance, evidence (each claim quoted from your answer, mapped to a fact or flagged "Not in your profile – add it as a fact if true, otherwise don't say it"), honesty + learning plan on gap questions, improved answer from facts only. Retry shows the previous answer; **See the summary** at the end.
 6. **Settings**: bring your own AI (OpenRouter, OpenAI, Mistral, Groq), masked key, **Test connection**.
 7. `npm test`: 37 tests, including data isolation, quote verification, encryption, SSRF and rate limits.
 
@@ -110,7 +110,8 @@ npm test       # 29 tests: data isolation, encryption, AI JSON retry, who pays, 
 
 ## Known limitations
 
-- Voice mode (ElevenLabs), tailored CV / cover letter (Phase 6) and the pipeline dashboard (Phase 7) are not built yet.
+- Tailored CV / cover letter (Phase 6) and the pipeline dashboard (Phase 7) are not built yet.
+- Voice answers use the browser's speech recognition (Chrome, Edge); ElevenLabs speech-to-text is not wired yet.
 - Offers will be added by link or pasted text: no job-board APIs. No automatic applying. LeetCode is a manual fact.
 - Clerk runs as a development instance (shared OAuth credentials, small "Development mode" badge).
 - Free OpenRouter models can be saturated (429); a fallback model is configured.
