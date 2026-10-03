@@ -6,7 +6,7 @@ NextRound helps people apply to tech jobs, with a focus on **interview preparati
 
 Each user brings their own AI (paid or free).
 
-**Live app:** https://nextround-gamma.vercel.app
+**Live app:** https://nextround-gamma.vercel.app · **Stripe Projects stack:** [projects.dev share link](https://projects.dev/s#v1:Neon~postgres,ElevenLabs~tts,Firecrawl~api,Vercel~project,Clerk~auth,OpenRouter~api)
 
 ## The core promise: the AI never invents anything
 
@@ -25,12 +25,12 @@ Built in one day for the Stripe Community hackathon, phase by phase.
 | 0 | Setup: Stripe CLI, Stripe Projects, agent skills, git | ✅ done |
 | 1 | Stack, providers, GitHub sign-in, data isolation, first deploy | ✅ done |
 | 2 | "Bring your own AI" layer (OpenAI-compatible client, encrypted keys) | ✅ done |
-| 3 | Profile: GitHub / Codewars / CV import, fact validation | ⏳ next |
-| 4 | Saved offers: scan by URL, verified quotes, match score | planned |
-| 5 | Interview simulation on the offer's stack (main feature) | planned |
-| 6 | Tailored CV and cover letter with a sentence-level verifier | planned |
-| 7 | Dashboard (application pipeline) | planned |
-| 8 | Hardening, final README, submission | planned |
+| 3 | Profile: one-click GitHub import, validate / edit / reject facts, manual facts | ✅ done (Codewars, CV PDF and onboarding chat: not yet) |
+| 4 | Saved offers: scan by URL, verified quotes, match score | not started |
+| 5 | Interview simulation on the offer's stack (main feature) | not started: AI layer ready (Phase 2) |
+| 6 | Tailored CV and cover letter with a sentence-level verifier | not started |
+| 7 | Dashboard (application pipeline) | not started |
+| 8 | Hardening, final README, submission | ✅ partial: see the security checklist below |
 
 ## Documentation
 
@@ -82,6 +82,40 @@ npm run bootstrap -- --owner <your-github-login>             # run them
 npm run dev    # http://localhost:3000
 npm test       # 29 tests: data isolation, encryption, AI JSON retry, who pays, SSRF, rate limits
 ```
+
+## Demo script (what works today)
+
+1. Open https://nextround-gamma.vercel.app and **Continue with GitHub**.
+2. **Dashboard**: the "Your profile" card and the "AI in use" card (the owner uses the instance key: OpenRouter free model).
+3. **Profile → Import my repositories**: one project fact per public repo, each linked to its repo URL. Validate, edit or reject each one; add a manual fact (e.g. LeetCode).
+4. **Settings**: pick a provider (OpenRouter, OpenAI, Mistral, Groq), load its models, paste a key (stored encrypted, shown as `••••` + last 4), **Test connection**.
+5. Show `npm test` (data isolation between users, encryption, JSON retry, who pays, SSRF, rate limits) and `npm run bootstrap -- --owner <login> --dry-run` (self-hosting on your own accounts).
+
+## Security checklist
+
+| Item | State |
+|---|---|
+| OAuth secrets and encryption key in env only | ✅ `.env` (git-ignored), Vercel env vars; nothing in the repo (secret scan before each commit) |
+| Per-user isolation | ✅ every table has `user_id`; every query filters on the session user id; `tests/isolation.test.ts` |
+| User AI keys encrypted, masked, never logged | ✅ AES-256-GCM, only the last 4 characters leave the server, generic errors |
+| Custom base URL disabled by default | ✅ presets only unless `ALLOW_CUSTOM_LLM_BASE_URL=true`, checked at save and call time |
+| zod validation and length limits | ✅ on every server action (answer/page/PDF limits will apply to Phases 4–5) |
+| Rate limits on instance keys | ✅ 8/min and 40/day, stored in Postgres |
+| AI output rendered as plain text | ✅ React escapes text; no `dangerouslySetInnerHTML` |
+| Generic errors, no secrets in the repo | ✅ |
+| URL fetching restricted, untrusted data in prompts | ⏳ Phase 4 (offer scanning) not built yet |
+
+## Known limitations
+
+- Phases 4 to 7 (offers, interview simulation, CV/letter, pipeline) are not built yet; the AI layer they rely on is.
+- Offers will be added by link or pasted text: no job-board APIs. No automatic applying. LeetCode is a manual fact.
+- Clerk runs as a development instance (shared OAuth credentials, small "Development mode" badge).
+- Free OpenRouter models can be saturated (429); a fallback model is configured.
+- `scripts/bootstrap.mjs` was tested in `--dry-run` mode; a full run on a second set of accounts is still to do.
+
+## Next steps
+
+Offers by URL with verified quotes and green/red matching, the interview simulation (text, then voice with ElevenLabs), tailored CV and cover letter, the application pipeline; then job-board APIs, market-demand insights, LeetCode import and the design rework from the Lovable prototype.
 
 ## Built with Stripe Projects
 
