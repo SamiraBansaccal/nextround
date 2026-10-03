@@ -178,7 +178,7 @@ export function AiSettingsForm({ initial, presets, allowCustom, isOwner, suggest
           {!pending && message && (
             <p className={`flex items-center gap-2 text-sm ${message.kind === "error" ? "text-destructive" : ""}`}>
               {message.kind === "success" ? (
-                <CheckCircle2 className="size-4 text-emerald-600" aria-hidden="true" />
+                <CheckCircle2 className="size-4 text-success" aria-hidden="true" />
               ) : (
                 <XCircle className="size-4" aria-hidden="true" />
               )}

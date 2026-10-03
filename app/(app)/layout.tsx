@@ -1,10 +1,12 @@
 import { UserButton } from "@clerk/nextjs";
 import Link from "next/link";
+import { Logo } from "@/components/brand/logo";
 import { ThemeToggle } from "@/components/theme-toggle";
 
 const NAV = [
   { href: "/dashboard", label: "Dashboard" },
   { href: "/profile", label: "Profile" },
+  { href: "/offers", label: "Offers" },
   { href: "/settings", label: "Settings" },
 ] as const;
 
@@ -12,12 +14,10 @@ const NAV = [
 export default function AppLayout({ children }: LayoutProps<"/">) {
   return (
     <div className="flex min-h-full flex-1 flex-col">
-      <header className="flex items-center justify-between gap-4 border-b px-4 py-3 sm:px-6">
+      <header className="flex flex-wrap items-center justify-between gap-4 border-b bg-card/60 px-4 py-3 sm:px-6">
         <div className="flex items-center gap-6">
-          <Link href="/dashboard" className="text-lg font-semibold tracking-tight">
-            NextRound
-          </Link>
-          <nav aria-label="Main" className="flex gap-4 text-sm text-muted-foreground">
+          <Logo href="/dashboard" />
+          <nav aria-label="Main" className="flex flex-wrap gap-4 text-sm font-medium text-muted-foreground">
             {NAV.map((item) => (
               <Link key={item.href} href={item.href} className="hover:text-foreground">
                 {item.label}

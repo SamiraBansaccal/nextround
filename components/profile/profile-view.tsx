@@ -181,7 +181,7 @@ function FactRow({
             <Badge variant="secondary">{fact.type}</Badge>
             <Badge variant="outline">{fact.source}</Badge>
             {fact.validated ? (
-              <span className="flex items-center gap-1 text-xs text-emerald-700 dark:text-emerald-400">
+              <span className="flex items-center gap-1 text-xs text-success">
                 <Check className="size-3" aria-hidden="true" /> validated
               </span>
             ) : (
