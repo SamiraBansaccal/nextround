@@ -14,7 +14,7 @@ const NAV = [
 export default function AppLayout({ children }: LayoutProps<"/">) {
   return (
     <div className="flex min-h-full flex-1 flex-col">
-      <header className="flex flex-wrap items-center justify-between gap-4 border-b bg-card/60 px-4 py-3 sm:px-6">
+      <header className="no-print flex flex-wrap items-center justify-between gap-4 border-b bg-card/60 px-4 py-3 sm:px-6">
         <div className="flex items-center gap-6">
           <Logo href="/dashboard" />
           <nav aria-label="Main" className="flex flex-wrap gap-4 text-sm font-medium text-muted-foreground">

@@ -23,6 +23,8 @@ export interface Account {
   displayName: string;
   githubLogin: string | null;
   isOwner: boolean;
+  imageUrl: string | null;
+  fullName: string;
 }
 
 /** The signed-in account: name, GitHub username (from the GitHub account linked through OAuth) and owner flag. */
@@ -35,6 +37,8 @@ export async function getAccount(): Promise<Account> {
     userId: user.id,
     displayName: user.firstName ?? githubLogin ?? user.primaryEmailAddress?.emailAddress ?? "there",
     githubLogin,
+    imageUrl: user.imageUrl ?? null,
+    fullName: user.fullName ?? user.firstName ?? githubLogin ?? "Candidate",
     // The owner (OWNER_GITHUB_LOGIN) may use the instance's AI keys; other users bring their own.
     isOwner: githubLogin !== null && githubLogin.toLowerCase() === serverEnv().OWNER_GITHUB_LOGIN.toLowerCase(),
   };

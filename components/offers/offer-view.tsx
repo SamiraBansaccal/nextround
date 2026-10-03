@@ -1,6 +1,7 @@
 "use client";
 
 import { Check, ExternalLink, Loader2, Mic, Quote, X } from "lucide-react";
+import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { useState, useTransition } from "react";
 import { Badge } from "@/components/ui/badge";
@@ -205,6 +206,9 @@ export function OfferView({ offer, segments, requirements, contacts, score, inte
                   </div>
                 ))
               )}
+              <Button asChild variant="outline">
+                <Link href={`/offers/${offer.id}/cv`}>Tailored CV and cover letter</Link>
+              </Button>
               {offer.sourceUrl && (
                 <Button asChild variant="outline">
                   <a href={offer.sourceUrl} target="_blank" rel="noopener noreferrer">
