@@ -1,6 +1,7 @@
 import { notFound } from "next/navigation";
 import { OfferView } from "@/components/offers/offer-view";
 import { requireUserId } from "@/lib/auth";
+import { listDocuments } from "@/lib/data/documents";
 import { listFacts } from "@/lib/data/facts";
 import { listInterviewIdsForOffer } from "@/lib/data/interviews";
 import { getOfferDetail, matchScore } from "@/lib/data/offers";
@@ -13,7 +14,12 @@ export const maxDuration = 120;
 export default async function OfferPage({ params }: PageProps<"/offers/[id]">) {
   const { id } = await params;
   const userId = await requireUserId();
-  const [detail, facts, interviewIds] = await Promise.all([getOfferDetail(userId, id), listFacts(userId), listInterviewIdsForOffer(userId, id)]);
+  const [detail, facts, interviewIds, docs] = await Promise.all([
+    getOfferDetail(userId, id),
+    listFacts(userId),
+    listInterviewIdsForOffer(userId, id),
+    listDocuments(userId, id),
+  ]);
   if (!detail) notFound();
 
   const validFacts = new Map(facts.filter((f) => f.validated).map((f) => [f.id, f]));
@@ -51,6 +57,10 @@ export default async function OfferPage({ params }: PageProps<"/offers/[id]">) {
       contacts={detail.contacts.map((c) => ({ kind: c.kind, value: c.value, quote: c.quote }))}
       score={matchScore(detail.requirements, validIds)}
       interviewIds={interviewIds}
+      documents={{
+        cv: docs.find((d) => d.kind === "cv")?.version ?? null, // newest first
+        letter: docs.find((d) => d.kind === "cover_letter")?.version ?? null,
+      }}
       actions={{ markApplied: markAppliedAction, startInterview: startInterviewAction }}
     />
   );

@@ -12,7 +12,8 @@ export interface PipelineCardData {
   id: string;
   company: string | null;
   title: string | null;
-  sourceSite: string;
+  location: string | null;
+  sourceSite: Offer["sourceSite"];
   status: Offer["status"];
   covered: number;
   total: number;
@@ -36,6 +37,7 @@ export function buildPipelineCards(
       id: offer.id,
       company: offer.company,
       title: offer.title,
+      location: offer.location,
       sourceSite: offer.sourceSite,
       status: offer.status,
       covered: m.covered,

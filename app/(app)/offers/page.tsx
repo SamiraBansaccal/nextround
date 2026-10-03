@@ -1,48 +1,52 @@
-import Link from "next/link";
+import { Briefcase } from "lucide-react";
+import Image from "next/image";
 import { AddOfferForm } from "@/components/offers/add-offer-form";
-import { Badge } from "@/components/ui/badge";
-import { Card, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
+import { OfferCard } from "@/components/offers/offer-card";
+import { PageHeading } from "@/components/page-heading";
 import { requireUserId } from "@/lib/auth";
 import { listFacts } from "@/lib/data/facts";
-import { listOffers, listRequirementsForUser, matchScore } from "@/lib/data/offers";
+import { countInterviewsByOffer } from "@/lib/data/interviews";
+import { listOffers, listRequirementsForUser } from "@/lib/data/offers";
+import { buildPipelineCards } from "@/lib/pipeline";
 import { addOfferAction } from "./actions";
 
 export const maxDuration = 120; // AI scans with free models can be slow
 
 export default async function OffersPage() {
   const userId = await requireUserId();
-  const [offers, reqs, facts] = await Promise.all([listOffers(userId), listRequirementsForUser(userId), listFacts(userId)]);
-  const valid = new Set(facts.filter((f) => f.validated).map((f) => f.id));
+  const [offers, reqs, facts, interviewCounts] = await Promise.all([
+    listOffers(userId),
+    listRequirementsForUser(userId),
+    listFacts(userId),
+    countInterviewsByOffer(userId),
+  ]);
+  const cards = buildPipelineCards(offers, reqs, new Set(facts.filter((f) => f.validated).map((f) => f.id)), interviewCounts);
 
   return (
-    <div className="flex flex-col gap-6">
-      <div>
-        <h1 className="text-3xl font-semibold tracking-tight">Offers</h1>
-        <p className="text-muted-foreground">Save the offers you like; each one gets its match, its apply panel and its interview practice.</p>
-      </div>
+    <div className="space-y-10">
+      <PageHeading eyebrow="Saved opportunities" title="Your offers">
+        <Image
+          src="/brand/progress-editorial.jpg"
+          width={912}
+          height={912}
+          alt="Illustration of applications being reviewed"
+          className="size-16 rounded-md object-cover sm:size-20"
+        />
+      </PageHeading>
       <AddOfferForm addOffer={addOfferAction} />
-      <div className="grid gap-3 sm:grid-cols-2">
-        {offers.map((offer) => {
-          const m = matchScore(reqs.filter((r) => r.offerId === offer.id), valid);
-          return (
-            <Link key={offer.id} href={`/offers/${offer.id}`} className="rounded-xl focus-visible:outline-2">
-              <Card className="h-full transition-colors hover:bg-muted/40">
-                <CardHeader>
-                  <CardTitle className="text-base">{offer.title ?? "Untitled offer"}</CardTitle>
-                  <CardDescription>{offer.company ?? "Company not stated"}</CardDescription>
-                  <div className="flex flex-wrap gap-2 pt-1 text-xs">
-                    <Badge variant="outline">{offer.sourceSite}</Badge>
-                    <Badge variant="secondary">
-                      {m.covered}/{m.total} requirements covered
-                    </Badge>
-                    <Badge variant="outline">{offer.status}</Badge>
-                  </div>
-                </CardHeader>
-              </Card>
-            </Link>
-          );
-        })}
-      </div>
+      {cards.length === 0 ? (
+        <div className="flex flex-col items-center gap-2 border border-dashed border-earth/30 p-10 text-center">
+          <Briefcase className="size-6 text-primary" aria-hidden="true" />
+          <p className="font-display text-xl">No offers yet</p>
+          <p className="text-sm text-muted-foreground">Paste the link of an offer you like above: NextRound reads it and checks every quote.</p>
+        </div>
+      ) : (
+        <div className="grid gap-4 sm:grid-cols-2 xl:grid-cols-3">
+          {cards.map((card) => (
+            <OfferCard key={card.id} card={card} />
+          ))}
+        </div>
+      )}
     </div>
   );
 }
