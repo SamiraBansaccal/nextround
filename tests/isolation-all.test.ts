@@ -1,0 +1,113 @@
+import { beforeAll, describe, expect, it, vi } from "vitest";
+import { createTestDb } from "./test-db";
+
+// Data isolation for every table added after Phase 1: user B, even knowing the ids of user A's
+// rows, can neither read nor change them. Same in-memory Postgres (PGlite) as tests/isolation.
+
+let testDb: Awaited<ReturnType<typeof createTestDb>>;
+vi.mock("@/lib/db", () => ({ getDb: () => testDb }));
+
+const A = "user_alice";
+const B = "user_bob";
+
+const offersData = await import("@/lib/data/offers");
+const interviewsData = await import("@/lib/data/interviews");
+const documentsData = await import("@/lib/data/documents");
+const sourcesData = await import("@/lib/data/sources");
+const factsData = await import("@/lib/data/facts");
+
+const TEXT = "We need React. Docker is a plus. Write to jobs@example.com.";
+let offerId = "";
+let interviewId = "";
+let questionId = "";
+
+beforeAll(async () => {
+  testDb = await createTestDb();
+  const offer = await offersData.createOffer(A, {
+    sourceUrl: "https://example.com/job",
+    sourceSite: "company",
+    rawText: TEXT,
+    extraction: {
+      title: "Dev",
+      company: "Example",
+      location: null,
+      contract: null,
+      language: "en",
+      stack: [{ value: "React", quote: "React" }],
+      requirements: [{ kind: "must", category: "tech", text: "React", quote: "We need React.", factIds: [] }],
+      contacts: [{ kind: "email", value: "jobs@example.com", quote: "Write to jobs@example.com." }],
+      dropped: 0,
+    },
+  });
+  offerId = offer.id;
+  interviewId = await interviewsData.createInterview(A, offerId, [{ group: "hr", text: "Introduce yourself", source: "Standard HR question", suggestedAnswer: [] }]);
+  questionId = (await interviewsData.getInterview(A, interviewId))!.questions[0].id;
+  await interviewsData.saveAnswer(A, questionId, "Hello", {
+    star: { rating: "good", comment: "ok" },
+    relevance: { rating: "good", comment: "ok" },
+    evidence: { rating: "good", comment: "ok", claims: [] },
+    improvedAnswer: [],
+  });
+  await documentsData.saveDocumentVersion(A, offerId, "cv", [{ text: "Built things.", factIds: [] }]);
+});
+
+describe("offers, requirements and contacts", () => {
+  it("B cannot read A's offer, nor its requirements and contacts", async () => {
+    expect(await offersData.getOffer(B, offerId)).toBeNull();
+    expect(await offersData.getOfferDetail(B, offerId)).toBeNull();
+    expect(await offersData.listOffers(B)).toEqual([]);
+    expect(await offersData.listRequirementsForUser(B)).toEqual([]);
+  });
+  it("B cannot change the status of A's offer", async () => {
+    expect(await offersData.setOfferStatus(B, offerId, "rejected")).toBe(false);
+    expect(await offersData.markApplied(B, offerId)).toBe(false);
+    expect((await offersData.getOffer(A, offerId))?.status).toBe("saved");
+  });
+  it("A can move their own offer, and 'applied' stamps the date once", async () => {
+    expect(await offersData.setOfferStatus(A, offerId, "applied")).toBe(true);
+    const applied = await offersData.getOffer(A, offerId);
+    expect(applied?.appliedAt).toBeInstanceOf(Date);
+    await offersData.setOfferStatus(A, offerId, "interview");
+    await offersData.setOfferStatus(A, offerId, "applied");
+    expect((await offersData.getOffer(A, offerId))?.appliedAt?.getTime()).toBe(applied?.appliedAt?.getTime());
+  });
+});
+
+describe("interviews, questions and answers", () => {
+  it("B cannot read A's interview, its questions or its answers", async () => {
+    expect(await interviewsData.getInterview(B, interviewId)).toBeNull();
+    expect(await interviewsData.getQuestionWithOffer(B, questionId)).toBeNull();
+    expect(await interviewsData.listInterviewIdsForOffer(B, offerId)).toEqual([]);
+    expect(await interviewsData.listInterviewsWithProgress(B)).toEqual([]);
+    expect((await interviewsData.countInterviewsByOffer(B)).size).toBe(0);
+  });
+  it("A sees their progress", async () => {
+    const [item] = await interviewsData.listInterviewsWithProgress(A);
+    expect(item).toMatchObject({ id: interviewId, answered: 1, total: 1 });
+  });
+});
+
+describe("documents (CV / cover letter versions)", () => {
+  it("B cannot list A's documents; versions are numbered per user and offer", async () => {
+    expect(await documentsData.listDocuments(B, offerId)).toEqual([]);
+    await documentsData.saveDocumentVersion(A, offerId, "cv", [{ text: "v2", factIds: [] }]);
+    const versions = (await documentsData.listDocuments(A, offerId)).filter((d) => d.kind === "cv").map((d) => d.version);
+    expect(versions).toEqual([2, 1]);
+    // B's own first CV for the same offer id starts at 1: counters are not shared.
+    const own = await documentsData.saveDocumentVersion(B, offerId, "cv", [{ text: "x", factIds: [] }]);
+    expect(own.version).toBe(1);
+  });
+});
+
+describe("CV sources", () => {
+  it("B cannot remove A's CV; removing one's own CV keeps the validated facts", async () => {
+    const source = await sourcesData.addSource(A, "cv_upload", "cv.pdf");
+    const kept = await factsData.createFact(A, { type: "skill", text: "React", source: "cv_upload", sourceRef: sourcesData.cvRef(source.id), validated: true });
+    const dropped = await factsData.createFact(A, { type: "skill", text: "Vue", source: "cv_upload", sourceRef: sourcesData.cvRef(source.id), validated: false });
+    expect(await sourcesData.removeCvSource(B, source.id)).toBe(false);
+    expect(await sourcesData.listSources(B)).toEqual([]);
+    expect(await sourcesData.removeCvSource(A, source.id)).toBe(true);
+    expect(await factsData.getFact(A, kept.id)).not.toBeNull();
+    expect(await factsData.getFact(A, dropped.id)).toBeNull();
+  });
+});

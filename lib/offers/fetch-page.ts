@@ -15,8 +15,11 @@ export class PageFetchError extends Error {
 const MAX_BYTES = 2_000_000;
 export const MAX_PAGE_TEXT = 15_000;
 
+// Fail closed: anything that cannot be parsed with certainty counts as private.
 function isPrivateIPv4(ip: string): boolean {
-  const [a, b] = ip.split(".").map(Number);
+  const parts = ip.split(".").map((p) => (/^\d{1,3}$/.test(p) ? Number(p) : NaN));
+  if (parts.length !== 4 || parts.some((p) => Number.isNaN(p) || p > 255)) return true;
+  const [a, b] = parts;
   return (
     a === 0 || a === 10 || a === 127 || a >= 224 || // this-network, private, loopback, multicast/reserved
     (a === 100 && b >= 64 && b <= 127) || // carrier-grade NAT
@@ -28,11 +31,33 @@ function isPrivateIPv4(ip: string): boolean {
   );
 }
 
-function isPrivateIP(ip: string): boolean {
+/** "::ffff:7f00:1" (how URL normalises ::ffff:127.0.0.1) -> "127.0.0.1"; null if not that form. */
+function mappedIPv4(v6: string): string | null {
+  const rest = v6.slice("::ffff:".length);
+  if (isIP(rest) === 4) return rest;
+  const hex = rest.match(/^([0-9a-f]{1,4}):([0-9a-f]{1,4})$/);
+  if (!hex) return null;
+  const hi = parseInt(hex[1], 16);
+  const lo = parseInt(hex[2], 16);
+  return `${hi >> 8}.${hi & 255}.${lo >> 8}.${lo & 255}`;
+}
+
+export function isPrivateIP(ip: string): boolean {
   if (isIP(ip) === 4) return isPrivateIPv4(ip);
+  if (isIP(ip) !== 6) return true;
   const v6 = ip.toLowerCase();
-  if (v6.startsWith("::ffff:")) return isPrivateIPv4(v6.slice(7));
-  return v6 === "::" || v6 === "::1" || v6.startsWith("fc") || v6.startsWith("fd") || v6.startsWith("fe80") || v6.startsWith("ff");
+  if (v6.startsWith("::ffff:")) {
+    const v4 = mappedIPv4(v6);
+    return v4 === null || isPrivateIPv4(v4); // IPv4-mapped IPv6: judge the embedded IPv4
+  }
+  return (
+    v6 === "::" || // unspecified
+    v6 === "::1" || // loopback
+    /^f[cd]/.test(v6) || // unique local fc00::/7
+    /^fe[89ab]/.test(v6) || // link-local fe80::/10
+    v6.startsWith("ff") || // multicast
+    v6.startsWith("64:ff9b:") // NAT64: may embed an internal IPv4, refused conservatively
+  );
 }
 
 /** Throws unless the URL is http(s) and its host resolves only to public addresses. */

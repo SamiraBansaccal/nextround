@@ -135,7 +135,7 @@ export function InterviewSession(props: Props) {
               alt="Marie, the simulated recruiter, in a video call"
               className="object-cover"
             />
-            <div className="absolute inset-0 bg-gradient-to-b from-earth/50 via-transparent to-earth/95" />
+            <div className="absolute inset-0 bg-gradient-to-b from-earth/55 via-earth/5 to-earth" />
 
             <div className="absolute inset-x-0 top-0 flex items-start justify-between gap-3 p-4 md:p-6">
               <div className="flex items-center gap-2 rounded-full border border-earth-foreground/20 bg-earth/65 px-3 py-2 text-sm backdrop-blur-md">
@@ -157,7 +157,7 @@ export function InterviewSession(props: Props) {
             </div>
 
             <div className="absolute right-0 bottom-0 left-0 p-4 pb-24 md:p-7 md:pb-28 lg:pr-52">
-              <div className="mb-3 flex items-center gap-2 text-earth-foreground/80">
+              <div className="mb-3 flex items-center gap-2 text-earth-foreground drop-shadow">
                 {voice.speaking ? (
                   <span className="flex h-3 items-end gap-0.5" aria-hidden="true">
                     {[0, 1, 2, 3].map((i) => (
@@ -177,13 +177,13 @@ export function InterviewSession(props: Props) {
             </div>
 
             {/* Self view */}
-            <div className="absolute right-4 bottom-4 z-10 w-32 overflow-hidden rounded-md border-2 border-earth-foreground/25 bg-earth shadow-xl md:right-6 md:bottom-6 md:w-40">
+            <div className="absolute top-24 right-4 z-10 w-24 overflow-hidden rounded-md border-2 border-earth-foreground/25 bg-earth shadow-xl md:top-auto md:right-6 md:bottom-6 md:w-40">
               <div className="grid aspect-video place-items-center bg-primary-soft">
                 {me.imageUrl ? (
                   // eslint-disable-next-line @next/next/no-img-element -- remote avatar from Clerk
-                  <img src={me.imageUrl} alt="" className="size-12 rounded-full object-cover" />
+                  <img src={me.imageUrl} alt="" className="size-8 rounded-full object-cover md:size-12" />
                 ) : (
-                  <span className="grid size-12 place-items-center rounded-full bg-primary text-sm font-bold text-primary-foreground">
+                  <span className="grid size-8 place-items-center rounded-full bg-primary text-xs font-bold text-primary-foreground md:size-12 md:text-sm">
                     {me.name.slice(0, 2).toUpperCase()}
                   </span>
                 )}
@@ -267,7 +267,7 @@ export function InterviewSession(props: Props) {
                       <span
                         className={cn(
                           "mt-0.5 grid size-5 shrink-0 place-items-center rounded-full border text-[10px]",
-                          answered ? "border-success bg-success text-earth" : "border-earth-foreground/30",
+                          answered ? "border-success bg-success text-earth-foreground" : "border-earth-foreground/30",
                         )}
                       >
                         {answered ? <Check className="size-3" aria-hidden="true" /> : i + 1}

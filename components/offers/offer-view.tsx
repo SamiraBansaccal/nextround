@@ -57,7 +57,8 @@ export interface OfferViewData {
   contacts: { kind: "email" | "phone" | "person" | "apply_url"; value: string; quote: string }[];
   score: { covered: number; total: number };
   interviewIds: string[];
-  documents: { cv: number | null; letter: number | null }; // latest version numbers
+  /** Latest version of each document, with its number of sentences not backed by a fact. */
+  documents: { cv: DocSummary | null; letter: DocSummary | null };
 }
 
 interface Props extends OfferViewData {
@@ -68,6 +69,11 @@ interface Props extends OfferViewData {
 }
 
 const CONTACT_ICON = { email: Mail, phone: Phone, person: User, apply_url: Link2 } as const;
+
+interface DocSummary {
+  version: number;
+  unsupported: number;
+}
 
 // Offer page (layout from the Lovable prototype): header, application kit, annotated offer on the
 // left; profile match, practice and apply on the right. Every highlighted requirement was verified
@@ -147,8 +153,8 @@ export function OfferView({ offer, segments, requirements, contacts, score, inte
               </h2>
             </div>
             <div className="grid gap-4 sm:grid-cols-2">
-              <DocumentPanel kind="letter" version={documents.letter} offerId={offer.id} />
-              <DocumentPanel kind="cv" version={documents.cv} offerId={offer.id} />
+              <DocumentPanel kind="letter" doc={documents.letter} offerId={offer.id} />
+              <DocumentPanel kind="cv" doc={documents.cv} offerId={offer.id} />
             </div>
           </section>
 
@@ -360,7 +366,7 @@ export function OfferView({ offer, segments, requirements, contacts, score, inte
   );
 }
 
-function DocumentPanel({ kind, version, offerId }: { kind: "cv" | "letter"; version: number | null; offerId: string }) {
+function DocumentPanel({ kind, doc, offerId }: { kind: "cv" | "letter"; doc: DocSummary | null; offerId: string }) {
   const isCv = kind === "cv";
   const Icon = isCv ? FileText : FilePenLine;
   return (
@@ -372,17 +378,19 @@ function DocumentPanel({ kind, version, offerId }: { kind: "cv" | "letter"; vers
         <div>
           <h3 className="font-sans text-base font-bold">{isCv ? "Tailored CV" : "Cover letter"}</h3>
           <p className="mt-1 text-sm text-muted-foreground">
-            {version
-              ? `Version ${version} — every sentence linked to a validated fact.`
+            {doc
+              ? doc.unsupported === 0
+                ? `Version ${doc.version} — every sentence is backed by a validated fact.`
+                : `Version ${doc.version} — ${doc.unsupported} sentence${doc.unsupported > 1 ? "s" : ""} not backed by your profile.`
               : isCv
                 ? "Written for this offer from your validated facts only."
                 : "Specific to this company, built from your validated facts only."}
           </p>
         </div>
       </div>
-      <Button className="mt-5" size="sm" variant={version ? "outline" : "default"} asChild>
+      <Button className="mt-5" size="sm" variant={doc ? "outline" : "default"} asChild>
         <Link href={`/offers/${offerId}/cv`}>
-          {version ? (
+          {doc ? (
             "Open"
           ) : (
             <>

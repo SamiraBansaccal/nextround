@@ -4,6 +4,7 @@ import { PageHeading } from "@/components/page-heading";
 import { Button } from "@/components/ui/button";
 import { requireUserId } from "@/lib/auth";
 import { listInterviewsWithProgress } from "@/lib/data/interviews";
+import { formatDay } from "@/lib/dates";
 
 // All practice sessions (layout from the Lovable prototype).
 export default async function InterviewsPage() {
@@ -35,7 +36,7 @@ export default async function InterviewsPage() {
                 <div className="min-w-0 flex-1">
                   <p className="font-display text-xl">{iv.offerTitle ?? "Untitled offer"}</p>
                   <p className="text-sm text-muted-foreground">
-                    {[iv.company, iv.answered === 0 ? "Ready to practise" : iv.answered === iv.total ? "Completed" : "In progress", iv.createdAt.toISOString().slice(0, 10)]
+                    {[iv.company, iv.answered === 0 ? "Ready to practise" : iv.answered === iv.total ? "Completed" : "In progress", formatDay(iv.createdAt)]
                       .filter(Boolean)
                       .join(" · ")}
                   </p>

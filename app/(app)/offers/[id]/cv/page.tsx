@@ -6,6 +6,7 @@ import { listFacts } from "@/lib/data/facts";
 import { getOfferDetail } from "@/lib/data/offers";
 import type { SourcedSentence } from "@/lib/types";
 import { generateDocumentsAction } from "./actions";
+import { formatDay } from "@/lib/dates";
 
 export const maxDuration = 120;
 
@@ -38,7 +39,7 @@ export default async function OfferCvPage({ params, searchParams }: PageProps<"/
       candidate={{ name: account.fullName, imageUrl: account.imageUrl, githubLogin: account.githubLogin }}
       cv={cv ? { version: cv.version, sentences: cv.sentences as (SourcedSentence & { section?: string })[] } : null}
       letter={letter ? { version: letter.version, sentences: letter.sentences } : null}
-      versions={cvVersions.map((d) => ({ version: d.version, createdOn: d.createdAt.toISOString().slice(0, 10) })).sort((a, b) => b.version - a.version)}
+      versions={cvVersions.map((d) => ({ version: d.version, createdOn: formatDay(d.createdAt) })).sort((a, b) => b.version - a.version)}
       facts={Object.fromEntries(validated.map((f) => [f.id, f.text]))}
       feedback={{
         requirements: [...covered.map((r) => ({ text: r.text, covered: true })), ...gaps.map((r) => ({ text: r.text, covered: false }))],

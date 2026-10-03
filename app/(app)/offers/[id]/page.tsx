@@ -8,8 +8,14 @@ import { getOfferDetail, matchScore } from "@/lib/data/offers";
 import { highlightSegments } from "@/lib/offers/segments";
 import { startInterviewAction } from "../../interview/actions";
 import { markAppliedAction } from "../actions";
+import { formatDay } from "@/lib/dates";
 
 export const maxDuration = 120;
+
+/** Latest version (documents come newest first) and how many sentences have no valid fact. */
+function docSummary(doc: { version: number; sentences: { factIds: string[] }[] } | undefined) {
+  return doc ? { version: doc.version, unsupported: doc.sentences.filter((s) => s.factIds.length === 0).length } : null;
+}
 
 export default async function OfferPage({ params }: PageProps<"/offers/[id]">) {
   const { id } = await params;
@@ -49,7 +55,7 @@ export default async function OfferPage({ params }: PageProps<"/offers/[id]">) {
         sourceSite: detail.offer.sourceSite,
         sourceUrl: detail.offer.sourceUrl,
         status: detail.offer.status,
-        appliedAt: detail.offer.appliedAt ? detail.offer.appliedAt.toISOString().slice(0, 10) : null,
+        appliedAt: detail.offer.appliedAt ? formatDay(detail.offer.appliedAt) : null,
         stack: detail.offer.stack,
       }}
       segments={highlightSegments(detail.offer.rawText, requirements)}
@@ -57,10 +63,7 @@ export default async function OfferPage({ params }: PageProps<"/offers/[id]">) {
       contacts={detail.contacts.map((c) => ({ kind: c.kind, value: c.value, quote: c.quote }))}
       score={matchScore(detail.requirements, validIds)}
       interviewIds={interviewIds}
-      documents={{
-        cv: docs.find((d) => d.kind === "cv")?.version ?? null, // newest first
-        letter: docs.find((d) => d.kind === "cover_letter")?.version ?? null,
-      }}
+      documents={{ cv: docSummary(docs.find((d) => d.kind === "cv")), letter: docSummary(docs.find((d) => d.kind === "cover_letter")) }}
       actions={{ markApplied: markAppliedAction, startInterview: startInterviewAction }}
     />
   );

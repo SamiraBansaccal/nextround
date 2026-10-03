@@ -12,7 +12,8 @@
     "db:generate": "drizzle-kit generate",
     "db:migrate": "drizzle-kit migrate",
     "setup:env": "node scripts/setup-env.mjs",
-    "bootstrap": "node scripts/bootstrap.mjs"
+    "bootstrap": "node scripts/bootstrap.mjs",
+    "e2e": "node scripts/e2e.mjs"
   },
   "dependencies": {
     "@clerk/nextjs": "^7.9.10",
@@ -33,7 +34,9 @@
     "zod": "^4.6.5"
   },
   "devDependencies": {
+    "@clerk/testing": "^2.2.42",
     "@electric-sql/pglite": "^0.5.8",
+    "@playwright/test": "^1.63.0",
     "@tailwindcss/postcss": "^4",
     "@types/node": "^24.19.1",
     "@types/react": "^19",

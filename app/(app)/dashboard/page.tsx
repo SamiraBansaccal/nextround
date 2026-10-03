@@ -66,7 +66,7 @@ export default async function DashboardPage() {
         <Opportunities cards={cards} move={setOfferStatusAction} />
       </div>
 
-      <div className="mt-12 grid gap-4 md:grid-cols-2">
+      <div className="mt-12 grid items-start gap-4 md:grid-cols-2">
         <section className="flex flex-col justify-between gap-4 border border-earth/20 bg-card p-6 shadow-soft">
           <div>
             <p className="flex items-center gap-2 text-xs font-bold text-terracotta uppercase">

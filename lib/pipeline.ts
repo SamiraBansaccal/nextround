@@ -1,12 +1,13 @@
 import type { Offer, Requirement } from "@/lib/data/offers";
 import { matchScore } from "@/lib/data/offers";
+import { formatDay } from "@/lib/dates";
 
 // Dashboard pipeline cards (business logic, kept out of the components).
 // Follow-up reminder: 7 days after applying, while the offer is still Applied or Interview.
 
 const DAY = 24 * 60 * 60 * 1000;
 export const FOLLOW_UP_DAYS = 7;
-const isoDay = (d: Date) => d.toISOString().slice(0, 10);
+const isoDay = formatDay;
 
 export interface PipelineCardData {
   id: string;

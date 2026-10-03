@@ -352,6 +352,7 @@ export function ProfileLibrary({ candidate, cvs, facts, actions }: Props) {
         </article>
       </section>
 
+      <div className="divide-y divide-earth/20 border-y border-earth/20">
       {/* ---------- GitHub ---------- */}
       <ImportSection
         icon={<FolderGit2 className="size-4" aria-hidden="true" />}
@@ -402,13 +403,14 @@ export function ProfileLibrary({ candidate, cvs, facts, actions }: Props) {
           </Button>
         </div>
       </ImportSection>
+      </div>
     </div>
   );
 }
 
 function ImportSection({ icon, eyebrow, title, body, children }: { icon: ReactNode; eyebrow: string; title: string; body: string; children: ReactNode }) {
   return (
-    <section className="border-y border-earth/20 py-7">
+    <section className="py-7">
       <div className="grid gap-5 lg:grid-cols-[minmax(0,1fr)_auto] lg:items-center">
         <div>
           <p className="flex items-center gap-2 text-xs font-bold text-terracotta uppercase">
@@ -431,7 +433,7 @@ function OnboardingChat({ pending, onFinish }: { pending: boolean; onFinish: (an
   const done = step >= CHAT_QUESTIONS.length;
 
   return (
-    <section className="border-y border-earth/20 py-7" aria-labelledby="chat-title">
+    <section className="py-7" aria-labelledby="chat-title">
       <div className="grid gap-5 lg:grid-cols-[minmax(0,1fr)_auto] lg:items-center">
         <div>
           <p className="flex items-center gap-2 text-xs font-bold text-terracotta uppercase">

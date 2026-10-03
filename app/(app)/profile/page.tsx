@@ -2,6 +2,7 @@ import { type ProfileFactView, ProfileLibrary } from "@/components/profile/profi
 import { getAccount } from "@/lib/auth";
 import { listFacts } from "@/lib/data/facts";
 import { cvRef, listSources } from "@/lib/data/sources";
+import { formatDay } from "@/lib/dates";
 import {
   addManualFactAction,
   chatFactsAction,
@@ -32,7 +33,7 @@ export default async function ProfilePage() {
         return {
           id: s.id,
           fileName: s.ref,
-          importedAt: s.importedAt.toISOString().slice(0, 10),
+          importedAt: formatDay(s.importedAt),
           facts: fromCv.length,
           validated: fromCv.filter((f) => f.validated).length,
         };

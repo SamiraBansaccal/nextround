@@ -7,6 +7,7 @@ import { createFact, deleteFact, listFacts, updateFact } from "@/lib/data/facts"
 import { aiErrorMessage } from "@/lib/ai/errors";
 import { addSource, cvRef, removeCvSource } from "@/lib/data/sources";
 import { fetchRelevantRepos, repoToFactText } from "@/lib/github";
+import { codewarsFact, codewarsProfileSchema, codewarsUsername } from "@/lib/profile/codewars";
 import { factKey, proposeFactsFromText } from "@/lib/profile/extract-facts";
 
 export type ActionResult = { ok: true; message: string } | { ok: false; error: string };
@@ -85,20 +86,10 @@ export async function addManualFactAction(input: unknown): Promise<ActionResult>
 
 // ---------- Phase 3: Codewars, CV / LinkedIn PDFs (as many as you want), onboarding chat ----------
 
-const codewarsUser = z.string().trim().regex(/^[A-Za-z0-9_-]{1,40}$/);
-const codewarsSchema = z.object({
-  username: z.string(),
-  ranks: z.object({
-    overall: z.object({ name: z.string() }),
-    languages: z.record(z.string(), z.object({ name: z.string() })).default({}),
-  }),
-  codeChallenges: z.object({ totalCompleted: z.number() }),
-});
-
 /** Codewars (public profile): proposes one achievement fact with the rank, katas and languages. */
 export async function importCodewarsAction(username: unknown): Promise<ActionResult> {
   const userId = await requireUserId();
-  const parsed = codewarsUser.safeParse(username);
+  const parsed = codewarsUsername.safeParse(username);
   if (!parsed.success) return { ok: false, error: "Enter a valid Codewars username." };
   let profile;
   try {
@@ -108,20 +99,15 @@ export async function importCodewarsAction(username: unknown): Promise<ActionRes
       cache: "no-store",
     });
     if (response.status === 404) return { ok: false, error: "No Codewars user with this name." };
-    profile = codewarsSchema.parse(await response.json());
+    profile = codewarsProfileSchema.parse(await response.json());
   } catch {
     return { ok: false, error: "Codewars could not be reached. Please try again." };
   }
-  const languages = Object.entries(profile.ranks.languages)
-    .slice(0, 5)
-    .map(([lang, rank]) => `${lang} ${rank.name}`)
-    .join(", ");
-  const text = `Codewars: ${profile.ranks.overall.name} overall, ${profile.codeChallenges.totalCompleted} katas completed${languages ? ` (${languages})` : ""}`;
-  const ref = `https://www.codewars.com/users/${encodeURIComponent(profile.username)}`;
-  const existing = (await listFacts(userId)).find((f) => f.source === "codewars" && f.sourceRef === ref);
+  const { text, sourceRef } = codewarsFact(profile);
+  const existing = (await listFacts(userId)).find((f) => f.source === "codewars" && f.sourceRef === sourceRef);
   if (existing) await updateFact(userId, existing.id, { text, validated: false });
-  else await createFact(userId, { type: "achievement", text, source: "codewars", sourceRef: ref, validated: false });
-  await addSource(userId, "codewars", ref);
+  else await createFact(userId, { type: "achievement", text, source: "codewars", sourceRef, validated: false });
+  await addSource(userId, "codewars", sourceRef);
   revalidatePath("/", "layout");
   return { ok: true, message: "Codewars achievement proposed: check it, then keep it." };
 }

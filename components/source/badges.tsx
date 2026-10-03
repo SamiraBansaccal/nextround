@@ -16,7 +16,7 @@ const SITE_LABEL: Record<SourceSite, string> = {
 };
 
 export function SiteBadge({ site }: { site: SourceSite }) {
-  return <span className="inline-flex items-center rounded-md border px-1.5 py-0.5 text-[11px] font-medium text-muted-foreground">{SITE_LABEL[site]}</span>;
+  return <span className="inline-flex w-fit items-center justify-self-start rounded-md border px-1.5 py-0.5 text-[11px] font-medium text-muted-foreground">{SITE_LABEL[site]}</span>;
 }
 
 export const statusVisual: Record<OfferStatus, { label: string; surface: string; badge: string; Icon: typeof Bookmark }> = {

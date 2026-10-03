@@ -26,3 +26,8 @@ npm-debug.log*
 .env
 .env.*
 !.env.example
+
+# Visual checks (Playwright)
+/e2e-screens/
+/test-results/
+/playwright-report/
