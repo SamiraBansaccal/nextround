@@ -6,7 +6,7 @@ import { aiErrorMessage, AiError } from "@/lib/ai/errors";
 import { consumeInstanceQuota } from "@/lib/ai/usage";
 import { getAccount, requireUserId } from "@/lib/auth";
 import { listFacts } from "@/lib/data/facts";
-import { createOffer, markApplied } from "@/lib/data/offers";
+import { createOffer, markApplied, setOfferStatus } from "@/lib/data/offers";
 import { serverEnv } from "@/lib/env";
 import { extractOffer } from "@/lib/offers/extract";
 import { fetchPageText, firecrawlPageText, looksBlocked, MAX_PAGE_TEXT, PageFetchError, sourceSiteFor } from "@/lib/offers/fetch-page";
@@ -68,6 +68,15 @@ export async function addOfferAction(input: unknown): Promise<AddOfferResult> {
 export async function markAppliedAction(offerId: unknown): Promise<{ ok: boolean }> {
   const userId = await requireUserId();
   const ok = typeof offerId === "string" && (await markApplied(userId, offerId));
+  revalidatePath("/", "layout");
+  return { ok };
+}
+
+export async function setOfferStatusAction(input: unknown): Promise<{ ok: boolean }> {
+  const userId = await requireUserId();
+  const parsed = z.object({ offerId: z.string().uuid(), status: z.enum(["saved", "applied", "interview", "offer", "rejected"]) }).safeParse(input);
+  if (!parsed.success) return { ok: false };
+  const ok = await setOfferStatus(userId, parsed.data.offerId, parsed.data.status);
   revalidatePath("/", "layout");
   return { ok };
 }

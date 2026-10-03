@@ -89,3 +89,11 @@ export async function saveAnswer(userId: string, questionId: string, answer: str
   const [row] = await getDb().insert(answers).values({ userId, questionId, answer, feedback }).returning();
   return row;
 }
+
+/** Number of practice interviews per offer, for the dashboard. */
+export async function countInterviewsByOffer(userId: string): Promise<Map<string, number>> {
+  const rows = await getDb().select({ offerId: interviews.offerId }).from(interviews).where(eq(interviews.userId, userId));
+  const counts = new Map<string, number>();
+  for (const r of rows) counts.set(r.offerId, (counts.get(r.offerId) ?? 0) + 1);
+  return counts;
+}

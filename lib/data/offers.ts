@@ -89,3 +89,23 @@ export function matchScore(reqs: Pick<Requirement, "factIds">[], validFactIds: R
   const covered = reqs.filter((r) => r.factIds.some((id) => validFactIds.has(id))).length;
   return { covered, total: reqs.length, score: reqs.length ? covered / reqs.length : 0 };
 }
+
+const STATUSES = ["saved", "applied", "interview", "offer", "rejected"] as const;
+export type PipelineStatus = (typeof STATUSES)[number];
+export function isPipelineStatus(value: unknown): value is PipelineStatus {
+  return typeof value === "string" && (STATUSES as readonly string[]).includes(value);
+}
+
+/** Moves an offer in the pipeline. Moving to "applied" stamps the application date once. */
+export async function setOfferStatus(userId: string, offerId: string, status: PipelineStatus): Promise<boolean> {
+  if (!isUuid(offerId)) return false;
+  const current = await getOffer(userId, offerId);
+  if (!current) return false;
+  const appliedAt = status === "applied" && !current.appliedAt ? new Date() : current.appliedAt;
+  const rows = await getDb()
+    .update(offers)
+    .set({ status, appliedAt })
+    .where(and(eq(offers.id, offerId), eq(offers.userId, userId)))
+    .returning({ id: offers.id });
+  return rows.length > 0;
+}
