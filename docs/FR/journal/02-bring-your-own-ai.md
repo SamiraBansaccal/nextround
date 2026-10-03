@@ -99,7 +99,7 @@ Choix : **Qwen par défaut, Nemotron en secours**. Le champ `models` d'OpenRoute
 
 ## 10. Reprendre le projet avec ses propres comptes
 
-Le dépôt ne contient **aucune** valeur liée aux comptes de l'autrice : tout passe par des variables d'environnement. Le script `scripts/bootstrap.mjs` crée tout le stack sur **les comptes de la personne qui le lance** :
+Le dépôt ne contient **aucune** valeur liée aux comptes de la personne à l'origine du projet : tout passe par des variables d'environnement. Le script `scripts/bootstrap.mjs` crée tout le stack sur **les comptes de la personne qui le lance** :
 
 ```bash
 npm run bootstrap -- --owner <ton-login-github> --dry-run   # affiche les commandes sans rien faire
