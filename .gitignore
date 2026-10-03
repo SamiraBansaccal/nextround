@@ -1,10 +1,3 @@
-.projects/cache
-.projects/vault
-.projects/state.test.json
-.projects/state.local.test.json
-.env
-.env.*
-!.env.example
 
 # Stripe Projects: machine-specific state (Stripe account id, project id, provider links).
 # Not a credential, but personal identifiers — kept out of this PUBLIC repo.
@@ -12,3 +5,11 @@
 
 # OS
 .DS_Store
+
+.projects/cache
+.projects/vault
+.projects/state.test.json
+.projects/state.local.test.json
+.env
+.env.*
+!.env.example

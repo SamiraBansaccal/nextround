@@ -45,7 +45,7 @@ stripe projects init nextround                       # crée le projet
 | `.gitignore` | Liste des fichiers que git doit ignorer. Stripe l'a créé ; on l'a complété. | Oui |
 | `AGENTS.md`, `CLAUDE.md` | Instructions pour les agents de code (Claude Code, Cursor…) : « ce dépôt utilise Stripe Projects ». | Oui |
 | `.claude/skills/stripe-projects-cli/` (et copies dans `.agents/`, `.cursor/`) | La skill qui documente toutes les commandes Projects pour l'agent. | Oui |
-| `.claude/settings.json` | Autorise l'agent à lancer les commandes `stripe` sans demander à chaque fois. | Oui |
+| `.claude/settings.json` | Liste des commandes que l'agent peut lancer sans demander (voir « Sécurité » plus bas). | Oui |
 
 ### `state.json` contient-il quelque chose de sensible ?
 
@@ -92,7 +92,6 @@ Seules des skills **publiées par les éditeurs officiels** ont été installée
 | `vercel-react-best-practices` | Vercel | Performance React / Next.js |
 | `vercel-composition-patterns` | Vercel | Organisation des composants, utile pour séparer l'interface de la logique |
 | `web-design-guidelines` | Vercel | Accessibilité et qualité de l'interface |
-| `deploy-to-vercel` | Vercel | Déploiement |
 | `shadcn` | shadcn | Bibliothèque de composants d'interface |
 | `frontend-design` | Anthropic | Design soigné de l'interface |
 | `text-to-speech`, `speech-to-text` | ElevenLabs | Mode vocal de la simulation d'entretien (Phase 5) |
@@ -100,6 +99,15 @@ Seules des skills **publiées par les éditeurs officiels** ont été installée
 Les 7 autres skills Stripe (paiements, Connect, facturation à l'usage…) n'ont pas été installées : NextRound n'encaisse pas d'argent. Les skills de base de données et d'authentification seront ajoutées une fois les fournisseurs choisis (Phase 1).
 
 `skills-lock.json` garde la source et l'empreinte (*hash*) de chaque skill installée : on sait d'où elle vient et si elle a changé.
+
+### Sécurité : deux corrections après une revue automatique
+
+Une revue de sécurité du premier commit a relevé deux problèmes, corrigés dans le commit suivant :
+
+1. **La skill `deploy-to-vercel` a été retirée.** Elle contenait des scripts de déploiement « sans compte » qui envoient tout le dossier du projet à un serveur Vercel public. Ils excluent `.env`, mais pas `.projects/` (coffre de clés chiffré, identifiants du compte). On déploie autrement (Stripe Projects + Vercel relié au dépôt GitHub), donc on n'en a pas besoin.
+2. **`.claude/settings.json` a été restreint.** `stripe projects init` avait écrit `Bash(stripe:*)`, qui autorise l'agent à lancer **n'importe quelle** commande Stripe sans confirmation, y compris l'ajout d'un service payant. Il n'autorise plus que des commandes de lecture (`status`, `catalog`, `search`, `spend`, `docs`…). Tout ce qui crée, modifie ou peut coûter de l'argent demande une confirmation.
+
+Leçon : une skill ou un fichier de configuration généré automatiquement se **relit** avant d'être versionné, surtout sur un dépôt public.
 
 ## 4. Git et GitHub
 

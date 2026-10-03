@@ -1,8 +1,14 @@
 {
   "permissions": {
     "allow": [
-      "Bash(stripe:*)",
-      "Bash(stripe projects:*)"
+      "Bash(stripe projects status:*)",
+      "Bash(stripe projects catalog:*)",
+      "Bash(stripe projects search:*)",
+      "Bash(stripe projects llm-context:*)",
+      "Bash(stripe projects spend:*)",
+      "Bash(stripe projects env list:*)",
+      "Bash(stripe projects env show:*)",
+      "Bash(stripe docs:*)"
     ]
   }
 }
