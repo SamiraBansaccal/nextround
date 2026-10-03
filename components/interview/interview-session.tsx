@@ -8,6 +8,7 @@ import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import type { Criterion, Feedback, QuestionGroup, SourcedSentence } from "@/lib/types";
+import { VoiceControls } from "./voice-controls";
 
 export interface SessionQuestion {
   id: string;
@@ -24,13 +25,15 @@ interface Props {
   questions: SessionQuestion[];
   facts: Record<string, string>;
   initialIndex: number;
+  language: string | null;
+  voiceLabel: string;
   submit: (input: { questionId: string; answer: string }) => Promise<{ ok: true; feedback: Feedback } | { ok: false; error: string }>;
 }
 
 const MAX = 3000;
 const GROUP_LABEL: Record<QuestionGroup, string> = { hr: "HR", technical: "Technical", gap: "Gap" };
 
-export function InterviewSession({ interviewId, offerTitle, questions, facts, initialIndex, submit }: Props) {
+export function InterviewSession({ interviewId, offerTitle, questions, facts, initialIndex, language, voiceLabel, submit }: Props) {
   const [idx, setIdx] = useState(initialIndex);
   const q = questions[idx];
   const [answer, setAnswer] = useState("");
@@ -113,6 +116,15 @@ export function InterviewSession({ interviewId, offerTitle, questions, facts, in
           )}
           {!feedback ? (
             <>
+              <VoiceControls
+                key={q.id}
+                questionId={q.id}
+                questionText={q.text}
+                language={language}
+                voiceLabel={voiceLabel}
+                disabled={pending}
+                onTranscript={(text) => setAnswer((a) => (a ? `${a} ${text}` : text).slice(0, MAX))}
+              />
               <textarea
                 className="min-h-40 w-full rounded-md border bg-transparent p-3 text-sm"
                 placeholder="Type your answer as you would say it in the interview"
