@@ -97,3 +97,51 @@ export async function countInterviewsByOffer(userId: string): Promise<Map<string
   for (const r of rows) counts.set(r.offerId, (counts.get(r.offerId) ?? 0) + 1);
   return counts;
 }
+
+export interface InterviewListItem {
+  id: string;
+  offerId: string;
+  offerTitle: string | null;
+  company: string | null;
+  createdAt: Date;
+  answered: number;
+  total: number;
+}
+
+/** All practice sessions of the user, newest first, with how many questions were answered. */
+export async function listInterviewsWithProgress(userId: string): Promise<InterviewListItem[]> {
+  const db = getDb();
+  const rows = await db
+    .select({ id: interviews.id, offerId: interviews.offerId, createdAt: interviews.createdAt, title: offers.title, company: offers.company })
+    .from(interviews)
+    .innerJoin(offers, and(eq(offers.id, interviews.offerId), eq(offers.userId, userId)))
+    .where(eq(interviews.userId, userId))
+    .orderBy(desc(interviews.createdAt));
+  if (rows.length === 0) return [];
+  const qs = await db
+    .select({ id: questions.id, interviewId: questions.interviewId })
+    .from(questions)
+    .where(and(eq(questions.userId, userId), inArray(questions.interviewId, rows.map((r) => r.id))));
+  const answeredIds = new Set(
+    qs.length === 0
+      ? []
+      : (
+          await db
+            .select({ questionId: answers.questionId })
+            .from(answers)
+            .where(and(eq(answers.userId, userId), inArray(answers.questionId, qs.map((q) => q.id))))
+        ).map((a) => a.questionId),
+  );
+  return rows.map((r) => {
+    const own = qs.filter((q) => q.interviewId === r.id);
+    return {
+      id: r.id,
+      offerId: r.offerId,
+      offerTitle: r.title,
+      company: r.company,
+      createdAt: r.createdAt,
+      answered: own.filter((q) => answeredIds.has(q.id)).length,
+      total: own.length,
+    };
+  });
+}

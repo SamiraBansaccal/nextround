@@ -1,13 +1,13 @@
 "use client";
 
-import { Check, Copy, Download, Loader2, Printer, RefreshCw, X } from "lucide-react";
+import { AlertTriangle, ArrowLeft, Check, Copy, Download, History, Loader2, Printer, RefreshCw } from "lucide-react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { useState, useTransition } from "react";
-import { Badge } from "@/components/ui/badge";
+import { CoverageLabel } from "@/components/source/badges";
 import { Button } from "@/components/ui/button";
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import type { SourcedSentence } from "@/lib/types";
+import { cn } from "@/lib/utils";
 
 type CvSentence = SourcedSentence & { section?: string };
 
@@ -17,14 +17,14 @@ interface Props {
   candidate: { name: string; imageUrl: string | null; githubLogin: string | null };
   cv: { version: number; sentences: CvSentence[] } | null;
   letter: { version: number; sentences: SourcedSentence[] } | null;
-  versions: number[];
+  versions: { version: number; createdOn: string }[];
   facts: Record<string, string>;
-  feedback: { covered: string[]; gaps: string[]; unusedFacts: string[] };
+  feedback: { requirements: { text: string; covered: boolean }[]; unusedFacts: string[] };
   generate: (offerId: string) => Promise<{ ok: true } | { ok: false; error: string }>;
 }
 
-// Printable tailored CV + cover letter. Every sentence is checked: green chips = validated facts,
-// red "Unsupported" = no valid fact behind it. Print / Save as PDF uses the browser's print dialog.
+// Tailored CV + cover letter (layout from the Lovable prototype). Every sentence carries the facts
+// it relies on; a sentence without one is "Unsupported". Print / Save as PDF uses the browser.
 export function CvView({ offerId, offerLabel, candidate, cv, letter, versions, facts, feedback, generate }: Props) {
   const router = useRouter();
   const [pending, startTransition] = useTransition();
@@ -32,33 +32,27 @@ export function CvView({ offerId, offerLabel, candidate, cv, letter, versions, f
   const [copied, setCopied] = useState(false);
   const letterText = letter?.sentences.map((s) => s.text).join(" ") ?? "";
   const unsupported = [...(cv?.sentences ?? []), ...(letter?.sentences ?? [])].filter((s) => s.factIds.length === 0).length;
-  const sections = cv ? [...new Set(cv.sentences.map((s) => s.section ?? "CV"))] : [];
+  const sections = cv ? [...new Set(cv.sentences.map((s) => s.section ?? "Profile"))] : [];
+
+  function regenerate() {
+    setError(null);
+    startTransition(async () => {
+      const result = await generate(offerId);
+      if (result.ok) router.refresh();
+      else setError(result.error);
+    });
+  }
 
   return (
-    <div className="flex flex-col gap-6">
+    <div className="space-y-6">
       <div className="no-print flex flex-wrap items-center justify-between gap-3">
-        <div>
-          <p className="text-sm text-muted-foreground">
-            <Link href={`/offers/${offerId}`} className="underline">
-              {offerLabel}
-            </Link>
-          </p>
-          <h1 className="text-3xl">Tailored CV and cover letter</h1>
-        </div>
+        <Link href={`/offers/${offerId}`} className="flex items-center gap-2 text-sm text-muted-foreground hover:text-foreground">
+          <ArrowLeft className="size-4" aria-hidden="true" /> {offerLabel}
+        </Link>
         <div className="flex flex-wrap gap-2">
-          <Button
-            disabled={pending}
-            onClick={() => {
-              setError(null);
-              startTransition(async () => {
-                const result = await generate(offerId);
-                if (result.ok) router.refresh();
-                else setError(result.error);
-              });
-            }}
-          >
+          <Button disabled={pending} onClick={regenerate}>
             {pending ? <Loader2 className="size-4 animate-spin" aria-hidden="true" /> : <RefreshCw className="size-4" aria-hidden="true" />}
-            {cv ? "Generate a new version" : "Generate"}
+            {cv ? "Generate a new version" : "Generate CV and cover letter"}
           </Button>
           {cv && (
             <Button variant="outline" onClick={() => window.print()}>
@@ -67,157 +61,170 @@ export function CvView({ offerId, offerLabel, candidate, cv, letter, versions, f
           )}
         </div>
       </div>
-      <div className="no-print flex flex-wrap items-center gap-2 text-sm" aria-live="polite">
+      <p aria-live="polite" className="no-print min-h-5 text-sm">
         {pending && <span className="text-muted-foreground">Writing from your validated facts only… up to a minute with free models.</span>}
         {error && <span className="text-destructive">{error}</span>}
-        {versions.length > 0 && (
-          <span className="flex flex-wrap items-center gap-1 text-muted-foreground">
-            Versions:
-            {versions.map((v) => (
-              <Link key={v} href={`/offers/${offerId}/cv?v=${v}`} className={`rounded border px-1.5 ${cv?.version === v ? "bg-primary-soft font-semibold text-foreground" : ""}`}>
-                v{v}
-              </Link>
-            ))}
-          </span>
-        )}
-        {cv && (
-          <Badge variant={unsupported ? "destructive" : "secondary"}>
-            {unsupported ? `${unsupported} unsupported sentence${unsupported > 1 ? "s" : ""}` : "Every sentence is backed by a fact"}
-          </Badge>
-        )}
-      </div>
+      </p>
 
-      {!cv && !pending && <p className="no-print text-muted-foreground">No CV yet for this offer. Generate one: it uses only your validated facts.</p>}
-
-      {cv && (
-        <div className="grid gap-6 lg:grid-cols-[minmax(0,1fr)_20rem]">
-          <article className="print-page rounded-lg border bg-card p-6 shadow-soft sm:p-10">
-            <header className="mb-6 flex items-center justify-between gap-4 border-b pb-4">
-              <div>
-                <p className="font-display text-lg text-muted-foreground">Curriculum Vitae</p>
-                <h2 className="text-3xl">{candidate.name}</h2>
-                {candidate.githubLogin && <p className="text-sm text-muted-foreground">github.com/{candidate.githubLogin}</p>}
-              </div>
-              {candidate.imageUrl && (
-                // eslint-disable-next-line @next/next/no-img-element -- remote avatar from Clerk
-                <img src={candidate.imageUrl} alt={candidate.name} width={96} height={96} className="aspect-square w-20 rounded-full border-4 border-primary object-cover" />
-              )}
-            </header>
-            {sections.map((section) => (
-              <section key={section} className="mb-5">
-                <h3 className="mb-2 border-b pb-1 text-lg">{section}</h3>
-                <ul className="flex flex-col gap-1.5">
-                  {cv.sentences
-                    .filter((s) => (s.section ?? "CV") === section)
-                    .map((s, i) => (
-                      <li key={i}>
-                        <SentenceView s={s} facts={facts} />
-                      </li>
-                    ))}
-                </ul>
-              </section>
-            ))}
-          </article>
-
-          <div className="no-print flex flex-col gap-4">
-            <Card>
-              <CardHeader>
-                <CardTitle className="text-base">CV feedback</CardTitle>
-              </CardHeader>
-              <CardContent className="flex flex-col gap-3 text-sm">
-                <List title={`Requirements covered (${feedback.covered.length})`} items={feedback.covered} icon="check" />
-                <List title={`Gaps (${feedback.gaps.length}) — never claimed`} items={feedback.gaps} icon="x" />
-                <List title={`Relevant facts not used (${feedback.unusedFacts.length})`} items={feedback.unusedFacts} icon="dot" />
-              </CardContent>
-            </Card>
-          </div>
+      {!cv && !pending && (
+        <div className="no-print border border-dashed border-earth/30 p-10 text-center">
+          <p className="font-display text-2xl">No CV for this offer yet</p>
+          <p className="mt-2 text-sm text-muted-foreground">It is written only from the facts you validated — never more.</p>
         </div>
       )}
 
-      {letter && (
-        <Card className="no-print">
-          <CardHeader className="flex flex-row flex-wrap items-center justify-between gap-2">
-            <CardTitle className="text-base">Cover letter (v{letter.version})</CardTitle>
-            <div className="flex gap-2">
-              <Button
-                size="sm"
-                variant="outline"
-                onClick={async () => {
-                  await navigator.clipboard.writeText(letterText);
-                  setCopied(true);
-                  window.setTimeout(() => setCopied(false), 2000);
-                }}
-              >
-                <Copy className="size-4" aria-hidden="true" /> {copied ? "Copied" : "Copy"}
-              </Button>
-              <Button
-                size="sm"
-                variant="outline"
-                onClick={() => {
-                  const url = URL.createObjectURL(new Blob([letterText], { type: "text/plain;charset=utf-8" }));
-                  const a = document.createElement("a");
-                  a.href = url;
-                  a.download = "cover-letter.txt";
-                  a.click();
-                  URL.revokeObjectURL(url);
-                }}
-              >
-                <Download className="size-4" aria-hidden="true" /> Download
-              </Button>
-            </div>
-          </CardHeader>
-          <CardContent className="flex flex-col gap-2 leading-relaxed">
-            {letter.sentences.map((s, i) => (
-              <p key={i}>
-                <SentenceView s={s} facts={facts} />
+      {cv && (
+        <div className="grid gap-6 lg:grid-cols-[minmax(0,1fr)_300px]">
+          <div className="space-y-6">
+            {unsupported > 0 && (
+              <p className="no-print flex items-start gap-2 rounded-xl border border-gap/30 bg-gap-soft p-3 text-sm">
+                <AlertTriangle className="mt-0.5 size-4 shrink-0 text-gap" aria-hidden="true" />
+                {unsupported} sentence{unsupported > 1 ? "s aren't" : " isn't"} backed by your profile. Remove {unsupported > 1 ? "them" : "it"}, or add the fact
+                if it&apos;s true.
               </p>
-            ))}
-          </CardContent>
-        </Card>
+            )}
+            <article className="print-page bg-card p-8 shadow-soft md:p-12">
+              <header className="flex items-start justify-between gap-6">
+                <div>
+                  <h1 className="text-4xl">{candidate.name}</h1>
+                  <p className="mt-1 text-muted-foreground">
+                    {offerLabel}
+                    {candidate.githubLogin && ` · github.com/${candidate.githubLogin}`}
+                  </p>
+                </div>
+                {candidate.imageUrl && (
+                  // eslint-disable-next-line @next/next/no-img-element -- remote avatar from Clerk
+                  <img src={candidate.imageUrl} alt={candidate.name} width={96} height={96} className="aspect-square w-20 shrink-0 border-4 border-primary object-cover" />
+                )}
+              </header>
+              <hr className="my-6" />
+              {sections.map((section) => (
+                <section key={section} className="mb-6">
+                  <h2 className="mb-3 font-sans text-sm font-semibold tracking-widest text-muted-foreground uppercase">{section}</h2>
+                  <div className="space-y-2">
+                    {cv.sentences
+                      .filter((s) => (s.section ?? "Profile") === section)
+                      .map((s, i) => (
+                        <SentenceView key={i} s={s} facts={facts} />
+                      ))}
+                  </div>
+                </section>
+              ))}
+            </article>
+
+            {letter && (
+              <article className="no-print bg-card p-8 shadow-soft">
+                <div className="mb-4 flex flex-wrap items-center justify-between gap-2">
+                  <h2 className="text-xl">Cover letter</h2>
+                  <div className="flex gap-2">
+                    <Button
+                      size="sm"
+                      variant="outline"
+                      onClick={async () => {
+                        await navigator.clipboard.writeText(letterText);
+                        setCopied(true);
+                        window.setTimeout(() => setCopied(false), 2000);
+                      }}
+                    >
+                      <Copy className="size-4" aria-hidden="true" /> {copied ? "Copied" : "Copy"}
+                    </Button>
+                    <Button
+                      size="sm"
+                      variant="outline"
+                      onClick={() => {
+                        const url = URL.createObjectURL(new Blob([letterText], { type: "text/plain;charset=utf-8" }));
+                        const a = document.createElement("a");
+                        a.href = url;
+                        a.download = "cover-letter.txt";
+                        a.click();
+                        URL.revokeObjectURL(url);
+                      }}
+                    >
+                      <Download className="size-4" aria-hidden="true" /> Download
+                    </Button>
+                  </div>
+                </div>
+                <div className="space-y-3">
+                  {letter.sentences.map((s, i) => (
+                    <SentenceView key={i} s={s} facts={facts} />
+                  ))}
+                </div>
+              </article>
+            )}
+          </div>
+
+          <aside className="no-print space-y-6">
+            <section>
+              <h3 className="mb-2 font-sans text-sm font-semibold">Requirements</h3>
+              <ul className="space-y-1">
+                {feedback.requirements.map((r, i) => (
+                  <li key={i} className="flex justify-between gap-2 text-sm">
+                    <span>{r.text}</span>
+                    <CoverageLabel covered={r.covered} />
+                  </li>
+                ))}
+              </ul>
+              <p className="mt-2 text-xs text-muted-foreground">Gaps are never claimed in the CV.</p>
+            </section>
+            <section>
+              <h3 className="mb-2 font-sans text-sm font-semibold">Relevant facts not used</h3>
+              {feedback.unusedFacts.length === 0 ? (
+                <p className="text-sm text-muted-foreground">None — every fact that proves a requirement is in the CV.</p>
+              ) : (
+                <div className="flex flex-wrap gap-1.5">
+                  {feedback.unusedFacts.map((text, i) => (
+                    <span key={i} title={text} className="inline-flex max-w-full items-center gap-1 rounded-full border border-success/30 bg-success-soft px-2 py-0.5 text-xs font-medium">
+                      <Check className="size-3 shrink-0 text-success" aria-hidden="true" />
+                      <span className="truncate">{text.slice(0, 40)}</span>
+                    </span>
+                  ))}
+                </div>
+              )}
+            </section>
+            <section>
+              <h3 className="mb-2 flex items-center gap-2 font-sans text-sm font-semibold">
+                <History className="size-4" aria-hidden="true" /> Version history
+              </h3>
+              <ul className="space-y-1 text-sm">
+                {versions.map((v) => (
+                  <li key={v.version}>
+                    <Link
+                      href={`/offers/${offerId}/cv?v=${v.version}`}
+                      className={cn("flex justify-between rounded-md px-2 py-1 hover:bg-muted", cv.version === v.version && "bg-primary-soft font-semibold")}
+                    >
+                      <span>Version {v.version}</span>
+                      <span className="text-muted-foreground">{v.createdOn}</span>
+                    </Link>
+                  </li>
+                ))}
+              </ul>
+            </section>
+          </aside>
+        </div>
       )}
     </div>
   );
 }
 
 function SentenceView({ s, facts }: { s: SourcedSentence; facts: Record<string, string> }) {
-  if (s.factIds.length === 0) {
-    return (
-      <span>
-        <span className="unsupported-underline">{s.text}</span>{" "}
-        <span className="no-print inline-flex items-center gap-0.5 rounded bg-gap-soft px-1.5 text-xs text-gap">
-          <X className="size-3" aria-hidden="true" /> Unsupported
-        </span>
+  const unsupported = s.factIds.length === 0;
+  return (
+    <p className="leading-relaxed">
+      <span className={cn(unsupported && "unsupported-underline")}>{s.text}</span>{" "}
+      <span className="no-print inline-flex flex-wrap gap-1 align-middle">
+        {unsupported ? (
+          <span className="inline-flex items-center gap-1 rounded-full border border-gap/30 bg-gap-soft px-2 py-0.5 text-xs font-semibold text-gap">
+            <AlertTriangle className="size-3" aria-hidden="true" /> Unsupported
+          </span>
+        ) : (
+          s.factIds.map((id) => (
+            <span key={id} title={facts[id]} className="inline-flex max-w-full items-center gap-1 rounded-full border border-success/30 bg-success-soft px-2 py-0.5 text-xs font-medium">
+              <Check className="size-3 shrink-0 text-success" aria-hidden="true" />
+              <span className="truncate">{(facts[id] ?? "fact").slice(0, 26)}</span>
+            </span>
+          ))
+        )}
       </span>
-    );
-  }
-  return (
-    <span>
-      {s.text}
-      {s.factIds.map((id) => (
-        <span key={id} title={facts[id]} className="no-print ml-1 inline-flex items-center gap-0.5 rounded-full border border-success/30 bg-success-soft px-1.5 align-middle text-xs">
-          <Check className="size-3 text-success" aria-hidden="true" /> {(facts[id] ?? "fact").slice(0, 24)}
-        </span>
-      ))}
-    </span>
-  );
-}
-
-function List({ title, items, icon }: { title: string; items: string[]; icon: "check" | "x" | "dot" }) {
-  return (
-    <div>
-      <p className="font-medium">{title}</p>
-      {items.length === 0 ? (
-        <p className="text-muted-foreground">—</p>
-      ) : (
-        <ul className="mt-1 flex flex-col gap-1">
-          {items.map((item, i) => (
-            <li key={i} className="flex gap-1.5">
-              {icon === "check" ? <Check className="mt-0.5 size-3.5 shrink-0 text-success" aria-hidden="true" /> : icon === "x" ? <X className="mt-0.5 size-3.5 shrink-0 text-gap" aria-hidden="true" /> : <span className="text-muted-foreground">•</span>}
-              <span>{item}</span>
-            </li>
-          ))}
-        </ul>
-      )}
-    </div>
+    </p>
   );
 }

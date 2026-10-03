@@ -1,6 +1,6 @@
 "use client";
 
-import { Briefcase, LayoutDashboard, Menu, PanelLeftClose, PanelLeftOpen, Settings, UserRound } from "lucide-react";
+import { Briefcase, LayoutDashboard, Menu, MessagesSquare, PanelLeftClose, PanelLeftOpen, Settings, UserRound } from "lucide-react";
 import Image from "next/image";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
@@ -15,6 +15,7 @@ import { cn } from "@/lib/utils";
 const NAV = [
   { href: "/dashboard", label: "Dashboard", Icon: LayoutDashboard, tint: "bg-primary-soft text-primary" },
   { href: "/offers", label: "Offers", Icon: Briefcase, tint: "bg-warning-soft text-warning" },
+  { href: "/interview", label: "Interviews", Icon: MessagesSquare, tint: "bg-terracotta-soft text-terracotta" },
   { href: "/profile", label: "Profile", Icon: UserRound, tint: "bg-success-soft text-success" },
   { href: "/settings", label: "Settings", Icon: Settings, tint: "bg-secondary text-secondary-foreground" },
 ] as const;
@@ -24,7 +25,7 @@ function NavLinks({ compact = false, onNavigate }: { compact?: boolean; onNaviga
   return (
     <nav className={cn("space-y-2", compact && "flex flex-col items-center")} aria-label="Main navigation">
       {NAV.map(({ href, label, Icon, tint }) => {
-        const active = path.startsWith(href) || (href === "/offers" && path.startsWith("/interview"));
+        const active = path.startsWith(href);
         return (
           <Link
             key={href}

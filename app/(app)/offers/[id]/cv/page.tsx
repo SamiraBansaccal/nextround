@@ -38,9 +38,12 @@ export default async function OfferCvPage({ params, searchParams }: PageProps<"/
       candidate={{ name: account.fullName, imageUrl: account.imageUrl, githubLogin: account.githubLogin }}
       cv={cv ? { version: cv.version, sentences: cv.sentences as (SourcedSentence & { section?: string })[] } : null}
       letter={letter ? { version: letter.version, sentences: letter.sentences } : null}
-      versions={cvVersions.map((d) => d.version).sort((a, b) => a - b)}
+      versions={cvVersions.map((d) => ({ version: d.version, createdOn: d.createdAt.toISOString().slice(0, 10) })).sort((a, b) => b.version - a.version)}
       facts={Object.fromEntries(validated.map((f) => [f.id, f.text]))}
-      feedback={{ covered: covered.map((r) => r.text), gaps: gaps.map((r) => r.text), unusedFacts }}
+      feedback={{
+        requirements: [...covered.map((r) => ({ text: r.text, covered: true })), ...gaps.map((r) => ({ text: r.text, covered: false }))],
+        unusedFacts,
+      }}
       generate={generateDocumentsAction}
     />
   );

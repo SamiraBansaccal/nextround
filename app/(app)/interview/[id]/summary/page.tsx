@@ -1,112 +1,112 @@
+import { CheckCircle2, CircleAlert, RotateCcw, ShieldAlert } from "lucide-react";
 import Link from "next/link";
 import { notFound } from "next/navigation";
+import { PageHeading } from "@/components/page-heading";
 import { Button } from "@/components/ui/button";
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { requireUserId } from "@/lib/auth";
+import { getAccount } from "@/lib/auth";
 import { getInterview } from "@/lib/data/interviews";
-import type { Feedback } from "@/lib/types";
+import { summarizeInterview } from "@/lib/interview/summary";
 
-// End-of-interview summary, computed by code from the verified feedback (no extra AI call).
-const CRITERIA: { key: "star" | "relevance" | "evidence" | "honesty"; label: string }[] = [
-  { key: "star", label: "STAR structure" },
-  { key: "relevance", label: "Relevance to the question and the offer" },
-  { key: "evidence", label: "Evidence from your profile" },
-  { key: "honesty", label: "Honesty about gaps" },
-];
+// End-of-interview summary (layout from the Lovable prototype), computed by code from the verified
+// feedback: no extra AI call, nothing that the feedback did not already say.
+const GROUP_LABEL = { hr: "General HR", technical: "Technical", gap: "Gap" } as const;
 
 export default async function SummaryPage({ params }: PageProps<"/interview/[id]/summary">) {
   const { id } = await params;
-  const userId = await requireUserId();
-  const data = await getInterview(userId, id);
+  const account = await getAccount();
+  const data = await getInterview(account.userId, id);
   if (!data) notFound();
-
-  const latest = new Map<string, Feedback | null>();
-  for (const a of data.answers) if (!latest.has(a.questionId)) latest.set(a.questionId, a.feedback ?? null);
-
-  const tally = CRITERIA.map((c) => {
-    let good = 0;
-    let improve = 0;
-    let comment = "";
-    for (const fb of latest.values()) {
-      const criterion = fb?.[c.key];
-      if (!criterion) continue;
-      if (criterion.rating === "good") good++;
-      else {
-        improve++;
-        comment ||= criterion.comment;
-      }
-    }
-    return { ...c, good, improve, comment };
-  });
-  const strengths = tally.filter((t) => t.good > 0 && t.good >= t.improve);
-  const toWork = [...tally].filter((t) => t.improve > 0).sort((a, b) => b.improve - a.improve).slice(0, 3);
-  const toRetry = data.questions
-    .map((q, index) => ({ q, index, fb: latest.get(q.id) }))
-    .filter(({ fb }) => !fb || CRITERIA.some((c) => fb[c.key]?.rating === "to_improve"));
-  const unsupportedClaims = [...latest.values()].reduce((n, fb) => n + (fb?.evidence.claims.filter((c) => !c.factId).length ?? 0), 0);
+  const summary = summarizeInterview(data.questions, data.answers);
 
   return (
-    <div className="flex flex-col gap-6">
-      <div>
-        <p className="text-sm text-muted-foreground">{[data.offer?.title, data.offer?.company].filter(Boolean).join(" · ")}</p>
-        <h1 className="text-3xl font-semibold tracking-tight">Interview summary</h1>
-        <p className="text-muted-foreground">
-          {latest.size} of {data.questions.length} questions answered
-          {unsupportedClaims > 0 && ` · ${unsupportedClaims} claim${unsupportedClaims > 1 ? "s" : ""} not backed by your profile`}
-        </p>
+    <div>
+      <PageHeading
+        eyebrow={`Interview complete · ${[data.offer?.title, data.offer?.company].filter(Boolean).join(" · ")}`}
+        title={summary.answered ? `Well done, ${account.displayName}. Here's what stood out.` : "No answer yet in this interview."}
+      >
+        <Button asChild>
+          <Link href={`/interview/${data.interview.id}`}>
+            <RotateCcw className="size-4" aria-hidden="true" /> Practise again
+          </Link>
+        </Button>
+      </PageHeading>
+      <p className="-mt-4 mb-8 text-sm text-muted-foreground">
+        {summary.answered} of {data.questions.length} questions answered.
+      </p>
+
+      <div className="grid gap-6 md:grid-cols-2">
+        <section className="bg-card p-6 shadow-soft">
+          <h2 className="mb-4 flex items-center gap-2 text-xl">
+            <CheckCircle2 className="size-5 text-success" aria-hidden="true" /> Strengths
+          </h2>
+          {summary.strengths.length === 0 ? (
+            <p className="text-sm text-muted-foreground">Answer more questions to see your strengths.</p>
+          ) : (
+            <ul className="space-y-3">
+              {summary.strengths.map((s) => (
+                <li key={s} className="text-sm leading-relaxed">
+                  {s}
+                </li>
+              ))}
+            </ul>
+          )}
+        </section>
+        <section className="bg-card p-6 shadow-soft">
+          <h2 className="mb-4 flex items-center gap-2 text-xl">
+            <CircleAlert className="size-5 text-warning" aria-hidden="true" /> Top 3 to work on
+          </h2>
+          {summary.toWork.length === 0 ? (
+            <p className="text-sm text-muted-foreground">Nothing flagged so far.</p>
+          ) : (
+            <ol className="space-y-3">
+              {summary.toWork.map((w, i) => (
+                <li key={w.label} className="flex gap-3 text-sm">
+                  <span className="font-display text-lg text-warning">{i + 1}</span>
+                  <span>
+                    <span className="font-semibold">{w.label}</span>
+                    {w.comment && <span className="text-muted-foreground"> — {w.comment}</span>}
+                  </span>
+                </li>
+              ))}
+            </ol>
+          )}
+        </section>
       </div>
-      <div className="grid gap-4 md:grid-cols-2">
-        <Card>
-          <CardHeader>
-            <CardTitle className="text-base">Strengths</CardTitle>
-          </CardHeader>
-          <CardContent className="text-sm">
-            {strengths.length === 0 ? <p className="text-muted-foreground">Answer more questions to see your strengths.</p> : (
-              <ul className="ml-5 list-disc">
-                {strengths.map((s) => (
-                  <li key={s.key}>
-                    {s.label}: good on {s.good} answer{s.good > 1 ? "s" : ""}
-                  </li>
-                ))}
-              </ul>
-            )}
-          </CardContent>
-        </Card>
-        <Card>
-          <CardHeader>
-            <CardTitle className="text-base">Top things to work on</CardTitle>
-          </CardHeader>
-          <CardContent className="text-sm">
-            {toWork.length === 0 ? <p className="text-muted-foreground">Nothing flagged so far.</p> : (
-              <ol className="ml-5 list-decimal">
-                {toWork.map((t) => (
-                  <li key={t.key}>
-                    <span className="font-medium">{t.label}</span> ({t.improve}×){t.comment && <span className="text-muted-foreground"> — {t.comment}</span>}
-                  </li>
-                ))}
-              </ol>
-            )}
-          </CardContent>
-        </Card>
-      </div>
-      <Card>
-        <CardHeader>
-          <CardTitle className="text-base">Questions to retry</CardTitle>
-        </CardHeader>
-        <CardContent className="flex flex-col gap-2 text-sm">
-          {toRetry.length === 0 && <p className="text-muted-foreground">All answered well.</p>}
-          {toRetry.map(({ q, index, fb }) => (
-            <div key={q.id} className="flex flex-wrap items-center justify-between gap-2">
-              <span>
-                {index + 1}. {q.text} {!fb && <span className="text-muted-foreground">(not answered)</span>}
-              </span>
-              <Button asChild size="sm" variant="outline">
-                <Link href={`/interview/${data.interview.id}?q=${index}`}>Retry</Link>
+
+      {summary.unsupportedClaims.length > 0 && (
+        <section className="mt-6 rounded-xl border border-gap/30 bg-gap-soft p-5">
+          <h2 className="mb-3 flex items-center gap-2 text-lg">
+            <ShieldAlert className="size-5 text-gap" aria-hidden="true" /> Claims your profile does not back up
+          </h2>
+          <p className="mb-3 text-sm text-muted-foreground">Add them as facts if they are true; otherwise, don&apos;t say them in the real interview.</p>
+          <ul className="space-y-1 text-sm">
+            {summary.unsupportedClaims.map((quote, i) => (
+              <li key={i}>“{quote}”</li>
+            ))}
+          </ul>
+        </section>
+      )}
+
+      <h2 className="mt-10 mb-4 text-xl">Questions to retry</h2>
+      {summary.toRetry.length === 0 ? (
+        <p className="text-sm text-muted-foreground">All answered well.</p>
+      ) : (
+        <div className="space-y-3">
+          {summary.toRetry.map(({ question, index, answered }) => (
+            <div key={question.id} className="flex flex-wrap items-center gap-4 rounded-xl border bg-card p-4">
+              <span className="rounded-full bg-primary-soft px-2 py-0.5 text-xs font-semibold text-primary">{GROUP_LABEL[question.group]}</span>
+              <p className="min-w-0 flex-1">
+                {question.text} {!answered && <span className="text-sm text-muted-foreground">(not answered)</span>}
+              </p>
+              <Button asChild variant="outline" size="sm">
+                <Link href={`/interview/${data.interview.id}?q=${index}`}>
+                  <RotateCcw className="size-4" aria-hidden="true" /> Retry
+                </Link>
               </Button>
             </div>
           ))}
-        </CardContent>
-      </Card>
+        </div>
+      )}
     </div>
   );
 }
