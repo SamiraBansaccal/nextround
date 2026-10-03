@@ -24,8 +24,8 @@ Built in one day for the Stripe Community hackathon, phase by phase.
 |---|---|---|
 | 0 | Setup: Stripe CLI, Stripe Projects, agent skills, git | ✅ done |
 | 1 | Stack, providers, GitHub sign-in, data isolation, first deploy | ✅ done |
-| 2 | "Bring your own AI" layer (OpenAI-compatible client, encrypted keys) | ⏳ next |
-| 3 | Profile: GitHub / Codewars / CV import, fact validation | planned |
+| 2 | "Bring your own AI" layer (OpenAI-compatible client, encrypted keys) | ✅ done |
+| 3 | Profile: GitHub / Codewars / CV import, fact validation | ⏳ next |
 | 4 | Saved offers: scan by URL, verified quotes, match score | planned |
 | 5 | Interview simulation on the offer's stack (main feature) | planned |
 | 6 | Tailored CV and cover letter with a sentence-level verifier | planned |
@@ -39,6 +39,7 @@ Detailed documentation, written to explain *how and why* everything works, lives
 - [docs/README.md](docs/README.md): index and glossary
 - [docs/00-setup.md](docs/00-setup.md): Stripe CLI, Stripe Projects, agent skills, git, and what is (not) committed
 - [docs/01-stack-auth-deploy.md](docs/01-stack-auth-deploy.md): stack, providers, GitHub sign-in, database, data isolation and its test, deployment
+- [docs/02-bring-your-own-ai.md](docs/02-bring-your-own-ai.md): one OpenAI-compatible client, who pays, encrypted keys, SSRF protection, JSON retry, instance limits
 
 ## Repository layout
 
@@ -55,15 +56,31 @@ docs/                How everything works, phase by phase (French)
 .projects/state.json Stripe Projects: which providers/services the app uses (no secrets)
 ```
 
+## Bring your own AI
+
+Settings accepts any OpenAI-compatible provider: **OpenRouter** (free models welcome), **OpenAI**, **Mistral** and **Groq**. Keys are encrypted (AES-256-GCM), never sent back to the browser (only `••••` + last 4 characters) and never logged. The instance owner (`OWNER_GITHUB_LOGIN`) falls back to the instance key, with a rate limit and a daily cap; other users bring their own key. A custom base URL (e.g. a local model with Ollama) is disabled on the public instance and enabled for self-hosting with `ALLOW_CUSTOM_LLM_BASE_URL=true`.
+
+## Self-host it with your own accounts
+
+Nothing in this repository is tied to the author's accounts: everything comes from environment variables. One command provisions **your** stack with Stripe Projects (your Stripe account, your provider accounts, free tiers) and deploys it:
+
+```bash
+# Requirements: Node 20+, the Stripe CLI and its Projects plugin, a Stripe account in live mode
+brew install stripe/stripe-cli/stripe && stripe plugin install projects
+
+git clone https://github.com/SamiraBansaccal/nextround.git && cd nextround
+npm install
+npm run bootstrap -- --owner <your-github-login> --dry-run   # preview the commands
+npm run bootstrap -- --owner <your-github-login>             # run them
+```
+
+`scripts/bootstrap.mjs` runs `stripe projects init`, adds Vercel, Neon, Clerk, OpenRouter, Firecrawl and ElevenLabs, pulls the credentials to `.env` (never committed), creates the app variables, migrates the database, enables GitHub sign-in on your Clerk application, pushes the env vars to Vercel and deploys. Each provider shows you its terms of service; completed steps are skipped on re-runs.
+
 ## Run it locally
 
 ```bash
-npm install
-stripe projects env --pull                       # credentials -> .env (never committed)
-npm run setup:env -- --owner <your-github-login>  # Clerk keys, encryption key, owner
-npm run db:migrate                                # create the tables
-npm run dev                                       # http://localhost:3000
-npm test                                          # includes the data isolation test
+npm run dev    # http://localhost:3000
+npm test       # 29 tests: data isolation, encryption, AI JSON retry, who pays, SSRF, rate limits
 ```
 
 ## Built with Stripe Projects

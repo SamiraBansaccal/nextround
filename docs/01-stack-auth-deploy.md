@@ -51,7 +51,7 @@ Stripe Projects ──(stripe projects env --pull)──▶ .env (local, jamais 
 
 ### `scripts/setup-env.mjs` : les variables « maison »
 
-Lancé une fois avec `npm run setup:env -- --owner SamiraBansaccal`. Il crée des **project variables** Stripe Projects : la valeur est stockée dans le coffre Stripe, puis écrite dans `.env`.
+Lancé une fois avec `npm run setup:env -- --owner <ton-login-github>`. Il crée des **project variables** Stripe Projects : la valeur est stockée dans le coffre Stripe, puis écrite dans `.env`.
 
 | Variable | D'où elle vient | Pourquoi |
 |---|---|---|

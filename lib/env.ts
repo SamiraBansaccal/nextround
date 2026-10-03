@@ -13,6 +13,9 @@ const serverEnvSchema = z.object({
   OPENROUTER_API_API_KEY: z.string().optional(),
   FIRECRAWL_API_API_KEY: z.string().optional(),
   ELEVENLABS_API_KEY: z.string().optional(),
+  // Instance model on OpenRouter (defaults in lib/ai/providers.ts); fallbacks are comma-separated.
+  INSTANCE_LLM_MODEL: z.string().optional(),
+  INSTANCE_LLM_FALLBACK_MODELS: z.string().optional(),
   // Self-hosting only: allow any OpenAI-compatible base URL (e.g. Ollama on localhost).
   ALLOW_CUSTOM_LLM_BASE_URL: z.enum(["true", "false"]).default("false"),
 });

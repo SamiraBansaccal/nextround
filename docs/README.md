@@ -8,6 +8,7 @@ Cette documentation explique **comment** et **pourquoi** chaque partie du projet
 |---|---|
 | [00-setup.md](00-setup.md) | Phase 0 : Stripe CLI, Stripe Projects, skills des agents, git, ce qui est (ou non) versionné |
 | [01-stack-auth-deploy.md](01-stack-auth-deploy.md) | Phase 1 : stack, fournisseurs, connexion GitHub, base de données, isolation des données et son test, déploiement |
+| [02-bring-your-own-ai.md](02-bring-your-own-ai.md) | Phase 2 : le client d'IA unique, qui paie, les clés chiffrées, la protection SSRF, la relance JSON, les limites, l'auto-hébergement |
 | [lovable-prompt.md](lovable-prompt.md) | Le prompt donné à Lovable pour le prototype d'interface |
 | [slides-prompt.md](slides-prompt.md) | Le prompt pour les slides du pitch |
 
@@ -29,4 +30,7 @@ Une page sera ajoutée à chaque phase.
 | **Proxy (Next.js 16)** | Code qui s'exécute avant chaque requête (anciennement « middleware ») : ici, il renvoie vers la connexion. |
 | **OAuth** | Le protocole derrière « Continuer avec GitHub » : GitHub confirme qui vous êtes, sans donner votre mot de passe à l'application. |
 | **Isolation des données** | Garantie qu'un utilisateur ne peut ni lire ni modifier les données d'un autre, même en changeant un identifiant dans une requête. |
+| **SSRF** | Attaque où l'on fait appeler par le serveur une adresse interne qu'on ne devrait pas pouvoir atteindre. D'où l'interdiction des URL personnalisées sur l'instance publique. |
+| **AES-256-GCM** | Algorithme de chiffrement standard ; « GCM » ajoute une signature qui détecte toute modification de la donnée chiffrée. |
+| **Server action** | Fonction serveur que l'interface appelle directement (Next.js) ; elle revérifie la session et valide ses entrées. |
 | **Remote (git)** | Le dépôt distant (ici sur GitHub) vers lequel on pousse (`git push`) les commits locaux. |
