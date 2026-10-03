@@ -1,5 +1,158 @@
 {
-  "version": 1,
-  "providers": {},
-  "resources": {}
+  "version": 2,
+  "providers": {
+    "clerk": {
+      "name": "Clerk"
+    },
+    "elevenlabs": {
+      "name": "ElevenLabs"
+    },
+    "firecrawl": {
+      "name": "Firecrawl"
+    },
+    "neon": {
+      "name": "Neon"
+    },
+    "openrouter": {
+      "name": "OpenRouter"
+    },
+    "vercel": {
+      "name": "Vercel"
+    }
+  },
+  "resources": {
+    "clerk-plan": {
+      "livemode": true,
+      "name": "clerk-plan",
+      "providerName": "Clerk",
+      "serviceId": "hobby"
+    },
+    "db": {
+      "livemode": true,
+      "name": "db",
+      "providerName": "Neon",
+      "serviceId": "postgres"
+    },
+    "elevenlabs-tts": {
+      "livemode": true,
+      "name": "elevenlabs-tts",
+      "providerName": "ElevenLabs",
+      "serviceId": "tts"
+    },
+    "firecrawl-api": {
+      "livemode": true,
+      "name": "firecrawl-api",
+      "providerName": "Firecrawl",
+      "serviceId": "api"
+    },
+    "firecrawl-plan": {
+      "livemode": true,
+      "name": "firecrawl-plan",
+      "providerName": "Firecrawl",
+      "serviceId": "free"
+    },
+    "neon-plan": {
+      "livemode": true,
+      "name": "neon-plan",
+      "providerName": "Neon",
+      "serviceId": "free"
+    },
+    "NextRound": {
+      "livemode": true,
+      "name": "NextRound",
+      "providerName": "Clerk",
+      "serviceId": "auth"
+    },
+    "openrouter-api": {
+      "livemode": true,
+      "name": "openrouter-api",
+      "providerName": "OpenRouter",
+      "serviceId": "api"
+    },
+    "openrouter-plan": {
+      "livemode": true,
+      "name": "openrouter-plan",
+      "providerName": "OpenRouter",
+      "serviceId": "free"
+    },
+    "vercel-plan": {
+      "livemode": true,
+      "name": "vercel-plan",
+      "providerName": "Vercel",
+      "serviceId": "hobby"
+    }
+  },
+  "environments": {
+    "default": {
+      "output": ".env",
+      "resources": [
+        {
+          "resourceName": "NextRound"
+        },
+        {
+          "resourceName": "clerk-plan"
+        },
+        {
+          "resourceName": "db"
+        },
+        {
+          "resourceName": "elevenlabs-tts"
+        },
+        {
+          "resourceName": "firecrawl-api"
+        },
+        {
+          "resourceName": "firecrawl-plan"
+        },
+        {
+          "resourceName": "neon-plan"
+        },
+        {
+          "resourceName": "openrouter-api"
+        },
+        {
+          "resourceName": "openrouter-plan"
+        },
+        {
+          "resourceName": "vercel-plan"
+        }
+      ],
+      "variables": [
+        {
+          "variableName": "app-encryption-key",
+          "envKey": "APP_ENCRYPTION_KEY"
+        },
+        {
+          "variableName": "clerk-publishable-key",
+          "envKey": "NEXT_PUBLIC_CLERK_PUBLISHABLE_KEY"
+        },
+        {
+          "variableName": "clerk-secret-key",
+          "envKey": "CLERK_SECRET_KEY"
+        },
+        {
+          "variableName": "owner-github-login",
+          "envKey": "OWNER_GITHUB_LOGIN"
+        }
+      ]
+    }
+  },
+  "variables": {
+    "app-encryption-key": {
+      "name": "app-encryption-key",
+      "backendId": "fprjvar_61VVrZRTtpNwtflan16VVqpc4H9CbgD1HiTIaKN4qF60"
+    },
+    "clerk-publishable-key": {
+      "name": "clerk-publishable-key",
+      "backendId": "fprjvar_61VVrZJekzXVHCcNM16VVqpc4H9CbgD1HiTIaKN4q4ae"
+    },
+    "clerk-secret-key": {
+      "name": "clerk-secret-key",
+      "backendId": "fprjvar_61VVrZMfHG1Uol1bh16VVqpc4H9CbgD1HiTIaKN4qQbI"
+    },
+    "owner-github-login": {
+      "name": "owner-github-login",
+      "backendId": "fprjvar_61VVrZOPdr4cyHrK116VVqpc4H9CbgD1HiTIaKN4qOwq"
+    }
+  }
 }
