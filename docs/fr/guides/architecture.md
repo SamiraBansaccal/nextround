@@ -43,17 +43,17 @@ app/
 ├── (app)/                    🔒 zone connectée (le dossier entre parenthèses n'apparaît pas dans l'URL)
 │   ├── layout.tsx            menu, bouton de langue EN/FR, thème
 │   ├── ui-actions.ts         server action : changer la langue du site
-│   ├── dashboard/            📊 tableau de bord
+│   ├── profile/              👤 page d'accueil : CV, faits, imports
 │   ├── offers/               💼 offres, une offre (/offers/[id]), CV et lettre (/offers/[id]/cv)
 │   ├── interview/            🎙️ liste, nouvel entretien (/new), l'appel (/[id]), le résumé (/[id]/summary)
-│   ├── profile/              👤 CV, faits, imports
-│   └── settings/             ⚙️ IA et voix
+│   └── settings/             ⚙️ IA, voix, pages d'offres
 └── api/tts/                  🔊 lecture des questions à voix haute
 ```
 
 - Chaque page est un *server component* : elle lit la session (`requireUserId()`), charge les données et les passe au composant.
 - Les **server actions** sont dans un `actions.ts` à côté de la page qui les utilise.
 - `proxy.ts` (à la racine) protège tout sauf l'accueil et la connexion ; le code serveur revérifie quand même la session.
+- Plus de tableau de bord : `/dashboard` renvoie vers `/profile` (`next.config.ts`, [ADR 0024](../adr/0024-pas-de-tableau-de-bord.md)).
 
 ## 🧩 `components/` : l'interface
 
@@ -65,8 +65,7 @@ Un dossier par **zone de l'app**, plus trois dossiers communs.
 | `layout/` | La coquille de l'app (`app-shell`), le logo, les titres de page, le thème clair/sombre |
 | `auth/` | Les boutons « Continue with GitHub / Google » |
 | `shared/` | Petits composants utilisés partout (ex. `with-code` : du texte avec du `code`) |
-| `dashboard/` | Premiers pas, suivi des candidatures |
-| `offers/` | Formulaire d'ajout, carte, page d'offre, badges (statut, site, couvert/lacune) |
+| `offers/` | Formulaire d'ajout, cartes rangées par parcours (`opportunities`), page d'offre, badges (statut, site, couvert/lacune) |
 | `documents/` | Page CV et lettre, rendu des documents écrits pour une offre |
 | `profile/` | Bibliothèque de CV, CV mis en page, relecture des faits |
 | `interview/` | Création d'entretien, choix de l'intervieweur, l'appel ; `media/` (caméra, micro) et `voice/` (lecture et dictée) |
@@ -89,8 +88,7 @@ Un dossier par **zone de l'app**, plus trois dossiers communs.
 | `interview/` | 🎙️ Entretiens | `generate.ts` (questions sans IA), `bank/` (questions techniques), `hr-bank/` (questions RH), `feedback.ts` (le seul appel à l'IA), `tracks.ts`, `copy.ts` |
 | `interviewers/` | 🎭 Les personnages | `catalog/` (une fiche par personnage), `flavor/` (leurs répliques), `categories.ts` |
 | `voice/` | 🔊 Voix | `elevenlabs.ts`, `text-to-speech.ts`, `audio-cache.ts` |
-| `dashboard/` | 📊 Tableau de bord | `greeting.ts` |
-| `i18n/` | 🌍 Textes de l'interface en EN et FR | `ui.ts`, `offers.ts`, `profile.ts`, `documents.ts`, `dashboard.ts`, `settings.ts`, `server.ts` (lit la langue dans le cookie) |
+| `i18n/` | 🌍 Textes de l'interface en EN et FR | `ui.ts`, `offers.ts`, `profile.ts`, `documents.ts`, `settings.ts`, `server.ts` (lit la langue dans le cookie) |
 
 À la racine de `lib/` il ne reste que `types.ts` (types partagés) et `utils.ts` (le `cn()` de shadcn, dont shadcn attend ce chemin).
 
@@ -113,7 +111,7 @@ tests/
 ├── offers/      couverture, lecture de page, suivi, projets vibe-codés
 ├── profile/     CV, faits, Codewars
 ├── documents/   CV et lettre par offre
-├── ui/          textes EN/FR (même clés, mêmes {variables}), dates, tableau de bord
+├── ui/          textes EN/FR (même clés, mêmes {variables}), dates
 ├── voice/       voix, cache audio
 └── e2e/         Playwright : chaque écran, avec un utilisateur de test jetable
 ```

@@ -18,13 +18,14 @@ Règle : chaque session a sa *branch*, s'inscrit ici, ouvre une PR, et met la li
 
 | *Branch* | Session | Sujet | PR |
 |---|---|---|---|
-| `claude/local-owner-only` | local | 🔐 Toutes les clés de l'instance pour la propriétaire seule (Firecrawl compris ; clé Firecrawl perso dans les Réglages), propriétaire reconnue par son id GitHub numérique, inscription Clerk fermée. Migration `0008`. Fichiers : `lib/ai/config.ts`, `lib/server/{auth,env}.ts`, `lib/data/ai-settings.ts`, `components/settings/**`, `app/(app)/settings/**`, `app/(app)/offers/actions.ts`, `scripts/{infra,owner}/**`, `tests/e2e/fixtures.mts` | [#17](https://github.com/SamiraBansaccal/nextround/pull/17) |
+| `claude/local-no-dashboard` | local | 🧭 Plus de tableau de bord : menu Profil → Offres → Entretiens → Réglages, le profil devient la page d'accueil, `/dashboard` renvoie vers `/profile`. Fichiers : `app/(app)/dashboard/` (supprimé), `components/{dashboard,layout,offers}/**`, `lib/i18n/{offers,ui}.ts`, `next.config.ts`, `tests/e2e/screens.spec.ts` | PR à venir |
 
 <details>
 <summary>📦 Branches déjà fusionnées</summary>
 
 | *Branch* | Session | Sujet | PR |
 |---|---|---|---|
+| `claude/local-owner-only` | local | 🔐 Toutes les clés de l'instance pour la propriétaire seule (Firecrawl compris ; clé Firecrawl perso dans les Réglages), propriétaire reconnue par son id GitHub numérique, inscription Clerk fermée. Migration `0008`. Fichiers : `lib/ai/config.ts`, `lib/server/{auth,env}.ts`, `lib/data/ai-settings.ts`, `components/settings/**`, `app/(app)/settings/**`, `app/(app)/offers/actions.ts`, `scripts/{infra,owner}/**`, `tests/e2e/fixtures.mts` | [#17](https://github.com/SamiraBansaccal/nextround/pull/17) |
 | `claude/local-settings` | local | ⚙️ Page Réglages (pleine largeur, encart « ce qui est branché », IA et voix côte à côte), bouton EN/FR aux couleurs de la DA, écrans e2e en français | [#16](https://github.com/SamiraBansaccal/nextround/pull/16) |
 | `claude/intelligent-einstein-58bqoh` | cloud | Entretiens sans offre, parcours de création, caméra, langue du site, couleurs, réglages IA | [#2](https://github.com/SamiraBansaccal/nextround/pull/2) |
 | `claude/owner-data-deploy` | local | Projets vibe-codés, « Update with my validated facts » | [#3](https://github.com/SamiraBansaccal/nextround/pull/3) |
@@ -40,6 +41,14 @@ Règle : chaque session a sa *branch*, s'inscrit ici, ouvre une PR, et met la li
 </details>
 
 ## ✅ Fait récemment
+
+### 🧭 Plus de tableau de bord (local, 2026-10-05)
+
+Décision : [ADR 0024](fr/adr/0024-pas-de-tableau-de-bord.md).
+
+- Menu dans l'ordre du travail : **Profil → Offres → Entretiens → Réglages**. Le profil est la page d'accueil (après la connexion, depuis l'accueil public, depuis le logo) ; `/dashboard` renvoie vers `/profile`.
+- Les cartes d'offres (`components/offers/opportunities.tsx`) ne vivent plus que sur la page Offres. Supprimés : salutation, bloc « Pour commencer », carte « IA utilisée », `lib/i18n/dashboard.ts`.
+- Vérifié : 197 tests unitaires, e2e 4/4 (qui vérifie aussi les deux redirections).
 
 ### 🔐 Clés de l'instance pour la propriétaire seule, inscription fermée (local, 2026-10-05)
 

@@ -13,7 +13,11 @@ const en = {
   noOffers: "No offers yet",
   noOffersHint: "Paste the link of an offer you like above: NextRound reads it and checks every quote.",
   // Add form
-  addOpportunity: "Add an opportunity",
+  yourOpportunities: "Your opportunities",
+  filterLabel: "Filter offers by track",
+  tabAll: "All",
+  tabOther: "Other",
+  stage: "Stage",
   addOffer: "Add an offer",
   addTitle: "Paste the link of an offer you like",
   addIntro:
@@ -117,7 +121,11 @@ const fr: OffersCopy = {
   offersIllustration: "Illustration de candidatures passées en revue",
   noOffers: "Aucune offre pour l'instant",
   noOffersHint: "Colle ci-dessus le lien d'une offre qui te plaît : NextRound la lit et vérifie chaque citation.",
-  addOpportunity: "Ajouter une opportunité",
+  yourOpportunities: "Tes opportunités",
+  filterLabel: "Filtrer les offres par parcours",
+  tabAll: "Toutes",
+  tabOther: "Autres",
+  stage: "Étape",
   addOffer: "Ajouter une offre",
   addTitle: "Colle le lien d'une offre qui te plaît",
   addIntro:

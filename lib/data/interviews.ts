@@ -148,7 +148,7 @@ export async function saveAnswer(userId: string, questionId: string, answer: str
   return row;
 }
 
-/** Number of practice interviews per offer, for the dashboard. */
+/** Number of practice interviews per offer, for the offer cards. */
 export async function countInterviewsByOffer(userId: string): Promise<Map<string, number>> {
   const rows = await getDb().select({ offerId: interviews.offerId }).from(interviews).where(eq(interviews.userId, userId));
   const counts = new Map<string, number>();

@@ -1,6 +1,6 @@
 "use client";
 
-import { Briefcase, LayoutDashboard, Menu, MessagesSquare, PanelLeftClose, PanelLeftOpen, Settings, UserRound } from "lucide-react";
+import { Briefcase, Menu, MessagesSquare, PanelLeftClose, PanelLeftOpen, Settings, UserRound } from "lucide-react";
 import Image from "next/image";
 import Link from "next/link";
 import { usePathname, useRouter } from "next/navigation";
@@ -13,11 +13,11 @@ import type { UiCopy, UiLang } from "@/lib/i18n/ui";
 import { cn } from "@/lib/utils";
 
 // App shell from the Lovable prototype: collapsible sidebar with tinted icons, sticky header.
+// In the order of the work: the profile (the base everything is written from) is the home page.
 const NAV = [
-  { href: "/dashboard", key: "navDashboard", Icon: LayoutDashboard, tint: "bg-ink-soft text-ink" },
+  { href: "/profile", key: "navProfile", Icon: UserRound, tint: "bg-terracotta-soft text-terracotta" },
   { href: "/offers", key: "navOffers", Icon: Briefcase, tint: "bg-warning-soft text-warning" },
   { href: "/interview", key: "navInterviews", Icon: MessagesSquare, tint: "bg-action text-action-foreground" },
-  { href: "/profile", key: "navProfile", Icon: UserRound, tint: "bg-terracotta-soft text-terracotta" },
   { href: "/settings", key: "navSettings", Icon: Settings, tint: "bg-secondary text-secondary-foreground" },
 ] as const;
 
@@ -94,9 +94,9 @@ export function AppShell({ children, userButton, lang, t, setLanguage }: { child
       >
         <div className={cn("mb-10 flex items-center", expanded ? "justify-between" : "flex-col gap-4")}>
           {expanded ? (
-            <Logo href="/dashboard" />
+            <Logo href="/profile" />
           ) : (
-            <Link href="/dashboard" aria-label="NextRound home" className="grid size-10 place-items-center">
+            <Link href="/profile" aria-label="NextRound home" className="grid size-10 place-items-center">
               <Image src="/brand/nextround-symbol.png" width={254} height={258} alt="" className="size-9 object-contain dark:brightness-0 dark:invert" />
             </Link>
           )}
@@ -127,7 +127,7 @@ export function AppShell({ children, userButton, lang, t, setLanguage }: { child
             </SheetTrigger>
             <SheetContent side="left" className="w-[min(18rem,88vw)] bg-sidebar p-4">
               <SheetTitle className="mb-6">
-                <Logo href="/dashboard" />
+                <Logo href="/profile" />
               </SheetTitle>
               <NavLinks t={t} onNavigate={() => setOpen(false)} />
             </SheetContent>

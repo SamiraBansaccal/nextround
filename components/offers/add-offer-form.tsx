@@ -11,16 +11,8 @@ import { cn } from "@/lib/utils";
 type Result = { ok: true; offerId: string; dropped: number } | { ok: false; error: string; needText?: boolean };
 
 // Add an offer by link (main flow), or by pasted text when the page blocks access.
-// Two layouts from the Lovable prototype: "card" (offers page) and "bar" (dashboard band).
-export function AddOfferForm({
-  addOffer,
-  t,
-  variant = "card",
-}: {
-  addOffer: (input: { url?: string; text?: string }) => Promise<Result>;
-  t: OffersCopy;
-  variant?: "card" | "bar";
-}) {
+// Layout from the Lovable prototype (offers page).
+export function AddOfferForm({ addOffer, t }: { addOffer: (input: { url?: string; text?: string }) => Promise<Result>; t: OffersCopy }) {
   const router = useRouter();
   const [url, setUrl] = useState("");
   const [text, setText] = useState("");
@@ -45,30 +37,20 @@ export function AddOfferForm({
     });
   }
 
-  const bar = variant === "bar";
-
   return (
     <section
-      className={cn(bar ? "border-y border-border bg-primary-soft/50 px-4 py-5 sm:px-6" : "border-l-4 border-terracotta bg-card p-5 shadow-soft sm:p-6")}
+      className="border-l-4 border-terracotta bg-card p-5 shadow-soft sm:p-6"
       aria-labelledby="add-offer-title"
     >
-      {bar ? (
-        <p id="add-offer-title" className="mb-3 text-sm font-semibold text-primary">
-          {t.addOpportunity}
-        </p>
-      ) : (
-        <>
-          <p className="flex items-center gap-2 text-xs font-bold text-terracotta uppercase">
-            <Link2 className="size-4" aria-hidden="true" /> {t.addOffer}
-          </p>
-          <h2 id="add-offer-title" className="mt-1 text-2xl text-earth dark:text-foreground">
-            {t.addTitle}
-          </h2>
-          <p className="mt-1 mb-4 max-w-3xl text-sm text-muted-foreground">
-            {t.addIntro}
-          </p>
-        </>
-      )}
+      <p className="flex items-center gap-2 text-xs font-bold text-terracotta uppercase">
+        <Link2 className="size-4" aria-hidden="true" /> {t.addOffer}
+      </p>
+      <h2 id="add-offer-title" className="mt-1 text-2xl text-earth dark:text-foreground">
+        {t.addTitle}
+      </h2>
+      <p className="mt-1 mb-4 max-w-3xl text-sm text-muted-foreground">
+        {t.addIntro}
+      </p>
       <form
         className="flex flex-col gap-2 sm:flex-row"
         onSubmit={(e) => {

@@ -39,7 +39,7 @@ The `@/` import alias is the repository root: `@/lib/ai/client`, `@/components/u
 |---|---|
 | 🏠 Landing page, sign-in | `page.tsx`, `sign-in/`, `sign-up/`, `sso-callback/` |
 | 🔒 Signed-in area (`(app)/` is not part of the URL) | `layout.tsx` (menu, EN/FR toggle), `ui-actions.ts` |
-| 📊 Dashboard · 💼 Offers · 🎙️ Interviews · 👤 Profile · ⚙️ Settings | `dashboard/`, `offers/` (+ `[id]/`, `[id]/cv/`), `interview/` (+ `new/`, `[id]/`, `[id]/summary/`), `profile/`, `settings/` |
+| 👤 Profile (home page) · 💼 Offers · 🎙️ Interviews · ⚙️ Settings | `profile/`, `offers/` (+ `[id]/`, `[id]/cv/`), `interview/` (+ `new/`, `[id]/`, `[id]/summary/`), `settings/`; `/dashboard` redirects to `/profile` (`next.config.ts`, [ADR 0024](../adr/0024-no-dashboard.md)) |
 | 🔊 Text-to-speech | `api/tts/` |
 
 Pages are server components: they read the session (`requireUserId()`), load data and hand it to a component. Server actions live in an `actions.ts` next to their page. `proxy.ts` guards every route except the landing and sign-in pages; server code still re-checks the session.
@@ -52,7 +52,7 @@ Pages are server components: they read the session (`requireUserId()`), load dat
 | `layout/` | App shell, logo, page headings, theme |
 | `auth/` | Sign-in buttons |
 | `shared/` | Small shared pieces (`with-code`) |
-| `dashboard/`, `offers/`, `documents/`, `profile/`, `interview/`, `settings/` | One folder per area of the app; `interview/media/` (camera, mic) and `interview/voice/` (speech) |
+| `offers/`, `documents/`, `profile/`, `interview/`, `settings/` | One folder per area of the app; `interview/media/` (camera, mic) and `interview/voice/` (speech) |
 
 Components make no network calls and hold no business logic: data, actions and translated copy (`t`) come in as props.
 
@@ -71,7 +71,6 @@ Components make no network calls and hold no business logic: data, actions and t
 | `interview/` | 🎙️ Questions built without AI (`generate.ts`, `bank/`, `hr-bank/`), feedback (the one AI call), tracks |
 | `interviewers/` | 🎭 Character catalog and their lines |
 | `voice/` | 🔊 ElevenLabs, text-to-speech, audio cache |
-| `dashboard/` | 📊 Greeting |
 | `i18n/` | 🌍 Interface copy in EN and FR, and the cookie that holds the site language |
 
 Only `types.ts` and `utils.ts` (shadcn's `cn()`, a path shadcn expects) stay at the root of `lib/`.
