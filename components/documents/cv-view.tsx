@@ -76,14 +76,16 @@ export function CvView({ ui, t, offerId, offerLabel, language, candidate, cv, le
   const lettersText = letter?.content ? letterText(letter.content) : (letter?.sentences.map((s) => s.text).join(" ") ?? "");
   const unsupported = [...(cv?.sentences ?? []), ...(letter?.sentences ?? [])].filter((s) => s.factIds.length === 0).length;
 
-  function run(kind: "cv" | "letter", action: () => Promise<Result>) {
+  function run(kind: "cv" | "letter", action: () => Promise<Result>, showLatest = false) {
     setError(null);
     setWorking(kind);
     startTransition(async () => {
       const result = await action();
       setWorking(null);
+      if (!result.ok) setError(result.error);
+      // A new version was written: show it, even if the URL pinned an older one (?v= / ?l=).
+      else if (showLatest) router.replace(`/offers/${offerId}/cv?lang=${language}`, { scroll: false });
       if (result.ok) router.refresh();
-      else setError(result.error);
     });
   }
 
@@ -149,7 +151,7 @@ export function CvView({ ui, t, offerId, offerLabel, language, candidate, cv, le
           ] as const
         ).map((w) => (
           <div key={w.kind} className="flex flex-wrap items-center gap-2 rounded-xl border border-earth/20 bg-card p-3">
-            <Button disabled={pending} onClick={() => run(w.kind, w.go)}>
+            <Button disabled={pending} onClick={() => run(w.kind, w.go, true)}>
               {working === w.kind ? <Loader2 className="size-4 animate-spin" aria-hidden="true" /> : w.kind === "cv" ? <RefreshCw className="size-4" aria-hidden="true" /> : <PenLine className="size-4" aria-hidden="true" />}
               {w.label}
             </Button>

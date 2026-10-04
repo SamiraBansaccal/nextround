@@ -50,3 +50,11 @@ describe("generateJson: JSON + zod validation + one retry", () => {
     expect(extractJson("no json here")).toBeNull();
   });
 });
+
+describe("empty answer", () => {
+  it("asks again without an empty assistant turn (some providers reject it)", async () => {
+    const { complete, calls } = fakeModel("", '{"skills":["Java"]}');
+    await expect(generateJson({ config, options, schema, system: "s", user: "u", complete })).resolves.toEqual({ skills: ["Java"] });
+    expect(calls[1].map((m) => m.role)).toEqual(["system", "user"]);
+  });
+});

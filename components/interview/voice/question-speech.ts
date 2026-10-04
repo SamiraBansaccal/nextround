@@ -6,16 +6,22 @@ export interface Playback {
   stop(): void;
 }
 
-// Audio already received in this tab, per question: "read again" replays it without asking the server.
+// Audio already received in this tab, per question and spoken text: "read again" replays it without asking
+// the server. Cleared when the interviewer changes (another voice reads the same question).
 const played = new Map<string, Blob>();
 
+export function forgetPlayedAudio(): void {
+  played.clear();
+}
+
 export async function speakQuestion(questionId: string, text: string, locale: string, onEnd: () => void): Promise<Playback> {
-  let blob = played.get(questionId) ?? null;
+  const key = `${questionId}\n${text}`;
+  let blob = played.get(key) ?? null;
   if (!blob) {
     const response = await fetch("/api/tts", { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ questionId }) });
     if (response.status === 200) {
       blob = await response.blob();
-      played.set(questionId, blob);
+      played.set(key, blob);
     }
   }
   if (blob) {

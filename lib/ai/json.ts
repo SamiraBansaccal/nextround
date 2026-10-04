@@ -35,14 +35,14 @@ export async function generateJson<T>(params: GenerateJsonParams<T>): Promise<T>
   if (firstResult.ok) return firstResult.value;
 
   // One retry, telling the model exactly what was wrong.
-  const retryMessages: ChatMessage[] = [
-    ...messages,
-    { role: "assistant", content: first.slice(0, 8000) },
-    {
-      role: "user",
-      content: `Your previous answer was not valid: ${firstResult.error}\nReturn only the corrected JSON object.`,
-    },
-  ];
+  // An empty answer is simply asked again: an empty assistant turn is rejected by some providers (Anthropic).
+  const retryMessages: ChatMessage[] = first.trim()
+    ? [
+        ...messages,
+        { role: "assistant", content: first.slice(0, 8000) },
+        { role: "user", content: `Your previous answer was not valid: ${firstResult.error}\nReturn only the corrected JSON object.` },
+      ]
+    : messages;
   const second = await complete(params.config, retryMessages, params.options);
   const secondResult = parseAndValidate(second, params.schema);
   if (secondResult.ok) return secondResult.value;

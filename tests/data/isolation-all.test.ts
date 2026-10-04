@@ -167,3 +167,13 @@ describe("switching interviewer and deleting an interview", () => {
     expect(await interviewsData.deleteInterview(A, "not-a-uuid")).toBe(false);
   });
 });
+
+describe("feedback reuse", () => {
+  it("finds A's saved feedback for the same answer on the same offer only, never for B", async () => {
+    // beforeAll: A answered "Hello" to "Introduce yourself" in an interview on offerId.
+    expect(await interviewsData.findSavedFeedback(A, "Introduce yourself", "Hello", offerId)).not.toBeNull();
+    expect(await interviewsData.findSavedFeedback(A, "Introduce yourself", "Hello", null)).toBeNull(); // practice, no offer
+    expect(await interviewsData.findSavedFeedback(A, "Introduce yourself", "Hello again", offerId)).toBeNull();
+    expect(await interviewsData.findSavedFeedback(B, "Introduce yourself", "Hello", offerId)).toBeNull();
+  });
+});

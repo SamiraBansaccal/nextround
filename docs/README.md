@@ -20,6 +20,7 @@
 | 🎭 Ajouter un intervieweur | [fr/guides/ajouter-un-personnage.md](fr/guides/ajouter-un-personnage.md) |
 | 🤔 Savoir *pourquoi* une décision a été prise | [fr/adr/](fr/adr/README.md) |
 | 📜 Revivre la construction du projet, phase par phase | [fr/journal/](#-journal-de-construction) |
+| 🔍 Voir le dernier audit (sécurité, code) | [fr/audits/2026-10-04-audit.md](fr/audits/2026-10-04-audit.md) |
 
 ## 🗂️ Comment la doc est rangée
 
@@ -30,6 +31,7 @@ docs/
 ├── fr/                🇫🇷 français
 │   ├── guides/        🛠️ comment faire (architecture, local/cloud, personnages)
 │   ├── adr/           🤔 décisions d'architecture (traduction des ADR anglais)
+│   ├── audits/        🔍 audits de sécurité et de code
 │   └── journal/       📜 récit des premières phases
 ├── en/                🇬🇧 English
 │   ├── guides/        🛠️ how-to (architecture)
@@ -56,6 +58,12 @@ docs/
 ### 🤔 Décisions (ADR)
 
 L'index complet, avec les questions auxquelles chaque ADR répond : [fr/adr/README.md](fr/adr/README.md).
+
+### 🔍 Audits
+
+| Page | Contenu |
+|---|---|
+| [2026-10-04-audit.md](fr/audits/2026-10-04-audit.md) | Sécurité, isolation, dépendances, *code review* : ce qui tient, ce qui a été corrigé, ce qui reste ouvert |
 
 ### 📜 Journal de construction
 
