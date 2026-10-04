@@ -17,7 +17,7 @@ import {
   timestamp,
   uuid,
 } from "drizzle-orm/pg-core";
-import type { CvDocument, Feedback, Quoted, SourcedSentence } from "@/lib/types";
+import type { CvDocument, Feedback, Quoted, SourcedSentence, TailoredDocument } from "@/lib/types";
 
 export const factType = pgEnum("fact_type", ["experience", "skill", "project", "education", "language", "achievement"]);
 export const factSource = pgEnum("fact_source", ["github", "codewars", "cv_upload", "chat", "manual"]);
@@ -203,6 +203,13 @@ export const documents = pgTable(
     kind: documentKind("kind").notNull(),
     version: integer("version").notNull(),
     sentences: jsonb("sentences").$type<SourcedSentence[]>().notNull(),
+    // Documents written for one offer (lib/documents): their language ("en" | "fr"), the structured
+    // document (a tailored CV or a cover letter; null for the first, sentence-only versions), and
+    // whether the candidate kept it in their profile to reuse it (with a title they can recognise).
+    language: text("language"),
+    content: jsonb("content").$type<TailoredDocument>(),
+    title: text("title"),
+    kept: boolean("kept").notNull().default(false),
     createdAt: createdAt(),
   },
   (t) => [index("documents_user_idx").on(t.userId)],

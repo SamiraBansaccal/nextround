@@ -1,40 +1,87 @@
 "use server";
 
 import { revalidatePath } from "next/cache";
+import { z } from "zod";
 import { aiErrorMessage } from "@/lib/ai/errors";
-import { getAccount } from "@/lib/auth";
-import { saveDocumentVersion } from "@/lib/data/documents";
+import { getAccount, requireUserId } from "@/lib/auth";
+import { getDocument, saveDocumentVersion, setDocumentKept } from "@/lib/data/documents";
 import { listFacts } from "@/lib/data/facts";
 import { getOfferDetail } from "@/lib/data/offers";
+import { generateCoverLetter } from "@/lib/documents/cover-letter";
+import { documentSentences } from "@/lib/documents/render";
+import { generateTailoredCv, type OfferForDocuments } from "@/lib/documents/tailored-cv";
 import { factIndex, isCovered } from "@/lib/offers/coverage";
-import { generateDocuments } from "@/lib/documents/generate";
+import type { DocumentLanguage } from "@/lib/types";
 
-/** Generates a new version of the tailored CV and cover letter for an offer (one AI call). */
-export async function generateDocumentsAction(offerId: unknown): Promise<{ ok: true } | { ok: false; error: string }> {
+// The CV and the cover letter written for one offer: one AI call each, in English or French, optionally
+// starting from a document the candidate kept in their profile for a similar job.
+
+type Result = { ok: true } | { ok: false; error: string };
+
+const generateSchema = z.object({ offerId: z.string().uuid(), language: z.enum(["en", "fr"]), baseId: z.string().uuid().nullish() });
+
+async function prepare(input: unknown) {
   const account = await getAccount();
-  if (typeof offerId !== "string") return { ok: false, error: "Offer not found." };
-  const detail = await getOfferDetail(account.userId, offerId);
-  if (!detail) return { ok: false, error: "Offer not found." };
-  const facts = (await listFacts(account.userId)).filter((f) => f.validated);
-  if (facts.length === 0) return { ok: false, error: "Validate some facts in your profile first: the CV is built only from them." };
-  const profile = factIndex(facts); // vibe-coded projects never cover a technical requirement
+  const parsed = generateSchema.safeParse(input);
+  if (!parsed.success) return { ok: false, error: "Offer not found." } as const;
+  const detail = await getOfferDetail(account.userId, parsed.data.offerId);
+  if (!detail) return { ok: false, error: "Offer not found." } as const;
+  const facts = await listFacts(account.userId);
+  if (!facts.some((f) => f.validated)) return { ok: false, error: "Validate some facts in your profile first: documents are built only from them." } as const;
+  const profile = factIndex(facts); // a vibe-coded project never covers a technical requirement
+  const offer: OfferForDocuments = {
+    title: detail.offer.title,
+    company: detail.offer.company,
+    stack: detail.offer.stack.map((s) => s.value),
+    requirements: detail.requirements.map((r) => ({ text: r.text, covered: isCovered(r, profile) })),
+  };
+  const base = parsed.data.baseId ? await getDocument(account.userId, parsed.data.baseId) : null;
+  const language: DocumentLanguage = parsed.data.language;
+  const title = `${[detail.offer.title, detail.offer.company].filter(Boolean).join(" · ") || "Offer"} (${language.toUpperCase()})`;
+  return { ok: true, account, offerId: detail.offer.id, facts, offer, language, base, title } as const;
+}
+
+export async function generateCvAction(input: unknown): Promise<Result> {
+  const ready = await prepare(input);
+  if (!ready.ok) return { ok: false, error: ready.error };
+  const { account, offerId, facts, offer, language, base, title } = ready;
   try {
-    const docs = await generateDocuments(
+    const cv = await generateTailoredCv(
       { userId: account.userId, isOwner: account.isOwner },
-      {
-        title: detail.offer.title,
-        company: detail.offer.company,
-        language: detail.offer.language,
-        requirements: detail.requirements.map((r) => ({ text: r.text, covered: isCovered(r, profile) })),
-      },
-      facts,
-      account.displayName,
+      { offer, facts, language, base: base?.content?.kind === "tailored_cv" ? base.content : null },
     );
-    await saveDocumentVersion(account.userId, detail.offer.id, "cv", docs.cv);
-    if (docs.coverLetter.length) await saveDocumentVersion(account.userId, detail.offer.id, "cover_letter", docs.coverLetter);
-    revalidatePath(`/offers/${detail.offer.id}/cv`);
+    await saveDocumentVersion(account.userId, offerId, "cv", documentSentences(cv), { language, content: cv, title });
+    revalidatePath(`/offers/${offerId}/cv`);
     return { ok: true };
   } catch (error) {
     return { ok: false, error: aiErrorMessage(error) };
   }
+}
+
+export async function generateLetterAction(input: unknown): Promise<Result> {
+  const ready = await prepare(input);
+  if (!ready.ok) return { ok: false, error: ready.error };
+  const { account, offerId, facts, offer, language, base, title } = ready;
+  try {
+    const letter = await generateCoverLetter(
+      { userId: account.userId, isOwner: account.isOwner },
+      { offer, facts, candidateName: account.fullName, language, base: base?.content?.kind === "cover_letter" ? base.content : null },
+    );
+    await saveDocumentVersion(account.userId, offerId, "cover_letter", documentSentences(letter), { language, content: letter, title });
+    revalidatePath(`/offers/${offerId}/cv`);
+    return { ok: true };
+  } catch (error) {
+    return { ok: false, error: aiErrorMessage(error) };
+  }
+}
+
+const keepSchema = z.object({ id: z.string().uuid(), kept: z.boolean() });
+
+/** Keeps a CV or a letter in the profile, to reuse it or start a new one from it; or takes it out. */
+export async function keepDocumentAction(input: unknown): Promise<Result> {
+  const userId = await requireUserId();
+  const parsed = keepSchema.safeParse(input);
+  if (!parsed.success || !(await setDocumentKept(userId, parsed.data.id, parsed.data.kept))) return { ok: false, error: "Document not found." };
+  revalidatePath("/", "layout");
+  return { ok: true };
 }

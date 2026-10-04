@@ -83,3 +83,50 @@ export interface CvDocument {
   languages: CvLanguage[];
   skills: string[];
 }
+
+// ---------- Documents written for one offer (lib/documents) ----------
+// Every line cites the validated facts that prove it (factIds); a line without one is "Unsupported".
+
+export type DocumentLanguage = "en" | "fr";
+
+/** A technology or a skill, as a tag or an item of the skills table. */
+export interface TailoredItem {
+  name: string;
+  factIds: string[];
+}
+
+/** A project, a training or a job: a title, its context, and a few lines. */
+export interface TailoredEntry {
+  title: string;
+  context: string | null; // "42 Belgium · solo", "Brussels · 2019"
+  link: string | null; // only a link found in the facts (a repository)
+  tags: TailoredItem[];
+  bullets: SourcedSentence[];
+  factIds: string[]; // the facts that prove the entry itself
+  aiAssisted: boolean; // a project built with AI ("vibe coding"): shown as such, no stack claimed
+}
+
+/** A CV written for one offer, with the structure of a tech CV: the profile holds everything, this keeps what serves the offer. */
+export interface TailoredCv {
+  kind: "tailored_cv";
+  language: DocumentLanguage;
+  headline: string | null; // the role sought, from the offer ("Junior DevOps Engineer"): not a claim
+  summary: SourcedSentence[];
+  skills: { category: string; items: TailoredItem[] }[];
+  projects: TailoredEntry[];
+  moreProjects: TailoredItem[]; // "Also on GitHub — …"
+  education: TailoredEntry[];
+  experience: TailoredEntry[];
+  languages: (TailoredItem & { level: string })[];
+}
+
+/** A cover letter: greeting and closing are formalities, every sentence of the body cites facts. */
+export interface TailoredLetter {
+  kind: "cover_letter";
+  language: DocumentLanguage;
+  greeting: string;
+  paragraphs: (SourcedSentence & { fromOffer?: boolean })[][]; // fromOffer: a sentence about the offer, not the candidate
+  closing: string;
+}
+
+export type TailoredDocument = TailoredCv | TailoredLetter;

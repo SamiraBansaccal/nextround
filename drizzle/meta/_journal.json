@@ -43,6 +43,13 @@
       "when": 1791139636235,
       "tag": "0005_practice_interviews",
       "breakpoints": true
+    },
+    {
+      "idx": 6,
+      "version": "7",
+      "when": 1791141046577,
+      "tag": "0006_tailored_documents",
+      "breakpoints": true
     }
   ]
 }

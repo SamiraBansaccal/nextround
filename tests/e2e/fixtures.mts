@@ -8,7 +8,7 @@
 process.loadEnvFile(".env");
 
 import { createClerkClient } from "@clerk/backend";
-import type { CvSentence } from "@/lib/documents/generate";
+import type { SourcedSentence } from "@/lib/types";
 
 export const E2E_EMAIL = "nextround-e2e+clerk_test@example.com";
 
@@ -142,7 +142,7 @@ async function seed() {
     ],
   });
 
-  const cvSentences: CvSentence[] = [
+  const cvSentences: (SourcedSentence & { section: string })[] = [
     { section: "Projets", text: "weather-app : tableau de bord météo en React et TypeScript qui consomme une API REST.", factIds: [weather.id] },
     { section: "Compétences", text: "Node.js et Express : une API REST pour un projet d'école.", factIds: [node.id] },
     { section: "Langues", text: "Français (langue maternelle), anglais (B2).", factIds: [lang.id] },

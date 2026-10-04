@@ -24,6 +24,7 @@ import {
   Wrench,
   X,
 } from "lucide-react";
+import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { type ReactNode, useRef, useState, useTransition } from "react";
 import { PageHeading, SectionHeading } from "@/components/page-heading";
@@ -53,6 +54,16 @@ export interface CvItem {
   validated: number;
 }
 
+/** A CV or a cover letter written for an offer and kept in the profile, to reuse it or start from it. */
+export interface KeptDocument {
+  id: string;
+  kind: "cv" | "cover_letter";
+  title: string;
+  language: string | null;
+  createdOn: string;
+  href: string | null;
+}
+
 /** The CV shown as a document: the one chosen in the library, else the latest. */
 export interface SelectedCv {
   id: string;
@@ -66,6 +77,7 @@ type Result = { ok: true; message: string; sourceId?: string } | { ok: false; er
 interface Props {
   candidate: { name: string; imageUrl: string | null; githubLogin: string | null };
   cvs: CvItem[];
+  keptDocuments: KeptDocument[];
   selectedCv: SelectedCv | null;
   facts: ProfileFactView[];
   actions: {
@@ -80,6 +92,7 @@ interface Props {
     reject: (id: string) => Promise<Result>;
     edit: (input: { id: string; text: string }) => Promise<Result>;
     setAiAssisted: (input: { id: string; aiAssisted: boolean }) => Promise<Result>;
+    keepDocument: (input: { id: string; kept: boolean }) => Promise<{ ok: true } | { ok: false; error: string }>;
     addManual: (input: { type: FactType; text: string }) => Promise<Result>;
   };
 }
@@ -114,7 +127,7 @@ async function pdfToText(file: File): Promise<string> {
   return (Array.isArray(text) ? text.join("\n") : text).trim();
 }
 
-export function ProfileLibrary({ candidate, cvs, selectedCv, facts, actions }: Props) {
+export function ProfileLibrary({ candidate, cvs, keptDocuments, selectedCv, facts, actions }: Props) {
   const router = useRouter();
   const fileInput = useRef<HTMLInputElement>(null);
   const [pending, startTransition] = useTransition();
@@ -271,6 +284,51 @@ export function ProfileLibrary({ candidate, cvs, selectedCv, facts, actions }: P
           </button>
         </div>
       </section>
+
+      {/* ---------- CVs and letters written for offers, kept to reuse ---------- */}
+      {keptDocuments.length > 0 && (
+        <section aria-labelledby="kept-title">
+          <SectionHeading
+            eyebrow="Written for your offers"
+            title="CVs and letters you kept"
+            id="kept-title"
+            aside={<span className="text-sm text-muted-foreground">{keptDocuments.length}</span>}
+          />
+          <p className="-mt-2 mb-4 text-sm text-muted-foreground">Start the next one from them on any offer&apos;s CV page (“Start from”).</p>
+          <ul className="grid gap-3 md:grid-cols-2">
+            {keptDocuments.map((doc) => (
+              <li key={doc.id} className="flex items-start justify-between gap-3 border border-earth/20 bg-card p-4">
+                <div className="min-w-0">
+                  <p className="text-xs font-bold text-muted-foreground uppercase">
+                    {doc.kind === "cv" ? "CV" : "Cover letter"}
+                    {doc.language && ` · ${doc.language.toUpperCase()}`} · {doc.createdOn}
+                  </p>
+                  {doc.href ? (
+                    <Link href={doc.href} className="mt-1 block truncate text-sm font-semibold hover:underline">
+                      {doc.title}
+                    </Link>
+                  ) : (
+                    <p className="mt-1 truncate text-sm font-semibold">{doc.title}</p>
+                  )}
+                </div>
+                <Button
+                  size="sm"
+                  variant="ghost"
+                  disabled={pending}
+                  onClick={() =>
+                    run(async () => {
+                      const result = await actions.keepDocument({ id: doc.id, kept: false });
+                      return result.ok ? { ok: true, message: "Taken out of your profile." } : result;
+                    })
+                  }
+                >
+                  Remove
+                </Button>
+              </li>
+            ))}
+          </ul>
+        </section>
+      )}
 
       {/* ---------- Facts to review ---------- */}
       {proposed.length > 0 && (
