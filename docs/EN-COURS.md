@@ -18,7 +18,7 @@ Règle : chaque session a sa *branch*, s'inscrit ici, ouvre une PR, et met la li
 
 | *Branch* | Session | Sujet | PR |
 |---|---|---|---|
-| `claude/local-settings` | local | ⚙️ Page Réglages (pleine largeur, encart « ce qui est branché », IA et voix côte à côte), bouton EN/FR aux couleurs de la DA, écrans e2e en français. Fichiers : `app/(app)/settings/**`, `components/settings/**`, `lib/i18n/settings.ts`, `components/layout/**`, `tests/e2e/screens.spec.ts` | en cours |
+| `claude/local-settings` | local | ⚙️ Page Réglages (pleine largeur, encart « ce qui est branché », IA et voix côte à côte), bouton EN/FR aux couleurs de la DA, écrans e2e en français | [#16](https://github.com/SamiraBansaccal/nextround/pull/16) (fusionnée) |
 
 <details>
 <summary>📦 Branches déjà fusionnées</summary>
