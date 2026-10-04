@@ -2,7 +2,7 @@
 
 Mis à jour à la fin de chaque session Claude (locale ou cloud). **À lire en premier.**
 
-_Dernière mise à jour : 2026-10-04, session cloud._
+_Dernière mise à jour : 2026-10-05, session locale (Mac)._
 
 ## 🧭 Sommaire
 
@@ -18,7 +18,7 @@ Règle : chaque session a sa *branch*, s'inscrit ici, ouvre une PR, et met la li
 
 | *Branch* | Session | Sujet | PR |
 |---|---|---|---|
-| — | — | Aucune branche en cours | — |
+| `claude/local-settings` | local | ⚙️ Page Réglages (pleine largeur, encart « ce qui est branché », IA et voix côte à côte), bouton EN/FR aux couleurs de la DA, écrans e2e en français | [#16](https://github.com/SamiraBansaccal/nextround/pull/16) (fusionnée) |
 
 <details>
 <summary>📦 Branches déjà fusionnées</summary>
@@ -39,6 +39,13 @@ Règle : chaque session a sa *branch*, s'inscrit ici, ouvre une PR, et met la li
 </details>
 
 ## ✅ Fait récemment
+
+### ⚙️ Réglages et reprise de la to-do du cloud (local, 2026-10-05)
+
+- Migration `0007` appliquée à Neon ; e2e 4/4 sur le Mac, **écrans en français compris** (nouveaux écrans `fr-*` dans `tests/e2e/screens.spec.ts`), les *security headers* ne gênent pas Clerk ; production déployée (`node scripts/infra/deploy.mjs`).
+- Page Réglages : pleine largeur ; bandeau brun « ce qui est branché » (IA, modèle, source de la clé, voix, appels du jour avec la clé de l'instance) avec une explication d'OpenRouter et des limites de la clé de l'instance (`DEFAULT_LIMITS`) ; IA à gauche, voix à droite, chacune avec « où elle travaille » dans le site (`components/settings/connection-banner.tsx`, `getTodayUsage` dans `lib/ai/usage.ts`).
+- Bouton EN/FR et fournisseur choisi en terracotta (plus de bleu hors DA).
+- Question de la propriétaire (inscription ouverte) : les clés d'IA et de voix de l'instance ne servent qu'à son compte ; **mais l'inscription Clerk est ouverte** (instance de développement, pas de liste d'autorisation) et la clé **Firecrawl** sert à tout compte connecté (30 lectures de page par jour et par compte). Propositions en attente de sa réponse : réserver Firecrawl à la propriétaire, fermer l'inscription (liste d'autorisation Clerk : son e-mail + l'adresse e2e), reconnaître la propriétaire par un identifiant stable plutôt que par son pseudo GitHub (point de l'audit).
 
 ### 🎨 Tour des pages (cloud, PR #15)
 
