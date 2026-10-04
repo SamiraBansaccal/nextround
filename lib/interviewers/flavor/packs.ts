@@ -1,4 +1,9 @@
-import type { FlavorPack } from "./types";
+import { ANIME_LINES } from "./lines/anime";
+import { CARTOONS_LINES } from "./lines/cartoons";
+import { CLASSIC_ARCHETYPE_LINES } from "./lines/classic-archetypes";
+import { FILM_GAMES_LINES } from "./lines/film-games";
+import { SIMPSONS_LINES } from "./lines/simpsons";
+import { FLAVOR_FIELDS, type FlavorPack } from "./types";
 
 // Lines per category, then per character. Characters are fan parodies of FICTIONAL characters, invented
 // archetypes or NextRound's own recruiters; real people never get a pack here (see registers.ts).
@@ -48,7 +53,7 @@ export const CATEGORY_PACKS: Record<string, FlavorPack> = {
   },
 };
 
-export const CHARACTER_PACKS: Record<string, FlavorPack> = {
+const BASE_PACKS: Record<string, FlavorPack> = {
   // ---------- NextRound's own recruiters ----------
   marie: { greetings: [{ en: "Hello, I'm Marie. Thank you for your time.", fr: "Bonjour, je suis Marie. Merci pour {votre|ton} temps." }] },
   tom: { greetings: [{ en: "Hi, I'm Tom. No stress, it's a conversation.", fr: "Salut, moi c'est Tom. Pas de stress, on discute." }] },
@@ -259,3 +264,26 @@ export const CHARACTER_PACKS: Record<string, FlavorPack> = {
     closers: [{ en: "Do not be sorry. Be better.", fr: "Ne {soyez|sois} pas désolé. {Soyez|Sois} meilleur." }],
   },
 };
+
+/** Two packs as one: lines of `more` come after those of `base`, topic lines merged per topic. */
+function mergePacks(base: FlavorPack, more: FlavorPack): FlavorPack {
+  const merged: FlavorPack = { ...base };
+  for (const field of FLAVOR_FIELDS) {
+    if (more[field]) merged[field] = [...(base[field] ?? []), ...more[field]];
+  }
+  if (more.topicOpeners) {
+    const topics = { ...base.topicOpeners };
+    for (const [topic, lines] of Object.entries(more.topicOpeners) as [keyof typeof topics, FlavorPack["closers"]][]) {
+      topics[topic] = [...(topics[topic] ?? []), ...(lines ?? [])];
+    }
+    merged.topicOpeners = topics;
+  }
+  return merged;
+}
+
+const MORE_LINES: Record<string, FlavorPack>[] = [CLASSIC_ARCHETYPE_LINES, SIMPSONS_LINES, CARTOONS_LINES, ANIME_LINES, FILM_GAMES_LINES];
+
+export const CHARACTER_PACKS: Record<string, FlavorPack> = MORE_LINES.reduce<Record<string, FlavorPack>>((packs, more) => {
+  for (const [id, pack] of Object.entries(more)) packs[id] = mergePacks(packs[id] ?? {}, pack);
+  return packs;
+}, { ...BASE_PACKS });

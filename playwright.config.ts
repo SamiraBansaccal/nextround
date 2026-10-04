@@ -14,9 +14,17 @@ export default defineConfig({
   use: {
     baseURL: `http://localhost:${PORT}`,
     trace: "off",
+    // Cloud sessions go through a network proxy with its own certificate authority (see PLAYWRIGHT_CHROMIUM_PATH).
+    ignoreHTTPSErrors: Boolean(process.env.PLAYWRIGHT_CHROMIUM_PATH),
+    proxy: process.env.PLAYWRIGHT_CHROMIUM_PATH && process.env.HTTPS_PROXY ? { server: process.env.HTTPS_PROXY, bypass: "localhost,127.0.0.1" } : undefined,
     // A fake camera and microphone (Chromium's own test devices) for the "Ready to join?" screen.
     permissions: ["camera", "microphone"],
-    launchOptions: { args: ["--use-fake-ui-for-media-stream", "--use-fake-device-for-media-stream"] },
+    launchOptions: {
+      args: ["--use-fake-ui-for-media-stream", "--use-fake-device-for-media-stream"],
+      // Cloud sessions ship a Chromium that may not match this Playwright version: point at it with
+      // PLAYWRIGHT_CHROMIUM_PATH (unset on a normal machine, where Playwright uses its own browser).
+      executablePath: process.env.PLAYWRIGHT_CHROMIUM_PATH || undefined,
+    },
   },
   projects: [
     { name: "desktop", use: { ...devices["Desktop Chrome"], viewport: { width: 1440, height: 900 } } },

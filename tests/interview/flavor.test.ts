@@ -1,6 +1,8 @@
 import { describe, expect, it } from "vitest";
 import { inRegister } from "@/lib/interview/register";
-import { findInterviewer, getInterviewer, listCategories } from "@/lib/interviewers";
+import { QUESTION_TYPES } from "@/lib/interview/question-types";
+import { registerOf } from "@/lib/interview/register";
+import { findInterviewer, getInterviewer, INTERVIEWERS, listCategories } from "@/lib/interviewers";
 import { CATEGORY_PACKS, CHARACTER_PACKS, flavorInterview, flavorLayers, type FlavorPack } from "@/lib/interviewers/flavor";
 import { NEUTRAL } from "@/lib/interviewers/flavor/registers";
 import { FLAVOR_FIELDS } from "@/lib/interviewers/flavor/types";
@@ -71,5 +73,38 @@ describe("flavorInterview", () => {
     expect(trump.kind).toBe("real_person");
     expect(flavorLayers(trump).some((layer) => layer.weight === 5)).toBe(false);
     expect(flavorLayers(homer)[0].weight).toBe(5);
+  });
+});
+
+describe("character lines (coverage)", () => {
+  const fictional = INTERVIEWERS.filter((i) => i.kind !== "real_person");
+  const count = (pack: FlavorPack) => pieces(pack).length;
+
+  it("gives every fictional character a full set of lines, including lines about the question's topic", () => {
+    for (const interviewer of fictional) {
+      const pack = CHARACTER_PACKS[interviewer.id];
+      expect(pack, interviewer.id).toBeDefined();
+      expect(count(pack), interviewer.id).toBeGreaterThanOrEqual(5);
+      expect(Object.keys(pack.topicOpeners ?? {}).length, interviewer.id).toBeGreaterThanOrEqual(2);
+    }
+  });
+
+  it("only uses real question types as topics", () => {
+    for (const pack of Object.values(CHARACTER_PACKS)) {
+      for (const topic of Object.keys(pack.topicOpeners ?? {})) expect(QUESTION_TYPES as readonly string[], topic).toContain(topic);
+    }
+  });
+
+  it("never makes a 'vous' character say 'tu' in French", () => {
+    for (const interviewer of fictional.filter((i) => registerOf(i.traits) === "formal")) {
+      for (const piece of pieces(CHARACTER_PACKS[interviewer.id])) {
+        expect(inRegister(piece.fr, "formal"), interviewer.id).not.toMatch(/(?<!\p{L})(tu|ton|ta|tes|toi|t')(?!\p{L})/iu);
+      }
+    }
+  });
+
+  it("speaks about the topic of the question when the character has a line for it", () => {
+    const lines = flavorInterview(getInterviewer("homer-simpson"), [{ tech: null }, { tech: null, topic: "salary" }], "en", always(0));
+    expect(lines[1].intro).toContain("Money! Mmm… money.");
   });
 });

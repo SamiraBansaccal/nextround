@@ -1,6 +1,7 @@
 import { inRegister, type Register } from "@/lib/interview/register";
 import type { Lang } from "@/lib/interviewers/types";
 import { HR_ENTRIES } from "./data";
+import { MORE_HR_ENTRIES } from "./data-more";
 import type { HrQuestion, HrType } from "./types";
 
 // HR questions of an interview, drawn from the bank by code (no AI): one question per slot of the
@@ -9,7 +10,7 @@ import type { HrQuestion, HrType } from "./types";
 export type { HrQuestion, HrType } from "./types";
 export { HR_TYPES } from "./types";
 
-export const HR_BANK: readonly HrQuestion[] = HR_ENTRIES.map(([slug, type, en, fr, answerEn, answerFr]) => ({
+export const HR_BANK: readonly HrQuestion[] = [...HR_ENTRIES, ...MORE_HR_ENTRIES].map(([slug, type, en, fr, answerEn, answerFr]) => ({
   id: `hr.${slug}`,
   type,
   variants: en.map((text, i) => ({ en: text, fr: fr[i] ?? fr[0] })),
