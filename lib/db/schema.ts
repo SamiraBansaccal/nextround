@@ -131,9 +131,13 @@ export const interviews = pgTable(
   {
     id: id(),
     userId: userId(),
-    offerId: uuid("offer_id")
-      .notNull()
-      .references(() => offers.id, { onDelete: "cascade" }),
+    // The offer the interview prepares for; null for a practice interview on a technology or on general
+    // HR questions (`kind` and `topic` below).
+    offerId: uuid("offer_id").references(() => offers.id, { onDelete: "cascade" }),
+    // "offer" | "technology" | "hr" (lib/interview/practice.ts). `topic`: for "technology", a track or
+    // technology id of lib/interview/tracks.ts ("track:devops", "tech:docker").
+    kind: text("kind").notNull().default("offer"),
+    topic: text("topic"),
     mode: interviewMode("mode").notNull().default("text"),
     // Who asks the questions: an id of the catalog in lib/interviewers/ (code data, so no foreign key).
     interviewerId: text("interviewer_id").notNull().default("marie"),

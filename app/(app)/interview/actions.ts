@@ -10,7 +10,9 @@ import { getOfferDetail } from "@/lib/data/offers";
 import { bankAnswerText, findBankQuestion, findTech } from "@/lib/interview/bank";
 import { answerFeedback, MAX_ANSWER } from "@/lib/interview/feedback";
 import { toLang } from "@/lib/interview/copy";
-import { generateQuestions } from "@/lib/interview/generate";
+import { generateQuestions, type OfferForInterview } from "@/lib/interview/generate";
+import { INTERVIEW_KINDS, practiceAbout, practiceFocus, practiceOffer } from "@/lib/interview/practice";
+import { parseTopic, type Topic, topicValue } from "@/lib/interview/tracks";
 import { registerOf } from "@/lib/interview/register";
 import { FOCUSES } from "@/lib/interview/session";
 import { findInterviewer } from "@/lib/interviewers";
@@ -19,47 +21,80 @@ import { personaInstructions } from "@/lib/interviewers/persona";
 import type { Feedback } from "@/lib/types";
 
 const startSchema = z.object({
-  offerId: z.string().uuid(),
+  kind: z.enum(INTERVIEW_KINDS).default("offer"),
+  offerId: z.string().uuid().nullish(),
+  topic: z.string().trim().max(80).nullish(), // technology interviews: "track:<id>" or "tech:<id>"
   interviewerId: z.string().trim().min(1).max(80),
   language: z.enum(["en", "fr"]),
-  focus: z.enum(FOCUSES),
+  focus: z.enum(FOCUSES).default("both"), // offer interviews only
 });
 
+export type StartInterviewInput = z.input<typeof startSchema>;
+
 /**
- * Turns the setup screen's configuration into an interview session: questions of the chosen kind, in
+ * Turns the setup screen's configuration into an interview session: on an offer (general, technical or
+ * both), on a technology or a track (technical questions from the bank), or general HR questions; in
  * the chosen language, phrased in the chosen interviewer's style.
  */
 export async function startInterviewAction(input: unknown): Promise<{ ok: true; interviewId: string } | { ok: false; error: string }> {
   const account = await getAccount();
   const parsed = startSchema.safeParse(input);
-  if (!parsed.success) return { ok: false, error: "Offer not found." };
-  const { language, focus } = parsed.data;
+  if (!parsed.success) return { ok: false, error: "Invalid interview settings." };
+  const { kind, language } = parsed.data;
   const fail = (en: string, fr: string) => ({ ok: false as const, error: language === "fr" ? fr : en });
   const interviewer = findInterviewer(parsed.data.interviewerId);
   if (!interviewer) return fail("Choose an interviewer first.", "Choisis d'abord qui mène l'entretien.");
-  const detail = await getOfferDetail(account.userId, parsed.data.offerId);
-  if (!detail) return fail("Offer not found.", "Offre introuvable.");
+
+  let offer: OfferForInterview;
+  let offerId: string | null = null;
+  let focus = parsed.data.focus;
+  let practice: { about: string; stackOnly: boolean } | null = null;
+  let topic: Topic | null = null;
+  let requirements: { text: string; quote: string; factIds: string[] }[] = [];
+  if (kind === "offer") {
+    const detail = parsed.data.offerId ? await getOfferDetail(account.userId, parsed.data.offerId) : null;
+    if (!detail) return fail("Offer not found.", "Offre introuvable.");
+    offerId = detail.offer.id;
+    offer = {
+      title: detail.offer.title,
+      company: detail.offer.company,
+      language: detail.offer.language,
+      stack: detail.offer.stack,
+      requirements: [], // filled below, once the validated facts are known
+    };
+    requirements = detail.requirements;
+  } else {
+    topic = kind === "technology" ? parseTopic(parsed.data.topic) : null;
+    if (kind === "technology" && !topic) return fail("Choose a technology first.", "Choisis d'abord une technologie.");
+    offer = practiceOffer(topic);
+    focus = practiceFocus(kind);
+    practice = { about: practiceAbout(kind, topic), stackOnly: kind === "technology" };
+  }
+
   const [allFacts, askedBefore] = await Promise.all([listFacts(account.userId), listAskedBankIds(account.userId)]);
   const facts = allFacts.filter((f) => f.validated);
   const valid = new Set(facts.map((f) => f.id));
+  offer.requirements = requirements.map((r) => ({ text: r.text, quote: r.quote, covered: r.factIds.some((id) => valid.has(id)) }));
   try {
-    const generated = await generateQuestions(
-      { userId: account.userId, isOwner: account.isOwner },
-      {
-        title: detail.offer.title,
-        company: detail.offer.company,
-        language: detail.offer.language,
-        stack: detail.offer.stack,
-        requirements: detail.requirements.map((r) => ({ text: r.text, quote: r.quote, covered: r.factIds.some((id) => valid.has(id)) })),
-      },
-      facts,
-      { language, focus, persona: personaInstructions(interviewer), register: registerOf(interviewer.traits), askedBefore },
-    );
+    const generated = await generateQuestions({ userId: account.userId, isOwner: account.isOwner }, offer, facts, {
+      language,
+      focus,
+      persona: personaInstructions(interviewer),
+      register: registerOf(interviewer.traits),
+      askedBefore,
+      practice,
+    });
     if (generated.length < 4) return fail("This model could not return valid output — try another model.", "Ce modèle n'a pas renvoyé de réponse valide — essaie un autre modèle.");
     // What the interviewer says around each question (greeting, catchphrases, lead-ins): code, not AI.
     const lines = flavorInterview(interviewer, generated.map((q) => ({ tech: q.group === "technical" ? (q.techLabel ?? null) : null })), language);
     const questions = generated.map((q, i) => ({ ...q, intro: lines[i].intro, outro: lines[i].outro }));
-    const interviewId = await createInterview(account.userId, detail.offer.id, questions, { interviewerId: interviewer.id, language, focus });
+    const interviewId = await createInterview(
+      account.userId,
+      offerId,
+      questions,
+      { interviewerId: interviewer.id, language, focus },
+      kind === "offer" ? null : { kind, topic: topic ? topicValue(topic) : null },
+    );
     revalidatePath("/", "layout");
     return { ok: true, interviewId };
   } catch (error) {

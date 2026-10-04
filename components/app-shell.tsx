@@ -13,10 +13,10 @@ import { cn } from "@/lib/utils";
 
 // App shell from the Lovable prototype: collapsible sidebar with tinted icons, sticky header.
 const NAV = [
-  { href: "/dashboard", label: "Dashboard", Icon: LayoutDashboard, tint: "bg-primary-soft text-primary" },
+  { href: "/dashboard", label: "Dashboard", Icon: LayoutDashboard, tint: "bg-ink-soft text-ink" },
   { href: "/offers", label: "Offers", Icon: Briefcase, tint: "bg-warning-soft text-warning" },
-  { href: "/interview", label: "Interviews", Icon: MessagesSquare, tint: "bg-terracotta-soft text-terracotta" },
-  { href: "/profile", label: "Profile", Icon: UserRound, tint: "bg-success-soft text-success" },
+  { href: "/interview", label: "Interviews", Icon: MessagesSquare, tint: "bg-action text-action-foreground" },
+  { href: "/profile", label: "Profile", Icon: UserRound, tint: "bg-terracotta-soft text-terracotta" },
   { href: "/settings", label: "Settings", Icon: Settings, tint: "bg-secondary text-secondary-foreground" },
 ] as const;
 

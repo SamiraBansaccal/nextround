@@ -70,6 +70,11 @@ export interface QuestionOptions {
   register?: Register;
   /** Bank questions already asked to this candidate: asked again only when nothing new is left. */
   askedBefore?: ReadonlySet<string>;
+  /**
+   * A practice interview without an offer (lib/interview/practice.ts): what it is about, for the prompt,
+   * and technical questions only on the `offer.stack` given (never on the profile's other technologies).
+   */
+  practice?: { about: string; stackOnly: boolean } | null;
   random?: () => number;
 }
 
@@ -178,7 +183,7 @@ export async function generateQuestions(ctx: AiContext, offer: OfferForInterview
   const gaps = offer.requirements.filter((r) => !r.covered);
   const picks = pickTechnicalQuestions({
     stack: offer.stack,
-    facts: facts.map((f) => f.text),
+    facts: options.practice?.stackOnly ? [] : facts.map((f) => f.text),
     count: technicalSlots(options.focus, gaps.length),
     askedBefore: options.askedBefore,
     random: options.random,
@@ -201,7 +206,7 @@ export async function generateQuestions(ctx: AiContext, offer: OfferForInterview
 
   const raw = await aiJson(ctx, {
     schema: questionsSchema,
-    system: `You prepare a junior candidate for a job interview for one specific offer.
+    system: `You prepare a junior candidate for ${options.practice ? `a practice job interview (no specific offer): ${options.practice.about}` : "a job interview for one specific offer"}.
 Write ${total} interview questions:
 ${planLines(options.focus, counts).join("\n")}
 Write EVERYTHING (questions and suggested answers) in ${languageName}, whatever the language of the offer or of the facts.${
@@ -218,7 +223,7 @@ ${options.persona}
         : ""
     }
 Output format: {"questions": [{"group": "hr" | "technical" | "gap", "type": "...", "text": "...", "ref": "S1" | "R1" | "B1" | null, "suggested_answer": [{"text": "...", "fact_ids": ["F1"]}]}]}`,
-    user: `OFFER: ${offer.title ?? "(untitled)"} at ${offer.company ?? "(company not stated)"}
+    user: `${options.practice ? `PRACTICE INTERVIEW: ${options.practice.about}` : `OFFER: ${offer.title ?? "(untitled)"} at ${offer.company ?? "(company not stated)"}`}
 ${technical ? `STACK:\n${stackList}\nGAPS (requirements not covered by the candidate's facts):\n${gapList}\n` : ""}${
       bankList ? `TECHNICAL QUESTIONS ALREADY WRITTEN (copy them, add the suggested answers):\n${bankList}\n` : ""
     }CANDIDATE FACTS (validated):\n${listing || "(none yet)"}`,
