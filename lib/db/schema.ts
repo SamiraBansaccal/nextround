@@ -17,7 +17,7 @@ import {
   timestamp,
   uuid,
 } from "drizzle-orm/pg-core";
-import type { Feedback, Quoted, SourcedSentence } from "@/lib/types";
+import type { CvDocument, Feedback, Quoted, SourcedSentence } from "@/lib/types";
 
 export const factType = pgEnum("fact_type", ["experience", "skill", "project", "education", "language", "achievement"]);
 export const factSource = pgEnum("fact_source", ["github", "codewars", "cv_upload", "chat", "manual"]);
@@ -60,6 +60,10 @@ export const sources = pgTable(
     kind: text("kind").notNull(), // github | codewars | cv_upload | chat
     ref: text("ref").notNull(),
     importedAt: timestamp("imported_at", { withTimezone: true }).notNull().defaultNow(),
+    // CVs only: the text read from the PDF (the file itself never reaches the server), and the CV
+    // as a document, every string checked against that text (lib/profile/cv-document.ts).
+    text: text("text"),
+    document: jsonb("document").$type<CvDocument>(),
   },
   (t) => [index("sources_user_idx").on(t.userId)],
 );

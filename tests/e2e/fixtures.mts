@@ -30,6 +30,24 @@ Profil recherché :
 - Français courant, anglais technique.
 Pour postuler, envoyez votre CV à jobs@brusselstech.example avant le 30 octobre.`;
 
+// A fictional CV: its text (as read from the PDF) and the document laid out from it.
+const CV_TEXT = `Alex Tester
+Développeur·se web junior
+E-mail : alex.tester@example.com   Téléphone : 0470 00 00 00
+EXPÉRIENCES
+Bruxelles   Février 2025 – Juin 2025
+Stagiaire développeuse front-end chez WebAgency SPRL, Bruxelles (février 2025 - juin 2025)
+Intégration de maquettes en React et TypeScript.
+Correction de bugs sur un portail client.
+FORMATIONS
+Bruxelles   2023 - 2025
+42 Belgium, cursus de développement logiciel (2023 - 2025)
+Pédagogie par projet, peer learning.
+LANGUES
+Français (langue maternelle), anglais (B2)
+COMPÉTENCES
+React, TypeScript, Node.js, Git`;
+
 async function seed() {
   const user = (await findUser()) ?? (await clerk.users.createUser({ emailAddress: [E2E_EMAIL], firstName: "Alex", lastName: "Tester", skipPasswordRequirement: true }));
   const userId = user.id;
@@ -41,8 +59,36 @@ async function seed() {
   const { createInterview, saveAnswer, getInterview } = await import("@/lib/data/interviews");
   const { saveDocumentVersion } = await import("@/lib/data/documents");
   const { verifyExtraction } = await import("@/lib/offers/extract");
+  const { cvDocumentSchema, verifyCvDocument } = await import("@/lib/profile/cv-document");
 
-  const cv = await addSource(userId, "cv_upload", "cv-frontend-2025.pdf");
+  const { document } = verifyCvDocument(
+    cvDocumentSchema.parse({
+      language: "fr",
+      name: "Alex Tester",
+      headline: "Développeur·se web junior",
+      contacts: [
+        { kind: "email", label: "E-mail", value: "alex.tester@example.com" },
+        { kind: "phone", label: "Téléphone", value: "0470 00 00 00" },
+      ],
+      experiences: [
+        {
+          title: "Stagiaire développeuse front-end",
+          organisation: "WebAgency SPRL",
+          location: "Bruxelles",
+          period: "Février 2025 – Juin 2025",
+          details: ["Intégration de maquettes en React et TypeScript.", "Correction de bugs sur un portail client."],
+        },
+      ],
+      education: [{ title: "cursus de développement logiciel", organisation: "42 Belgium", location: "Bruxelles", period: "2023 - 2025", details: ["Pédagogie par projet, peer learning."] }],
+      languages: [
+        { name: "Français", level: "langue maternelle" },
+        { name: "anglais", level: "B2" },
+      ],
+      skills: ["React", "TypeScript", "Node.js", "Git"],
+    }),
+    CV_TEXT,
+  );
+  const cv = await addSource(userId, "cv_upload", "cv-frontend-2025.pdf", { text: CV_TEXT, document });
   const weather = await createFact(userId, { type: "project", text: "weather-app — weather dashboard in React and TypeScript fetching a REST API", source: "github", sourceRef: "https://github.com/example/weather-app", validated: true });
   const node = await createFact(userId, { type: "skill", text: "Node.js and Express: built a small REST API for a school project", source: "manual", validated: true });
   const lang = await createFact(userId, { type: "language", text: "French (native), English (B2)", source: "cv_upload", sourceRef: cvRef(cv.id), quote: "Français (langue maternelle), anglais (B2)", validated: true });

@@ -13,6 +13,7 @@ import {
   MessageCircle,
   PencilLine,
   Plus,
+  Printer,
   RefreshCw,
   Send,
   Swords,
@@ -22,11 +23,13 @@ import {
   Wrench,
   X,
 } from "lucide-react";
+import { useRouter } from "next/navigation";
 import { type ReactNode, useRef, useState, useTransition } from "react";
 import { PageHeading, SectionHeading } from "@/components/page-heading";
+import { CvDocumentView } from "@/components/profile/cv-document";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
-import type { FactType } from "@/lib/types";
+import type { CvDocument, FactType } from "@/lib/types";
 
 export interface ProfileFactView {
   id: string;
@@ -47,17 +50,27 @@ export interface CvItem {
   validated: number;
 }
 
-type Result = { ok: true; message: string } | { ok: false; error: string };
+/** The CV shown as a document: the one chosen in the library, else the latest. */
+export interface SelectedCv {
+  id: string;
+  fileName: string;
+  document: CvDocument | null;
+  hasText: boolean; // false for CVs added before the text was kept: they must be added again
+}
+
+type Result = { ok: true; message: string; sourceId?: string } | { ok: false; error: string };
 
 interface Props {
   candidate: { name: string; imageUrl: string | null; githubLogin: string | null };
   cvs: CvItem[];
+  selectedCv: SelectedCv | null;
   facts: ProfileFactView[];
   actions: {
     importGithub: () => Promise<Result>;
     importCodewars: (username: string) => Promise<Result>;
     importCvText: (input: { fileName: string; text: string }) => Promise<Result>;
     removeCv: (sourceId: string) => Promise<Result>;
+    structureCv: (sourceId: string) => Promise<Result>;
     chatFacts: (answers: { question: string; answer: string }[]) => Promise<Result>;
     validate: (id: string) => Promise<Result>;
     validateAll: () => Promise<Result>;
@@ -97,7 +110,8 @@ async function pdfToText(file: File): Promise<string> {
   return (Array.isArray(text) ? text.join("\n") : text).trim();
 }
 
-export function ProfileLibrary({ candidate, cvs, facts, actions }: Props) {
+export function ProfileLibrary({ candidate, cvs, selectedCv, facts, actions }: Props) {
+  const router = useRouter();
   const fileInput = useRef<HTMLInputElement>(null);
   const [pending, startTransition] = useTransition();
   const [message, setMessage] = useState<{ kind: "success" | "error"; text: string } | null>(null);
@@ -109,6 +123,8 @@ export function ProfileLibrary({ candidate, cvs, facts, actions }: Props) {
   const proposed = facts.filter((f) => !f.validated);
   const validated = facts.filter((f) => f.validated);
   const uploading = uploads.some((u) => u.status === "reading" || u.status === "analysing");
+
+  const selectCv = (id: string) => router.push(`/profile?cv=${id}`, { scroll: false });
 
   function run(action: () => Promise<Result>, after?: () => void) {
     setMessage(null);
@@ -125,6 +141,7 @@ export function ProfileLibrary({ candidate, cvs, facts, actions }: Props) {
     if (files.length === 0) return;
     setMessage(null);
     setUploads(files.map((f) => ({ name: f.name, status: "reading" })));
+    let added: string | undefined;
     // One CV after the other: each one is read in the browser, then analysed by the AI.
     for (const [i, file] of files.entries()) {
       const update = (status: "reading" | "analysing" | "done" | "error", note?: string) =>
@@ -147,11 +164,14 @@ export function ProfileLibrary({ candidate, cvs, facts, actions }: Props) {
       update("analysing");
       const result = await actions.importCvText({ fileName: file.name, text });
       update(result.ok ? "done" : "error", result.ok ? result.message : result.error);
+      if (result.ok && result.sourceId) added = result.sourceId;
     }
+    if (added) selectCv(added); // show the CV just added as a document
   }
 
   return (
     <div className="space-y-12">
+      <div className="no-print space-y-12">
       <PageHeading eyebrow="Your professional source library" title="All your CVs">
         <input
           ref={fileInput}
@@ -181,7 +201,7 @@ export function ProfileLibrary({ candidate, cvs, facts, actions }: Props) {
 
       {/* ---------- CV library ---------- */}
       <section aria-labelledby="library-title">
-        <SectionHeading eyebrow="CV library" title="Your CVs" id="library-title" aside={<span className="text-sm text-muted-foreground">{cvs.length} CV</span>} />
+        <SectionHeading eyebrow="CV library" title="Choose a source CV" id="library-title" aside={<span className="text-sm text-muted-foreground">{cvs.length} CV</span>} />
         {uploads.length > 0 && (
           <ul className="mb-4 space-y-1 text-sm" aria-live="polite">
             {uploads.map((u) => (
@@ -195,36 +215,46 @@ export function ProfileLibrary({ candidate, cvs, facts, actions }: Props) {
                 )}
                 <span className="font-medium">{u.name}</span>
                 <span className="text-muted-foreground">
-                  {u.status === "reading" ? "reading the PDF…" : u.status === "analysing" ? "finding your facts, each with a quote from the CV…" : u.note}
+                  {u.status === "reading" ? "reading the PDF…" : u.status === "analysing" ? "finding your facts and laying out your CV, every line checked against the PDF… a minute or two with free models" : u.note}
                 </span>
               </li>
             ))}
           </ul>
         )}
         <div className="grid gap-3 sm:grid-cols-2 xl:grid-cols-3">
-          {cvs.map((cv) => (
-            <article key={cv.id} className="border border-earth/20 bg-card p-5">
-              <div className="grid grid-cols-[auto_minmax(0,1fr)] gap-3">
-                <span className="grid size-11 shrink-0 place-items-center bg-earth text-earth-foreground">
-                  <FileText className="size-5" aria-hidden="true" />
-                </span>
-                <div className="min-w-0">
-                  <h3 className="truncate font-sans text-base font-bold" title={cv.fileName}>
-                    {cv.fileName.replace(/\.pdf$/i, "")}
-                  </h3>
-                  <p className="mt-1 text-xs text-muted-foreground">Added {cv.importedAt}</p>
-                  <p className="mt-2 text-xs">
-                    <span className="font-bold text-primary">{cv.validated}</span> validated · {cv.facts - cv.validated} to review
-                  </p>
+          {cvs.map((cv) => {
+            const selected = cv.id === selectedCv?.id;
+            return (
+              <article key={cv.id} className={`border p-5 ${selected ? "border-primary bg-primary-soft/45" : "border-earth/20 bg-card"}`}>
+                <div className="grid grid-cols-[auto_minmax(0,1fr)] gap-3">
+                  <span className="grid size-11 shrink-0 place-items-center bg-earth text-earth-foreground">
+                    <FileText className="size-5" aria-hidden="true" />
+                  </span>
+                  <div className="min-w-0">
+                    <h3 className="truncate font-sans text-base font-bold" title={cv.fileName}>
+                      {cv.fileName.replace(/\.pdf$/i, "")}
+                    </h3>
+                    <p className="mt-1 text-xs text-muted-foreground">
+                      Added {cv.importedAt} · <span className="font-bold text-primary">{cv.validated}</span> validated · {cv.facts - cv.validated} to review
+                    </p>
+                    {selected && (
+                      <span className="mt-2 inline-flex items-center gap-1 text-xs font-bold text-primary">
+                        <Check className="size-3.5" aria-hidden="true" /> Current source
+                      </span>
+                    )}
+                  </div>
                 </div>
-              </div>
-              <div className="mt-4 flex justify-end">
-                <Button size="sm" variant="ghost" disabled={pending} onClick={() => run(() => actions.removeCv(cv.id))}>
-                  <Trash2 className="size-4" aria-hidden="true" /> Remove
-                </Button>
-              </div>
-            </article>
-          ))}
+                <div className="mt-5 grid grid-cols-[1fr_auto] gap-2">
+                  <Button size="sm" variant={selected ? "default" : "outline"} onClick={() => selectCv(cv.id)} aria-pressed={selected}>
+                    {selected ? "Selected" : "Use as source"}
+                  </Button>
+                  <Button size="sm" variant="ghost" disabled={pending} onClick={() => run(() => actions.removeCv(cv.id))} aria-label={`Remove ${cv.fileName}`}>
+                    <Trash2 className="size-4" aria-hidden="true" /> Remove
+                  </Button>
+                </div>
+              </article>
+            );
+          })}
           <button
             type="button"
             onClick={() => fileInput.current?.click()}
@@ -297,6 +327,46 @@ export function ProfileLibrary({ candidate, cvs, facts, actions }: Props) {
         </section>
       )}
 
+      </div>
+
+      {/* ---------- The selected CV, as a document ---------- */}
+      {selectedCv && (
+        <section aria-labelledby="preview-title">
+          <div className="no-print">
+            <SectionHeading
+              eyebrow="Selected CV"
+              title={selectedCv.fileName.replace(/\.pdf$/i, "")}
+              id="preview-title"
+              aside={
+                <div className="flex gap-2">
+                  {selectedCv.hasText && (
+                    <Button size="sm" variant="outline" disabled={pending} onClick={() => run(() => actions.structureCv(selectedCv.id))}>
+                      <RefreshCw className={`size-4 ${pending ? "animate-spin" : ""}`} aria-hidden="true" /> {selectedCv.document ? "Lay out again" : "Lay it out"}
+                    </Button>
+                  )}
+                  {selectedCv.document && (
+                    <Button size="sm" variant="outline" onClick={() => window.print()}>
+                      <Printer className="size-4" aria-hidden="true" /> PDF
+                    </Button>
+                  )}
+                </div>
+              }
+            />
+            <p className="-mt-2 mb-4 text-sm text-muted-foreground">Laid out by the AI, then checked: every line below is written word for word in your PDF.</p>
+          </div>
+          {selectedCv.document ? (
+            <CvDocumentView document={selectedCv.document} fallbackName={candidate.name} photoUrl={candidate.imageUrl} />
+          ) : (
+            <div className="no-print border border-dashed border-earth/30 p-8 text-center text-sm text-muted-foreground">
+              {selectedCv.hasText
+                ? "This CV is not laid out yet. Use “Lay it out”: about a minute with free models."
+                : "This CV was added before NextRound kept its text. Remove it and add the PDF again to see it here."}
+            </div>
+          )}
+        </section>
+      )}
+
+      <div className="no-print space-y-12">
       {/* ---------- Fact base, shown as a CV ---------- */}
       <section aria-labelledby="base-title">
         <SectionHeading eyebrow="Your fact base" title="Everything you validated" id="base-title" aside={<span className="text-sm text-muted-foreground">{validated.length} facts</span>} />
@@ -403,6 +473,7 @@ export function ProfileLibrary({ candidate, cvs, facts, actions }: Props) {
           </Button>
         </div>
       </ImportSection>
+      </div>
       </div>
     </div>
   );

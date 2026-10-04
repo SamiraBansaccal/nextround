@@ -5,12 +5,13 @@ import { z } from "zod";
 import { getAccount, requireUserId } from "@/lib/auth";
 import { createFact, deleteFact, listFacts, updateFact } from "@/lib/data/facts";
 import { aiErrorMessage } from "@/lib/ai/errors";
-import { addSource, cvRef, removeCvSource } from "@/lib/data/sources";
+import { addSource, cvRef, getCvSource, removeCvSource, setCvDocument } from "@/lib/data/sources";
 import { fetchRelevantRepos, repoToFactText } from "@/lib/github";
 import { codewarsFact, codewarsProfileSchema, codewarsUsername } from "@/lib/profile/codewars";
+import { isEmptyCvDocument, structureCv } from "@/lib/profile/cv-document";
 import { factKey, proposeFactsFromText } from "@/lib/profile/extract-facts";
 
-export type ActionResult = { ok: true; message: string } | { ok: false; error: string };
+export type ActionResult = { ok: true; message: string; sourceId?: string } | { ok: false; error: string };
 
 /** GitHub import: proposes one project fact per relevant public repo (source_ref = repo URL). */
 export async function importGithubAction(): Promise<ActionResult> {
@@ -117,19 +118,21 @@ const cvSchema = z.object({
   text: z.string().trim().min(100, "This PDF has almost no text (is it a scan?).").max(60_000),
 });
 
-/** One CV or LinkedIn PDF: the browser extracted its text; the AI proposes facts with verified quotes. */
+/**
+ * One CV or LinkedIn PDF: the browser extracted its text. In parallel, the AI proposes facts (each with
+ * a verified quote) and structures the CV as a document (each string checked against the text).
+ */
 export async function importCvTextAction(input: unknown): Promise<ActionResult> {
   const account = await getAccount();
   const parsed = cvSchema.safeParse(input);
   if (!parsed.success) return { ok: false, error: parsed.error.issues[0]?.message ?? "Invalid file." };
   const text = parsed.data.text.slice(0, 15_000);
-  let result;
-  try {
-    result = await proposeFactsFromText({ userId: account.userId, isOwner: account.isOwner }, text, "cv");
-  } catch (error) {
-    return { ok: false, error: aiErrorMessage(error) };
-  }
-  const source = await addSource(account.userId, "cv_upload", parsed.data.fileName);
+  const ctx = { userId: account.userId, isOwner: account.isOwner };
+  const [factsResult, documentResult] = await Promise.allSettled([proposeFactsFromText(ctx, text, "cv"), structureCv(ctx, text)]);
+  if (factsResult.status === "rejected") return { ok: false, error: aiErrorMessage(factsResult.reason) };
+  const result = factsResult.value;
+  const document = documentResult.status === "fulfilled" && !isEmptyCvDocument(documentResult.value.document) ? documentResult.value.document : null;
+  const source = await addSource(account.userId, "cv_upload", parsed.data.fileName, { text, document });
   const known = new Set((await listFacts(account.userId)).map((f) => factKey(f.text)));
   let added = 0;
   for (const fact of result.facts) {
@@ -141,8 +144,26 @@ export async function importCvTextAction(input: unknown): Promise<ActionResult> 
   revalidatePath("/", "layout");
   return {
     ok: true,
-    message: `${parsed.data.fileName}: ${added} new fact${added === 1 ? "" : "s"} to review${result.dropped ? ` (${result.dropped} dropped: quote not found in the PDF)` : ""}.`,
+    sourceId: source.id,
+    message: `${parsed.data.fileName}: ${added} new fact${added === 1 ? "" : "s"} to review${result.dropped ? ` (${result.dropped} dropped: quote not found in the PDF)` : ""}.${document ? "" : " The CV could not be laid out yet: try again from its card."}`,
   };
+}
+
+/** Lays out one of the user's CVs as a document again, from the text kept at import. */
+export async function structureCvAction(sourceId: unknown): Promise<ActionResult> {
+  const account = await getAccount();
+  const source = typeof sourceId === "string" ? await getCvSource(account.userId, sourceId) : null;
+  if (!source) return { ok: false, error: "CV not found." };
+  if (!source.text) return { ok: false, error: "This CV was added before NextRound kept its text: remove it and add the PDF again." };
+  try {
+    const { document } = await structureCv({ userId: account.userId, isOwner: account.isOwner }, source.text);
+    if (isEmptyCvDocument(document)) return { ok: false, error: "No part of this CV could be verified word for word. Try another model." };
+    await setCvDocument(account.userId, source.id, document);
+  } catch (error) {
+    return { ok: false, error: aiErrorMessage(error) };
+  }
+  revalidatePath("/profile");
+  return { ok: true, sourceId: source.id, message: "Your CV is laid out: every line was found word for word in the PDF." };
 }
 
 export async function removeCvAction(sourceId: unknown): Promise<ActionResult> {

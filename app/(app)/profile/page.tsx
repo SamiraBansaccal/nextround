@@ -12,18 +12,22 @@ import {
   importGithubAction,
   rejectFactAction,
   removeCvAction,
+  structureCvAction,
   validateAllAction,
   validateFactAction,
 } from "./actions";
 
-export const maxDuration = 120; // CV analysis with free models can be slow
+export const maxDuration = 300; // a CV read by a free model: facts and layout take about a minute, more with a retry
 
 const ORIGIN: Record<ProfileFactView["source"], string> = { github: "GitHub", codewars: "Codewars", cv_upload: "CV", chat: "Chat", manual: "Manual" };
 
-export default async function ProfilePage() {
+export default async function ProfilePage({ searchParams }: PageProps<"/profile">) {
   const account = await getAccount();
+  const { cv } = await searchParams;
   const [facts, cvSources] = await Promise.all([listFacts(account.userId), listSources(account.userId, "cv_upload")]);
   const cvName = new Map(cvSources.map((s) => [cvRef(s.id), s.ref]));
+  // The CV shown as a document: the one chosen in the library (?cv=), else the latest one.
+  const selected = cvSources.find((s) => s.id === cv) ?? cvSources[0] ?? null;
 
   return (
     <ProfileLibrary
@@ -38,6 +42,7 @@ export default async function ProfilePage() {
           validated: fromCv.filter((f) => f.validated).length,
         };
       })}
+      selectedCv={selected && { id: selected.id, fileName: selected.ref, document: selected.document, hasText: Boolean(selected.text) }}
       facts={facts.map((f) => ({
         id: f.id,
         type: f.type,
@@ -53,6 +58,7 @@ export default async function ProfilePage() {
         importCodewars: importCodewarsAction,
         importCvText: importCvTextAction,
         removeCv: removeCvAction,
+        structureCv: structureCvAction,
         chatFacts: chatFactsAction,
         validate: validateFactAction,
         validateAll: validateAllAction,

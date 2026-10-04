@@ -110,4 +110,17 @@ describe("CV sources", () => {
     expect(await factsData.getFact(A, kept.id)).not.toBeNull();
     expect(await factsData.getFact(A, dropped.id)).toBeNull();
   });
+
+  it("B cannot read A's CV text and document, nor overwrite the document", async () => {
+    const doc = { language: "fr", name: "Alice", headline: null, contacts: [], experiences: [], education: [], languages: [], skills: ["React"] };
+    const source = await sourcesData.addSource(A, "cv_upload", "cv2.pdf", { text: "Alice — React", document: doc });
+    expect(await sourcesData.getCvSource(B, source.id)).toBeNull();
+    expect(await sourcesData.setCvDocument(B, source.id, { ...doc, skills: ["Changed by B"] })).toBe(false);
+    const own = await sourcesData.getCvSource(A, source.id);
+    expect(own?.text).toBe("Alice — React");
+    expect(own?.document?.skills).toEqual(["React"]);
+    expect(await sourcesData.setCvDocument(A, source.id, { ...doc, skills: ["React", "Node.js"] })).toBe(true);
+    expect((await sourcesData.getCvSource(A, source.id))?.document?.skills).toEqual(["React", "Node.js"]);
+    expect(await sourcesData.getCvSource(A, "not-a-uuid")).toBeNull();
+  });
 });

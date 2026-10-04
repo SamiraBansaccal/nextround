@@ -41,3 +41,45 @@ export interface Feedback {
   honesty?: Criterion & { learningPlan: string[] };
   improvedAnswer: SourcedSentence[];
 }
+
+// ---------- A CV shown as a document (Profile page) ----------
+// Every string below was found word for word in the CV text (lib/profile/cv-document.ts).
+
+export type CvContactKind = "email" | "phone" | "address" | "website" | "linkedin" | "github" | "birthdate" | "nationality" | "other";
+
+export interface CvContact {
+  kind: CvContactKind;
+  label: string | null; // the label written in the CV, e.g. "Téléphone"
+  value: string;
+}
+
+/** A job, a training or a degree, as written in the CV. */
+export interface CvEntry {
+  title: string;
+  organisation: string | null;
+  location: string | null;
+  period: string | null;
+  details: string[];
+}
+
+/** A language with its level; the five CEFR columns are filled only when the CV has that grid. */
+export interface CvLanguage {
+  name: string;
+  level: string | null;
+  listening: string | null;
+  reading: string | null;
+  spoken: string | null;
+  interaction: string | null;
+  writing: string | null;
+}
+
+export interface CvDocument {
+  language: string; // ISO code of the CV text, used for the section titles only
+  name: string | null;
+  headline: string | null;
+  contacts: CvContact[];
+  experiences: CvEntry[];
+  education: CvEntry[];
+  languages: CvLanguage[];
+  skills: string[];
+}
