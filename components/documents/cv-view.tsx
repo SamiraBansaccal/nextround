@@ -3,15 +3,17 @@
 import { AlertTriangle, ArrowLeft, Check, Copy, Download, History, Loader2, Printer, RefreshCw } from "lucide-react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
-import { useState, useTransition } from "react";
+import { useEffect, useState, useTransition } from "react";
 import { CoverageLabel } from "@/components/source/badges";
 import { Button } from "@/components/ui/button";
 import type { SourcedSentence } from "@/lib/types";
+import { shorten } from "@/lib/text";
 import { cn } from "@/lib/utils";
 
 type CvSentence = SourcedSentence & { section?: string };
 
 interface Props {
+  autoPrint?: boolean; // opened from the offer's "PDF" button: print right away
   offerId: string;
   offerLabel: string;
   candidate: { name: string; imageUrl: string | null; githubLogin: string | null };
@@ -25,11 +27,16 @@ interface Props {
 
 // Tailored CV + cover letter (layout from the Lovable prototype). Every sentence carries the facts
 // it relies on; a sentence without one is "Unsupported". Print / Save as PDF uses the browser.
-export function CvView({ offerId, offerLabel, candidate, cv, letter, versions, facts, feedback, generate }: Props) {
+export function CvView({ offerId, offerLabel, candidate, cv, letter, versions, facts, feedback, generate, autoPrint = false }: Props) {
   const router = useRouter();
   const [pending, startTransition] = useTransition();
   const [error, setError] = useState<string | null>(null);
   const [copied, setCopied] = useState(false);
+  const hasCv = cv !== null;
+
+  useEffect(() => {
+    if (autoPrint && hasCv) window.print();
+  }, [autoPrint, hasCv]);
   const letterText = letter?.sentences.map((s) => s.text).join(" ") ?? "";
   const unsupported = [...(cv?.sentences ?? []), ...(letter?.sentences ?? [])].filter((s) => s.factIds.length === 0).length;
   const sections = cv ? [...new Set(cv.sentences.map((s) => s.section ?? "Profile"))] : [];
@@ -175,7 +182,7 @@ export function CvView({ offerId, offerLabel, candidate, cv, letter, versions, f
                   {feedback.unusedFacts.map((text, i) => (
                     <span key={i} title={text} className="inline-flex max-w-full items-center gap-1 rounded-full border border-success/30 bg-success-soft px-2 py-0.5 text-xs font-medium">
                       <Check className="size-3 shrink-0 text-success" aria-hidden="true" />
-                      <span className="truncate">{text.slice(0, 40)}</span>
+                      <span className="truncate">{shorten(text, 48)}</span>
                     </span>
                   ))}
                 </div>
@@ -220,7 +227,7 @@ function SentenceView({ s, facts }: { s: SourcedSentence; facts: Record<string, 
           s.factIds.map((id) => (
             <span key={id} title={facts[id]} className="inline-flex max-w-full items-center gap-1 rounded-full border border-success/30 bg-success-soft px-2 py-0.5 text-xs font-medium">
               <Check className="size-3 shrink-0 text-success" aria-hidden="true" />
-              <span className="truncate">{(facts[id] ?? "fact").slice(0, 26)}</span>
+              <span className="truncate">{shorten(facts[id] ?? "fact", 32)}</span>
             </span>
           ))
         )}

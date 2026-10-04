@@ -1,10 +1,13 @@
 "use client";
 
 import {
+  AlertTriangle,
   ArrowUpRight,
   BriefcaseBusiness,
   CheckCircle2,
   ChevronDown,
+  Copy,
+  Download,
   ExternalLink,
   FilePenLine,
   FileText,
@@ -16,6 +19,7 @@ import {
   Phone,
   Play,
   Plus,
+  Printer,
   Send,
   Sparkles,
   User,
@@ -73,6 +77,7 @@ const CONTACT_ICON = { email: Mail, phone: Phone, person: User, apply_url: Link2
 interface DocSummary {
   version: number;
   unsupported: number;
+  text: string; // plain text, to copy or download
 }
 
 // Offer page (layout from the Lovable prototype): header, application kit, annotated offer on the
@@ -289,6 +294,7 @@ export function OfferView({ offer, segments, requirements, contacts, score, inte
                 })}
               </ul>
             )}
+            <ApplicationKit offerId={offer.id} company={offer.company} cv={documents.cv} letter={documents.letter} />
             <div className="mt-4 flex flex-col gap-2">
               {offer.sourceUrl && (
                 <Button variant="outline" className="w-full" asChild>
@@ -400,5 +406,80 @@ function DocumentPanel({ kind, doc, offerId }: { kind: "cv" | "letter"; doc: Doc
         </Link>
       </Button>
     </article>
+  );
+}
+
+/** "Apply" panel: the tailored CV and cover letter, ready to copy or download (or the way to create them). */
+function ApplicationKit({ offerId, company, cv, letter }: { offerId: string; company: string | null; cv: DocSummary | null; letter: DocSummary | null }) {
+  const [copied, setCopied] = useState<"cv" | "letter" | null>(null);
+  const slug = (company ?? "offer").toLowerCase().replace(/[^\p{L}\p{N}]+/gu, "-").replace(/^-|-$/g, "") || "offer";
+
+  async function copy(kind: "cv" | "letter", text: string) {
+    await navigator.clipboard.writeText(text);
+    setCopied(kind);
+    window.setTimeout(() => setCopied(null), 2000);
+  }
+
+  function download(text: string, fileName: string) {
+    const url = URL.createObjectURL(new Blob([text], { type: "text/plain;charset=utf-8" }));
+    const a = document.createElement("a");
+    a.href = url;
+    a.download = fileName;
+    a.click();
+    URL.revokeObjectURL(url);
+  }
+
+  if (!cv && !letter) {
+    return (
+      <div className="mt-4 border-t border-earth/15 pt-4">
+        <p className="text-xs font-bold text-muted-foreground uppercase">Your application kit</p>
+        <Button variant="outline" size="sm" className="mt-2 w-full" asChild>
+          <Link href={`/offers/${offerId}/cv`}>
+            <FileText className="size-4" aria-hidden="true" /> Create your CV and cover letter
+          </Link>
+        </Button>
+      </div>
+    );
+  }
+
+  const rows: { kind: "cv" | "letter"; label: string; doc: DocSummary }[] = [];
+  if (letter) rows.push({ kind: "letter", label: "Cover letter", doc: letter });
+  if (cv) rows.push({ kind: "cv", label: "Tailored CV", doc: cv });
+
+  return (
+    <div className="mt-4 border-t border-earth/15 pt-4">
+      <p className="text-xs font-bold text-muted-foreground uppercase">Your application kit</p>
+      <ul className="mt-2 space-y-3">
+        {rows.map(({ kind, label, doc }) => (
+          <li key={kind}>
+            <p className="text-sm font-semibold">
+              {label} <span className="font-normal text-muted-foreground">· version {doc.version}</span>
+            </p>
+            {doc.unsupported > 0 && (
+              <p className="mt-0.5 flex items-center gap-1 text-xs text-gap">
+                <AlertTriangle className="size-3.5 shrink-0" aria-hidden="true" />
+                {doc.unsupported} sentence{doc.unsupported > 1 ? "s" : ""} not backed by your profile: check before sending
+              </p>
+            )}
+            <div className="mt-1.5 grid grid-cols-2 gap-2">
+              <Button size="sm" variant="outline" onClick={() => copy(kind, doc.text)}>
+                <Copy className="size-4" aria-hidden="true" /> {copied === kind ? "Copied" : "Copy"}
+              </Button>
+              {kind === "letter" ? (
+                <Button size="sm" variant="outline" onClick={() => download(doc.text, `cover-letter-${slug}.txt`)}>
+                  <Download className="size-4" aria-hidden="true" /> Download
+                </Button>
+              ) : (
+                <Button size="sm" variant="outline" asChild>
+                  <Link href={`/offers/${offerId}/cv?print=1`}>
+                    <Printer className="size-4" aria-hidden="true" /> PDF
+                  </Link>
+                </Button>
+              )}
+            </div>
+          </li>
+        ))}
+      </ul>
+    </div>
   );
 }

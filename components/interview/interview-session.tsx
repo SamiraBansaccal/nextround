@@ -6,6 +6,7 @@ import Link from "next/link";
 import { useEffect, useState, useTransition } from "react";
 import { Button } from "@/components/ui/button";
 import type { Criterion, Feedback, QuestionGroup, SourcedSentence } from "@/lib/types";
+import { shorten } from "@/lib/text";
 import { cn } from "@/lib/utils";
 import { useVoice } from "./use-voice";
 
@@ -421,7 +422,7 @@ function Sentences({ sentences, facts, empty }: { sentences: SourcedSentence[]; 
                   className="ml-1 inline-flex max-w-full items-center gap-1 rounded-full border border-success/30 bg-success-soft px-2 py-0.5 align-middle text-xs font-medium"
                 >
                   <Check className="size-3 shrink-0 text-success" aria-hidden="true" />
-                  <span className="truncate">{(facts[id] ?? "fact").slice(0, 28)}</span>
+                  <span className="truncate">{shorten(facts[id] ?? "fact", 32)}</span>
                 </span>
               ))}
             </>
@@ -487,7 +488,7 @@ function FeedbackPanel({ feedback, facts }: { feedback: Feedback; facts: Record<
                     title={facts[claim.factId]}
                     className="ml-1 inline-flex items-center gap-1 rounded-full border border-success/30 bg-success-soft px-2 py-0.5 align-middle text-xs font-medium"
                   >
-                    <Check className="size-3 text-success" aria-hidden="true" /> {(facts[claim.factId] ?? "fact").slice(0, 32)}
+                    <Check className="size-3 text-success" aria-hidden="true" /> {shorten(facts[claim.factId] ?? "fact", 36)}
                   </span>
                 ) : (
                   <span className="ml-1 inline-flex items-center gap-1 rounded-full bg-gap-soft px-2 py-0.5 align-middle text-xs font-medium text-gap">

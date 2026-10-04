@@ -12,7 +12,7 @@ export const maxDuration = 120;
 
 export default async function OfferCvPage({ params, searchParams }: PageProps<"/offers/[id]/cv">) {
   const { id } = await params;
-  const { v } = await searchParams;
+  const { v, print } = await searchParams;
   const account = await getAccount();
   const [detail, facts, docs] = await Promise.all([getOfferDetail(account.userId, id), listFacts(account.userId), listDocuments(account.userId, id)]);
   if (!detail) notFound();
@@ -46,6 +46,7 @@ export default async function OfferCvPage({ params, searchParams }: PageProps<"/
         unusedFacts,
       }}
       generate={generateDocumentsAction}
+      autoPrint={print === "1"}
     />
   );
 }

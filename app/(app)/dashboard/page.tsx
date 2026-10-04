@@ -2,6 +2,7 @@ import { UserRound } from "lucide-react";
 import Image from "next/image";
 import Link from "next/link";
 import { AiStatusCard } from "@/components/ai/ai-status-card";
+import { GetStarted } from "@/components/dashboard/get-started";
 import { Opportunities } from "@/components/dashboard/opportunities";
 import { AddOfferForm } from "@/components/offers/add-offer-form";
 import { PageHeading } from "@/components/page-heading";
@@ -14,6 +15,7 @@ import { countInterviewsByOffer } from "@/lib/data/interviews";
 import { listOffers, listRequirementsForUser } from "@/lib/data/offers";
 import { buildPipelineCards } from "@/lib/pipeline";
 import { addOfferAction, setOfferStatusAction } from "../offers/actions";
+import { importGithubAction } from "../profile/actions";
 
 export const maxDuration = 120; // adding an offer from here runs the AI scan
 
@@ -42,6 +44,7 @@ export default async function DashboardPage() {
           </>
         }
       />
+      {facts.length === 0 && <GetStarted githubLogin={account.githubLogin} importGithub={importGithubAction} />}
       <div className="mb-8 grid grid-cols-[72px_minmax(0,1fr)] items-center gap-4 border-y border-border py-5 sm:mb-10 sm:grid-cols-[112px_minmax(0,1fr)_auto] sm:gap-7">
         <Image
           src="/brand/progress-editorial.jpg"

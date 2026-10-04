@@ -9,12 +9,15 @@ import { highlightSegments } from "@/lib/offers/segments";
 import { startInterviewAction } from "../../interview/actions";
 import { markAppliedAction } from "../actions";
 import { formatDay } from "@/lib/dates";
+import { documentPlainText } from "@/lib/documents/plain-text";
 
 export const maxDuration = 120;
 
-/** Latest version (documents come newest first) and how many sentences have no valid fact. */
-function docSummary(doc: { version: number; sentences: { factIds: string[] }[] } | undefined) {
-  return doc ? { version: doc.version, unsupported: doc.sentences.filter((s) => s.factIds.length === 0).length } : null;
+/** Latest version (documents come newest first), its plain text, and how many sentences have no valid fact. */
+function docSummary(doc: { kind: "cv" | "cover_letter"; version: number; sentences: { text: string; factIds: string[]; section?: string }[] } | undefined) {
+  return doc
+    ? { version: doc.version, unsupported: doc.sentences.filter((s) => s.factIds.length === 0).length, text: documentPlainText(doc.kind, doc.sentences) }
+    : null;
 }
 
 export default async function OfferPage({ params }: PageProps<"/offers/[id]">) {
