@@ -3,7 +3,7 @@
 For every entry of characters/sources.json: lists the images used on the character's page, keeps the
 large ones, ranks them (official art and transparent renders first) and downloads the best ones into
 characters/<id>/candidates/ with a contact sheet (contact-sheet.jpg) to pick the references from.
-Usage: python3 scripts/avatars/collect-references.py [character-id …]   (all characters by default)
+Usage: python3 scripts/avatars/collect-references.py [--missing] [character-id …]   (all by default; --missing skips done ones)
 """
 import io, json, re, sys, time, urllib.parse, urllib.request
 from pathlib import Path
@@ -49,19 +49,38 @@ def category_files(wiki, category):
             return files
         cont = d["continue"]
 
-def candidates(wiki, title):
-    """Files from the character page, its /Gallery subpage and its image categories."""
-    files = page_files(wiki, title) + page_files(wiki, f"{title}/Gallery")
+def file_search(wiki, query, limit=100):
+    d = api(wiki, action="query", list="search", srnamespace=6, srsearch=query, srlimit=limit)
+    return [r["title"] for r in d.get("query", {}).get("search", [])]
+
+def wikipedia_image(article):
+    """The canonical image of the character's English Wikipedia article (small, but always on-model)."""
+    url = f"https://en.wikipedia.org/api/rest_v1/page/summary/{urllib.parse.quote(article.replace(' ', '_'))}"
+    try:
+        with urllib.request.urlopen(urllib.request.Request(url, headers=UA), timeout=30) as r:
+            img = json.load(r).get("originalimage")
+        if img:
+            return {"title": f"Wikipedia: {article}", "url": img["source"].split("?")[0], "w": img["width"], "h": img["height"], "mime": "image/png", "canonical": True}
+    except Exception:
+        pass
+    return None
+
+def candidates(wiki, title, article=None):
+    """Files named after the character (official renders are usually there), the character page, its
+    /Gallery subpage and its image categories, plus the Wikipedia article's image."""
+    short = title.split(" (")[0]
+    named = [f for f in file_search(wiki, f'"{short}" png') + file_search(wiki, short) if f.lower().endswith(".png")]
+    files = named + page_files(wiki, title) + page_files(wiki, f"{title}/Gallery")
     words = [w for w in re.split(r"[^A-Za-z]+", title) if len(w) > 2]
-    cats = api(wiki, action="query", list="search", srnamespace=14, srsearch=f"Images {title}", srlimit=20)["query"]["search"]
+    cats = api(wiki, action="query", list="search", srnamespace=14, srsearch=f"Images {title}", srlimit=20).get("query", {}).get("search", [])
     for c in cats:
         if re.match(r"Category:(Images|Gallery)", c["title"]) and any(w.lower() in c["title"].lower() for w in words):
             files += category_files(wiki, c["title"])
     files = [f for f in dict.fromkeys(files) if not SKIP.search(f)]
     infos = [i for i in file_infos(wiki, files) if i["w"] <= i["h"] * 1.9]
-    # Shortlist: renders are usually PNG; then the largest. The final ranking needs the pixels.
-    infos.sort(key=lambda i: (i["mime"] == "image/png", GOOD.search(i["title"]) is not None, min(i["w"], i["h"])), reverse=True)
-    return infos[:28]
+    infos.sort(key=lambda i: (i["mime"] == "image/png", i["title"] in named, min(i["w"], i["h"])), reverse=True)
+    canonical = wikipedia_image(article or short)
+    return ([canonical] if canonical else []) + infos[:30]
 
 def transparent_ratio(im):
     """Share of transparent pixels on the image border: high = a cut-out render, easy to reuse."""
@@ -93,12 +112,18 @@ def contact_sheet(paths, out):
 
 def main():
     sources = json.load(open(ROOT / "sources.json"))
-    ids = sys.argv[1:] or list(sources)
+    ids = [a for a in sys.argv[1:] if not a.startswith("--")] or list(sources)
     for cid in ids:
-        wiki, title = sources[cid]
+        wiki, title, *rest = sources[cid]
+        if "--missing" in sys.argv[1:2] and (ROOT / cid / "contact-sheet.jpg").exists():
+            continue
         folder = ROOT / cid / "candidates"
         folder.mkdir(parents=True, exist_ok=True)
-        found = candidates(wiki, title)
+        try:
+            found = candidates(wiki, title, rest[0] if rest else None)
+        except Exception as error:
+            print(f"{cid}: failed ({error})")
+            continue
         scored = []
         for info in found:
             try:
@@ -107,7 +132,7 @@ def main():
                 continue
             ratio = transparent_ratio(im)
             portrait = im.size[1] >= im.size[0]
-            scored.append((ratio * 10 + (2 if portrait else 0) + min(im.size) / 400, info, im, ratio))
+            scored.append((ratio * 10 + (2 if portrait else 0) + min(im.size) / 400 + (8 if info.get("canonical") else 0), info, im, ratio))
             time.sleep(0.2)
         scored.sort(key=lambda t: t[0], reverse=True)
         for old_file in folder.glob("c*.png"):
