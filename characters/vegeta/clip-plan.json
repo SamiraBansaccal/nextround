@@ -1,0 +1,266 @@
+[
+ {
+  "id": "idle-breathing",
+  "category": "idle",
+  "seconds": 5,
+  "loop": true,
+  "voice": false,
+  "prompt": "Vegeta as a job interviewer in a video call, in a Capsule Corp room. Same character, same outfit (flame-shaped black hair, blue bodysuit, white gloves and armour), same background, same framing and lighting as the reference: static webcam shot, chest-up, facing the camera, no camera movement, no cuts, no text. Canonical design and art style of the character, unchanged. Personality: Proud, arrogant, relentless. Waits for the candidate: natural breathing, blinks, relaxed posture, tiny natural body movement, never frozen. Characteristic mannerisms when natural: arms crossed; proud smirk; scoffs. Mouth closed, no speech, no sound. Starts and ends in the same neutral pose, looking at the camera."
+ },
+ {
+  "id": "idle-glance",
+  "category": "idle",
+  "seconds": 5,
+  "loop": true,
+  "voice": false,
+  "prompt": "Vegeta as a job interviewer in a video call, in a Capsule Corp room. Same character, same outfit (flame-shaped black hair, blue bodysuit, white gloves and armour), same background, same framing and lighting as the reference: static webcam shot, chest-up, facing the camera, no camera movement, no cuts, no text. Canonical design and art style of the character, unchanged. Personality: Proud, arrogant, relentless. Waits: eyes drift slightly to the side for a moment, then come back to the camera. Mouth closed, no speech, no sound. Starts and ends in the same neutral pose, looking at the camera."
+ },
+ {
+  "id": "listen-attentive",
+  "category": "listening",
+  "seconds": 5,
+  "loop": true,
+  "voice": false,
+  "prompt": "Vegeta as a job interviewer in a video call, in a Capsule Corp room. Same character, same outfit (flame-shaped black hair, blue bodysuit, white gloves and armour), same background, same framing and lighting as the reference: static webcam shot, chest-up, facing the camera, no camera movement, no cuts, no text. Canonical design and art style of the character, unchanged. Personality: Proud, arrogant, relentless. Listens to the candidate speaking: steady eye contact, unreadable expression, a slight change of expression midway. Mouth closed, no speech, no sound. Starts and ends in the same neutral pose, looking at the camera."
+ },
+ {
+  "id": "listen-nod",
+  "category": "listening",
+  "seconds": 4,
+  "loop": true,
+  "voice": false,
+  "prompt": "Vegeta as a job interviewer in a video call, in a Capsule Corp room. Same character, same outfit (flame-shaped black hair, blue bodysuit, white gloves and armour), same background, same framing and lighting as the reference: static webcam shot, chest-up, facing the camera, no camera movement, no cuts, no text. Canonical design and art style of the character, unchanged. Personality: Proud, arrogant, relentless. Listens and one slow, measured nod. Mouth closed, no speech, no sound. Starts and ends in the same neutral pose, looking at the camera."
+ },
+ {
+  "id": "listen-notes",
+  "category": "listening",
+  "seconds": 5,
+  "loop": true,
+  "voice": false,
+  "prompt": "Vegeta as a job interviewer in a video call, in a Capsule Corp room. Same character, same outfit (flame-shaped black hair, blue bodysuit, white gloves and armour), same background, same framing and lighting as the reference: static webcam shot, chest-up, facing the camera, no camera movement, no cuts, no text. Canonical design and art style of the character, unchanged. Personality: Proud, arrogant, relentless. Listens, glances down to write a short note, then looks back up at the camera. Mouth closed, no speech, no sound. Starts and ends in the same neutral pose, looking at the camera."
+ },
+ {
+  "id": "react-interest",
+  "category": "positive",
+  "seconds": 4,
+  "loop": true,
+  "voice": false,
+  "prompt": "Vegeta as a job interviewer in a video call, in a Capsule Corp room. Same character, same outfit (flame-shaped black hair, blue bodysuit, white gloves and armour), same background, same framing and lighting as the reference: static webcam shot, chest-up, facing the camera, no camera movement, no cuts, no text. Canonical design and art style of the character, unchanged. Personality: Proud, arrogant, relentless. Reacts to the candidate's answer: narrows the eyes slightly and tilts the head, calculating. Mouth closed, no speech, no sound. Starts and ends in the same neutral pose, looking at the camera."
+ },
+ {
+  "id": "react-approval",
+  "category": "positive",
+  "seconds": 4,
+  "loop": true,
+  "voice": false,
+  "prompt": "Vegeta as a job interviewer in a video call, in a Capsule Corp room. Same character, same outfit (flame-shaped black hair, blue bodysuit, white gloves and armour), same background, same framing and lighting as the reference: static webcam shot, chest-up, facing the camera, no camera movement, no cuts, no text. Canonical design and art style of the character, unchanged. Personality: Proud, arrogant, relentless. Reacts to the candidate's answer: one slow, measured nod. Mouth closed, no speech, no sound. Starts and ends in the same neutral pose, looking at the camera."
+ },
+ {
+  "id": "react-smile",
+  "category": "positive",
+  "seconds": 4,
+  "loop": true,
+  "voice": false,
+  "prompt": "Vegeta as a job interviewer in a video call, in a Capsule Corp room. Same character, same outfit (flame-shaped black hair, blue bodysuit, white gloves and armour), same background, same framing and lighting as the reference: static webcam shot, chest-up, facing the camera, no camera movement, no cuts, no text. Canonical design and art style of the character, unchanged. Personality: Proud, arrogant, relentless. Reacts to the candidate's answer: a thin, condescending smile. Mouth closed, no speech, no sound. Starts and ends in the same neutral pose, looking at the camera."
+ },
+ {
+  "id": "react-amusement",
+  "category": "positive",
+  "seconds": 4,
+  "loop": true,
+  "voice": false,
+  "prompt": "Vegeta as a job interviewer in a video call, in a Capsule Corp room. Same character, same outfit (flame-shaped black hair, blue bodysuit, white gloves and armour), same background, same framing and lighting as the reference: static webcam shot, chest-up, facing the camera, no camera movement, no cuts, no text. Canonical design and art style of the character, unchanged. Personality: Proud, arrogant, relentless. Reacts to the candidate's answer: a thin, condescending smile and a short silent chuckle. Mouth closed, no speech, no sound. Starts and ends in the same neutral pose, looking at the camera."
+ },
+ {
+  "id": "react-enthusiasm",
+  "category": "positive",
+  "seconds": 4,
+  "loop": true,
+  "voice": false,
+  "prompt": "Vegeta as a job interviewer in a video call, in a Capsule Corp room. Same character, same outfit (flame-shaped black hair, blue bodysuit, white gloves and armour), same background, same framing and lighting as the reference: static webcam shot, chest-up, facing the camera, no camera movement, no cuts, no text. Canonical design and art style of the character, unchanged. Personality: Proud, arrogant, relentless. Reacts to the candidate's answer: a rare, slightly unsettling gleam of satisfaction. Mouth closed, no speech, no sound. Starts and ends in the same neutral pose, looking at the camera."
+ },
+ {
+  "id": "react-satisfaction",
+  "category": "positive",
+  "seconds": 4,
+  "loop": true,
+  "voice": false,
+  "prompt": "Vegeta as a job interviewer in a video call, in a Capsule Corp room. Same character, same outfit (flame-shaped black hair, blue bodysuit, white gloves and armour), same background, same framing and lighting as the reference: static webcam shot, chest-up, facing the camera, no camera movement, no cuts, no text. Canonical design and art style of the character, unchanged. Personality: Proud, arrogant, relentless. Reacts to the candidate's answer: steeples the fingers, a slow satisfied smile. Mouth closed, no speech, no sound. Starts and ends in the same neutral pose, looking at the camera."
+ },
+ {
+  "id": "react-doubt",
+  "category": "negative",
+  "seconds": 4,
+  "loop": true,
+  "voice": false,
+  "prompt": "Vegeta as a job interviewer in a video call, in a Capsule Corp room. Same character, same outfit (flame-shaped black hair, blue bodysuit, white gloves and armour), same background, same framing and lighting as the reference: static webcam shot, chest-up, facing the camera, no camera movement, no cuts, no text. Canonical design and art style of the character, unchanged. Personality: Proud, arrogant, relentless. Reacts to the candidate's answer: one eyebrow raised, unimpressed. Mouth closed, no speech, no sound. Starts and ends in the same neutral pose, looking at the camera."
+ },
+ {
+  "id": "react-disapproval",
+  "category": "negative",
+  "seconds": 4,
+  "loop": true,
+  "voice": false,
+  "prompt": "Vegeta as a job interviewer in a video call, in a Capsule Corp room. Same character, same outfit (flame-shaped black hair, blue bodysuit, white gloves and armour), same background, same framing and lighting as the reference: static webcam shot, chest-up, facing the camera, no camera movement, no cuts, no text. Canonical design and art style of the character, unchanged. Personality: Proud, arrogant, relentless. Reacts to the candidate's answer: cold stare, lips pressed thin. Mouth closed, no speech, no sound. Starts and ends in the same neutral pose, looking at the camera."
+ },
+ {
+  "id": "react-disappointment",
+  "category": "negative",
+  "seconds": 4,
+  "loop": true,
+  "voice": false,
+  "prompt": "Vegeta as a job interviewer in a video call, in a Capsule Corp room. Same character, same outfit (flame-shaped black hair, blue bodysuit, white gloves and armour), same background, same framing and lighting as the reference: static webcam shot, chest-up, facing the camera, no camera movement, no cuts, no text. Canonical design and art style of the character, unchanged. Personality: Proud, arrogant, relentless. Reacts to the candidate's answer: looks away briefly with contempt, then back. Mouth closed, no speech, no sound. Starts and ends in the same neutral pose, looking at the camera."
+ },
+ {
+  "id": "react-scepticism",
+  "category": "negative",
+  "seconds": 4,
+  "loop": true,
+  "voice": false,
+  "prompt": "Vegeta as a job interviewer in a video call, in a Capsule Corp room. Same character, same outfit (flame-shaped black hair, blue bodysuit, white gloves and armour), same background, same framing and lighting as the reference: static webcam shot, chest-up, facing the camera, no camera movement, no cuts, no text. Canonical design and art style of the character, unchanged. Personality: Proud, arrogant, relentless. Reacts to the candidate's answer: looks down the nose, eyebrow raised. Mouth closed, no speech, no sound. Starts and ends in the same neutral pose, looking at the camera."
+ },
+ {
+  "id": "react-confusion",
+  "category": "negative",
+  "seconds": 4,
+  "loop": true,
+  "voice": false,
+  "prompt": "Vegeta as a job interviewer in a video call, in a Capsule Corp room. Same character, same outfit (flame-shaped black hair, blue bodysuit, white gloves and armour), same background, same framing and lighting as the reference: static webcam shot, chest-up, facing the camera, no camera movement, no cuts, no text. Canonical design and art style of the character, unchanged. Personality: Proud, arrogant, relentless. Reacts to the candidate's answer: brief blank stare, slight head tilt. Mouth closed, no speech, no sound. Starts and ends in the same neutral pose, looking at the camera."
+ },
+ {
+  "id": "react-irritation",
+  "category": "negative",
+  "seconds": 4,
+  "loop": true,
+  "voice": false,
+  "prompt": "Vegeta as a job interviewer in a video call, in a Capsule Corp room. Same character, same outfit (flame-shaped black hair, blue bodysuit, white gloves and armour), same background, same framing and lighting as the reference: static webcam shot, chest-up, facing the camera, no camera movement, no cuts, no text. Canonical design and art style of the character, unchanged. Personality: Proud, arrogant, relentless. Reacts to the candidate's answer: icy irritation: jaw tightens, fingers drum once. Mouth closed, no speech, no sound. Starts and ends in the same neutral pose, looking at the camera."
+ },
+ {
+  "id": "react-surprise",
+  "category": "strong",
+  "seconds": 4,
+  "loop": true,
+  "voice": false,
+  "prompt": "Vegeta as a job interviewer in a video call, in a Capsule Corp room. Same character, same outfit (flame-shaped black hair, blue bodysuit, white gloves and armour), same background, same framing and lighting as the reference: static webcam shot, chest-up, facing the camera, no camera movement, no cuts, no text. Canonical design and art style of the character, unchanged. Personality: Proud, arrogant, relentless. Reacts to the candidate's answer: a single raised eyebrow, otherwise perfectly still. Mouth closed, no speech, no sound. Starts and ends in the same neutral pose, looking at the camera."
+ },
+ {
+  "id": "react-shock",
+  "category": "strong",
+  "seconds": 4,
+  "loop": true,
+  "voice": false,
+  "prompt": "Vegeta as a job interviewer in a video call, in a Capsule Corp room. Same character, same outfit (flame-shaped black hair, blue bodysuit, white gloves and armour), same background, same framing and lighting as the reference: static webcam shot, chest-up, facing the camera, no camera movement, no cuts, no text. Canonical design and art style of the character, unchanged. Personality: Proud, arrogant, relentless. Reacts to the candidate's answer: stiffens, eyes widen slightly, composure regained at once. Mouth closed, no speech, no sound. Starts and ends in the same neutral pose, looking at the camera."
+ },
+ {
+  "id": "react-disbelief",
+  "category": "strong",
+  "seconds": 4,
+  "loop": true,
+  "voice": false,
+  "prompt": "Vegeta as a job interviewer in a video call, in a Capsule Corp room. Same character, same outfit (flame-shaped black hair, blue bodysuit, white gloves and armour), same background, same framing and lighting as the reference: static webcam shot, chest-up, facing the camera, no camera movement, no cuts, no text. Canonical design and art style of the character, unchanged. Personality: Proud, arrogant, relentless. Reacts to the candidate's answer: slow blink, unconvinced stare. Mouth closed, no speech, no sound. Starts and ends in the same neutral pose, looking at the camera."
+ },
+ {
+  "id": "react-laughter",
+  "category": "strong",
+  "seconds": 4,
+  "loop": true,
+  "voice": false,
+  "prompt": "Vegeta as a job interviewer in a video call, in a Capsule Corp room. Same character, same outfit (flame-shaped black hair, blue bodysuit, white gloves and armour), same background, same framing and lighting as the reference: static webcam shot, chest-up, facing the camera, no camera movement, no cuts, no text. Canonical design and art style of the character, unchanged. Personality: Proud, arrogant, relentless. Reacts to the candidate's answer: a dry, wheezy chuckle, quickly suppressed. Mouth closed, no speech, no sound. Starts and ends in the same neutral pose, looking at the camera."
+ },
+ {
+  "id": "react-anger",
+  "category": "strong",
+  "seconds": 4,
+  "loop": true,
+  "voice": false,
+  "prompt": "Vegeta as a job interviewer in a video call, in a Capsule Corp room. Same character, same outfit (flame-shaped black hair, blue bodysuit, white gloves and armour), same background, same framing and lighting as the reference: static webcam shot, chest-up, facing the camera, no camera movement, no cuts, no text. Canonical design and art style of the character, unchanged. Personality: Proud, arrogant, relentless. Reacts to the candidate's answer: cold fury: glares, clenches the hands, says nothing. Mouth closed, no speech, no sound. Starts and ends in the same neutral pose, looking at the camera."
+ },
+ {
+  "id": "react-embarrassment",
+  "category": "strong",
+  "seconds": 4,
+  "loop": true,
+  "voice": false,
+  "prompt": "Vegeta as a job interviewer in a video call, in a Capsule Corp room. Same character, same outfit (flame-shaped black hair, blue bodysuit, white gloves and armour), same background, same framing and lighting as the reference: static webcam shot, chest-up, facing the camera, no camera movement, no cuts, no text. Canonical design and art style of the character, unchanged. Personality: Proud, arrogant, relentless. Reacts to the candidate's answer: clears the throat, adjusts the collar, looks away. Mouth closed, no speech, no sound. Starts and ends in the same neutral pose, looking at the camera."
+ },
+ {
+  "id": "think",
+  "category": "transition",
+  "seconds": 4,
+  "loop": true,
+  "voice": false,
+  "prompt": "Vegeta as a job interviewer in a video call, in a Capsule Corp room. Same character, same outfit (flame-shaped black hair, blue bodysuit, white gloves and armour), same background, same framing and lighting as the reference: static webcam shot, chest-up, facing the camera, no camera movement, no cuts, no text. Canonical design and art style of the character, unchanged. Personality: Proud, arrogant, relentless. Thinks before replying: a brief, still pause, eyes narrowing, then back to the camera. Mouth closed, no speech, no sound. Starts and ends in the same neutral pose, looking at the camera."
+ },
+ {
+  "id": "check-notes",
+  "category": "transition",
+  "seconds": 4,
+  "loop": true,
+  "voice": false,
+  "prompt": "Vegeta as a job interviewer in a video call, in a Capsule Corp room. Same character, same outfit (flame-shaped black hair, blue bodysuit, white gloves and armour), same background, same framing and lighting as the reference: static webcam shot, chest-up, facing the camera, no camera movement, no cuts, no text. Canonical design and art style of the character, unchanged. Personality: Proud, arrogant, relentless. Looks down at the notes on the desk, then raises the eyes back to the camera. Mouth closed, no speech, no sound. Starts and ends in the same neutral pose, looking at the camera."
+ },
+ {
+  "id": "prepare-question",
+  "category": "transition",
+  "seconds": 4,
+  "loop": false,
+  "voice": false,
+  "prompt": "Vegeta as a job interviewer in a video call, in a Capsule Corp room. Same character, same outfit (flame-shaped black hair, blue bodysuit, white gloves and armour), same background, same framing and lighting as the reference: static webcam shot, chest-up, facing the camera, no camera movement, no cuts, no text. Canonical design and art style of the character, unchanged. Personality: Proud, arrogant, relentless. Takes a breath and shifts posture slightly, about to ask the next question. Ends looking at the camera, lips about to part. Mouth closed, no speech, no sound."
+ },
+ {
+  "id": "speak-neutral",
+  "category": "speaking",
+  "seconds": 5,
+  "loop": false,
+  "voice": true,
+  "prompt": "Vegeta as a job interviewer in a video call, in a Capsule Corp room. Same character, same outfit (flame-shaped black hair, blue bodysuit, white gloves and armour), same background, same framing and lighting as the reference: static webcam shot, chest-up, facing the camera, no camera movement, no cuts, no text. Canonical design and art style of the character, unchanged. Personality: Proud, arrogant, relentless. Speaks to the candidate, lip-synced to the audio, in a normal tone, small natural head and hand movements, then stops and looks at the camera."
+ },
+ {
+  "id": "speak-interested",
+  "category": "speaking",
+  "seconds": 5,
+  "loop": false,
+  "voice": true,
+  "prompt": "Vegeta as a job interviewer in a video call, in a Capsule Corp room. Same character, same outfit (flame-shaped black hair, blue bodysuit, white gloves and armour), same background, same framing and lighting as the reference: static webcam shot, chest-up, facing the camera, no camera movement, no cuts, no text. Canonical design and art style of the character, unchanged. Personality: Proud, arrogant, relentless. Speaks to the candidate, lip-synced to the audio, in a interested tone, small natural head and hand movements, then stops and looks at the camera."
+ },
+ {
+  "id": "speak-serious",
+  "category": "speaking",
+  "seconds": 5,
+  "loop": false,
+  "voice": true,
+  "prompt": "Vegeta as a job interviewer in a video call, in a Capsule Corp room. Same character, same outfit (flame-shaped black hair, blue bodysuit, white gloves and armour), same background, same framing and lighting as the reference: static webcam shot, chest-up, facing the camera, no camera movement, no cuts, no text. Canonical design and art style of the character, unchanged. Personality: Proud, arrogant, relentless. Speaks to the candidate, lip-synced to the audio, in a serious tone, small natural head and hand movements, then stops and looks at the camera."
+ },
+ {
+  "id": "speak-amused",
+  "category": "speaking",
+  "seconds": 5,
+  "loop": false,
+  "voice": true,
+  "prompt": "Vegeta as a job interviewer in a video call, in a Capsule Corp room. Same character, same outfit (flame-shaped black hair, blue bodysuit, white gloves and armour), same background, same framing and lighting as the reference: static webcam shot, chest-up, facing the camera, no camera movement, no cuts, no text. Canonical design and art style of the character, unchanged. Personality: Proud, arrogant, relentless. Speaks to the candidate, lip-synced to the audio, in a amused tone, small natural head and hand movements, then stops and looks at the camera."
+ },
+ {
+  "id": "speak-sceptical",
+  "category": "speaking",
+  "seconds": 5,
+  "loop": false,
+  "voice": true,
+  "prompt": "Vegeta as a job interviewer in a video call, in a Capsule Corp room. Same character, same outfit (flame-shaped black hair, blue bodysuit, white gloves and armour), same background, same framing and lighting as the reference: static webcam shot, chest-up, facing the camera, no camera movement, no cuts, no text. Canonical design and art style of the character, unchanged. Personality: Proud, arrogant, relentless. Speaks to the candidate, lip-synced to the audio, in a sceptical tone, small natural head and hand movements, then stops and looks at the camera."
+ },
+ {
+  "id": "speak-irritated",
+  "category": "speaking",
+  "seconds": 5,
+  "loop": false,
+  "voice": true,
+  "prompt": "Vegeta as a job interviewer in a video call, in a Capsule Corp room. Same character, same outfit (flame-shaped black hair, blue bodysuit, white gloves and armour), same background, same framing and lighting as the reference: static webcam shot, chest-up, facing the camera, no camera movement, no cuts, no text. Canonical design and art style of the character, unchanged. Personality: Proud, arrogant, relentless. Speaks to the candidate, lip-synced to the audio, in a irritated tone, small natural head and hand movements, then stops and looks at the camera."
+ },
+ {
+  "id": "speak-enthusiastic",
+  "category": "speaking",
+  "seconds": 5,
+  "loop": false,
+  "voice": true,
+  "prompt": "Vegeta as a job interviewer in a video call, in a Capsule Corp room. Same character, same outfit (flame-shaped black hair, blue bodysuit, white gloves and armour), same background, same framing and lighting as the reference: static webcam shot, chest-up, facing the camera, no camera movement, no cuts, no text. Canonical design and art style of the character, unchanged. Personality: Proud, arrogant, relentless. Speaks to the candidate, lip-synced to the audio, in a enthusiastic tone, small natural head and hand movements, then stops and looks at the camera."
+ }
+]

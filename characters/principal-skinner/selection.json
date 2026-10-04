@@ -1,0 +1,11 @@
+{
+ "master": {
+  "file": "c01"
+ },
+ "references": [
+  {
+   "file": "c01"
+  }
+ ],
+ "notes": "Only clean on-model render found (suit); the rest are crowded show frames."
+}

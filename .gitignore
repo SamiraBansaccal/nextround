@@ -37,3 +37,6 @@ npm-debug.log*
 
 # Personal, machine-only files (your own CVs, offers, import scripts): never committed
 /.local/
+
+# Avatar reference candidates (large, re-downloadable with scripts/avatars/collect-references.py)
+/characters/*/candidates/*.png

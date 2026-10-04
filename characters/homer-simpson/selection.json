@@ -1,0 +1,5 @@
+{
+  "master": {"file": "c05"},
+  "references": [{"file": "c05"}, {"file": "c07"}, {"file": "c01"}, {"file": "c08"}],
+  "notes": "c05: official full-body render, canonical white short-sleeved shirt and blue trousers, front view, transparent. c07: bust render (face and expression detail). c01: Wikipedia's canonical image. c08: walking 3/4 view for proportions. Costume variants (c02 coat, c04 tracksuit, c06 top hat) left out."
+}

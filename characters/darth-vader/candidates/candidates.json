@@ -1,0 +1,228 @@
+[
+ {
+  "file": "c01.png",
+  "source": "https://static.wikia.nocookie.net/starwars/images/2/24/AhsokaAnakin-TCWLD.png/revision/latest?cb=20221118014708",
+  "wiki_file": "File:AhsokaAnakin-TCWLD.png",
+  "size": [
+   5120,
+   5150
+  ],
+  "transparent_border": 1.0
+ },
+ {
+  "file": "c02.png",
+  "source": "https://static.wikia.nocookie.net/starwars/images/9/95/AnakinSkywalkerEpIII-SWBC52.png/revision/latest?cb=20240101210055",
+  "wiki_file": "File:AnakinSkywalkerEpIII-SWBC52.png",
+  "size": [
+   2185,
+   3165
+  ],
+  "transparent_border": 1.0
+ },
+ {
+  "file": "c03.png",
+  "source": "https://static.wikia.nocookie.net/starwars/images/6/6c/AnakinSkywalker-SWBC52cvr.png/revision/latest?cb=20260109062122",
+  "wiki_file": "File:AnakinSkywalker-SWBC52cvr.png",
+  "size": [
+   2000,
+   2667
+  ],
+  "transparent_border": 0.75
+ },
+ {
+  "file": "c04.png",
+  "source": "https://static.wikia.nocookie.net/starwars/images/3/32/AnakinSkywalkerExpansion.png/revision/latest?cb=20250602031049",
+  "wiki_file": "File:AnakinSkywalkerExpansion.png",
+  "size": [
+   1085,
+   1998
+  ],
+  "transparent_border": 0.98
+ },
+ {
+  "file": "c05.png",
+  "source": "https://static.wikia.nocookie.net/starwars/images/1/19/AnakinSkywalker-TCWForceWarriors.png/revision/latest?cb=20260102003928",
+  "wiki_file": "File:AnakinSkywalker-TCWForceWarriors.png",
+  "size": [
+   1080,
+   1440
+  ],
+  "transparent_border": 0.84
+ },
+ {
+  "file": "c06.png",
+  "source": "https://static.wikia.nocookie.net/starwars/images/8/82/Anakin-TCWCotF.png/revision/latest?cb=20230709145018",
+  "wiki_file": "File:Anakin-TCWCotF.png",
+  "size": [
+   1024,
+   1152
+  ],
+  "transparent_border": 0.69
+ },
+ {
+  "file": "c07.png",
+  "source": "https://static.wikia.nocookie.net/starwars/images/c/cf/AnakinSkywalker-2026Promo.png/revision/latest?cb=20260916001036",
+  "wiki_file": "File:AnakinSkywalker-2026Promo.png",
+  "size": [
+   3103,
+   3500
+  ],
+  "transparent_border": 0.0
+ },
+ {
+  "file": "c08.png",
+  "source": "https://static.wikia.nocookie.net/starwars/images/5/58/Anakin-Skywalker-Shatterpoint.png/revision/latest?cb=20221203035657",
+  "wiki_file": "File:Anakin-Skywalker-Shatterpoint.png",
+  "size": [
+   2500,
+   4000
+  ],
+  "transparent_border": 0.0
+ },
+ {
+  "file": "c09.png",
+  "source": "https://static.wikia.nocookie.net/starwars/images/b/bb/Happy-Color-Watto-and-Anakin.png/revision/latest?cb=20260116145419",
+  "wiki_file": "File:Happy-Color-Watto-and-Anakin.png",
+  "size": [
+   2048,
+   2048
+  ],
+  "transparent_border": 0.0
+ },
+ {
+  "file": "c10.png",
+  "source": "https://static.wikia.nocookie.net/starwars/images/c/ca/Shatterpoint-Anakin-wallpaper.png/revision/latest?cb=20231119223555",
+  "wiki_file": "File:Shatterpoint-Anakin-wallpaper.png",
+  "size": [
+   1008,
+   1599
+  ],
+  "transparent_border": 0.25
+ },
+ {
+  "file": "c11.png",
+  "source": "https://static.wikia.nocookie.net/starwars/images/5/5b/AnakinGhost-GhostsOfVadersCastle5.png/revision/latest?cb=20211025001242",
+  "wiki_file": "File:AnakinGhost-GhostsOfVadersCastle5.png",
+  "size": [
+   1988,
+   3056
+  ],
+  "transparent_border": 0.0
+ },
+ {
+  "file": "c12.png",
+  "source": "https://static.wikia.nocookie.net/starwars/images/3/38/Stories_of_Jedi_and_Sith_Anakin_Obi-Wan.png/revision/latest?cb=20220706202008",
+  "wiki_file": "File:Stories of Jedi and Sith Anakin Obi-Wan.png",
+  "size": [
+   1898,
+   2268
+  ],
+  "transparent_border": 0.0
+ },
+ {
+  "file": "c13.png",
+  "source": "https://static.wikia.nocookie.net/starwars/images/1/14/AoR-AnakinSkywalker-C-textless.png/revision/latest?cb=20190626051023",
+  "wiki_file": "File:AoR-AnakinSkywalker-C-textless.png",
+  "size": [
+   1737,
+   2643
+  ],
+  "transparent_border": 0.0
+ },
+ {
+  "file": "c14.png",
+  "source": "https://static.wikia.nocookie.net/starwars/images/3/32/AoR-AnakinSkywalker-E-textless.png/revision/latest?cb=20190626051049",
+  "wiki_file": "File:AoR-AnakinSkywalker-E-textless.png",
+  "size": [
+   1737,
+   2644
+  ],
+  "transparent_border": 0.0
+ },
+ {
+  "file": "c15.png",
+  "source": "https://static.wikia.nocookie.net/starwars/images/3/3e/Obi-Wan-And-Anakin-Find-Yoda.png/revision/latest?cb=20211222050255",
+  "wiki_file": "File:Obi-Wan-And-Anakin-Find-Yoda.png",
+  "size": [
+   1600,
+   2324
+  ],
+  "transparent_border": 0.0
+ },
+ {
+  "file": "c16.png",
+  "source": "https://static.wikia.nocookie.net/starwars/images/5/52/AnakinSkywalkerEpIII-SWFB.png/revision/latest?cb=20200823195028",
+  "wiki_file": "File:AnakinSkywalkerEpIII-SWFB.png",
+  "size": [
+   1320,
+   1760
+  ],
+  "transparent_border": 0.0
+ },
+ {
+  "file": "c17.png",
+  "source": "https://static.wikia.nocookie.net/starwars/images/c/c2/Darth-Vader-RO-SWCT.png/revision/latest?cb=20251030040446",
+  "wiki_file": "File:Darth-Vader-RO-SWCT.png",
+  "size": [
+   720,
+   835
+  ],
+  "transparent_border": 0.76,
+  "query": "Darth Vader"
+ },
+ {
+  "file": "c18.png",
+  "source": "https://static.wikia.nocookie.net/starwars/images/3/3a/DarthVader-Chrome2023.png/revision/latest?cb=20251104054536",
+  "wiki_file": "File:DarthVader-Chrome2023.png",
+  "size": [
+   500,
+   700
+  ],
+  "transparent_border": 0.79,
+  "query": "Darth Vader"
+ },
+ {
+  "file": "c19.png",
+  "source": "https://static.wikia.nocookie.net/starwars/images/f/f7/Darth-Vader-DLotS-12.jpg/revision/latest?cb=20180223060019",
+  "wiki_file": "File:Darth-Vader-DLotS-12.jpg",
+  "size": [
+   1988,
+   3056
+  ],
+  "transparent_border": 0.0,
+  "query": "Darth Vader"
+ },
+ {
+  "file": "c20.png",
+  "source": "https://static.wikia.nocookie.net/starwars/images/d/df/DarthVader-BlackWhiteRed1-virginsecondprinting.jpg/revision/latest?cb=20250810123147",
+  "wiki_file": "File:DarthVader-BlackWhiteRed1-virginsecondprinting.jpg",
+  "size": [
+   1988,
+   3056
+  ],
+  "transparent_border": 0.0,
+  "query": "Darth Vader"
+ },
+ {
+  "file": "c21.png",
+  "source": "https://static.wikia.nocookie.net/starwars/images/f/fb/DarthVader-DLotS-11-Solicitation.jpg/revision/latest?cb=20180208183703",
+  "wiki_file": "File:DarthVader-DLotS-11-Solicitation.jpg",
+  "size": [
+   1988,
+   3056
+  ],
+  "transparent_border": 0.0,
+  "query": "Darth Vader"
+ },
+ {
+  "file": "c22.png",
+  "source": "https://static.wikia.nocookie.net/starwars/images/6/66/AoR-DarthVader.jpg/revision/latest?cb=20190627042136",
+  "wiki_file": "File:AoR-DarthVader.jpg",
+  "size": [
+   1987,
+   3056
+  ],
+  "transparent_border": 0.0,
+  "query": "Darth Vader"
+ }
+]

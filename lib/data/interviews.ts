@@ -166,3 +166,52 @@ export async function listInterviewsWithProgress(userId: string): Promise<Interv
     };
   });
 }
+
+/** Deletes one of the user's interviews; its questions and answers go with it (foreign keys cascade). */
+export async function deleteInterview(userId: string, interviewId: string): Promise<boolean> {
+  if (!isUuid(interviewId)) return false;
+  const rows = await getDb()
+    .delete(interviews)
+    .where(and(eq(interviews.id, interviewId), eq(interviews.userId, userId)))
+    .returning({ id: interviews.id });
+  return rows.length > 0;
+}
+
+/**
+ * Switches the interviewer of one of the user's interviews. `lines` gives what the new interviewer says
+ * around each question (by question id); only questions without an answer get them, answered ones keep
+ * what was said.
+ */
+export async function switchInterviewer(userId: string, interviewId: string, interviewerId: string, lines: Map<string, { intro: string | null; outro: string | null }>): Promise<boolean> {
+  if (!isUuid(interviewId)) return false;
+  const db = getDb();
+  const updated = await db
+    .update(interviews)
+    .set({ interviewerId })
+    .where(and(eq(interviews.id, interviewId), eq(interviews.userId, userId)))
+    .returning({ id: interviews.id });
+  if (updated.length === 0) return false;
+  const qs = await db
+    .select({ id: questions.id })
+    .from(questions)
+    .where(and(eq(questions.interviewId, interviewId), eq(questions.userId, userId)));
+  const answered = new Set(
+    qs.length === 0
+      ? []
+      : (
+          await db
+            .select({ questionId: answers.questionId })
+            .from(answers)
+            .where(and(eq(answers.userId, userId), inArray(answers.questionId, qs.map((q) => q.id))))
+        ).map((a) => a.questionId),
+  );
+  for (const q of qs) {
+    const line = lines.get(q.id);
+    if (!line || answered.has(q.id)) continue;
+    await db
+      .update(questions)
+      .set({ intro: line.intro, outro: line.outro })
+      .where(and(eq(questions.id, q.id), eq(questions.userId, userId)));
+  }
+  return true;
+}

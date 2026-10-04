@@ -1,0 +1,266 @@
+[
+ {
+  "id": "idle-breathing",
+  "category": "idle",
+  "seconds": 5,
+  "loop": true,
+  "voice": false,
+  "prompt": "Homer as a job interviewer in a video call, in the Springfield Nuclear Power Plant sector 7G control room, a console behind him. Same character, same outfit (white short-sleeved shirt, blue trousers, bald with two hairs, stubble), same background, same framing and lighting as the reference: static webcam shot, chest-up, facing the camera, no camera movement, no cuts, no text. Canonical design and art style of the character, unchanged. Personality: Kind, lazy, distracted, hilarious. Waits for the candidate: natural breathing, blinks, relaxed posture, tiny natural body movement, never frozen. Characteristic mannerisms when natural: scratches his head; a dreamy distracted look upwards, as if thinking about donuts. Mouth closed, no speech, no sound. Starts and ends in the same neutral pose, looking at the camera."
+ },
+ {
+  "id": "idle-glance",
+  "category": "idle",
+  "seconds": 5,
+  "loop": true,
+  "voice": false,
+  "prompt": "Homer as a job interviewer in a video call, in the Springfield Nuclear Power Plant sector 7G control room, a console behind him. Same character, same outfit (white short-sleeved shirt, blue trousers, bald with two hairs, stubble), same background, same framing and lighting as the reference: static webcam shot, chest-up, facing the camera, no camera movement, no cuts, no text. Canonical design and art style of the character, unchanged. Personality: Kind, lazy, distracted, hilarious. Waits: eyes drift slightly to the side for a moment, then come back to the camera. Mouth closed, no speech, no sound. Starts and ends in the same neutral pose, looking at the camera."
+ },
+ {
+  "id": "listen-attentive",
+  "category": "listening",
+  "seconds": 5,
+  "loop": true,
+  "voice": false,
+  "prompt": "Homer as a job interviewer in a video call, in the Springfield Nuclear Power Plant sector 7G control room, a console behind him. Same character, same outfit (white short-sleeved shirt, blue trousers, bald with two hairs, stubble), same background, same framing and lighting as the reference: static webcam shot, chest-up, facing the camera, no camera movement, no cuts, no text. Canonical design and art style of the character, unchanged. Personality: Kind, lazy, distracted, hilarious. Listens to the candidate speaking: steady eye contact, attentive expression, a slight change of expression midway. Mouth closed, no speech, no sound. Starts and ends in the same neutral pose, looking at the camera."
+ },
+ {
+  "id": "listen-nod",
+  "category": "listening",
+  "seconds": 4,
+  "loop": true,
+  "voice": false,
+  "prompt": "Homer as a job interviewer in a video call, in the Springfield Nuclear Power Plant sector 7G control room, a console behind him. Same character, same outfit (white short-sleeved shirt, blue trousers, bald with two hairs, stubble), same background, same framing and lighting as the reference: static webcam shot, chest-up, facing the camera, no camera movement, no cuts, no text. Canonical design and art style of the character, unchanged. Personality: Kind, lazy, distracted, hilarious. Listens and big enthusiastic nod. Mouth closed, no speech, no sound. Starts and ends in the same neutral pose, looking at the camera."
+ },
+ {
+  "id": "listen-notes",
+  "category": "listening",
+  "seconds": 5,
+  "loop": true,
+  "voice": false,
+  "prompt": "Homer as a job interviewer in a video call, in the Springfield Nuclear Power Plant sector 7G control room, a console behind him. Same character, same outfit (white short-sleeved shirt, blue trousers, bald with two hairs, stubble), same background, same framing and lighting as the reference: static webcam shot, chest-up, facing the camera, no camera movement, no cuts, no text. Canonical design and art style of the character, unchanged. Personality: Kind, lazy, distracted, hilarious. Listens, glances down to write a short note, then looks back up at the camera. Mouth closed, no speech, no sound. Starts and ends in the same neutral pose, looking at the camera."
+ },
+ {
+  "id": "react-interest",
+  "category": "positive",
+  "seconds": 4,
+  "loop": true,
+  "voice": false,
+  "prompt": "Homer as a job interviewer in a video call, in the Springfield Nuclear Power Plant sector 7G control room, a console behind him. Same character, same outfit (white short-sleeved shirt, blue trousers, bald with two hairs, stubble), same background, same framing and lighting as the reference: static webcam shot, chest-up, facing the camera, no camera movement, no cuts, no text. Canonical design and art style of the character, unchanged. Personality: Kind, lazy, distracted, hilarious. Reacts to the candidate's answer: leans in eagerly, eyes bright. Mouth closed, no speech, no sound. Starts and ends in the same neutral pose, looking at the camera."
+ },
+ {
+  "id": "react-approval",
+  "category": "positive",
+  "seconds": 4,
+  "loop": true,
+  "voice": false,
+  "prompt": "Homer as a job interviewer in a video call, in the Springfield Nuclear Power Plant sector 7G control room, a console behind him. Same character, same outfit (white short-sleeved shirt, blue trousers, bald with two hairs, stubble), same background, same framing and lighting as the reference: static webcam shot, chest-up, facing the camera, no camera movement, no cuts, no text. Canonical design and art style of the character, unchanged. Personality: Kind, lazy, distracted, hilarious. Reacts to the candidate's answer: big enthusiastic nod. Mouth closed, no speech, no sound. Starts and ends in the same neutral pose, looking at the camera."
+ },
+ {
+  "id": "react-smile",
+  "category": "positive",
+  "seconds": 4,
+  "loop": true,
+  "voice": false,
+  "prompt": "Homer as a job interviewer in a video call, in the Springfield Nuclear Power Plant sector 7G control room, a console behind him. Same character, same outfit (white short-sleeved shirt, blue trousers, bald with two hairs, stubble), same background, same framing and lighting as the reference: static webcam shot, chest-up, facing the camera, no camera movement, no cuts, no text. Canonical design and art style of the character, unchanged. Personality: Kind, lazy, distracted, hilarious. Reacts to the candidate's answer: wide open smile. Mouth closed, no speech, no sound. Starts and ends in the same neutral pose, looking at the camera."
+ },
+ {
+  "id": "react-amusement",
+  "category": "positive",
+  "seconds": 4,
+  "loop": true,
+  "voice": false,
+  "prompt": "Homer as a job interviewer in a video call, in the Springfield Nuclear Power Plant sector 7G control room, a console behind him. Same character, same outfit (white short-sleeved shirt, blue trousers, bald with two hairs, stubble), same background, same framing and lighting as the reference: static webcam shot, chest-up, facing the camera, no camera movement, no cuts, no text. Canonical design and art style of the character, unchanged. Personality: Kind, lazy, distracted, hilarious. Reacts to the candidate's answer: bursts out laughing, shoulders shaking, then settles. Mouth closed, no speech, no sound. Starts and ends in the same neutral pose, looking at the camera."
+ },
+ {
+  "id": "react-enthusiasm",
+  "category": "positive",
+  "seconds": 4,
+  "loop": true,
+  "voice": false,
+  "prompt": "Homer as a job interviewer in a video call, in the Springfield Nuclear Power Plant sector 7G control room, a console behind him. Same character, same outfit (white short-sleeved shirt, blue trousers, bald with two hairs, stubble), same background, same framing and lighting as the reference: static webcam shot, chest-up, facing the camera, no camera movement, no cuts, no text. Canonical design and art style of the character, unchanged. Personality: Kind, lazy, distracted, hilarious. Reacts to the candidate's answer: excited, bouncing slightly, hands up. Mouth closed, no speech, no sound. Starts and ends in the same neutral pose, looking at the camera."
+ },
+ {
+  "id": "react-satisfaction",
+  "category": "positive",
+  "seconds": 4,
+  "loop": true,
+  "voice": false,
+  "prompt": "Homer as a job interviewer in a video call, in the Springfield Nuclear Power Plant sector 7G control room, a console behind him. Same character, same outfit (white short-sleeved shirt, blue trousers, bald with two hairs, stubble), same background, same framing and lighting as the reference: static webcam shot, chest-up, facing the camera, no camera movement, no cuts, no text. Canonical design and art style of the character, unchanged. Personality: Kind, lazy, distracted, hilarious. Reacts to the candidate's answer: pumps a fist. Mouth closed, no speech, no sound. Starts and ends in the same neutral pose, looking at the camera."
+ },
+ {
+  "id": "react-doubt",
+  "category": "negative",
+  "seconds": 4,
+  "loop": true,
+  "voice": false,
+  "prompt": "Homer as a job interviewer in a video call, in the Springfield Nuclear Power Plant sector 7G control room, a console behind him. Same character, same outfit (white short-sleeved shirt, blue trousers, bald with two hairs, stubble), same background, same framing and lighting as the reference: static webcam shot, chest-up, facing the camera, no camera movement, no cuts, no text. Canonical design and art style of the character, unchanged. Personality: Kind, lazy, distracted, hilarious. Reacts to the candidate's answer: exaggerated squint, head tilted. Mouth closed, no speech, no sound. Starts and ends in the same neutral pose, looking at the camera."
+ },
+ {
+  "id": "react-disapproval",
+  "category": "negative",
+  "seconds": 4,
+  "loop": true,
+  "voice": false,
+  "prompt": "Homer as a job interviewer in a video call, in the Springfield Nuclear Power Plant sector 7G control room, a console behind him. Same character, same outfit (white short-sleeved shirt, blue trousers, bald with two hairs, stubble), same background, same framing and lighting as the reference: static webcam shot, chest-up, facing the camera, no camera movement, no cuts, no text. Canonical design and art style of the character, unchanged. Personality: Kind, lazy, distracted, hilarious. Reacts to the candidate's answer: shakes the head dramatically. Mouth closed, no speech, no sound. Starts and ends in the same neutral pose, looking at the camera."
+ },
+ {
+  "id": "react-disappointment",
+  "category": "negative",
+  "seconds": 4,
+  "loop": true,
+  "voice": false,
+  "prompt": "Homer as a job interviewer in a video call, in the Springfield Nuclear Power Plant sector 7G control room, a console behind him. Same character, same outfit (white short-sleeved shirt, blue trousers, bald with two hairs, stubble), same background, same framing and lighting as the reference: static webcam shot, chest-up, facing the camera, no camera movement, no cuts, no text. Canonical design and art style of the character, unchanged. Personality: Kind, lazy, distracted, hilarious. Reacts to the candidate's answer: slumps, exaggerated sigh. Mouth closed, no speech, no sound. Starts and ends in the same neutral pose, looking at the camera."
+ },
+ {
+  "id": "react-scepticism",
+  "category": "negative",
+  "seconds": 4,
+  "loop": true,
+  "voice": false,
+  "prompt": "Homer as a job interviewer in a video call, in the Springfield Nuclear Power Plant sector 7G control room, a console behind him. Same character, same outfit (white short-sleeved shirt, blue trousers, bald with two hairs, stubble), same background, same framing and lighting as the reference: static webcam shot, chest-up, facing the camera, no camera movement, no cuts, no text. Canonical design and art style of the character, unchanged. Personality: Kind, lazy, distracted, hilarious. Reacts to the candidate's answer: squints, leans back, arms crossed. Mouth closed, no speech, no sound. Starts and ends in the same neutral pose, looking at the camera."
+ },
+ {
+  "id": "react-confusion",
+  "category": "negative",
+  "seconds": 4,
+  "loop": true,
+  "voice": false,
+  "prompt": "Homer as a job interviewer in a video call, in the Springfield Nuclear Power Plant sector 7G control room, a console behind him. Same character, same outfit (white short-sleeved shirt, blue trousers, bald with two hairs, stubble), same background, same framing and lighting as the reference: static webcam shot, chest-up, facing the camera, no camera movement, no cuts, no text. Canonical design and art style of the character, unchanged. Personality: Kind, lazy, distracted, hilarious. Reacts to the candidate's answer: scratches the head, baffled face. Mouth closed, no speech, no sound. Starts and ends in the same neutral pose, looking at the camera."
+ },
+ {
+  "id": "react-irritation",
+  "category": "negative",
+  "seconds": 4,
+  "loop": true,
+  "voice": false,
+  "prompt": "Homer as a job interviewer in a video call, in the Springfield Nuclear Power Plant sector 7G control room, a console behind him. Same character, same outfit (white short-sleeved shirt, blue trousers, bald with two hairs, stubble), same background, same framing and lighting as the reference: static webcam shot, chest-up, facing the camera, no camera movement, no cuts, no text. Canonical design and art style of the character, unchanged. Personality: Kind, lazy, distracted, hilarious. Reacts to the candidate's answer: visible exasperation, hands thrown up, then settles. Mouth closed, no speech, no sound. Starts and ends in the same neutral pose, looking at the camera."
+ },
+ {
+  "id": "react-surprise",
+  "category": "strong",
+  "seconds": 4,
+  "loop": true,
+  "voice": false,
+  "prompt": "Homer as a job interviewer in a video call, in the Springfield Nuclear Power Plant sector 7G control room, a console behind him. Same character, same outfit (white short-sleeved shirt, blue trousers, bald with two hairs, stubble), same background, same framing and lighting as the reference: static webcam shot, chest-up, facing the camera, no camera movement, no cuts, no text. Canonical design and art style of the character, unchanged. Personality: Kind, lazy, distracted, hilarious. Reacts to the candidate's answer: eyes go wide, eyebrows shoot up, leans back. Mouth closed, no speech, no sound. Starts and ends in the same neutral pose, looking at the camera."
+ },
+ {
+  "id": "react-shock",
+  "category": "strong",
+  "seconds": 4,
+  "loop": true,
+  "voice": false,
+  "prompt": "Homer as a job interviewer in a video call, in the Springfield Nuclear Power Plant sector 7G control room, a console behind him. Same character, same outfit (white short-sleeved shirt, blue trousers, bald with two hairs, stubble), same background, same framing and lighting as the reference: static webcam shot, chest-up, facing the camera, no camera movement, no cuts, no text. Canonical design and art style of the character, unchanged. Personality: Kind, lazy, distracted, hilarious. Reacts to the candidate's answer: jaw drops, freezes, then recovers. Mouth closed, no speech, no sound. Starts and ends in the same neutral pose, looking at the camera."
+ },
+ {
+  "id": "react-disbelief",
+  "category": "strong",
+  "seconds": 4,
+  "loop": true,
+  "voice": false,
+  "prompt": "Homer as a job interviewer in a video call, in the Springfield Nuclear Power Plant sector 7G control room, a console behind him. Same character, same outfit (white short-sleeved shirt, blue trousers, bald with two hairs, stubble), same background, same framing and lighting as the reference: static webcam shot, chest-up, facing the camera, no camera movement, no cuts, no text. Canonical design and art style of the character, unchanged. Personality: Kind, lazy, distracted, hilarious. Reacts to the candidate's answer: blinks repeatedly, mouth open. Mouth closed, no speech, no sound. Starts and ends in the same neutral pose, looking at the camera."
+ },
+ {
+  "id": "react-laughter",
+  "category": "strong",
+  "seconds": 4,
+  "loop": true,
+  "voice": false,
+  "prompt": "Homer as a job interviewer in a video call, in the Springfield Nuclear Power Plant sector 7G control room, a console behind him. Same character, same outfit (white short-sleeved shirt, blue trousers, bald with two hairs, stubble), same background, same framing and lighting as the reference: static webcam shot, chest-up, facing the camera, no camera movement, no cuts, no text. Canonical design and art style of the character, unchanged. Personality: Kind, lazy, distracted, hilarious. Reacts to the candidate's answer: big belly laugh, nearly falls back. Mouth closed, no speech, no sound. Starts and ends in the same neutral pose, looking at the camera."
+ },
+ {
+  "id": "react-anger",
+  "category": "strong",
+  "seconds": 4,
+  "loop": true,
+  "voice": false,
+  "prompt": "Homer as a job interviewer in a video call, in the Springfield Nuclear Power Plant sector 7G control room, a console behind him. Same character, same outfit (white short-sleeved shirt, blue trousers, bald with two hairs, stubble), same background, same framing and lighting as the reference: static webcam shot, chest-up, facing the camera, no camera movement, no cuts, no text. Canonical design and art style of the character, unchanged. Personality: Kind, lazy, distracted, hilarious. Reacts to the candidate's answer: red-faced outburst without words, then calms down. Mouth closed, no speech, no sound. Starts and ends in the same neutral pose, looking at the camera."
+ },
+ {
+  "id": "react-embarrassment",
+  "category": "strong",
+  "seconds": 4,
+  "loop": true,
+  "voice": false,
+  "prompt": "Homer as a job interviewer in a video call, in the Springfield Nuclear Power Plant sector 7G control room, a console behind him. Same character, same outfit (white short-sleeved shirt, blue trousers, bald with two hairs, stubble), same background, same framing and lighting as the reference: static webcam shot, chest-up, facing the camera, no camera movement, no cuts, no text. Canonical design and art style of the character, unchanged. Personality: Kind, lazy, distracted, hilarious. Reacts to the candidate's answer: covers the face, laughs nervously. Mouth closed, no speech, no sound. Starts and ends in the same neutral pose, looking at the camera."
+ },
+ {
+  "id": "think",
+  "category": "transition",
+  "seconds": 4,
+  "loop": true,
+  "voice": false,
+  "prompt": "Homer as a job interviewer in a video call, in the Springfield Nuclear Power Plant sector 7G control room, a console behind him. Same character, same outfit (white short-sleeved shirt, blue trousers, bald with two hairs, stubble), same background, same framing and lighting as the reference: static webcam shot, chest-up, facing the camera, no camera movement, no cuts, no text. Canonical design and art style of the character, unchanged. Personality: Kind, lazy, distracted, hilarious. Thinks before replying: looks up and aside, considering, then back to the camera. Mouth closed, no speech, no sound. Starts and ends in the same neutral pose, looking at the camera."
+ },
+ {
+  "id": "check-notes",
+  "category": "transition",
+  "seconds": 4,
+  "loop": true,
+  "voice": false,
+  "prompt": "Homer as a job interviewer in a video call, in the Springfield Nuclear Power Plant sector 7G control room, a console behind him. Same character, same outfit (white short-sleeved shirt, blue trousers, bald with two hairs, stubble), same background, same framing and lighting as the reference: static webcam shot, chest-up, facing the camera, no camera movement, no cuts, no text. Canonical design and art style of the character, unchanged. Personality: Kind, lazy, distracted, hilarious. Looks down at the notes on the desk, then raises the eyes back to the camera. Mouth closed, no speech, no sound. Starts and ends in the same neutral pose, looking at the camera."
+ },
+ {
+  "id": "prepare-question",
+  "category": "transition",
+  "seconds": 4,
+  "loop": false,
+  "voice": false,
+  "prompt": "Homer as a job interviewer in a video call, in the Springfield Nuclear Power Plant sector 7G control room, a console behind him. Same character, same outfit (white short-sleeved shirt, blue trousers, bald with two hairs, stubble), same background, same framing and lighting as the reference: static webcam shot, chest-up, facing the camera, no camera movement, no cuts, no text. Canonical design and art style of the character, unchanged. Personality: Kind, lazy, distracted, hilarious. Takes a breath and shifts posture slightly, about to ask the next question. Ends looking at the camera, lips about to part. Mouth closed, no speech, no sound."
+ },
+ {
+  "id": "speak-neutral",
+  "category": "speaking",
+  "seconds": 5,
+  "loop": false,
+  "voice": true,
+  "prompt": "Homer as a job interviewer in a video call, in the Springfield Nuclear Power Plant sector 7G control room, a console behind him. Same character, same outfit (white short-sleeved shirt, blue trousers, bald with two hairs, stubble), same background, same framing and lighting as the reference: static webcam shot, chest-up, facing the camera, no camera movement, no cuts, no text. Canonical design and art style of the character, unchanged. Personality: Kind, lazy, distracted, hilarious. Speaks to the candidate, lip-synced to the audio, in a normal tone, small natural head and hand movements, then stops and looks at the camera."
+ },
+ {
+  "id": "speak-interested",
+  "category": "speaking",
+  "seconds": 5,
+  "loop": false,
+  "voice": true,
+  "prompt": "Homer as a job interviewer in a video call, in the Springfield Nuclear Power Plant sector 7G control room, a console behind him. Same character, same outfit (white short-sleeved shirt, blue trousers, bald with two hairs, stubble), same background, same framing and lighting as the reference: static webcam shot, chest-up, facing the camera, no camera movement, no cuts, no text. Canonical design and art style of the character, unchanged. Personality: Kind, lazy, distracted, hilarious. Speaks to the candidate, lip-synced to the audio, in a interested tone, small natural head and hand movements, then stops and looks at the camera."
+ },
+ {
+  "id": "speak-serious",
+  "category": "speaking",
+  "seconds": 5,
+  "loop": false,
+  "voice": true,
+  "prompt": "Homer as a job interviewer in a video call, in the Springfield Nuclear Power Plant sector 7G control room, a console behind him. Same character, same outfit (white short-sleeved shirt, blue trousers, bald with two hairs, stubble), same background, same framing and lighting as the reference: static webcam shot, chest-up, facing the camera, no camera movement, no cuts, no text. Canonical design and art style of the character, unchanged. Personality: Kind, lazy, distracted, hilarious. Speaks to the candidate, lip-synced to the audio, in a serious tone, small natural head and hand movements, then stops and looks at the camera."
+ },
+ {
+  "id": "speak-amused",
+  "category": "speaking",
+  "seconds": 5,
+  "loop": false,
+  "voice": true,
+  "prompt": "Homer as a job interviewer in a video call, in the Springfield Nuclear Power Plant sector 7G control room, a console behind him. Same character, same outfit (white short-sleeved shirt, blue trousers, bald with two hairs, stubble), same background, same framing and lighting as the reference: static webcam shot, chest-up, facing the camera, no camera movement, no cuts, no text. Canonical design and art style of the character, unchanged. Personality: Kind, lazy, distracted, hilarious. Speaks to the candidate, lip-synced to the audio, in a amused tone, small natural head and hand movements, then stops and looks at the camera."
+ },
+ {
+  "id": "speak-sceptical",
+  "category": "speaking",
+  "seconds": 5,
+  "loop": false,
+  "voice": true,
+  "prompt": "Homer as a job interviewer in a video call, in the Springfield Nuclear Power Plant sector 7G control room, a console behind him. Same character, same outfit (white short-sleeved shirt, blue trousers, bald with two hairs, stubble), same background, same framing and lighting as the reference: static webcam shot, chest-up, facing the camera, no camera movement, no cuts, no text. Canonical design and art style of the character, unchanged. Personality: Kind, lazy, distracted, hilarious. Speaks to the candidate, lip-synced to the audio, in a sceptical tone, small natural head and hand movements, then stops and looks at the camera."
+ },
+ {
+  "id": "speak-irritated",
+  "category": "speaking",
+  "seconds": 5,
+  "loop": false,
+  "voice": true,
+  "prompt": "Homer as a job interviewer in a video call, in the Springfield Nuclear Power Plant sector 7G control room, a console behind him. Same character, same outfit (white short-sleeved shirt, blue trousers, bald with two hairs, stubble), same background, same framing and lighting as the reference: static webcam shot, chest-up, facing the camera, no camera movement, no cuts, no text. Canonical design and art style of the character, unchanged. Personality: Kind, lazy, distracted, hilarious. Speaks to the candidate, lip-synced to the audio, in a irritated tone, small natural head and hand movements, then stops and looks at the camera."
+ },
+ {
+  "id": "speak-enthusiastic",
+  "category": "speaking",
+  "seconds": 5,
+  "loop": false,
+  "voice": true,
+  "prompt": "Homer as a job interviewer in a video call, in the Springfield Nuclear Power Plant sector 7G control room, a console behind him. Same character, same outfit (white short-sleeved shirt, blue trousers, bald with two hairs, stubble), same background, same framing and lighting as the reference: static webcam shot, chest-up, facing the camera, no camera movement, no cuts, no text. Canonical design and art style of the character, unchanged. Personality: Kind, lazy, distracted, hilarious. Speaks to the candidate, lip-synced to the audio, in a enthusiastic tone, small natural head and hand movements, then stops and looks at the camera."
+ }
+]

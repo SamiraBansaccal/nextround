@@ -1,0 +1,17 @@
+{
+ "master": {
+  "file": "c04"
+ },
+ "references": [
+  {
+   "file": "c04"
+  },
+  {
+   "file": "c05"
+  },
+  {
+   "file": "c03"
+  }
+ ],
+ "notes": "Official renders, blue shirt."
+}

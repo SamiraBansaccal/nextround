@@ -1,0 +1,17 @@
+{
+ "master": {
+  "file": "c03"
+ },
+ "references": [
+  {
+   "file": "c03"
+  },
+  {
+   "file": "c02"
+  },
+  {
+   "file": "c04"
+  }
+ ],
+ "notes": "Dexter alone, lab coat and glasses; group image left out."
+}

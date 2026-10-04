@@ -7,9 +7,9 @@ import { getInterview } from "@/lib/data/interviews";
 import { bankAnswerText, findBankQuestion, findTech } from "@/lib/interview/bank";
 import { INTERVIEW_COPY, toLang } from "@/lib/interview/copy";
 import { bankQuestionLabel, questionLabel } from "@/lib/interview/question-types";
-import { getInterviewer } from "@/lib/interviewers";
+import { getInterviewer, INTERVIEWERS, listCategories } from "@/lib/interviewers";
 import { KIND_NOTICE } from "@/lib/interviewers/labels";
-import { submitAnswerAction } from "../actions";
+import { submitAnswerAction, switchInterviewerAction } from "../actions";
 
 export const maxDuration = 120;
 
@@ -60,6 +60,7 @@ export default async function InterviewPage({ params, searchParams }: PageProps<
       initialIndex={start}
       voiceLabel={status.voice === "browser" ? copy.voiceBrowser : status.voice === "own_key" ? copy.voiceOwn : copy.voiceInstance}
       submit={submitAnswerAction}
+      switcher={{ categories: listCategories(), interviewers: INTERVIEWERS, change: switchInterviewerAction }}
     />
   );
 }

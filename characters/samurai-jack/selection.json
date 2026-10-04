@@ -1,0 +1,14 @@
+{
+ "master": {
+  "file": "c17"
+ },
+ "references": [
+  {
+   "file": "c17"
+  },
+  {
+   "file": "c18"
+  }
+ ],
+ "notes": "Original renders, white gi and katana."
+}

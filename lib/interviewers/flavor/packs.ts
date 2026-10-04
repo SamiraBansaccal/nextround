@@ -302,4 +302,11 @@ export const CHARACTER_PACKS: Record<string, FlavorPack> = {
     techOpeners: [{ en: "{tech}, the question is about. Hmm.", fr: "Sur {tech}, la question porte. Hmm." }],
     closers: [{ en: "Do or do not. There is no try.", fr: "Fais-le ou ne le fais pas. Il n'y a pas d'essai." }],
   },
+  kratos: {
+    greetings: [{ en: "Sit. We begin.", fr: "{Asseyez-vous|Assieds-toi}. Nous commençons." }],
+    interjections: [{ en: "Hm.", fr: "Hm." }],
+    openers: [{ en: "Next. Focus.", fr: "Suivant. {Concentrez-vous|Concentre-toi}." }],
+    techOpeners: [{ en: "{tech}. Show me what you know.", fr: "{tech}. {Montrez|Montre}-moi ce que {vous savez|tu sais}." }],
+    closers: [{ en: "Do not be sorry. Be better.", fr: "Ne {soyez|sois} pas désolé. {Soyez|Sois} meilleur." }],
+  },
 };

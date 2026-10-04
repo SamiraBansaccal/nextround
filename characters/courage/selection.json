@@ -1,0 +1,17 @@
+{
+ "master": {
+  "file": "c03"
+ },
+ "references": [
+  {
+   "file": "c03"
+  },
+  {
+   "file": "c04"
+  },
+  {
+   "file": "c02"
+  }
+ ],
+ "notes": "Official renders, pink dog."
+}

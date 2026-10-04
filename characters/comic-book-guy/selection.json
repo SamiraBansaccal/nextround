@@ -1,0 +1,14 @@
+{
+ "master": {
+  "file": "c02"
+ },
+ "references": [
+  {
+   "file": "c02"
+  },
+  {
+   "file": "c03"
+  }
+ ],
+ "notes": "c02 official render; c01 left out (speech bubble), c03 for proportions."
+}

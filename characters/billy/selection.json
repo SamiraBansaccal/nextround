@@ -1,0 +1,17 @@
+{
+ "master": {
+  "file": "c05"
+ },
+ "references": [
+  {
+   "file": "c05"
+  },
+  {
+   "file": "c03"
+  },
+  {
+   "file": "c01"
+  }
+ ],
+ "notes": "Official renders, canonical red cap and big nose."
+}

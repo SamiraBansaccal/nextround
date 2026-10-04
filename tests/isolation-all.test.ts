@@ -132,3 +132,38 @@ describe("CV sources", () => {
     expect(await sourcesData.getCvSource(A, "not-a-uuid")).toBeNull();
   });
 });
+
+describe("switching interviewer and deleting an interview", () => {
+  it("B cannot switch A's interviewer; A's switch only changes the lines of unanswered questions", async () => {
+    const id = await interviewsData.createInterview(
+      A,
+      offerId,
+      [
+        { group: "hr", type: "introduction", text: "Q1", source: "HR", suggestedAnswer: [], intro: "old 1", outro: null },
+        { group: "hr", type: "motivation", text: "Q2", source: "HR", suggestedAnswer: [], intro: "old 2", outro: null },
+      ],
+      { interviewerId: "homer-simpson", language: "en", focus: "general" },
+    );
+    const [q1, q2] = (await interviewsData.getInterview(A, id))!.questions;
+    await interviewsData.saveAnswer(A, q1.id, "Hi", { star: { rating: "good", comment: "" }, relevance: { rating: "good", comment: "" }, evidence: { rating: "good", comment: "", claims: [] }, improvedAnswer: [] });
+    const lines = new Map([
+      [q1.id, { intro: "new 1", outro: null }],
+      [q2.id, { intro: "new 2", outro: "bye" }],
+    ]);
+    expect(await interviewsData.switchInterviewer(B, id, "mr-burns", lines)).toBe(false);
+    expect((await interviewsData.getInterview(A, id))!.interview.interviewerId).toBe("homer-simpson");
+    expect(await interviewsData.switchInterviewer(A, id, "mr-burns", lines)).toBe(true);
+    const after = (await interviewsData.getInterview(A, id))!;
+    expect(after.interview.interviewerId).toBe("mr-burns");
+    expect(after.questions.map((q) => [q.intro, q.outro])).toEqual([["old 1", null], ["new 2", "bye"]]);
+  });
+
+  it("B cannot delete A's interview; A's deletion removes its questions and answers", async () => {
+    const id = await interviewsData.createInterview(A, offerId, [{ group: "hr", type: "introduction", text: "Q", source: "HR", suggestedAnswer: [] }], { interviewerId: "homer-simpson", language: "en", focus: "general" });
+    expect(await interviewsData.deleteInterview(B, id)).toBe(false);
+    expect(await interviewsData.getInterview(A, id)).not.toBeNull();
+    expect(await interviewsData.deleteInterview(A, id)).toBe(true);
+    expect(await interviewsData.getInterview(A, id)).toBeNull();
+    expect(await interviewsData.deleteInterview(A, "not-a-uuid")).toBe(false);
+  });
+});

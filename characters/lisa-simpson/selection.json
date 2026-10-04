@@ -1,0 +1,14 @@
+{
+ "master": {
+  "file": "c01"
+ },
+ "references": [
+  {
+   "file": "c01"
+  },
+  {
+   "file": "c07"
+  }
+ ],
+ "notes": "Official renders, canonical red-orange dress and pearls."
+}

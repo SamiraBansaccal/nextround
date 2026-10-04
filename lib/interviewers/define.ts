@@ -1,3 +1,4 @@
+import { PICTURES } from "./pictures";
 import type { FollowUpStyle, Interviewer, InterviewerKind, InterviewerTraits, Localized, VoiceProfile } from "./types";
 
 // Lets each catalog file state only what is specific to a character. Defaults: no picture yet
@@ -29,7 +30,7 @@ export function defineCategory(categoryId: string, defaults: { kind: Interviewer
       ...spec,
       categoryId,
       kind: spec.kind ?? defaults.kind,
-      image: spec.image ?? null,
+      image: PICTURES[spec.id] ?? spec.image ?? null, // public/interviewers/<id>.webp first, once it exists
       llmInstructions: spec.llmInstructions ?? null,
       voice: { provider: "default", voiceId: null, settings: null, ...voice, style: voiceStyle },
       copy: {

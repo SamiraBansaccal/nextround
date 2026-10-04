@@ -58,4 +58,10 @@ export const CATEGORIES: InterviewerCategory[] = [
     description: { en: "Heroes, rivals and mentors.", fr: "Des héros, des rivaux et des mentors." },
     icon: "swords",
   },
+  {
+    id: "games",
+    label: { en: "Video games", fr: "Jeux vidéo" },
+    description: { en: "Heroes and legends from video games.", fr: "Des héros et des légendes du jeu vidéo." },
+    icon: "gamepad",
+  },
 ];

@@ -5,6 +5,7 @@ import { business } from "./catalog/business";
 import { cartoons } from "./catalog/cartoons";
 import { classic } from "./catalog/classic";
 import { film } from "./catalog/film";
+import { games } from "./catalog/games";
 import { music } from "./catalog/music";
 import { politics } from "./catalog/politics";
 import { simpsons } from "./catalog/simpsons";
@@ -13,7 +14,7 @@ import type { Interviewer, InterviewerCategory } from "./types";
 // The interviewer catalog. Adding a character = adding an entry to one of the catalog files; adding a
 // category = one line in categories.ts plus a catalog file imported here. No component changes.
 
-export const INTERVIEWERS: Interviewer[] = [...classic, ...archetypes, ...politics, ...business, ...film, ...music, ...simpsons, ...cartoons, ...anime];
+export const INTERVIEWERS: Interviewer[] = [...classic, ...archetypes, ...politics, ...business, ...film, ...music, ...simpsons, ...cartoons, ...anime, ...games];
 
 export const DEFAULT_INTERVIEWER_ID = "marie";
 

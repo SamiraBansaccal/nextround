@@ -9,6 +9,9 @@ Cette documentation explique **comment** et **pourquoi** chaque partie du projet
 | [00-setup.md](00-setup.md) | Phase 0 : Stripe CLI, Stripe Projects, skills des agents, git, ce qui est (ou non) versionné |
 | [01-stack-auth-deploy.md](01-stack-auth-deploy.md) | Phase 1 : stack, fournisseurs, connexion GitHub, base de données, isolation des données et son test, déploiement |
 | [02-bring-your-own-ai.md](02-bring-your-own-ai.md) | Phase 2 : le client d'IA unique, qui paie, les clés chiffrées, la protection SSRF, la relance JSON, les limites, l'auto-hébergement |
+| [EN-COURS.md](EN-COURS.md) | Où on en est : fait, en cours, ensuite (mis à jour à chaque session) |
+| [FR/local-et-cloud.md](FR/local-et-cloud.md) | Passer d'une session Claude locale au cloud et inversement : code, secrets, fichiers perso, scripts propriétaire |
+| [FR/ajouter-un-personnage.md](FR/ajouter-un-personnage.md) | Ajouter un intervieweur : fiche, répliques, catégorie, avatar (procédure suivie par Claude) |
 | [lovable-prompt.md](lovable-prompt.md) | Le prompt donné à Lovable pour le prototype d'interface |
 | [slides-prompt.md](slides-prompt.md) | Le prompt pour les slides du pitch |
 

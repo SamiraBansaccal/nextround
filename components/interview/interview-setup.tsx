@@ -1,55 +1,34 @@
 "use client";
 
 import {
-  Briefcase,
-  Building2,
   Check,
-  Clapperboard,
   Code2,
-  Landmark,
   Layers,
   Loader2,
   MessagesSquare,
   Mic,
   MicOff,
-  Music,
   PhoneCall,
-  Sparkles,
-  Swords,
-  Tv,
   UserRound,
-  Users,
   Video,
   VideoOff,
 } from "lucide-react";
 import { useRouter } from "next/navigation";
 import { useEffect, useState, useTransition } from "react";
 import { Button } from "@/components/ui/button";
-import { Sheet, SheetContent, SheetDescription, SheetHeader, SheetTitle } from "@/components/ui/sheet";
 import { fill, type InterviewCopy, LANGUAGES } from "@/lib/interview/copy";
 import type { Focus } from "@/lib/interview/session";
 import { KIND_LABEL, KIND_NOTICE, LEVEL_OF, TRAIT_LABELS } from "@/lib/interviewers/labels";
 import type { Interviewer, InterviewerCategory, Lang } from "@/lib/interviewers/types";
 import { cn } from "@/lib/utils";
 import { InterviewerAvatar } from "./interviewer-avatar";
+import { InterviewerChooser } from "./interviewer-chooser";
 import { SelfPreview } from "./media/self-preview";
 import { saveMediaChoice, useLocalMedia } from "./media/use-local-media";
 
 // "Ready to join?": the pre-call screen. Configure the session (interviewer, language, questions),
 // check the camera and microphone, then start: only then is the interview created and the call shown.
 // The screen itself switches to the chosen language, like the whole interview will.
-
-const ICONS: Record<string, typeof UserRound> = {
-  briefcase: Briefcase,
-  users: Users,
-  landmark: Landmark,
-  building: Building2,
-  clapperboard: Clapperboard,
-  music: Music,
-  tv: Tv,
-  sparkles: Sparkles,
-  swords: Swords,
-};
 
 interface Props {
   offer: { id: string; title: string };
@@ -287,84 +266,5 @@ export function InterviewSetup({ offer, me, categories, interviewers, defaultInt
         }}
       />
     </div>
-  );
-}
-
-function InterviewerChooser(props: {
-  open: boolean;
-  onOpenChange: (open: boolean) => void;
-  categories: InterviewerCategory[];
-  interviewers: Interviewer[];
-  selectedId: string;
-  language: Lang;
-  t: InterviewCopy;
-  onChoose: (id: string) => void;
-}) {
-  const { open, onOpenChange, categories, interviewers, selectedId, language, t, onChoose } = props;
-  const selected = interviewers.find((i) => i.id === selectedId);
-  const [categoryId, setCategoryId] = useState(selected?.categoryId ?? categories[0].id);
-  const category = categories.find((c) => c.id === categoryId) ?? categories[0];
-  const list = interviewers.filter((i) => i.categoryId === category.id);
-
-  return (
-    <Sheet open={open} onOpenChange={onOpenChange}>
-      <SheetContent className="w-full overflow-y-auto sm:max-w-2xl" lang={language}>
-        <SheetHeader>
-          <SheetTitle>{t.chooseInterviewer}</SheetTitle>
-          <SheetDescription>{t.chooseInterviewerHint}</SheetDescription>
-        </SheetHeader>
-        <div className="space-y-5 px-4 pb-6">
-          <div className="flex flex-wrap gap-2" role="group" aria-label={t.chooseInterviewer}>
-            {categories.map((c) => {
-              const Icon = ICONS[c.icon] ?? UserRound;
-              const active = c.id === category.id;
-              return (
-                <button
-                  key={c.id}
-                  type="button"
-                  onClick={() => setCategoryId(c.id)}
-                  aria-pressed={active}
-                  className={cn(
-                    "inline-flex items-center gap-2 rounded-full border px-3 py-1.5 text-sm font-medium transition-colors",
-                    active ? "border-primary bg-primary text-primary-foreground" : "border-earth/20 bg-card hover:border-primary/50",
-                  )}
-                >
-                  <Icon className="size-4" aria-hidden="true" />
-                  {c.label[language]}
-                  <span className={cn("text-xs", active ? "opacity-80" : "text-muted-foreground")}>{interviewers.filter((i) => i.categoryId === c.id).length}</span>
-                </button>
-              );
-            })}
-          </div>
-          <p className="text-sm text-muted-foreground">{category.description[language]}</p>
-          <ul className="grid gap-2 sm:grid-cols-2">
-            {list.map((i) => {
-              const active = i.id === selectedId;
-              const c = i.copy[language];
-              return (
-                <li key={i.id}>
-                  <button
-                    type="button"
-                    onClick={() => onChoose(i.id)}
-                    aria-pressed={active}
-                    className={cn(
-                      "flex h-full w-full items-start gap-3 rounded-lg border p-3 text-left transition-colors",
-                      active ? "border-primary bg-primary-soft/60" : "border-earth/20 bg-card hover:border-primary/50",
-                    )}
-                  >
-                    <InterviewerAvatar interviewer={{ id: i.id, name: c.name, image: i.image }} />
-                    <span className="min-w-0">
-                      <span className="block font-semibold">{c.name}</span>
-                      <span className="block text-xs font-semibold text-primary">{c.style}</span>
-                      <span className="line-clamp-2 text-xs text-muted-foreground">{c.description}</span>
-                    </span>
-                  </button>
-                </li>
-              );
-            })}
-          </ul>
-        </div>
-      </SheetContent>
-    </Sheet>
   );
 }

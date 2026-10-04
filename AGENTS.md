@@ -23,3 +23,4 @@ This repository is initialized for the Stripe project "nextround".
 - UI and logic stay separate: business logic, AI calls and verification live in `lib/` and server code; components only render data passed as props.
 - Every server query filters by the user id from the server-side session (`requireUserId()`), never from the client.
 - AI output is untrusted: validate it with zod and verify quotes and fact ids in code before showing it.
+- Continuity between local and cloud sessions: read `docs/EN-COURS.md` first; before ending a session, update it (done, in progress, next) and commit it with the work. See `docs/FR/local-et-cloud.md`.
