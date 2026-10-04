@@ -2,9 +2,17 @@
 
 Mis à jour à la fin de chaque session de travail avec Claude (local ou cloud). Le lire en premier.
 
-_Dernière mise à jour : 2026-10-04, session cloud._
+_Dernière mise à jour : 2026-10-04, session locale (Mac)._
+
+## Branches en cours
+
+- `claude/owner-data-deploy` (session locale, Mac) : projets « vibecodés » (marqués « Built with AI » dans le profil : ils montrent l'intérêt pour l'IA, la créativité, les hackathons, mais ne prouvent **jamais** la maîtrise de leur stack), règle unique de couverture `lib/offers/coverage.ts`, bouton « Update with my validated facts » sur une offre (`lib/offers/match.ts`). **Attend la PR #2** : sa migration `0005` crée `profile_facts.ai_assisted`. Ensuite : fusionner `main`, `npm run db:migrate` depuis le Mac, écarter les faits vibecodés dans `buildQuestions` et le `covered` des entretiens, e2e, déploiement.
+- `claude/intelligent-einstein-58bqoh` (session cloud, PR #2) : entretiens sans offre, nouveau parcours, langue de l'interface, réglages IA, appels OpenRouter sans raisonnement.
 
 ## Fait récemment
+
+- Session locale du 2026-10-04 : CV `cv-fev2026.pdf` importé (15 faits proposés, mis en page), 6 dépôts GitHub de plus (18 projets), 10 offres Actiris importées (5953957 C++, 5843176 Java, 5965434 et 5949141 et 5952000 DevOps, 5905968 admin système, 5947174, 5947193, 5959174, 5964627 junior). Rien n'est encore validé : à faire dans Profil. Production déployée (`1ea6f1a`, banque de questions et avatars visibles).
+- Les modèles gratuits d'OpenRouter sont des modèles « à raisonnement » : 90 s ou plus par appel, réponse parfois vide (d'où « This model could not return valid output »). Avec `reasoning: { enabled: false }` : 10 s. Corrigé dans la PR #2 ; d'ici là, les imports du Mac passent par un lanceur local qui ajoute cette option.
 
 - Banque de questions techniques (42 technologies, réponses types EN/FR) et répliques des intervieweurs (`c4ec9fc`). Migration `0004` déjà appliquée à Neon.
 - Import de CV plus tolérant aux réponses imparfaites de l'IA ; avatars pris automatiquement dans `public/interviewers/<id>.webp` (PR #1).
