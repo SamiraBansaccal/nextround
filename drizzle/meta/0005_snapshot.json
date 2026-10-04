@@ -1,5 +1,5 @@
 {
-  "id": "a361fbad-3b64-4c9a-bb52-d7198788bc20",
+  "id": "c0255df9-19b6-40bb-baf5-a15ea8761959",
   "prevId": "33024308-262d-4c04-b3af-04d79e326596",
   "version": "7",
   "dialect": "postgresql",
@@ -610,6 +610,13 @@
         },
         "validated": {
           "name": "validated",
+          "type": "boolean",
+          "primaryKey": false,
+          "notNull": true,
+          "default": false
+        },
+        "ai_assisted": {
+          "name": "ai_assisted",
           "type": "boolean",
           "primaryKey": false,
           "notNull": true,
