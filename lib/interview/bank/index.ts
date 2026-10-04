@@ -3,6 +3,7 @@ import { inRegister, type Register } from "@/lib/interview/register";
 import type { Lang } from "@/lib/interviewers/types";
 import { TECH_ENTRIES } from "./catalog";
 import { TOOL_QUESTIONS } from "./generic";
+import { MORE_QUESTIONS } from "./more";
 import { type BankQuestion, type Tech, type TechKind } from "./types";
 
 // The technical question bank (app data, same for everyone) and how an interview draws from it: the
@@ -14,9 +15,16 @@ export { TECH_KINDS } from "./types";
 
 export const TECHS: readonly Tech[] = TECH_ENTRIES.map((entry) => entry.tech);
 
-/** Every question: those written for each technology, plus the generic ones for each tool. */
+/** Every question: those written for each technology (bank files and more.ts), plus the generic ones for each tool. */
 export const BANK: readonly BankQuestion[] = TECH_ENTRIES.flatMap(({ tech, questions }) => [
   ...questions,
+  ...(MORE_QUESTIONS[tech.id] ?? []).map(([slug, kind, en, fr, answerEn, answerFr]) => ({
+    id: `${tech.id}.${slug}`,
+    tech: tech.id,
+    kind,
+    text: { en, fr },
+    answer: { en: answerEn, fr: answerFr },
+  })),
   ...(tech.tool
     ? TOOL_QUESTIONS.map(([slug, kind, en, fr, answerEn, answerFr]) => ({
         id: `${tech.id}.${slug}`,
