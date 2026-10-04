@@ -18,7 +18,7 @@ Règle : chaque session a sa *branch*, s'inscrit ici, ouvre une PR, et met la li
 
 | *Branch* | Session | Sujet | PR |
 |---|---|---|---|
-| `claude/intelligent-einstein-58bqoh` | cloud | 👤 Profil = une base unique (CV fusionnés sans doublons, tout validé, crayon sur chaque ligne, LeetCode), CV et lettre modifiables phrase par phrase, cartes d'offres alignées. Migration `0007` | PR à venir |
+| — | — | Aucune branche en cours | — |
 
 <details>
 <summary>📦 Branches déjà fusionnées</summary>
@@ -31,6 +31,7 @@ Règle : chaque session a sa *branch*, s'inscrit ici, ouvre une PR, et met la li
 | `claude/intelligent-einstein-58bqoh` | cloud | Réorganisation des dossiers, doc revue en profondeur, nouveaux ADR | [#9](https://github.com/SamiraBansaccal/nextround/pull/9) |
 | `claude/intelligent-einstein-58bqoh` | cloud | Audit sécurité et code, corrections | [#10](https://github.com/SamiraBansaccal/nextround/pull/10) |
 | `claude/remove-interviewers` | local | Retrait des 38 intervieweurs masqués par la propriétaire | [#7](https://github.com/SamiraBansaccal/nextround/pull/7) |
+| `claude/intelligent-einstein-58bqoh` | cloud | 👤 Profil = une base unique (CV fusionnés sans doublons, tout validé, crayon sur chaque ligne, LeetCode), CV et lettre modifiables phrase par phrase, cartes d'offres alignées. Migration `0007` | [#13](https://github.com/SamiraBansaccal/nextround/pull/13) — ⚠️ `npm run db:migrate` (0007) à lancer depuis le Mac |
 | `claude/intelligent-einstein-58bqoh` | cloud | 🎭 Répliques des personnages, banques de questions enrichies, Stripe dans le cloud | [#12](https://github.com/SamiraBansaccal/nextround/pull/12) |
 | `claude/intelligent-einstein-58bqoh` | cloud | Traduction EN/FR de tout le site | [#6](https://github.com/SamiraBansaccal/nextround/pull/6), [#8](https://github.com/SamiraBansaccal/nextround/pull/8) |
 
