@@ -12,9 +12,8 @@ export function DeleteInterviewButton({ interviewId, label, remove }: { intervie
   const [pending, startTransition] = useTransition();
   return (
     <Button
-      size="icon"
-      variant="ghost"
-      className="text-muted-foreground hover:text-destructive"
+      variant="danger"
+      className="h-10 rounded-full px-4"
       disabled={pending}
       aria-label={`Delete the interview “${label}”`}
       title="Delete this interview"
@@ -27,6 +26,7 @@ export function DeleteInterviewButton({ interviewId, label, remove }: { intervie
       }}
     >
       {pending ? <Loader2 className="size-4 animate-spin" aria-hidden="true" /> : <Trash2 className="size-4" aria-hidden="true" />}
+      <span className="hidden sm:inline">Delete</span>
     </Button>
   );
 }

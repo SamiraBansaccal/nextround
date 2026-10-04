@@ -40,3 +40,8 @@ npm-debug.log*
 
 # Avatar reference candidates (large, re-downloadable with scripts/avatars/collect-references.py)
 /characters/*/candidates/*.png
+
+# UI preview (scripts in .preview/): generated files
+/.preview/*.png
+/.preview/app.js
+/.preview/out.css

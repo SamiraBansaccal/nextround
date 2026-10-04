@@ -29,6 +29,11 @@ const en = {
   // ---------- Setup ("Ready to join?") ----------
   setupEyebrow: "Interview practice · {offer}",
   setupTitle: "Ready to join?",
+  interviewerStepTitle: "Who will interview you?",
+  interviewerStepIntro: "Each interviewer has their own tone, pressure and rhythm. The questions always come from the question banks and your offer.",
+  continueToCall: "Continue to the call check",
+  backToInterviewer: "Change interviewer",
+  settingsHeading: "Your interview",
   setupIntro: "Set up your interview and check your camera and microphone. The call starts when you click “Start interview”.",
   interviewerHeading: "Who interviews you",
   change: "Change",
@@ -169,6 +174,11 @@ export type InterviewCopy = typeof en;
 const fr: InterviewCopy = {
   setupEyebrow: "Entraînement à l'entretien · {offer}",
   setupTitle: "Tout est prêt pour l'appel ?",
+  interviewerStepTitle: "Qui va te faire passer l'entretien ?",
+  interviewerStepIntro: "Chaque intervieweur a son ton, sa pression et son rythme. Les questions viennent toujours des banques de questions et de ton offre.",
+  continueToCall: "Continuer vers le test de l'appel",
+  backToInterviewer: "Changer d'intervieweur",
+  settingsHeading: "Ton entretien",
   setupIntro: "Configure ton entretien et vérifie ta caméra et ton micro. L'appel commence quand tu cliques sur « Démarrer l'entretien ».",
   interviewerHeading: "Qui mène l'entretien",
   change: "Changer",

@@ -8,7 +8,8 @@ import type { Interviewer, InterviewerCategory, Lang } from "@/lib/interviewers/
 import { cn } from "@/lib/utils";
 import { InterviewerAvatar } from "./interviewer-avatar";
 
-// The interviewer picker (a side sheet by category), used before the call and during it to switch.
+// The interviewer picker: a grid by category (the setup page) and the same grid in a wide side sheet
+// (switching during the call).
 // Interviewers can be hidden from the list (temporary, this browser only): hidden ones stay one click
 // away ("Show hidden") and the current interviewer is always listed.
 
@@ -54,17 +55,18 @@ function useHiddenInterviewers() {
   };
 }
 
-export function InterviewerChooser(props: {
-  open: boolean;
-  onOpenChange: (open: boolean) => void;
+/** Categories and interviewers as a grid of tiles, with the hide button (this browser only). */
+export function InterviewerBrowser(props: {
   categories: InterviewerCategory[];
   interviewers: Interviewer[];
   selectedId: string;
   language: Lang;
   t: InterviewCopy;
   onChoose: (id: string) => void;
+  /** "beside": next to the profile panel (one column on large screens, so sentences stay on a line); "wide": full width. */
+  layout?: "beside" | "wide";
 }) {
-  const { open, onOpenChange, categories, interviewers, selectedId, language, t, onChoose } = props;
+  const { categories, interviewers, selectedId, language, t, onChoose, layout = "beside" } = props;
   const selected = interviewers.find((i) => i.id === selectedId);
   const [categoryId, setCategoryId] = useState(selected?.categoryId ?? categories[0].id);
   const [showHidden, setShowHidden] = useState(false);
@@ -76,80 +78,99 @@ export function InterviewerChooser(props: {
   const hiddenHere = inCategory.filter((i) => !visible(i)).length;
 
   return (
+    <div className="space-y-5">
+      <div className="flex flex-wrap gap-2" role="group" aria-label={t.chooseInterviewer}>
+        {categories.map((c) => {
+          const Icon = ICONS[c.icon] ?? UserRound;
+          const active = c.id === category.id;
+          const count = interviewers.filter((i) => i.categoryId === c.id && visible(i)).length;
+          return (
+            <button
+              key={c.id}
+              type="button"
+              onClick={() => setCategoryId(c.id)}
+              aria-pressed={active}
+              className={cn(
+                "inline-flex items-center gap-2 rounded-full border px-4 py-2 text-sm font-semibold transition-colors",
+                active ? "border-ink bg-ink text-white" : "border-border bg-card hover:border-ink/60",
+              )}
+            >
+              <Icon className="size-4" aria-hidden="true" />
+              {c.label[language]}
+              <span className={cn("text-xs", active ? "opacity-80" : "text-muted-foreground")}>{count}</span>
+            </button>
+          );
+        })}
+      </div>
+      <p className="text-sm text-muted-foreground">{category.description[language]}</p>
+      <ul className={cn("grid gap-3", layout === "wide" ? "md:grid-cols-2 xl:grid-cols-3" : "md:grid-cols-2 lg:grid-cols-1 2xl:grid-cols-2")}>
+        {list.map((i) => {
+          const active = i.id === selectedId;
+          const isHidden = hidden.has(i.id);
+          const c = i.copy[language];
+          return (
+            <li key={i.id} className={cn("relative", isHidden && "opacity-50")}>
+              <button
+                type="button"
+                onClick={() => onChoose(i.id)}
+                aria-pressed={active}
+                className={cn(
+                  "flex h-full w-full items-center gap-4 rounded-2xl border-2 p-3 pr-11 text-left transition-colors",
+                  active ? "border-ink bg-ink-soft" : "border-transparent bg-card hover:border-ink/40",
+                )}
+              >
+                <InterviewerAvatar interviewer={{ id: i.id, name: c.name, image: i.image }} className="size-16 text-xl" />
+                <span className="min-w-0">
+                  <span className="block font-display text-lg leading-tight">{c.name}</span>
+                  <span className="mt-0.5 block text-sm font-semibold text-terracotta">{c.style}</span>
+                  <span className="mt-0.5 block text-sm text-muted-foreground">{c.description}</span>
+                </span>
+              </button>
+              {!active && (
+                <button
+                  type="button"
+                  onClick={() => (isHidden ? show(i.id) : hide(i.id))}
+                  className="absolute top-2 right-2 grid size-8 place-items-center rounded-full text-muted-foreground hover:bg-muted hover:text-foreground"
+                  aria-label={fill(isHidden ? t.showInterviewer : t.hideInterviewer, { name: c.name })}
+                  title={fill(isHidden ? t.showInterviewer : t.hideInterviewer, { name: c.name })}
+                >
+                  {isHidden ? <Eye className="size-4" aria-hidden="true" /> : <EyeOff className="size-4" aria-hidden="true" />}
+                </button>
+              )}
+            </li>
+          );
+        })}
+      </ul>
+      {(hiddenHere > 0 || showHidden) && (
+        <button type="button" className="text-sm font-semibold text-ink underline-offset-4 hover:underline" onClick={() => setShowHidden(!showHidden)}>
+          {showHidden ? t.hideHidden : fill(t.showHidden, { n: String(hiddenHere) })}
+        </button>
+      )}
+    </div>
+  );
+}
+
+/** The browser in a wide side sheet: switching interviewer during the call. */
+export function InterviewerChooser(props: {
+  open: boolean;
+  onOpenChange: (open: boolean) => void;
+  categories: InterviewerCategory[];
+  interviewers: Interviewer[];
+  selectedId: string;
+  language: Lang;
+  t: InterviewCopy;
+  onChoose: (id: string) => void;
+}) {
+  const { open, onOpenChange, language, t, ...browser } = props;
+  return (
     <Sheet open={open} onOpenChange={onOpenChange}>
-      <SheetContent className="w-full overflow-y-auto sm:max-w-2xl" lang={language}>
+      <SheetContent className="w-full overflow-y-auto sm:max-w-[min(72rem,92vw)]" lang={language}>
         <SheetHeader>
-          <SheetTitle>{t.chooseInterviewer}</SheetTitle>
+          <SheetTitle className="font-display text-2xl">{t.chooseInterviewer}</SheetTitle>
           <SheetDescription>{t.chooseInterviewerHint}</SheetDescription>
         </SheetHeader>
-        <div className="space-y-5 px-4 pb-6">
-          <div className="flex flex-wrap gap-2" role="group" aria-label={t.chooseInterviewer}>
-            {categories.map((c) => {
-              const Icon = ICONS[c.icon] ?? UserRound;
-              const active = c.id === category.id;
-              const count = interviewers.filter((i) => i.categoryId === c.id && visible(i)).length;
-              return (
-                <button
-                  key={c.id}
-                  type="button"
-                  onClick={() => setCategoryId(c.id)}
-                  aria-pressed={active}
-                  className={cn(
-                    "inline-flex items-center gap-2 rounded-full border px-3 py-1.5 text-sm font-medium transition-colors",
-                    active ? "border-primary bg-primary text-primary-foreground" : "border-earth/20 bg-card hover:border-primary/50",
-                  )}
-                >
-                  <Icon className="size-4" aria-hidden="true" />
-                  {c.label[language]}
-                  <span className={cn("text-xs", active ? "opacity-80" : "text-muted-foreground")}>{count}</span>
-                </button>
-              );
-            })}
-          </div>
-          <p className="text-sm text-muted-foreground">{category.description[language]}</p>
-          <ul className="grid gap-2 sm:grid-cols-2">
-            {list.map((i) => {
-              const active = i.id === selectedId;
-              const isHidden = hidden.has(i.id);
-              const c = i.copy[language];
-              return (
-                <li key={i.id} className={cn("relative", isHidden && "opacity-50")}>
-                  <button
-                    type="button"
-                    onClick={() => onChoose(i.id)}
-                    aria-pressed={active}
-                    className={cn(
-                      "flex h-full w-full items-start gap-3 rounded-lg border p-3 pr-10 text-left transition-colors",
-                      active ? "border-primary bg-primary-soft/60" : "border-earth/20 bg-card hover:border-primary/50",
-                    )}
-                  >
-                    <InterviewerAvatar interviewer={{ id: i.id, name: c.name, image: i.image }} />
-                    <span className="min-w-0">
-                      <span className="block font-semibold">{c.name}</span>
-                      <span className="block text-xs font-semibold text-primary">{c.style}</span>
-                      <span className="line-clamp-2 text-xs text-muted-foreground">{c.description}</span>
-                    </span>
-                  </button>
-                  {!active && (
-                    <button
-                      type="button"
-                      onClick={() => (isHidden ? show(i.id) : hide(i.id))}
-                      className="absolute top-2 right-2 grid size-8 place-items-center rounded-full text-muted-foreground hover:bg-muted hover:text-foreground"
-                      aria-label={fill(isHidden ? t.showInterviewer : t.hideInterviewer, { name: c.name })}
-                      title={fill(isHidden ? t.showInterviewer : t.hideInterviewer, { name: c.name })}
-                    >
-                      {isHidden ? <Eye className="size-4" aria-hidden="true" /> : <EyeOff className="size-4" aria-hidden="true" />}
-                    </button>
-                  )}
-                </li>
-              );
-            })}
-          </ul>
-          {(hiddenHere > 0 || showHidden) && (
-            <button type="button" className="text-sm font-semibold text-primary underline-offset-4 hover:underline" onClick={() => setShowHidden(!showHidden)}>
-              {showHidden ? t.hideHidden : fill(t.showHidden, { n: String(hiddenHere) })}
-            </button>
-          )}
+        <div className="px-4 pb-6">
+          <InterviewerBrowser {...browser} language={language} t={t} layout="wide" />
         </div>
       </SheetContent>
     </Sheet>
