@@ -1,6 +1,6 @@
-// Domain types shared by the server logic and the UI.
-// The UI prototype (Lovable, see docs/lovable-prompt.md) uses exactly the same shapes,
-// so its presentational components can be plugged onto this logic without changes.
+// Domain value types shared by the server logic and the UI. They have exactly the shapes given to
+// the UI prototype (Lovable, see docs/prompts/lovable-prompt.md). Entity types (offers, facts,
+// interviews…) come from the database schema instead: see lib/data/*.
 
 export type FactType = "experience" | "skill" | "project" | "education" | "language" | "achievement";
 export type FactSource = "github" | "codewars" | "cv_upload" | "chat" | "manual";

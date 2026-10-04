@@ -42,7 +42,13 @@ export async function addOfferAction(input: unknown): Promise<AddOfferResult> {
       if (error instanceof PageFetchError && (error.reason === "invalid_url" || error.reason === "blocked_address")) {
         return { ok: false, error: "Only public http(s) links are accepted." };
       }
-      if (error instanceof AiError) return { ok: false, error: "Daily page-reading limit reached. Paste the offer text instead.", needText: true };
+      if (error instanceof AiError) {
+        const message =
+          error.code === "rate_limited"
+            ? "Too many pages read this minute. Wait a moment, or paste the offer text instead."
+            : "Daily page-reading limit reached. Paste the offer text instead.";
+        return { ok: false, error: message, needText: true };
+      }
       return { ok: false, error: NEED_TEXT, needText: true };
     }
     if (looksBlocked(text)) return { ok: false, error: NEED_TEXT, needText: true };

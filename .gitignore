@@ -2,6 +2,8 @@
 # Stripe Projects: machine-specific state (Stripe account id, project id, provider links).
 # Not a credential, but personal identifiers — kept out of this PUBLIC repo.
 .projects/state.local.json
+# Upstream state set aside by scripts/bootstrap.mjs in a fresh clone: local only.
+.projects/state.upstream.json
 
 # OS
 .DS_Store
@@ -19,6 +21,12 @@ next-env.d.ts
 npm-debug.log*
 .vercel
 
+
+# Visual checks (Playwright)
+/e2e-screens/
+/test-results/
+/playwright-report/
+
 .projects/cache
 .projects/vault
 .projects/state.test.json
@@ -26,8 +34,3 @@ npm-debug.log*
 .env
 .env.*
 !.env.example
-
-# Visual checks (Playwright)
-/e2e-screens/
-/test-results/
-/playwright-report/

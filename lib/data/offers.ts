@@ -73,15 +73,9 @@ export async function listRequirementsForUser(userId: string): Promise<Requireme
   return getDb().select().from(requirements).where(eq(requirements.userId, userId));
 }
 
-/** "I applied": status Applied + date. Only for this user's offer. */
+/** "I applied": status Applied; the application date is set once (same rule as the pipeline). */
 export async function markApplied(userId: string, offerId: string): Promise<boolean> {
-  if (!isUuid(offerId)) return false;
-  const rows = await getDb()
-    .update(offers)
-    .set({ status: "applied", appliedAt: new Date() })
-    .where(and(eq(offers.id, offerId), eq(offers.userId, userId)))
-    .returning({ id: offers.id });
-  return rows.length > 0;
+  return setOfferStatus(userId, offerId, "applied");
 }
 
 /** Covered = at least one CURRENTLY validated fact proves it (facts can be removed later). */
