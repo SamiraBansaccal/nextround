@@ -72,6 +72,7 @@ const en = {
   questionOf: "Question {n} / {total}",
   progress: "Progress",
   asks: "{name} asks:",
+  spoken: "“{text}”", // the interviewer's own words around a question
   readAloud: "Read the question aloud",
   speaking: "{name} is speaking…",
   voice: "Voice: {voice}",
@@ -106,6 +107,12 @@ const en = {
   show: "Show",
   hide: "Hide",
   suggestedEmpty: "No validated fact supports an answer yet: add facts to your profile.",
+  // Technical questions of the bank: a model answer written by NextRound, then the answer from the facts.
+  suggestedTitleWithModel: "Model answer, then a suggestion built only from your validated facts",
+  modelAnswer: "Model answer",
+  modelMethod: "How to build your answer",
+  modelNote: "General knowledge written by NextRound, not taken from your profile.",
+  fromYourFacts: "With your validated facts",
   // ---------- Feedback ----------
   coachFeedback: "Coach feedback",
   howItLands: "How this answer lands",
@@ -147,6 +154,7 @@ const en = {
   sourceStack: "From the offer's stack: {item} — “{quote}”",
   sourceStackShort: "From the offer's stack",
   sourceGap: "From a gap in your profile: “{quote}”",
+  sourceProfile: "From your profile: “{fact}”",
 };
 
 export type InterviewCopy = typeof en;
@@ -196,6 +204,7 @@ const fr: InterviewCopy = {
   questionOf: "Question {n} / {total}",
   progress: "Progression",
   asks: "{name} demande :",
+  spoken: "« {text} »",
   readAloud: "Lire la question à voix haute",
   speaking: "{name} parle…",
   voice: "Voix : {voice}",
@@ -228,6 +237,11 @@ const fr: InterviewCopy = {
   show: "Afficher",
   hide: "Masquer",
   suggestedEmpty: "Aucun fait validé ne permet encore de répondre : ajoute des faits à ton profil.",
+  suggestedTitleWithModel: "Réponse type, puis une suggestion construite uniquement à partir de tes faits validés",
+  modelAnswer: "Réponse type",
+  modelMethod: "Comment construire ta réponse",
+  modelNote: "Connaissances générales rédigées par NextRound, pas tirées de ton profil.",
+  fromYourFacts: "Avec tes faits validés",
   coachFeedback: "Retour du coach",
   howItLands: "Comment cette réponse est perçue",
   star: "Structure STAR",
@@ -266,6 +280,7 @@ const fr: InterviewCopy = {
   sourceStack: "Tirée de la stack de l'offre : {item} — « {quote} »",
   sourceStackShort: "Tirée de la stack de l'offre",
   sourceGap: "Tirée d'une lacune de ton profil : « {quote} »",
+  sourceProfile: "Tirée de ton profil : « {fact} »",
 };
 
 export const INTERVIEW_COPY: Record<Lang, InterviewCopy> = { en, fr };

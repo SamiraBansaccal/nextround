@@ -6,7 +6,8 @@ import { Button } from "@/components/ui/button";
 import { getAccount } from "@/lib/auth";
 import { getInterview } from "@/lib/data/interviews";
 import { fill, INTERVIEW_COPY, toLang } from "@/lib/interview/copy";
-import { questionLabel } from "@/lib/interview/question-types";
+import { findBankQuestion, findTech } from "@/lib/interview/bank";
+import { bankQuestionLabel, questionLabel } from "@/lib/interview/question-types";
 import { summarizeInterview } from "@/lib/interview/summary";
 import { getInterviewer } from "@/lib/interviewers";
 
@@ -23,6 +24,10 @@ export default async function SummaryPage({ params }: PageProps<"/interview/[id]
   const summary = summarizeInterview(data.questions, data.answers, lang);
   const interviewerName = getInterviewer(data.interview.interviewerId).copy[lang].name;
   const offer = [data.offer?.title, data.offer?.company].filter(Boolean).join(" · ");
+  const label = (question: (typeof data.questions)[number]) => {
+    const tech = findTech(findBankQuestion(question.bankId)?.tech);
+    return tech ? bankQuestionLabel(tech.label[lang], question.type, lang) : questionLabel(question.group, question.type, lang);
+  };
 
   return (
     <div lang={lang}>
@@ -98,7 +103,7 @@ export default async function SummaryPage({ params }: PageProps<"/interview/[id]
         <div className="space-y-3">
           {summary.toRetry.map(({ question, index, answered }) => (
             <div key={question.id} className="flex flex-wrap items-center gap-4 rounded-xl border bg-card p-4">
-              <span className="rounded-full bg-primary-soft px-2 py-0.5 text-xs font-semibold text-primary">{questionLabel(question.group, question.type, lang)}</span>
+              <span className="rounded-full bg-primary-soft px-2 py-0.5 text-xs font-semibold text-primary">{label(question)}</span>
               <p className="min-w-0 flex-1">
                 {question.text} {!answered && <span className="text-sm text-muted-foreground">{t.notAnswered}</span>}
               </p>

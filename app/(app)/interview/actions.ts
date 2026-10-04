@@ -5,13 +5,16 @@ import { z } from "zod";
 import { aiErrorMessage } from "@/lib/ai/errors";
 import { getAccount } from "@/lib/auth";
 import { listFacts } from "@/lib/data/facts";
-import { createInterview, getQuestionWithOffer, saveAnswer } from "@/lib/data/interviews";
+import { createInterview, getQuestionWithOffer, listAskedBankIds, saveAnswer } from "@/lib/data/interviews";
 import { getOfferDetail } from "@/lib/data/offers";
+import { bankAnswerText, findBankQuestion } from "@/lib/interview/bank";
 import { answerFeedback, MAX_ANSWER } from "@/lib/interview/feedback";
 import { toLang } from "@/lib/interview/copy";
 import { generateQuestions } from "@/lib/interview/generate";
+import { registerOf } from "@/lib/interview/register";
 import { FOCUSES } from "@/lib/interview/session";
 import { findInterviewer } from "@/lib/interviewers";
+import { flavorInterview } from "@/lib/interviewers/flavor";
 import { personaInstructions } from "@/lib/interviewers/persona";
 import type { Feedback } from "@/lib/types";
 
@@ -36,7 +39,8 @@ export async function startInterviewAction(input: unknown): Promise<{ ok: true; 
   if (!interviewer) return fail("Choose an interviewer first.", "Choisis d'abord qui mène l'entretien.");
   const detail = await getOfferDetail(account.userId, parsed.data.offerId);
   if (!detail) return fail("Offer not found.", "Offre introuvable.");
-  const facts = (await listFacts(account.userId)).filter((f) => f.validated);
+  const [allFacts, askedBefore] = await Promise.all([listFacts(account.userId), listAskedBankIds(account.userId)]);
+  const facts = allFacts.filter((f) => f.validated);
   const valid = new Set(facts.map((f) => f.id));
   try {
     const generated = await generateQuestions(
@@ -49,10 +53,13 @@ export async function startInterviewAction(input: unknown): Promise<{ ok: true; 
         requirements: detail.requirements.map((r) => ({ text: r.text, quote: r.quote, covered: r.factIds.some((id) => valid.has(id)) })),
       },
       facts,
-      { language, focus, persona: personaInstructions(interviewer) },
+      { language, focus, persona: personaInstructions(interviewer), register: registerOf(interviewer.traits), askedBefore },
     );
     if (generated.length < 4) return fail("This model could not return valid output — try another model.", "Ce modèle n'a pas renvoyé de réponse valide — essaie un autre modèle.");
-    const interviewId = await createInterview(account.userId, detail.offer.id, generated, { interviewerId: interviewer.id, language, focus });
+    // What the interviewer says around each question (greeting, catchphrases, lead-ins): code, not AI.
+    const lines = flavorInterview(interviewer, generated.map((q) => ({ tech: q.group === "technical" ? (q.techLabel ?? null) : null })), language);
+    const questions = generated.map((q, i) => ({ ...q, intro: lines[i].intro, outro: lines[i].outro }));
+    const interviewId = await createInterview(account.userId, detail.offer.id, questions, { interviewerId: interviewer.id, language, focus });
     revalidatePath("/", "layout");
     return { ok: true, interviewId };
   } catch (error) {
@@ -70,6 +77,8 @@ export async function submitAnswerAction(input: unknown): Promise<{ ok: true; fe
   if (!found) return { ok: false, error: "Question not found." };
   const lang = toLang(found.interview?.language); // feedback in the interview's language
   const facts = (await listFacts(account.userId)).filter((f) => f.validated);
+  // A bank question's model answer guides the technical part of the feedback ("experience" ones have none).
+  const bank = findBankQuestion(found.question.bankId);
   try {
     const feedback = await answerFeedback(
       { userId: account.userId, isOwner: account.isOwner },
@@ -80,6 +89,7 @@ export async function submitAnswerAction(input: unknown): Promise<{ ok: true; fe
         offerTitle: found.offer?.title ?? null,
         company: found.offer?.company ?? null,
         language: lang,
+        reference: bank && bank.kind !== "experience" ? bankAnswerText(bank, lang) : null,
       },
       facts,
     );

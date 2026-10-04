@@ -4,8 +4,9 @@ import { getAiStatus } from "@/lib/ai/config";
 import { getAccount } from "@/lib/auth";
 import { listFacts } from "@/lib/data/facts";
 import { getInterview } from "@/lib/data/interviews";
+import { bankAnswerText, findBankQuestion, findTech } from "@/lib/interview/bank";
 import { INTERVIEW_COPY, toLang } from "@/lib/interview/copy";
-import { questionLabel } from "@/lib/interview/question-types";
+import { bankQuestionLabel, questionLabel } from "@/lib/interview/question-types";
 import { getInterviewer } from "@/lib/interviewers";
 import { KIND_NOTICE } from "@/lib/interviewers/labels";
 import { submitAnswerAction } from "../actions";
@@ -40,12 +41,17 @@ export default async function InterviewPage({ params, searchParams }: PageProps<
       interviewer={{ id: interviewer.id, name: who.name, role: who.role, image: interviewer.image, notice: KIND_NOTICE[interviewer.kind]?.[lang] ?? null }}
       questions={data.questions.map((question) => {
         const answer = latest.get(question.id);
+        const bank = findBankQuestion(question.bankId);
+        const tech = findTech(bank?.tech);
         return {
           id: question.id,
           group: question.group,
-          label: questionLabel(question.group, question.type, lang),
+          label: tech ? bankQuestionLabel(tech.label[lang], question.type, lang) : questionLabel(question.group, question.type, lang),
           text: question.text,
+          intro: question.intro,
+          outro: question.outro,
           source: question.source,
+          model: bank ? { text: bankAnswerText(bank, lang), method: bank.kind === "experience" } : null,
           suggestedAnswer: question.suggestedAnswer,
           lastAnswer: answer ? { answer: answer.answer, feedback: answer.feedback ?? null } : null,
         };

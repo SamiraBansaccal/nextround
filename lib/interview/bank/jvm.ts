@@ -1,0 +1,182 @@
+import { defineTech, same } from "./types";
+
+// Java and its ecosystem.
+
+export const java = defineTech(
+  {
+    id: "java",
+    label: same("Java"),
+    family: "language",
+    tool: true,
+    aliases: ["java", "jdk", "jvm", "java se", "java ee", "jakarta ee", "j2ee", "java 8", "java 11", "java 17", "java 21", "maven", "gradle", "junit"],
+  },
+  [
+    [
+      "jvm", "concept",
+      "What are the JDK, the JRE and the JVM, and what happens when you run a Java program?",
+      "Que sont le JDK, le JRE et la JVM, et que se passe-t-il quand on lance un programme Java ?",
+      "The JDK is the development kit: the javac compiler, tools and the runtime. The JRE is what you need to run Java programs, and the JVM is the virtual machine inside it. javac compiles .java files into bytecode in .class files; the JVM loads that bytecode and runs it, first interpreted, then compiled to machine code on the fly by the JIT for the busiest parts. That is how the same bytecode runs on any platform.",
+      "Le JDK est le kit de développement : le compilateur javac, des outils et l'environnement d'exécution. Le JRE est ce qu'il faut pour exécuter des programmes Java, et la JVM est la machine virtuelle qu'il contient. javac compile les fichiers .java en bytecode dans des fichiers .class ; la JVM charge ce bytecode et l'exécute, d'abord interprété, puis compilé en code machine à la volée par le JIT pour les parties les plus utilisées. C'est ce qui permet au même bytecode de tourner sur n'importe quelle plateforme.",
+    ],
+    [
+      "interface-vs-abstract", "compare",
+      "Interface or abstract class in Java: how do you choose?",
+      "Interface ou classe abstraite en Java : comment choisir ?",
+      "An interface defines a contract that unrelated classes can implement, and a class can implement several; since Java 8 it can have default methods, but no instance state. An abstract class can hold fields, constructors and shared code, but a class extends only one. I choose an interface for a capability, like Comparable, and an abstract class when closely related classes share state and code.",
+      "Une interface définit un contrat que des classes sans lien entre elles peuvent implémenter, et une classe peut en implémenter plusieurs ; depuis Java 8, elle peut avoir des méthodes default, mais pas d'état d'instance. Une classe abstraite peut contenir des attributs, des constructeurs et du code commun, mais une classe n'en étend qu'une seule. Je choisis une interface pour une capacité, comme Comparable, et une classe abstraite quand des classes très proches partagent un état et du code.",
+    ],
+    [
+      "equals-hashcode", "concept",
+      "Why must equals and hashCode be overridden together? What breaks in a HashMap if they are not?",
+      "Pourquoi faut-il redéfinir equals et hashCode ensemble ? Qu'est-ce qui casse dans une HashMap sinon ?",
+      "A HashMap first uses hashCode to find the bucket, then equals to find the key inside it. The contract says that two equal objects must have the same hash code. If you override equals but not hashCode, two equal keys land in different buckets: get does not find a value you just put with an equal key, and a HashSet keeps duplicates.",
+      "Une HashMap utilise d'abord hashCode pour trouver le compartiment, puis equals pour y trouver la clé. Le contrat impose que deux objets égaux aient le même hashCode. Si on redéfinit equals sans hashCode, deux clés égales tombent dans des compartiments différents : get ne retrouve pas une valeur qu'on vient d'ajouter avec une clé égale, et un HashSet garde des doublons.",
+    ],
+    [
+      "strings", "concept",
+      "Why are Strings immutable in Java, and when would you use a StringBuilder?",
+      "Pourquoi les String sont-elles immuables en Java, et quand utiliser un StringBuilder ?",
+      "Immutability makes Strings safe to share between threads and to use as HashMap keys, and it lets the string pool reuse identical literals. The downside is that every change creates a new object, so building a string with + in a loop creates many temporary objects. There I use a StringBuilder, which modifies a single buffer, and call toString at the end.",
+      "L'immuabilité permet de partager les String entre threads sans risque et de les utiliser comme clés de HashMap, et elle laisse le pool de chaînes réutiliser les littéraux identiques. L'inconvénient : chaque modification crée un nouvel objet, donc construire une chaîne avec + dans une boucle crée beaucoup d'objets temporaires. Dans ce cas, j'utilise un StringBuilder, qui modifie un seul tampon, puis toString à la fin.",
+    ],
+    [
+      "collections", "compare",
+      "ArrayList, LinkedList, HashMap, TreeMap: when do you use each one?",
+      "ArrayList, LinkedList, HashMap, TreeMap : quand utiliser chacune ?",
+      "ArrayList is the default list: fast access by index and fast iteration. LinkedList is rarely better, except for adding and removing at both ends, where ArrayDeque is usually preferred anyway. HashMap gives constant-time lookups by key on average, with no order; TreeMap keeps its keys sorted, with operations in O(log n), which is useful for ranges or sorted output.",
+      "ArrayList est la liste par défaut : accès rapide par indice et parcours rapide. LinkedList est rarement meilleure, sauf pour ajouter ou retirer aux deux extrémités, où on préfère de toute façon ArrayDeque. HashMap offre des recherches par clé en temps constant en moyenne, sans ordre ; TreeMap garde ses clés triées, avec des opérations en O(log n), ce qui est utile pour des intervalles ou un affichage trié.",
+    ],
+    [
+      "exceptions", "compare",
+      "What is the difference between checked and unchecked exceptions, and how do you decide which one to throw?",
+      "Quelle est la différence entre exceptions vérifiées (checked) et non vérifiées (unchecked), et comment choisir laquelle lever ?",
+      "Checked exceptions, like IOException, must be declared or caught: the compiler forces the caller to handle them, so they suit recoverable problems the caller can act on, such as a missing file. Unchecked exceptions extend RuntimeException, like IllegalArgumentException, and usually signal programming errors. Many teams prefer unchecked exceptions to keep signatures light, and an exception is never swallowed silently.",
+      "Les exceptions vérifiées, comme IOException, doivent être déclarées ou attrapées : le compilateur oblige l'appelant à les traiter, donc elles conviennent aux problèmes récupérables sur lesquels l'appelant peut agir, comme un fichier manquant. Les exceptions non vérifiées héritent de RuntimeException, comme IllegalArgumentException, et signalent plutôt des erreurs de programmation. Beaucoup d'équipes privilégient les non vérifiées pour alléger les signatures, et on n'avale jamais une exception en silence.",
+    ],
+    [
+      "garbage-collector", "concept",
+      "How does garbage collection work in Java, and can you still have a memory leak?",
+      "Comment fonctionne le ramasse-miettes (garbage collector) en Java, et peut-on quand même avoir une fuite mémoire ?",
+      "The JVM frees the objects that can no longer be reached from the roots, such as local variables and static fields. Most collectors are generational: young objects are collected often and cheaply, and the survivors move to the old generation. And yes, you can still leak: an object that is still referenced is never collected, for example in a static collection or a cache that only grows, or a listener that is never removed.",
+      "La JVM libère les objets qui ne sont plus atteignables depuis les racines, comme les variables locales et les attributs static. La plupart des ramasse-miettes sont générationnels : les objets jeunes sont collectés souvent et à faible coût, et les survivants passent dans l'ancienne génération. Et oui, on peut quand même fuir : un objet encore référencé n'est jamais collecté, par exemple dans une collection static ou un cache qui ne fait que grossir, ou un listener jamais retiré.",
+    ],
+    [
+      "static-final", "concept",
+      "What do static and final mean in Java, on a field, a method and a class?",
+      "Que signifient static et final en Java, sur un attribut, une méthode et une classe ?",
+      "static means the member belongs to the class rather than to each instance: a static field is shared, and a static method is called without an object. final on a field means it is assigned only once; on a method, that it cannot be overridden; on a class, that it cannot be extended, like String. Constants are usually static final.",
+      "static signifie que le membre appartient à la classe et non à chaque instance : un attribut static est partagé, et une méthode static s'appelle sans objet. final sur un attribut veut dire qu'il n'est affecté qu'une fois ; sur une méthode, qu'elle ne peut pas être redéfinie ; sur une classe, qu'elle ne peut pas être étendue, comme String. Les constantes sont en général static final.",
+    ],
+    [
+      "streams", "practice",
+      "What are streams and lambdas for? How would you take a list of users and keep only their e-mail addresses?",
+      "À quoi servent les streams et les lambdas ? Comment {feriez-vous|ferais-tu} pour ne garder que les adresses e-mail d'une liste d'utilisateurs ?",
+      "Streams describe a chain of operations on a collection, like filter, map and collect, instead of writing the loop yourself; lambdas are the short functions passed to each step. For the e-mails: users.stream().map(User::getEmail).filter(Objects::nonNull).toList(). The code reads like the intent; a plain loop is still fine when it is clearer.",
+      "Les streams décrivent une chaîne d'opérations sur une collection, comme filter, map et collect, au lieu d'écrire la boucle soi-même ; les lambdas sont les petites fonctions passées à chaque étape. Pour les e-mails : users.stream().map(User::getEmail).filter(Objects::nonNull).toList(). Le code se lit comme l'intention ; une simple boucle reste correcte quand elle est plus claire.",
+    ],
+    [
+      "generics", "concept",
+      "What do generics bring in Java, and what is type erasure?",
+      "Qu'apportent les génériques en Java, et qu'est-ce que l'effacement de type (type erasure) ?",
+      "Generics let a class or a method work with any type while keeping type checks at compile time: a List<String> refuses an Integer and needs no casts. Type erasure means the type parameters only exist for the compiler: at runtime a List<String> is just a List. So you cannot write new T() or test instanceof List<String>.",
+      "Les génériques permettent à une classe ou une méthode de fonctionner avec n'importe quel type tout en gardant la vérification des types à la compilation : une List<String> refuse un Integer et n'a pas besoin de casts. L'effacement de type signifie que les paramètres de type n'existent que pour le compilateur : à l'exécution, une List<String> n'est qu'une List. On ne peut donc pas écrire new T() ni tester instanceof List<String>.",
+    ],
+    [
+      "threads", "concept",
+      "How do you run work in parallel in Java, and what does synchronized protect against?",
+      "Comment exécuter du travail en parallèle en Java, et contre quoi synchronized protège-t-il ?",
+      "Rather than creating Threads by hand, I use an ExecutorService, a pool of threads that runs submitted tasks, or CompletableFuture for asynchronous steps. synchronized ensures that only one thread at a time runs a block for a given lock, and that the changes made inside it are visible to the next thread taking the lock: it protects shared data against race conditions.",
+      "Plutôt que de créer des Thread à la main, j'utilise un ExecutorService, un pool de threads qui exécute les tâches soumises, ou CompletableFuture pour des étapes asynchrones. synchronized garantit qu'un seul thread à la fois exécute un bloc pour un verrou donné, et que les modifications faites dedans sont visibles par le thread suivant qui prend le verrou : il protège les données partagées des race conditions.",
+    ],
+    [
+      "null-pointer", "troubleshoot",
+      "Your application crashes in production with a NullPointerException. How do you investigate, and how do you prevent it next time?",
+      "{Votre|Ton} application plante en production avec une NullPointerException. Comment {enquêtez-vous|enquêtes-tu}, et comment éviter que ça se reproduise ?",
+      "I start from the stack trace in the logs: the line and the call chain show which reference was null, and recent JVMs even name the variable. Then I find out why it was null, missing data, an empty lookup, an uninitialised field, and write a test that reproduces it. To prevent it: validate inputs early, return Optional or empty collections instead of null, and check with Objects.requireNonNull where a value is mandatory.",
+      "Je pars de la stack trace dans les logs : la ligne et la chaîne d'appels montrent quelle référence était nulle, et les JVM récentes nomment même la variable. Ensuite je cherche pourquoi elle l'était, donnée manquante, recherche sans résultat, attribut non initialisé, et j'écris un test qui reproduit le cas. Pour l'éviter : valider les entrées tôt, renvoyer Optional ou des collections vides plutôt que null, et vérifier avec Objects.requireNonNull là où une valeur est obligatoire.",
+    ],
+    [
+      "build-tools", "concept",
+      "What do Maven or Gradle do for a Java project?",
+      "Que font Maven ou Gradle pour un projet Java ?",
+      "They build the project in a standard way: they download the dependencies declared in pom.xml or build.gradle, with their versions, then compile, run the tests and package the result into a JAR or a WAR. They also give every project the same structure and lifecycle, so the build works the same on every machine and in CI.",
+      "Ils construisent le projet de façon standard : ils téléchargent les dépendances déclarées dans pom.xml ou build.gradle, avec leurs versions, puis compilent, lancent les tests et empaquettent le résultat dans un JAR ou un WAR. Ils donnent aussi la même structure et le même cycle de vie à chaque projet, pour que le build fonctionne pareil sur chaque machine et en CI.",
+    ],
+    [
+      "modelling", "design",
+      "How would you model a library, with books, members and loans, in Java classes? Which classes, which relationships?",
+      "Comment {modéliseriez-vous|modéliserais-tu} une bibliothèque, avec des livres, des membres et des emprunts, en classes Java ? Quelles classes, quelles relations ?",
+      "I would start with Book, with an id, a title and an author; Member, with an id and a name; and Loan, which links one member to one copy of a book with a loan date, a due date and a return date. A LibraryService would handle borrowing and returning, checking that a copy is available and that the member is under the limit. Keeping the rules in a service rather than spread across classes makes them easy to test.",
+      "Je commencerais par Book, avec un identifiant, un titre et un auteur ; Member, avec un identifiant et un nom ; et Loan, qui relie un membre à un exemplaire avec une date d'emprunt, une date d'échéance et une date de retour. Un LibraryService gérerait l'emprunt et le retour, en vérifiant qu'un exemplaire est disponible et que le membre n'a pas atteint sa limite. Garder les règles dans un service plutôt que dispersées dans les classes les rend faciles à tester.",
+    ],
+    [
+      "access-modifiers", "concept",
+      "public, protected, package-private, private: what does each one allow?",
+      "public, protected, package-private, private : que permet chacun ?",
+      "public is visible everywhere; protected is visible in the same package and in subclasses; package-private, written with no keyword, is visible only inside the same package; private is visible only inside the class. I keep fields private and expose the smallest possible public surface.",
+      "public est visible partout ; protected est visible dans le même package et dans les sous-classes ; package-private, sans mot-clé, n'est visible que dans le même package ; private n'est visible que dans la classe. Je garde les attributs private et j'expose la plus petite surface publique possible.",
+    ],
+  ],
+);
+
+export const spring = defineTech(
+  {
+    id: "spring",
+    label: same("Spring Boot"),
+    family: "web",
+    tool: true,
+    exact: ["spring"],
+    aliases: ["spring boot", "springboot", "spring framework", "spring mvc", "spring data", "spring security", "spring cloud", "hibernate", "jpa"],
+  },
+  [
+    [
+      "dependency-injection", "concept",
+      "What is dependency injection, and how does Spring do it for you?",
+      "Qu'est-ce que l'injection de dépendances, et comment Spring s'en charge-t-il ?",
+      "Instead of a class creating its own dependencies with new, it receives them from outside, usually through its constructor. Spring's container creates the beans, the objects annotated with @Component, @Service and so on, and injects them where they are needed. The code is less coupled and easier to test, because a test can pass in a fake implementation.",
+      "Au lieu qu'une classe crée elle-même ses dépendances avec new, elle les reçoit de l'extérieur, en général par son constructeur. Le conteneur de Spring crée les beans, les objets annotés @Component, @Service, etc., et les injecte là où on en a besoin. Le code est moins couplé et plus facile à tester, car un test peut passer une fausse implémentation.",
+    ],
+    [
+      "stereotypes", "compare",
+      "What is the difference between @Component, @Service, @Repository and @Controller?",
+      "Quelle est la différence entre @Component, @Service, @Repository et @Controller ?",
+      "They all register a class as a Spring bean, and @Component is the generic one. @Service marks business logic; @Repository marks data access and also translates database exceptions into Spring's own; @Controller, or @RestController, handles web requests. The names mostly document the role of each layer.",
+      "Elles enregistrent toutes une classe comme bean Spring, et @Component est la version générique. @Service marque la logique métier ; @Repository marque l'accès aux données et traduit en plus les exceptions de base de données en exceptions Spring ; @Controller, ou @RestController, traite les requêtes web. Les noms documentent surtout le rôle de chaque couche.",
+    ],
+    [
+      "boot", "concept",
+      "What does Spring Boot add on top of Spring?",
+      "Qu'apporte Spring Boot par rapport à Spring seul ?",
+      "Spring Boot makes a Spring application quick to start: auto-configuration sets sensible defaults based on the libraries present, starters bring coherent sets of dependencies, an embedded server like Tomcat lets you run a JAR directly, and Actuator adds health checks and metrics. You only configure what differs from the defaults, in application.properties or YAML.",
+      "Spring Boot permet de démarrer vite une application Spring : l'auto-configuration fixe des réglages par défaut selon les bibliothèques présentes, les starters apportent des ensembles de dépendances cohérents, un serveur embarqué comme Tomcat permet de lancer directement un JAR, et Actuator ajoute des contrôles de santé et des métriques. On ne configure que ce qui diffère des valeurs par défaut, dans application.properties ou en YAML.",
+    ],
+    [
+      "rest-endpoint", "practice",
+      "How would you expose a REST endpoint that returns a list of products with Spring Boot?",
+      "Comment {exposeriez-vous|exposerais-tu} avec Spring Boot un endpoint REST qui renvoie une liste de produits ?",
+      "A @RestController with a method annotated @GetMapping(\"/products\") that calls a ProductService and returns a List<ProductDto>, which Spring turns into JSON with Jackson. The service reads the data through a repository, for example a Spring Data JPA interface. I return DTOs rather than entities, add pagination if the list can be long, and handle errors in one place with a @ControllerAdvice.",
+      "Un @RestController avec une méthode annotée @GetMapping(\"/products\") qui appelle un ProductService et renvoie une List<ProductDto>, que Spring convertit en JSON avec Jackson. Le service lit les données via un repository, par exemple une interface Spring Data JPA. Je renvoie des DTO plutôt que des entités, j'ajoute une pagination si la liste peut être longue, et je gère les erreurs à un seul endroit avec un @ControllerAdvice.",
+    ],
+    [
+      "jpa", "concept",
+      "What do JPA and Hibernate do, and what is the N+1 query problem?",
+      "Que font JPA et Hibernate, et qu'est-ce que le problème des requêtes N+1 ?",
+      "JPA is the standard API to map Java classes to database tables, and Hibernate is its most common implementation: it generates the SQL, tracks changes to entities and saves them. The N+1 problem: you load N orders with one query, then reading the lazily loaded customer of each order fires one more query per order. A join fetch, an entity graph or batch fetching fixes it.",
+      "JPA est l'API standard pour faire correspondre des classes Java à des tables, et Hibernate en est l'implémentation la plus courante : il génère le SQL, suit les modifications des entités et les enregistre. Le problème N+1 : on charge N commandes en une requête, puis la lecture du client, chargé paresseusement, de chaque commande déclenche une requête de plus par commande. Un join fetch, un entity graph ou un chargement par lots le corrige.",
+    ],
+    [
+      "configuration", "best_practice",
+      "How do you manage configuration and secrets for each environment in a Spring Boot application?",
+      "Comment gérer la configuration et les secrets de chaque environnement dans une application Spring Boot ?",
+      "Configuration lives in application.properties or YAML, with one profile per environment, like application-dev and application-prod, chosen with spring.profiles.active. Values that change between environments, and above all secrets, come from environment variables or a secret manager, never from files committed to Git. Typed @ConfigurationProperties classes make the settings explicit and validated.",
+      "La configuration est dans application.properties ou en YAML, avec un profil par environnement, comme application-dev et application-prod, choisi avec spring.profiles.active. Les valeurs qui changent selon l'environnement, et surtout les secrets, viennent de variables d'environnement ou d'un gestionnaire de secrets, jamais de fichiers commités dans Git. Des classes @ConfigurationProperties typées rendent les réglages explicites et validés.",
+    ],
+    [
+      "testing", "practice",
+      "How would you test a Spring service that depends on a repository?",
+      "Comment {testeriez-vous|testerais-tu} un service Spring qui dépend d'un repository ?",
+      "For the business logic, a plain unit test with JUnit and Mockito: I mock the repository, define what it returns, and check the service's result and the calls it makes; it runs in milliseconds without starting Spring. Then a few integration tests, for example @DataJpaTest or @SpringBootTest with a real database in Testcontainers, check the wiring and the queries.",
+      "Pour la logique métier, un simple test unitaire avec JUnit et Mockito : je simule le repository, je définis ce qu'il renvoie, et je vérifie le résultat du service et les appels qu'il fait ; ça s'exécute en quelques millisecondes sans démarrer Spring. Ensuite, quelques tests d'intégration, par exemple @DataJpaTest ou @SpringBootTest avec une vraie base dans Testcontainers, vérifient le câblage et les requêtes.",
+    ],
+  ],
+);

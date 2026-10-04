@@ -1,5 +1,5 @@
 import "server-only";
-import { and, asc, desc, eq, inArray } from "drizzle-orm";
+import { and, asc, desc, eq, inArray, isNotNull } from "drizzle-orm";
 import { getDb } from "@/lib/db";
 import { answers, interviews, offers, questions } from "@/lib/db/schema";
 import { isUuid } from "@/lib/ids";
@@ -27,10 +27,22 @@ export async function createInterview(userId: string, offerId: string, generated
       text: q.text,
       source: q.source,
       suggestedAnswer: q.suggestedAnswer,
+      bankId: q.bankId ?? null,
+      intro: q.intro ?? null,
+      outro: q.outro ?? null,
     })),
   );
   await db.update(offers).set({ status: "interview" }).where(and(eq(offers.id, offerId), eq(offers.userId, userId), eq(offers.status, "applied")));
   return interview.id;
+}
+
+/** The bank questions already asked to this user, in any interview: the next ones favour new questions. */
+export async function listAskedBankIds(userId: string): Promise<Set<string>> {
+  const rows = await getDb()
+    .selectDistinct({ bankId: questions.bankId })
+    .from(questions)
+    .where(and(eq(questions.userId, userId), isNotNull(questions.bankId)));
+  return new Set(rows.map((r) => r.bankId).filter((id): id is string => !!id));
 }
 
 export async function listInterviewIdsForOffer(userId: string, offerId: string): Promise<string[]> {

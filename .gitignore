@@ -34,3 +34,6 @@ npm-debug.log*
 .env
 .env.*
 !.env.example
+
+# Personal, machine-only files (your own CVs, offers, import scripts): never committed
+/.local/

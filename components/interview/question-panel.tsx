@@ -10,6 +10,8 @@ import { cn } from "@/lib/utils";
 export interface PanelQuestion {
   id: string;
   text: string;
+  intro: string | null; // the interviewer's own words before the question (greeting, catchphrase…)
+  outro: string | null; // … and after it
   label: string; // "Motivation", "Technique"…, already in the interview's language
   source: string;
   answered: boolean;
@@ -19,6 +21,7 @@ interface PanelCopy {
   questionOf: string;
   progress: string;
   asks: string;
+  spoken: string;
   readAloud: string;
   speaking: string;
   voice: string;
@@ -52,7 +55,9 @@ export function QuestionPanel({ question, position, questions, interviewerName, 
       </div>
 
       <p className="mt-5 text-xs font-semibold text-muted-foreground">{fill(copy.asks, { name: interviewerName })}</p>
+      {question.intro && <p className="mt-1 text-sm text-muted-foreground italic">{fill(copy.spoken, { text: question.intro })}</p>}
       <h2 className="mt-1 text-2xl leading-snug text-foreground sm:text-[1.75rem]">{question.text}</h2>
+      {question.outro && <p className="mt-2 text-sm text-muted-foreground italic">{fill(copy.spoken, { text: question.outro })}</p>}
       <p className="mt-3 flex items-start gap-1.5 text-xs text-muted-foreground">
         <Lightbulb className="mt-0.5 size-3.5 shrink-0" aria-hidden="true" />
         {question.source}

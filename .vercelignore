@@ -17,3 +17,5 @@ node_modules/
 e2e-screens/
 test-results/
 playwright-report/
+# Personal, machine-only files (your own CVs, offers, import scripts)
+.local/

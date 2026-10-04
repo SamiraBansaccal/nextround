@@ -23,11 +23,14 @@ export async function POST(request: Request) {
 
   const tts = await resolveTextToSpeech(account.userId, account.isOwner);
   if (!tts) return new Response(null, { status: 204 });
+  const { intro, text, outro } = found.question;
   const speech: SpeechRequest = {
-    text: found.question.text,
-    language: found.offer?.language ?? null,
+    text: [intro, text, outro].filter(Boolean).join(" "), // the interviewer's lines around the question, then the question
+    language: found.interview?.language ?? found.offer?.language ?? null, // the session's language
     voice: getInterviewer(found.interview?.interviewerId).voice,
-    content: "dynamic", // questions are generated per interview today; validated fixed questions will be "static"
+    // Still "dynamic": the AI writes part of the questions. Bank questions and interviewer lines are fixed
+    // texts, so they could later be cached once per voice and assembled ("static").
+    content: "dynamic",
   };
   try {
     const key = isCacheable(speech) ? audioCacheKey(tts.provider.id, speech) : null;

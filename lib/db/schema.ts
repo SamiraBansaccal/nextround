@@ -160,6 +160,12 @@ export const questions = pgTable(
     text: text("text").notNull(),
     source: text("source").notNull(), // why this question was asked (offer quote, gap…)
     suggestedAnswer: jsonb("suggested_answer").$type<SourcedSentence[]>().notNull().default([]),
+    // Technical questions drawn from the question bank (lib/interview/bank): their id, to find their
+    // model answer and technology again, and to vary the questions from one interview to the next.
+    bankId: text("bank_id"),
+    // What the interviewer says before and after the question (lib/interviewers/flavor); null = nothing.
+    intro: text("intro"),
+    outro: text("outro"),
   },
   (t) => [index("questions_user_idx").on(t.userId)],
 );

@@ -20,7 +20,11 @@ export interface SessionQuestion {
   group: QuestionGroup;
   label: string; // question type, in the interview's language
   text: string;
+  intro: string | null; // what the interviewer says before the question
+  outro: string | null; // … and after it
   source: string;
+  /** Bank questions: the model answer (general knowledge), or how to build the answer ("method"). */
+  model: { text: string; method: boolean } | null;
   suggestedAnswer: SourcedSentence[];
   lastAnswer: { answer: string; feedback: Feedback | null } | null;
 }
@@ -172,15 +176,15 @@ export function InterviewSession(props: Props) {
           />
         </div>
         <QuestionPanel
-          question={{ id: q.id, text: q.text, label: q.label, source: q.source, answered: !!answers[q.id] }}
+          question={{ id: q.id, text: q.text, intro: q.intro, outro: q.outro, label: q.label, source: q.source, answered: !!answers[q.id] }}
           position={position}
-          questions={questions.map((item) => ({ id: item.id, text: item.text, label: item.label, source: item.source, answered: !!answers[item.id] }))}
+          questions={questions.map((item) => ({ id: item.id, text: item.text, intro: null, outro: null, label: item.label, source: item.source, answered: !!answers[item.id] }))}
           interviewerName={interviewer.name}
           speaking={voice.speaking}
           voiceLabel={voiceLabel}
           summaryHref={summaryHref}
           copy={copy}
-          onRead={() => voice.speak(q.id, q.text)}
+          onRead={() => voice.speak(q.id, [q.intro, q.text, q.outro].filter(Boolean).join(" "))}
           onSelect={goTo}
         />
       </div>
@@ -219,13 +223,23 @@ export function InterviewSession(props: Props) {
           >
             <span>
               <span className="block text-xs font-bold text-terracotta uppercase">{copy.hiddenOnPurpose}</span>
-              <span className="font-display text-xl">{copy.suggestedTitle}</span>
+              <span className="font-display text-xl">{q.model ? copy.suggestedTitleWithModel : copy.suggestedTitle}</span>
             </span>
             <span className="shrink-0 text-sm underline">{showSuggested ? copy.hide : copy.show}</span>
           </button>
           {showSuggested && (
-            <div className="mt-4">
-              <Sentences sentences={q.suggestedAnswer} facts={facts} empty={copy.suggestedEmpty} copy={copy} />
+            <div className="mt-4 space-y-4">
+              {q.model && (
+                <div className="rounded-lg border border-earth/15 bg-muted/40 p-4">
+                  <p className="text-xs font-bold text-muted-foreground uppercase">{q.model.method ? copy.modelMethod : copy.modelAnswer}</p>
+                  <p className="mt-0.5 text-xs text-muted-foreground">{copy.modelNote}</p>
+                  <p className="mt-2 text-sm leading-relaxed">{q.model.text}</p>
+                </div>
+              )}
+              <div>
+                {q.model && <p className="mb-2 text-xs font-bold text-muted-foreground uppercase">{copy.fromYourFacts}</p>}
+                <Sentences sentences={q.suggestedAnswer} facts={facts} empty={copy.suggestedEmpty} copy={copy} />
+              </div>
             </div>
           )}
         </section>
