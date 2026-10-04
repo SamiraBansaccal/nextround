@@ -1,8 +1,9 @@
-import { AiStatusCard } from "@/components/settings/ai-status-card";
+import { ConnectionBanner } from "@/components/settings/connection-banner";
 import { PageHeading } from "@/components/layout/page-heading";
 import { AiSettingsForm } from "@/components/settings/ai-settings-form";
 import { VoiceSettingsForm } from "@/components/settings/voice-settings-form";
 import { getAiStatus } from "@/lib/ai/config";
+import { DEFAULT_LIMITS, getTodayUsage } from "@/lib/ai/usage";
 import { DEFAULT_INSTANCE_MODEL, PRESET_IDS, PRESETS } from "@/lib/ai/providers";
 import { getAccount } from "@/lib/server/auth";
 import { getPublicAiSettings } from "@/lib/data/ai-settings";
@@ -22,14 +23,20 @@ export default async function SettingsPage() {
   const account = await getAccount();
   const lang = await getUiLang();
   const t = SETTINGS_COPY[lang];
-  const [settings, status] = await Promise.all([getPublicAiSettings(account.userId), getAiStatus(account.userId, account.isOwner)]);
+  const [settings, status, usage] = await Promise.all([getPublicAiSettings(account.userId), getAiStatus(account.userId, account.isOwner), getTodayUsage(account.userId)]);
   const env = serverEnv();
 
   return (
     <div>
       <PageHeading eyebrow={t.eyebrow} title={t.title} />
-      <div className="max-w-2xl space-y-6">
-        <AiStatusCard status={status} showSettingsLink={false} lang={lang} />
+      <div className="space-y-6">
+        <ConnectionBanner
+          status={status}
+          usage={account.isOwner && status.mode === "instance" ? { used: usage.llm, max: DEFAULT_LIMITS.llm.perDay } : null}
+          limits={DEFAULT_LIMITS.llm}
+          t={t}
+        />
+        <div className="grid items-start gap-6 lg:grid-cols-2">
         <AiSettingsForm
           initial={settings}
           presets={PRESET_IDS.map((id) => ({ id, label: PRESETS[id].label, keysUrl: PRESETS[id].keysUrl }))}
@@ -48,6 +55,7 @@ export default async function SettingsPage() {
           actions={{ save: saveVoiceKeyAction, remove: removeVoiceKeyAction }}
           t={t}
         />
+        </div>
       </div>
     </div>
   );

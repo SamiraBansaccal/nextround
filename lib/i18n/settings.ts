@@ -6,12 +6,43 @@ import type { UiLang } from "./ui";
 const en = {
   eyebrow: "Bring your own AI",
   title: "Settings",
+  // What is connected (banner at the top)
+  connectedTitle: "What's connected",
+  aiLabel: "AI",
+  voiceLabel: "Voice",
+  sourceOwn: "with your own key",
+  sourceInstance: "with the instance key",
+  noAi: "No AI connected yet",
+  noAiHint: "Add a key in the AI card below: free models are enough.",
+  voiceBrowser: "Your browser's voice",
+  voiceBrowserNote: "free, nothing to set up",
+  voiceElevenOwn: "ElevenLabs",
+  voiceElevenInstance: "ElevenLabs (instance key)",
+  usageToday: "Today: {used} of {max} AI calls on the instance key",
+  openRouterTitle: "What is OpenRouter?",
+  openRouterText:
+    "One door to hundreds of AI models (Qwen, Llama, Mistral…): one account, one key, and some models are free, their id ends in `:free`. NextRound sends it your answer and gets the coach's feedback back.",
+  instanceTitle: "The instance key",
+  instanceText:
+    "The key the owner of this site set on the server. Only the owner's account uses it, and only while no personal key is saved: at most {perMinute} calls a minute and {perDay} a day, to stay within OpenRouter's free allowance. Every other account brings its own key.",
+  aiUsedFor: "Where the AI works",
+  aiUses: {
+    interviews: "Interviews: the coach's feedback on each answer.",
+    offers: "Offers: reading an offer, and matching its requirements with your facts.",
+    profile: "Profile: finding the facts in a CV you add.",
+    documents: "CV & letter: writing them for an offer.",
+    free: "Interview questions and model answers are written in advance: they cost nothing.",
+  },
+  voiceUsedFor: "Where the voice works",
+  voiceUses: {
+    read: "Interviews: the interviewer reads each question aloud.",
+    dictate: "Answering out loud: your browser turns your voice into text, for free.",
+  },
   // AI provider
   aiTitle: "AI provider",
   aiIntro: "Your key stays yours. Free models work fine: OpenRouter lists them with ids ending in `:free`.",
   aiOwner: " As the instance owner, NextRound uses the instance key whenever you have no key saved.",
-  aiCost:
-    "The AI is only used to give feedback on your answers: questions and model answers are written in advance and cost nothing. Each feedback is one call billed by your provider (free on OpenRouter's `:free` models), and the same answer to the same question is never sent twice.",
+  aiCost: "Each AI call is billed by your provider (free with OpenRouter's `:free` models), and the same answer to the same question is never sent twice.",
   provider: "Provider",
   customUrl: "Custom URL",
   customOff:
@@ -66,11 +97,41 @@ export type SettingsCopy = typeof en;
 const fr: SettingsCopy = {
   eyebrow: "Ton IA, ta clé",
   title: "Réglages",
+  connectedTitle: "Ce qui est branché",
+  aiLabel: "IA",
+  voiceLabel: "Voix",
+  sourceOwn: "avec ta propre clé",
+  sourceInstance: "avec la clé de l'instance",
+  noAi: "Aucune IA branchée pour l'instant",
+  noAiHint: "Ajoute une clé dans la carte IA ci-dessous : les modèles gratuits suffisent.",
+  voiceBrowser: "La voix de ton navigateur",
+  voiceBrowserNote: "gratuite, rien à régler",
+  voiceElevenOwn: "ElevenLabs",
+  voiceElevenInstance: "ElevenLabs (clé de l'instance)",
+  usageToday: "Aujourd'hui : {used} appels d'IA sur {max} avec la clé de l'instance",
+  openRouterTitle: "C'est quoi, OpenRouter ?",
+  openRouterText:
+    "Une seule porte d'entrée vers des centaines de modèles d'IA (Qwen, Llama, Mistral…) : un compte, une clé, et certains modèles sont gratuits, leur identifiant finit par `:free`. NextRound lui envoie ta réponse et reçoit le retour du coach.",
+  instanceTitle: "La clé de l'instance",
+  instanceText:
+    "La clé que la propriétaire de ce site a mise sur le serveur. Seul son compte l'utilise, et seulement tant qu'aucune clé personnelle n'est enregistrée : au plus {perMinute} appels par minute et {perDay} par jour, pour rester dans le quota gratuit d'OpenRouter. Tout autre compte apporte sa propre clé.",
+  aiUsedFor: "Où l'IA travaille",
+  aiUses: {
+    interviews: "Entretiens : le retour du coach sur chaque réponse.",
+    offers: "Offres : la lecture d'une offre, et le rapprochement de ses exigences avec tes faits.",
+    profile: "Profil : la recherche des faits dans un CV que tu ajoutes.",
+    documents: "CV et lettre : leur rédaction pour une offre.",
+    free: "Les questions d'entretien et les réponses types sont écrites à l'avance : elles ne coûtent rien.",
+  },
+  voiceUsedFor: "Où la voix travaille",
+  voiceUses: {
+    read: "Entretiens : l'intervieweur lit chaque question à voix haute.",
+    dictate: "Répondre à l'oral : ton navigateur transforme ta voix en texte, gratuitement.",
+  },
   aiTitle: "Fournisseur d'IA",
   aiIntro: "Ta clé reste la tienne. Les modèles gratuits suffisent : OpenRouter les liste avec un identifiant qui finit par `:free`.",
   aiOwner: " En tant que propriétaire de l'instance, NextRound utilise la clé de l'instance tant que tu n'en as pas enregistré.",
-  aiCost:
-    "L'IA ne sert qu'à commenter tes réponses : les questions et les réponses types sont écrites à l'avance et ne coûtent rien. Chaque retour est un appel facturé par ton fournisseur (gratuit avec les modèles `:free` d'OpenRouter), et une même réponse à une même question n'est jamais envoyée deux fois.",
+  aiCost: "Chaque appel d'IA est facturé par ton fournisseur (gratuit avec les modèles `:free` d'OpenRouter), et une même réponse à une même question n'est jamais envoyée deux fois.",
   provider: "Fournisseur",
   customUrl: "URL personnalisée",
   customOff:

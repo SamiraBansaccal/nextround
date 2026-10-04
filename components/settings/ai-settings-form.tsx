@@ -92,12 +92,21 @@ export function AiSettingsForm({ initial, presets, allowCustom, isOwner, suggest
           <WithCode text={t.aiIntro} />
           {isOwner && t.aiOwner}
         </CardDescription>
+        <div className="rounded-xl border border-earth/15 px-4 py-3 text-sm">
+          <p className="font-semibold text-foreground">{t.aiUsedFor}</p>
+          <ul className="mt-1.5 list-disc space-y-0.5 pl-5 text-muted-foreground">
+            {[t.aiUses.interviews, t.aiUses.offers, t.aiUses.profile, t.aiUses.documents].map((use) => (
+              <li key={use}>{use}</li>
+            ))}
+          </ul>
+          <p className="mt-2 text-xs text-muted-foreground">{t.aiUses.free}</p>
+        </div>
         <p className="rounded-xl bg-warning-soft px-4 py-3 text-sm text-foreground">
           <WithCode text={t.aiCost} />
         </p>
       </CardHeader>
       <CardContent className="space-y-6">
-        <div className={cn("grid grid-cols-2 gap-2", options.length > 4 ? "sm:grid-cols-5" : "sm:grid-cols-4")} role="group" aria-label={t.provider}>
+        <div className="grid grid-cols-2 gap-2 sm:grid-cols-3" role="group" aria-label={t.provider}>
           {options.map((x) => (
             <Button
               key={x.id}
@@ -105,7 +114,7 @@ export function AiSettingsForm({ initial, presets, allowCustom, isOwner, suggest
               variant="outline"
               aria-pressed={provider === x.id}
               onClick={() => chooseProvider(x.id)}
-              className={cn("h-auto p-3 text-sm font-medium", provider === x.id && "border-primary bg-primary-soft text-accent-foreground")}
+              className={cn("h-auto p-3 text-sm font-medium whitespace-normal", provider === x.id && "border-terracotta bg-terracotta-soft text-terracotta dark:text-earth")}
             >
               {x.label}
             </Button>

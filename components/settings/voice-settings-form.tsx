@@ -45,6 +45,13 @@ export function VoiceSettingsForm({ hasKey: initialHasKey, keyLast4, isOwner, cu
           {isOwner && <WithCode text={t.voiceOwner} />}
           {t.voiceCredits}
         </CardDescription>
+        <div className="rounded-xl border border-earth/15 px-4 py-3 text-sm">
+          <p className="font-semibold text-foreground">{t.voiceUsedFor}</p>
+          <ul className="mt-1.5 list-disc space-y-0.5 pl-5 text-muted-foreground">
+            <li>{t.voiceUses.read}</li>
+            <li>{t.voiceUses.dictate}</li>
+          </ul>
+        </div>
       </CardHeader>
       <CardContent className="space-y-3">
         <Label htmlFor="voice-key">{t.voiceKey}</Label>

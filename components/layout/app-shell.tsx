@@ -72,7 +72,7 @@ function LanguageSwitch({ lang, t, setLanguage }: { lang: UiLang; t: UiCopy; set
               router.refresh();
             })
           }
-          className={cn("rounded-full px-3 py-1 text-xs font-bold transition-colors", lang === l ? "bg-ink text-white" : "text-muted-foreground hover:text-foreground")}
+          className={cn("rounded-full px-3 py-1 text-xs font-bold transition-colors", lang === l ? "bg-terracotta text-white dark:text-earth" : "text-muted-foreground hover:text-foreground")}
         >
           {l.toUpperCase()}
         </button>

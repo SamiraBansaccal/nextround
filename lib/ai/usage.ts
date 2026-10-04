@@ -1,5 +1,5 @@
 import "server-only";
-import { sql } from "drizzle-orm";
+import { and, eq, inArray, sql } from "drizzle-orm";
 import { getDb } from "@/lib/db";
 import { usageCounters } from "@/lib/db/schema";
 import { AiError } from "./errors";
@@ -47,4 +47,16 @@ export async function consumeInstanceQuota(
   if (perMinute > limits.perMinute) throw new AiError("rate_limited");
   const perDay = await increment(userId, day, kind);
   if (perDay > limits.perDay) throw new AiError("quota_exceeded");
+}
+
+/** How many instance-key calls of each kind this user made today (UTC day), for the Settings page. */
+export async function getTodayUsage(userId: string, now: Date = new Date()): Promise<Record<UsageKind, number>> {
+  const kinds: UsageKind[] = ["llm", "tts", "scrape"];
+  const rows = await getDb()
+    .select({ kind: usageCounters.kind, count: usageCounters.count })
+    .from(usageCounters)
+    .where(and(eq(usageCounters.userId, userId), eq(usageCounters.day, now.toISOString().slice(0, 10)), inArray(usageCounters.kind, kinds)));
+  const used: Record<UsageKind, number> = { llm: 0, tts: 0, scrape: 0 };
+  for (const row of rows) used[row.kind as UsageKind] = row.count;
+  return used;
 }
