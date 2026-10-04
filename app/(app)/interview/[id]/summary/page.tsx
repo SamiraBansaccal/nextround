@@ -1,9 +1,9 @@
 import { CheckCircle2, CircleAlert, RotateCcw, ShieldAlert } from "lucide-react";
 import Link from "next/link";
 import { notFound } from "next/navigation";
-import { PageHeading } from "@/components/page-heading";
+import { PageHeading } from "@/components/layout/page-heading";
 import { Button } from "@/components/ui/button";
-import { getAccount } from "@/lib/auth";
+import { getAccount } from "@/lib/server/auth";
 import { getInterview } from "@/lib/data/interviews";
 import { fill, INTERVIEW_COPY, toLang } from "@/lib/interview/copy";
 import { interviewTitle } from "@/lib/interview/practice";

@@ -33,7 +33,7 @@ Toutes les fonctionnalités appelleront `aiJson(ctx, { schema, system, user })` 
 
 ## 3. Les clés des utilisateurs
 
-- **Chiffrées** avec AES-256-GCM (`lib/crypto.ts`). Chaque chiffrement tire un IV aléatoire, donc la même clé donne un résultat différent à chaque fois. Le « tag » GCM détecte toute modification : une valeur trafiquée en base ne se déchiffre pas.
+- **Chiffrées** avec AES-256-GCM (`lib/server/crypto.ts`). Chaque chiffrement tire un IV aléatoire, donc la même clé donne un résultat différent à chaque fois. Le « tag » GCM détecte toute modification : une valeur trafiquée en base ne se déchiffre pas.
 - La clé de chiffrement est `APP_ENCRYPTION_KEY` (32 octets aléatoires, créée par `setup-env.mjs`). **Il ne faut jamais la changer** : les clés déjà enregistrées deviendraient illisibles.
 - **Jamais renvoyées au navigateur.** Le serveur ne transmet que `PublicAiSettings` : le fournisseur, le modèle, « a une clé » et les **4 derniers caractères** (`••••a3F9`). Le texte en clair n'existe que côté serveur, au moment de l'appel.
 - **Jamais journalisées :** aucun `console.log` de clé, et les erreurs sont génériques.
@@ -84,7 +84,7 @@ Choix : **Qwen par défaut, Nemotron en secours**. Le champ `models` d'OpenRoute
 | Actions serveur | `app/(app)/settings/actions.ts` | Enregistrer, tester, charger les modèles, retirer une clé. Chacune revérifie la session et valide l'entrée avec zod |
 | Formulaire IA | `components/settings/ai-settings-form.tsx` | Fournisseur, modèle (avec liste), clé masquée, boutons **Save**, **Test connection** et **Remove key** |
 | Formulaire voix | `components/settings/voice-settings-form.tsx` | Clé ElevenLabs facultative |
-| Carte d'état | `components/ai/ai-status-card.tsx` | « Ta clé », « clé de l'instance » ou « Add your AI key in Settings… » ; aussi affichée sur le tableau de bord |
+| Carte d'état | `components/settings/ai-status-card.tsx` | « Ta clé », « clé de l'instance » ou « Add your AI key in Settings… » ; aussi affichée sur le tableau de bord |
 
 **Test connection** envoie une seule petite requête (« réponds OK ») avec l'IA que l'utilisateur utiliserait **vraiment**, y compris la clé de l'instance pour le propriétaire.
 
@@ -92,14 +92,14 @@ Choix : **Qwen par défaut, Nemotron en secours**. Le champ `models` d'OpenRoute
 
 | Fichier | Ce qu'il vérifie |
 |---|---|
-| `tests/crypto.test.ts` | Aller-retour du chiffrement ; jamais de texte en clair ; IV différent à chaque fois ; valeur modifiée ou mauvaise clé refusée ; masquage aux 4 derniers caractères |
-| `tests/ai-json.test.ts` | JSON valide du premier coup ; JSON entouré de texte ; **une** relance qui contient l'erreur ; abandon avec le bon message |
-| `tests/ai-config.test.ts` | Sans clé, message « Add your AI key » ; repli du propriétaire sur la clé de l'instance ; priorité à la clé de l'utilisateur ; logique de la voix ; seuls les 4 derniers caractères sortent ; un autre utilisateur ne voit rien ; URL interne ou localhost refusée ; limite par minute et plafond par jour, remis à zéro le lendemain |
-| `tests/isolation.test.ts` | (Phase 1) Isolation des données entre utilisateurs |
+| `tests/data/crypto.test.ts` | Aller-retour du chiffrement ; jamais de texte en clair ; IV différent à chaque fois ; valeur modifiée ou mauvaise clé refusée ; masquage aux 4 derniers caractères |
+| `tests/ai/ai-json.test.ts` | JSON valide du premier coup ; JSON entouré de texte ; **une** relance qui contient l'erreur ; abandon avec le bon message |
+| `tests/ai/ai-config.test.ts` | Sans clé, message « Add your AI key » ; repli du propriétaire sur la clé de l'instance ; priorité à la clé de l'utilisateur ; logique de la voix ; seuls les 4 derniers caractères sortent ; un autre utilisateur ne voit rien ; URL interne ou localhost refusée ; limite par minute et plafond par jour, remis à zéro le lendemain |
+| `tests/data/isolation.test.ts` | (Phase 1) Isolation des données entre utilisateurs |
 
 ## 10. Reprendre le projet avec ses propres comptes
 
-Le dépôt ne contient **aucune** valeur liée aux comptes de la personne à l'origine du projet : tout passe par des variables d'environnement. Le script `scripts/bootstrap.mjs` crée tout le stack sur **les comptes de la personne qui le lance** :
+Le dépôt ne contient **aucune** valeur liée aux comptes de la personne à l'origine du projet : tout passe par des variables d'environnement. Le script `scripts/infra/bootstrap.mjs` crée tout le stack sur **les comptes de la personne qui le lance** :
 
 ```bash
 npm run bootstrap -- --owner <ton-login-github> --dry-run   # affiche les commandes sans rien faire

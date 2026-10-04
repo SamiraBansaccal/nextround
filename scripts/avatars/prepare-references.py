@@ -1,19 +1,19 @@
-"""Builds the references of a character from the candidates picked in characters/<id>/selection.json.
+"""Builds the references of a character from the candidates picked in assets/characters/<id>/selection.json.
 
 selection.json:
   {"master": {"file": "c01", "erase": [[x0, y0, x1, y1]]},           # fractions of the image
    "references": [{"file": "c01"}, {"file": "c08", "crop": [x0, y0, x1, y1]}],
    "notes": "why these images"}
 Output, same framing and scale for every character (white background, subject centred, 6 % margin):
-  characters/<id>/master_reference.png   1536x2048 (3:4), the cleanest full or 3/4 body image
-  characters/<id>/references/reference_NN.png   1024x1365 (3:4)
+  assets/characters/<id>/master_reference.png   1536x2048 (3:4), the cleanest full or 3/4 body image
+  assets/characters/<id>/references/reference_NN.png   1024x1365 (3:4)
 Usage: python3 scripts/avatars/prepare-references.py <character-id> […]
 """
 import json, sys
 from pathlib import Path
 from PIL import Image, ImageChops
 
-ROOT = Path(__file__).resolve().parents[2] / "characters"
+ROOT = Path(__file__).resolve().parents[2] / "assets" / "characters"
 
 def load(cid, spec):
     im = Image.open(ROOT / cid / "candidates" / f"{spec['file']}.png").convert("RGBA")

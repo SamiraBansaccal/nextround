@@ -3,7 +3,7 @@ import { z } from "zod";
 import { type AiContext, aiJson } from "@/lib/ai";
 import { lenientArray } from "@/lib/ai/lenient";
 import type { FactType } from "@/lib/types";
-import { isQuoteIn } from "@/lib/verify";
+import { isQuoteIn } from "@/lib/ai/verify";
 
 // Facts proposed from a CV / LinkedIn PDF text, or from the onboarding chat answers.
 // Each proposed fact MUST come with a verbatim quote from the source; unverified quotes are dropped.

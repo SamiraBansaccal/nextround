@@ -13,8 +13,8 @@ le navigateur, et inutiles à quelqu'un qui lirait la base.
 
 ## ✅ Décision
 
-- **AES-256-GCM** (`lib/crypto.ts`) avec une clé de 32 octets, `APP_ENCRYPTION_KEY`, créée une fois
-  par `scripts/setup-env.mjs` et stockée comme *project variable* Stripe Projects. Format :
+- **AES-256-GCM** (`lib/server/crypto.ts`) avec une clé de 32 octets, `APP_ENCRYPTION_KEY`, créée une fois
+  par `scripts/infra/setup-env.mjs` et stockée comme *project variable* Stripe Projects. Format :
   `v1:` + base64(IV de 12 octets | *tag* de 16 octets | texte chiffré). Un IV aléatoire neuf à
   chaque chiffrement ; le *tag* GCM fait échouer toute modification.
 - **Le navigateur ne reçoit jamais que `PublicAiSettings`** : le fournisseur, le modèle, « a une
@@ -30,7 +30,7 @@ le navigateur, et inutiles à quelqu'un qui lirait la base.
 
 - Un dump de la base ne révèle aucune clé à lui seul. Testé : le texte en clair n'apparaît jamais
   dans la valeur stockée, deux chiffrements diffèrent, un octet modifié ou une autre clé échouent
-  (`tests/crypto.test.ts`).
+  (`tests/data/crypto.test.ts`).
 - Les clés ne repartent jamais vers le navigateur, par construction des types.
 
 **Mauvaises** 👎

@@ -15,13 +15,13 @@ B's data by changing an id."
 
 - **Every table carries `user_id`**, including child tables (`requirements`, `offer_contacts`,
   `questions`, `answers`), so that no query has to go through a parent to know the owner.
-- **The user id comes from one place**: `requireUserId()` / `getAccount()` in `lib/auth.ts`, which
+- **The user id comes from one place**: `requireUserId()` / `getAccount()` in `lib/server/auth.ts`, which
   read the Clerk session on the server. Server actions never take a user id as input.
 - **Every function in `lib/data/` takes `userId` first and puts it in every `WHERE`** — reads,
   updates and deletes alike. Ids coming from the client are checked to be UUIDs before any query.
 - **Tests run on PGlite**, a real Postgres in memory, migrated with the same SQL files as
   production: user B, knowing the ids of user A's rows, can neither read, list, modify, delete nor
-  move them (`tests/isolation.test.ts`, `tests/isolation-all.test.ts`).
+  move them (`tests/data/isolation.test.ts`, `tests/data/isolation-all.test.ts`).
 - `proxy.ts` (Next.js 16's renamed middleware) refuses unauthenticated requests early, but it is
   only a first filter; the data layer is the guarantee.
 

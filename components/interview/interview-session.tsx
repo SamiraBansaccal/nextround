@@ -8,14 +8,14 @@ import { Button } from "@/components/ui/button";
 import { fill, type InterviewCopy } from "@/lib/interview/copy";
 import type { Interviewer, InterviewerCategory, Lang } from "@/lib/interviewers/types";
 import type { Criterion, Feedback, QuestionGroup, SourcedSentence } from "@/lib/types";
-import { shorten } from "@/lib/text";
+import { shorten } from "@/lib/shared/text";
 import { cn } from "@/lib/utils";
 import { AnswerComposer } from "./answer-composer";
 import { CallControls, CallStage } from "./call-stage";
 import { InterviewerChooser } from "./interviewer-chooser";
 import { readMediaChoice, useLocalMedia } from "./media/use-local-media";
 import { QuestionPanel } from "./question-panel";
-import { useVoice } from "./use-voice";
+import { useVoice } from "./voice/use-voice";
 
 export interface SessionQuestion {
   id: string;

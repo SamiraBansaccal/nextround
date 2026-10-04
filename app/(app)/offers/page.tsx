@@ -2,15 +2,15 @@ import { Briefcase } from "lucide-react";
 import Image from "next/image";
 import { AddOfferForm } from "@/components/offers/add-offer-form";
 import { OfferCard } from "@/components/offers/offer-card";
-import { PageHeading } from "@/components/page-heading";
-import { requireUserId } from "@/lib/auth";
+import { PageHeading } from "@/components/layout/page-heading";
+import { requireUserId } from "@/lib/server/auth";
 import { listFacts } from "@/lib/data/facts";
 import { OFFERS_COPY } from "@/lib/i18n/offers";
 import { getUiLang } from "@/lib/i18n/server";
 import { countInterviewsByOffer } from "@/lib/data/interviews";
 import { listOffers, listRequirementsForUser } from "@/lib/data/offers";
 import { factIndex } from "@/lib/offers/coverage";
-import { buildPipelineCards } from "@/lib/pipeline";
+import { buildPipelineCards } from "@/lib/offers/pipeline";
 import { addOfferAction } from "./actions";
 
 export const maxDuration = 120; // AI scans with free models can be slow

@@ -2,7 +2,7 @@ import "server-only";
 import { and, asc, desc, eq, inArray, isNotNull } from "drizzle-orm";
 import { getDb } from "@/lib/db";
 import { answers, interviews, offers, questions } from "@/lib/db/schema";
-import { isUuid } from "@/lib/ids";
+import { isUuid } from "@/lib/shared/ids";
 import { DEFAULT_INTERVIEWER_ID } from "@/lib/interviewers";
 import type { InterviewConfig } from "@/lib/interview/session";
 import type { GeneratedQuestion } from "@/lib/interview/generate";

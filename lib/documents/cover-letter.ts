@@ -2,9 +2,9 @@ import "server-only";
 import { z } from "zod";
 import { type AiContext, aiJson } from "@/lib/ai";
 import { lenientArray } from "@/lib/ai/lenient";
-import { factAliases, type FactForPrompt } from "@/lib/prompt-facts";
+import { factAliases, type FactForPrompt } from "@/lib/ai/prompt-facts";
 import type { DocumentLanguage, SourcedSentence, TailoredLetter } from "@/lib/types";
-import { keepValidFactIds } from "@/lib/verify";
+import { keepValidFactIds } from "@/lib/ai/verify";
 import type { OfferForDocuments, ProfileFact } from "./tailored-cv";
 
 // A cover letter for ONE offer, in English or French. The greeting and the closing are formalities;

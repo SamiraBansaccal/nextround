@@ -59,14 +59,14 @@ kratos: {
 Placeholders: `{formal|casual}` (vous/tu, chosen from the formality trait), `{tech}`, `{n}`. Check how
 existing packs are written before adding; quote catchphrases only if short and characteristic.
 
-## 4. Avatar material (characters/<id>/)
+## 4. Avatar material (assets/characters/<id>/)
 
-1. `characters/sources.json`: `"kratos": ["godofwar", "Kratos"]` — the franchise's Fandom wiki
+1. `assets/characters/sources.json`: `"kratos": ["godofwar", "Kratos"]` — the franchise's Fandom wiki
    subdomain and page title; a 3rd item if the English Wikipedia article title differs. Check it:
    `https://<wiki>.fandom.com/api.php?action=query&titles=<title>&format=json`.
-2. `characters/<id>/performance.json`: `setting` (one fixed place, same in all clips), `look`
+2. `assets/characters/<id>/performance.json`: `setting` (one fixed place, same in all clips), `look`
    (canonical outfit and details), `mannerisms` (2–3 signature gestures).
-3. `python3 scripts/avatars/collect-references.py <id>` → look at `characters/<id>/contact-sheet.jpg`,
+3. `python3 scripts/avatars/collect-references.py <id>` → look at `assets/characters/<id>/contact-sheet.jpg`,
    write `selection.json` (master = cleanest canonical full or 3/4 body, cut-out preferred; 2–4
    references in the SAME canonical outfit; `erase` signatures/watermarks, `crop` busts; `notes`
    saying why), then `python3 scripts/avatars/prepare-references.py <id>`.
@@ -79,13 +79,13 @@ designs them from a text prompt.
 
 ## 5. Thumbnail picture (optional)
 
-`public/interviewers/<id>.webp` (16:9 webcam-style, ~1280×720). `node scripts/interviewer-pictures.mjs`
+`public/interviewers/<id>.webp` (16:9 webcam-style, ~1280×720). `node scripts/avatars/interviewer-pictures.mjs`
 updates `lib/interviewers/pictures.ts` (also runs before `dev` and `build`).
 
 ## 6. Check
 
 ```bash
-npx vitest run tests/interviewers.test.ts tests/flavor.test.ts
+npx vitest run tests/interview/interviewers.test.ts tests/interview/flavor.test.ts
 npm run typecheck && npx eslint lib/interviewers
 ```
 

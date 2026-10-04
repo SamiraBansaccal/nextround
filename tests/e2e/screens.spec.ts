@@ -3,7 +3,7 @@ import { expect, type Page, test } from "@playwright/test";
 
 // Captures every screen and MEASURES what the eye misses: horizontal overflow, missing title,
 // console errors. Screenshots go to e2e-screens/<project>/ (git-ignored) to be reviewed.
-// Run with `npm run e2e` (scripts/e2e.mjs), never directly: it seeds and cleans the test user.
+// Run with `npm run e2e` (scripts/test/e2e.mjs), never directly: it seeds and cleans the test user.
 
 const E2E_EMAIL = "nextround-e2e+clerk_test@example.com";
 const ids = JSON.parse(process.env.E2E_IDS ?? "{}") as { offerId?: string; interviewId?: string; tailoredCvId?: string };

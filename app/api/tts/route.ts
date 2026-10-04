@@ -1,6 +1,6 @@
 import { z } from "zod";
 import { consumeInstanceQuota } from "@/lib/ai/usage";
-import { getAccount } from "@/lib/auth";
+import { getAccount } from "@/lib/server/auth";
 import { getQuestionWithOffer } from "@/lib/data/interviews";
 import { getInterviewer } from "@/lib/interviewers";
 import { audioCacheKey, audioStore, isCacheable } from "@/lib/voice/audio-cache";

@@ -14,7 +14,7 @@ than look**.
 
 ## ✅ Decision
 
-`npm run e2e` (`scripts/e2e.mjs`) does three things, the last one always:
+`npm run e2e` (`scripts/test/e2e.mjs`) does three things, the last one always:
 
 1. **Seed** — `tests/e2e/fixtures.mts` creates a Clerk **test user** (`+clerk_test` address of the
    development instance) and fictional sample data for it through the real `lib/data` functions.

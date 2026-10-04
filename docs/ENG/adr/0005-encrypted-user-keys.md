@@ -13,8 +13,8 @@ database.
 
 ## ✅ Decision
 
-- **AES-256-GCM** (`lib/crypto.ts`) with a 32-byte key, `APP_ENCRYPTION_KEY`, created once by
-  `scripts/setup-env.mjs` and stored as a Stripe Projects variable. Format:
+- **AES-256-GCM** (`lib/server/crypto.ts`) with a 32-byte key, `APP_ENCRYPTION_KEY`, created once by
+  `scripts/infra/setup-env.mjs` and stored as a Stripe Projects variable. Format:
   `v1:` + base64(IV 12 bytes | auth tag 16 bytes | ciphertext). A fresh random IV per encryption;
   the GCM tag makes any tampering fail.
 - **The browser only ever receives `PublicAiSettings`**: provider, model, "has a key" and the
@@ -28,7 +28,7 @@ database.
 **Good** 👍
 
 - A database dump alone reveals no key. Tested: the plaintext never appears in the stored value,
-  two encryptions differ, a flipped byte or another key fails (`tests/crypto.test.ts`).
+  two encryptions differ, a flipped byte or another key fails (`tests/data/crypto.test.ts`).
 - Keys never travel back to the browser, by construction of the types.
 
 **Bad** 👎

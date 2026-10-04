@@ -1,6 +1,6 @@
 import "server-only";
 import { getAiSecrets } from "@/lib/data/ai-settings";
-import { serverEnv } from "@/lib/env";
+import { serverEnv } from "@/lib/server/env";
 import type { LlmConfig } from "./client";
 import { AiError } from "./errors";
 import { DEFAULT_ANTHROPIC_MODEL, DEFAULT_INSTANCE_FALLBACK_MODELS, DEFAULT_INSTANCE_MODEL, PRESETS } from "./providers";

@@ -3,7 +3,7 @@
 import { revalidatePath } from "next/cache";
 import { z } from "zod";
 import { aiErrorMessage } from "@/lib/ai/errors";
-import { getAccount, requireUserId } from "@/lib/auth";
+import { getAccount, requireUserId } from "@/lib/server/auth";
 import { getDocument, saveDocumentVersion, setDocumentKept } from "@/lib/data/documents";
 import { listFacts } from "@/lib/data/facts";
 import { getOfferDetail } from "@/lib/data/offers";

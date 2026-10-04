@@ -1,7 +1,7 @@
 import { notFound } from "next/navigation";
 import { InterviewSession } from "@/components/interview/interview-session";
 import { getAiStatus } from "@/lib/ai/config";
-import { getAccount } from "@/lib/auth";
+import { getAccount } from "@/lib/server/auth";
 import { listFacts } from "@/lib/data/facts";
 import { getInterview } from "@/lib/data/interviews";
 import { bankAnswerText, findBankQuestion, findTech } from "@/lib/interview/bank";

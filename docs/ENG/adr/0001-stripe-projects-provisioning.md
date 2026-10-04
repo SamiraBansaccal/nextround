@@ -21,12 +21,12 @@ own accounts** ("it must above all not be mine"), and no secret may ever be comm
 1. **All six services are added with `stripe projects add <provider>/<service>`**, on free tiers,
    and credentials reach the app only through `stripe projects env --pull` (written to `.env`,
    git-ignored) and Stripe Projects *project variables* for the app's own values
-   (`scripts/setup-env.mjs`).
+   (`scripts/infra/setup-env.mjs`).
 2. **Nothing in the repository identifies the author's accounts.** The committed
    `.projects/state.json` holds service names only; `state.local.json` (account and project ids)
    is git-ignored.
 3. **Self-hosting is re-provisioning**, not sharing: `npm run bootstrap -- --owner <github-login>`
-   (`scripts/bootstrap.mjs`) runs `stripe projects init`, the eleven `add` commands with the same
+   (`scripts/infra/bootstrap.mjs`) runs `stripe projects init`, the eleven `add` commands with the same
    resource names, `env --pull`, `setup-env`, the database migration, the GitHub sign-in switch on
    Clerk and the deployment — on the accounts of whoever runs it.
 
@@ -46,7 +46,7 @@ own accounts** ("it must above all not be mine"), and no secret may ever be comm
   (KYC). The first attempt with a sandbox failed (`PROJECTS_CONTEXT_MISMATCH`). A self-hoster has
   to go through the same step.
 - **Production environment variables are not synchronised by Stripe Projects** (the docs say so).
-  `scripts/push-env-to-vercel.mjs` fills that gap.
+  `scripts/infra/push-env-to-vercel.mjs` fills that gap.
 - **The Vercel token it issues expires.** See [ADR 0007](0007-deploy-from-the-machine.md).
 - The bootstrap was verified in `--dry-run` mode on a fresh clone (all eleven services listed as
   to create) and on the reference project (all skipped). **A full run on a second set of accounts

@@ -25,7 +25,7 @@ import {
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { type ReactNode, useRef, useState, useTransition } from "react";
-import { PageHeading, SectionHeading } from "@/components/page-heading";
+import { PageHeading, SectionHeading } from "@/components/layout/page-heading";
 import { TailoredCvDocument, TailoredLetterDocument } from "@/components/documents/tailored-document";
 import { CvDocumentView } from "@/components/profile/cv-document";
 import { FactReviewList } from "@/components/profile/fact-review";

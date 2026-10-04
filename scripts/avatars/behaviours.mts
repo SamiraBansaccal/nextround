@@ -2,8 +2,8 @@
 // Every interviewer gets the same KINDS of clips (idle, listening, reactions, transitions, speaking), so an
 // interview can be assembled from short pieces: [QUESTION] → [LISTEN] → [REACTION] → [THINK] → [NEXT].
 // HOW a clip is played comes from the character's existing data (traits, personality, interview style in
-// lib/interviewers/catalog) plus optional notes in characters/<id>/performance.json (setting, mannerisms).
-// Writes characters/<id>/clip-plan.json; no generation, no credits.
+// lib/interviewers/catalog) plus optional notes in assets/characters/<id>/performance.json (setting, mannerisms).
+// Writes assets/characters/<id>/clip-plan.json; no generation, no credits.
 // Usage: npm run avatars:plan [-- character-id …]
 import { existsSync, readFileSync, writeFileSync } from "node:fs";
 import { findInterviewer } from "@/lib/interviewers";
@@ -106,14 +106,14 @@ export function planFor(i: Interviewer, perf: Performance): ClipPlan[] {
   ];
 }
 
-const sources: Record<string, unknown> = JSON.parse(readFileSync("characters/sources.json", "utf8"));
+const sources: Record<string, unknown> = JSON.parse(readFileSync("assets/characters/sources.json", "utf8"));
 const ids = process.argv.slice(2).length ? process.argv.slice(2) : Object.keys(sources);
 for (const id of ids) {
   const interviewer = findInterviewer(id);
   if (!interviewer) throw new Error(`Unknown interviewer: ${id}`);
-  const perfPath = `characters/${id}/performance.json`;
+  const perfPath = `assets/characters/${id}/performance.json`;
   const perf: Performance = existsSync(perfPath) ? JSON.parse(readFileSync(perfPath, "utf8")) : {};
   const plan = planFor(interviewer, perf);
-  writeFileSync(`characters/${id}/clip-plan.json`, JSON.stringify(plan, null, 1) + "\n");
+  writeFileSync(`assets/characters/${id}/clip-plan.json`, JSON.stringify(plan, null, 1) + "\n");
   console.log(`${id}: ${plan.length} clips planned`);
 }

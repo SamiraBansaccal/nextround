@@ -1,5 +1,5 @@
 import { UserButton } from "@clerk/nextjs";
-import { AppShell } from "@/components/app-shell";
+import { AppShell } from "@/components/layout/app-shell";
 import { getUiCopy } from "@/lib/i18n/server";
 import { setUiLanguageAction } from "./ui-actions";
 

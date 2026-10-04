@@ -2,7 +2,7 @@ import "server-only";
 import { and, desc, eq, isNull, max } from "drizzle-orm";
 import { getDb } from "@/lib/db";
 import { documents, offers } from "@/lib/db/schema";
-import { isUuid } from "@/lib/ids";
+import { isUuid } from "@/lib/shared/ids";
 import type { DocumentLanguage, SourcedSentence, TailoredDocument } from "@/lib/types";
 
 // Versioned CVs and cover letters (history per offer), and the ones the candidate kept in their profile

@@ -14,7 +14,7 @@ l'auteur a posé la règle : **mesurer plutôt que regarder**.
 
 ## ✅ Décision
 
-`npm run e2e` (`scripts/e2e.mjs`) fait trois choses, la dernière toujours :
+`npm run e2e` (`scripts/test/e2e.mjs`) fait trois choses, la dernière toujours :
 
 1. **Préparer** — `tests/e2e/fixtures.mts` crée un **utilisateur de test** Clerk (adresse
    `+clerk_test` de l'instance de développement) et des données d'exemple fictives pour lui, avec

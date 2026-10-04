@@ -32,7 +32,7 @@ requêtes.
 
 - Les limites tiennent entre instances *serverless*, sans ajouter de service Redis.
 - Testé sur un Postgres en mémoire : la limite par minute, le plafond quotidien et la remise à zéro
-  le lendemain (`tests/ai-config.test.ts`).
+  le lendemain (`tests/ai/ai-config.test.ts`).
 
 **Mauvaises** 👎
 

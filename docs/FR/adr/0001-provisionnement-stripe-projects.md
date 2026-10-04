@@ -23,12 +23,12 @@ avec ses propres comptes** (« ça doit surtout pas être les miens »), et aucu
 1. **Les six services sont ajoutés avec `stripe projects add <fournisseur>/<service>`**, en offre
    gratuite. Les identifiants n'arrivent dans l'app que par `stripe projects env --pull` (écrits
    dans `.env`, ignoré par git) et par les *project variables* de Stripe Projects pour les valeurs
-   propres à l'app (`scripts/setup-env.mjs`).
+   propres à l'app (`scripts/infra/setup-env.mjs`).
 2. **Rien dans le dépôt n'identifie les comptes de l'auteur.** Le `.projects/state.json` commité ne
    contient que des noms de services ; `state.local.json` (identifiants du compte et du projet) est
    ignoré par git.
 3. **S'auto-héberger, c'est tout recréer**, pas partager : `npm run bootstrap -- --owner
-   <login-github>` (`scripts/bootstrap.mjs`) lance `stripe projects init`, les onze commandes `add`
+   <login-github>` (`scripts/infra/bootstrap.mjs`) lance `stripe projects init`, les onze commandes `add`
    avec les mêmes noms de ressources, `env --pull`, `setup-env`, la migration de la base,
    l'activation de GitHub chez Clerk et le déploiement — sur les comptes de la personne qui le
    lance.
@@ -50,7 +50,7 @@ avec ses propres comptes** (« ça doit surtout pas être les miens »), et aucu
   premier essai avec un *sandbox* a échoué (`PROJECTS_CONTEXT_MISMATCH`). Toute personne qui
   s'auto-héberge passe par la même étape.
 - **Les variables de production ne sont pas synchronisées par Stripe Projects** (la doc le dit).
-  `scripts/push-env-to-vercel.mjs` comble ce manque.
+  `scripts/infra/push-env-to-vercel.mjs` comble ce manque.
 - **Le token Vercel qu'il fournit expire.** Voir l'[ADR 0007](0007-deployer-depuis-la-machine.md).
 - Le bootstrap a été vérifié en mode `--dry-run` sur un clone neuf (les onze services listés comme
   à créer) et sur le projet de référence (tous sautés). **Une exécution complète sur un second jeu

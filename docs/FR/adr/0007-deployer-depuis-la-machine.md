@@ -14,13 +14,13 @@ dans `.env`.
 
 ## ✅ Décision
 
-- **`node scripts/deploy.mjs`** déploie en production avec `vercel deploy --prod`. Le token est
+- **`node scripts/infra/deploy.mjs`** déploie en production avec `vercel deploy --prod`. Le token est
   passé à la CLI **uniquement par une variable d'environnement**, jamais en argument de commande
   (où il apparaîtrait dans la liste des processus).
 - **`.vercelignore`** liste ce qui n'est jamais envoyé : `.env`, `.env.*`, `.projects/`, les
   dossiers d'agents, la doc, les tests, les captures. Vérifié le 2026-10-03 par l'API Vercel : les
   dossiers exclus arrivent **vides** (0 fichier), contre 9 fichiers pour `app/` et 8 pour `lib/`.
-- **`node scripts/push-env-to-vercel.mjs`** copie une liste explicite de variables vers Vercel
+- **`node scripts/infra/push-env-to-vercel.mjs`** copie une liste explicite de variables vers Vercel
   (production et preview), jamais le token Vercel lui-même.
 
 **Amendement (2026-10-04).** Le token fourni par Stripe Projects **expire** (deux fois en deux

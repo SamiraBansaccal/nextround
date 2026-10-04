@@ -45,4 +45,4 @@ Les boutons de l'app restent disponibles : les scripts appellent exactement le m
 
 ## Déployer
 
-`node scripts/deploy.mjs` depuis le Mac (il a besoin de la CLI Stripe pour renouveler le jeton Vercel). Pour ne plus en dépendre : relier le projet Vercel au dépôt GitHub, et chaque fusion sur `main` se déploie seule.
+`node scripts/infra/deploy.mjs` depuis le Mac (il a besoin de la CLI Stripe pour renouveler le jeton Vercel). Pour ne plus en dépendre : relier le projet Vercel au dépôt GitHub, et chaque fusion sur `main` se déploie seule.

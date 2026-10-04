@@ -6,7 +6,7 @@ export default defineConfig({
     alias: {
       "@": fileURLToPath(new URL(".", import.meta.url)),
       // "server-only" throws outside of Next.js server components: neutralise it in tests.
-      "server-only": fileURLToPath(new URL("./tests/server-only-stub.ts", import.meta.url)),
+      "server-only": fileURLToPath(new URL("./tests/helpers/server-only-stub.ts", import.meta.url)),
     },
   },
   test: {

@@ -29,7 +29,7 @@ serverless functions: several instances can run at once, and none keeps memory b
 
 - The limits hold across serverless instances, without adding a Redis service.
 - Tested on an in-memory Postgres: the minute limit, the daily cap and the reset on the next day
-  (`tests/ai-config.test.ts`).
+  (`tests/ai/ai-config.test.ts`).
 
 **Bad** 👎
 

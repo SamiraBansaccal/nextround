@@ -4,14 +4,14 @@ Source per character: the master reference's candidate when selection.json exist
 canonical image (English Wikipedia's) found by collect-references.py, otherwise the best candidate.
 The picture is 1280x720 (16:9, the call's webcam frame) with the head and shoulders filling the
 height, centred, so the round avatar (centre square, object-cover) shows the face.
-Usage: python3 scripts/avatars/make-pictures.py [id …]   then: node scripts/interviewer-pictures.mjs
+Usage: python3 scripts/avatars/make-pictures.py [id …]   then: node scripts/avatars/interviewer-pictures.mjs
 """
 import json, sys
 from pathlib import Path
 from PIL import Image, ImageDraw
 
 ROOT = Path(__file__).resolve().parents[2]
-CHARS, OUT = ROOT / "characters", ROOT / "public" / "interviewers"
+CHARS, OUT = ROOT / "assets" / "characters", ROOT / "public" / "interviewers"
 sys.path.insert(0, str(Path(__file__).parent))
 prepare = __import__("prepare-references")  # subject_box, load
 

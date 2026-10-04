@@ -6,7 +6,7 @@ import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import { WithCode } from "@/components/with-code";
+import { WithCode } from "@/components/shared/with-code";
 import type { SettingsCopy } from "@/lib/i18n/settings";
 import { fill } from "@/lib/interview/copy";
 

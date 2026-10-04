@@ -1,9 +1,9 @@
 import "server-only";
 import { z } from "zod";
 import { type AiContext, aiJson } from "@/lib/ai";
-import { factAliases, type FactForPrompt } from "@/lib/prompt-facts";
+import { factAliases, type FactForPrompt } from "@/lib/ai/prompt-facts";
 import type { Feedback, QuestionGroup } from "@/lib/types";
-import { isQuoteIn, keepValidFactIds } from "@/lib/verify";
+import { isQuoteIn, keepValidFactIds } from "@/lib/ai/verify";
 
 // Feedback on one practice answer. The AI rates STAR, relevance, evidence (and honesty on gap
 // questions) and lists the claims of the answer. The code keeps a claim only if its quote is

@@ -1,9 +1,9 @@
 import { ProfileLibrary } from "@/components/profile/profile-library";
-import { getAccount } from "@/lib/auth";
+import { getAccount } from "@/lib/server/auth";
 import { listFacts } from "@/lib/data/facts";
 import { listKeptDocuments } from "@/lib/data/documents";
 import { cvRef, listSources } from "@/lib/data/sources";
-import { formatDay } from "@/lib/dates";
+import { formatDay } from "@/lib/shared/dates";
 import { PROFILE_COPY } from "@/lib/i18n/profile";
 import { getUiLang } from "@/lib/i18n/server";
 import {

@@ -1,6 +1,6 @@
 import "server-only";
 import { eq } from "drizzle-orm";
-import { decryptSecret, encryptSecret, last4 } from "@/lib/crypto";
+import { decryptSecret, encryptSecret, last4 } from "@/lib/server/crypto";
 import { getDb } from "@/lib/db";
 import { aiSettings } from "@/lib/db/schema";
 import type { ProviderId } from "@/lib/ai/providers";

@@ -2,7 +2,7 @@
 
 Use when the automatic collection found merchandise or screenshots: e.g. One Piece's official images
 are named "<Name> Anime Infobox.png". Appends the best matches (cut-out renders first) to
-characters/<id>/candidates/ as cNN.png and to candidates.json, then rebuilds contact-sheet.jpg.
+assets/characters/<id>/candidates/ as cNN.png and to candidates.json, then rebuilds contact-sheet.jpg.
 Usage: python3 scripts/avatars/search-files.py <id> "<search words>" [max]
 """
 import json, sys

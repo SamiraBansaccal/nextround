@@ -74,7 +74,7 @@ npm run bootstrap -- --owner <your-github-login> --dry-run   # preview the comma
 npm run bootstrap -- --owner <your-github-login>             # run them
 ```
 
-`scripts/bootstrap.mjs` runs `stripe projects init`, adds Vercel, Neon, Clerk, OpenRouter, Firecrawl and ElevenLabs, pulls the credentials to `.env` (never committed), creates the app variables, migrates the database, enables GitHub sign-in on your Clerk application, pushes the env vars to Vercel and deploys. Each provider shows you its terms of service; completed steps are skipped on re-runs.
+`scripts/infra/bootstrap.mjs` runs `stripe projects init`, adds Vercel, Neon, Clerk, OpenRouter, Firecrawl and ElevenLabs, pulls the credentials to `.env` (never committed), creates the app variables, migrates the database, enables GitHub sign-in on your Clerk application, pushes the env vars to Vercel and deploys. Each provider shows you its terms of service; completed steps are skipped on re-runs.
 
 ## Run it locally
 
@@ -100,7 +100,7 @@ npm test       # 29 tests: data isolation, encryption, AI JSON retry, who pays, 
 | Item | State |
 |---|---|
 | OAuth secrets and encryption key in env only | ✅ `.env` (git-ignored), Vercel env vars; nothing in the repo (secret scan before each commit) |
-| Per-user isolation | ✅ every table has `user_id`; every query filters on the session user id; `tests/isolation.test.ts` |
+| Per-user isolation | ✅ every table has `user_id`; every query filters on the session user id; `tests/data/isolation.test.ts` |
 | User AI keys encrypted, masked, never logged | ✅ AES-256-GCM, only the last 4 characters leave the server, generic errors |
 | Custom base URL disabled by default | ✅ presets only unless `ALLOW_CUSTOM_LLM_BASE_URL=true`, checked at save and call time |
 | zod validation and length limits | ✅ on every server action (answer/page/PDF limits will apply to Phases 4–5) |
@@ -116,7 +116,7 @@ npm test       # 29 tests: data isolation, encryption, AI JSON retry, who pays, 
 - Offers will be added by link or pasted text: no job-board APIs. No automatic applying. LeetCode is a manual fact.
 - Clerk runs as a development instance (shared OAuth credentials, small "Development mode" badge).
 - Free OpenRouter models can be saturated (429); a fallback model is configured.
-- `scripts/bootstrap.mjs` was tested in `--dry-run` mode; a full run on a second set of accounts is still to do.
+- `scripts/infra/bootstrap.mjs` was tested in `--dry-run` mode; a full run on a second set of accounts is still to do.
 
 ## Next steps
 

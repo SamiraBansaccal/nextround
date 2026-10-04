@@ -44,12 +44,12 @@ En acceptant les conditions de chaque fournisseur (`--accept-tos`), Stripe a tra
 ```
 Stripe Projects ──(stripe projects env --pull)──▶ .env (local, jamais commité)
                                                      │
-            scripts/setup-env.mjs ───────────────────┤  ajoute les variables « maison »
+            scripts/infra/setup-env.mjs ───────────────────┤  ajoute les variables « maison »
                                                      │
-            scripts/push-env-to-vercel.mjs ──────────┴──▶ variables d'environnement Vercel (production)
+            scripts/infra/push-env-to-vercel.mjs ──────────┴──▶ variables d'environnement Vercel (production)
 ```
 
-### `scripts/setup-env.mjs` : les variables « maison »
+### `scripts/infra/setup-env.mjs` : les variables « maison »
 
 Lancé une fois avec `npm run setup:env -- --owner <ton-login-github>`. Il crée des **project variables** Stripe Projects : la valeur est stockée dans le coffre Stripe, puis écrite dans `.env`.
 
@@ -62,11 +62,11 @@ Lancé une fois avec `npm run setup:env -- --owner <ton-login-github>`. Il crée
 
 Le script ne peut jamais afficher une valeur secrète. Il passe les valeurs à la CLI Stripe sans passer par un shell, donc rien ne reste dans l'historique. En cas d'erreur, il n'affiche pas la ligne de commande, qui contiendrait la valeur.
 
-### `scripts/push-env-to-vercel.mjs` : vers la production
+### `scripts/infra/push-env-to-vercel.mjs` : vers la production
 
 Stripe Projects écrit les clés **en local seulement** (la doc le précise). Ce script envoie à Vercel, via son API, la liste **exacte** des variables utiles à l'app (pas le jeton Vercel lui-même), pour les environnements production et preview.
 
-### `lib/env.ts` : lecture côté serveur
+### `lib/server/env.ts` : lecture côté serveur
 
 Toutes les variables sont validées par un schéma zod au premier usage. S'il en manque une, l'erreur donne les **noms** manquants, jamais les valeurs. Le fichier commence par `import "server-only"` : si un composant côté navigateur l'importait par erreur, le build échouerait.
 
@@ -76,10 +76,10 @@ Toutes les variables sont validées par un schéma zod au premier usage. S'il en
 |---|---|
 | `proxy.ts` | S'exécute avant chaque requête. Tout est protégé sauf `/`, `/sign-in`, `/sign-up` et `/sso-callback`. Un navigateur non connecté est redirigé vers la connexion ; un robot reçoit une 404 |
 | `app/page.tsx` | Page d'accueil : le nom, la phrase d'accroche et les deux boutons. Un utilisateur déjà connecté est envoyé vers `/dashboard` |
-| `components/sign-in-buttons.tsx` | Les boutons « Continue with GitHub / Google » : `signIn.authenticateWithRedirect()` envoie chez GitHub ou Google |
+| `components/auth/sign-in-buttons.tsx` | Les boutons « Continue with GitHub / Google » : `signIn.authenticateWithRedirect()` envoie chez GitHub ou Google |
 | `app/sso-callback/page.tsx` | Point de retour : `<AuthenticateWithRedirectCallback />` termine la connexion, ou crée le compte à la première connexion |
 | `app/sign-in`, `app/sign-up` | Pages de secours avec les composants Clerk tout faits, si une étape supplémentaire est nécessaire |
-| `lib/auth.ts` | `requireUserId()` : **la seule** façon d'obtenir l'identifiant de l'utilisateur côté serveur. `getAccount()` : nom, identifiant GitHub, et si c'est le propriétaire |
+| `lib/server/auth.ts` | `requireUserId()` : **la seule** façon d'obtenir l'identifiant de l'utilisateur côté serveur. `getAccount()` : nom, identifiant GitHub, et si c'est le propriétaire |
 
 **Pourquoi `proxy.ts` ne suffit pas :** la doc Next.js le dit, le proxy est un premier filtre « optimiste ». Chaque accès aux données revérifie la session avec `requireUserId()`.
 
@@ -127,7 +127,7 @@ export async function updateFact(userId: string, id: string, patch: FactPatch) {
 
 Même avec l'identifiant exact d'une ligne d'un autre utilisateur, la condition `user_id = <moi>` ne correspond à rien : la lecture renvoie `null`, la modification et la suppression ne touchent aucune ligne.
 
-### Le test : `tests/isolation.test.ts`
+### Le test : `tests/data/isolation.test.ts`
 
 ```bash
 npm test
@@ -156,8 +156,8 @@ Résultat : **7 tests sur 7 passent.** Chaque nouveau module de `lib/data/` rece
 ## 8. Le déploiement
 
 ```bash
-node scripts/push-env-to-vercel.mjs   # si des variables ont changé
-node scripts/deploy.mjs               # déploie en production
+node scripts/infra/push-env-to-vercel.mjs   # si des variables ont changé
+node scripts/infra/deploy.mjs               # déploie en production
 ```
 
 - **Depuis le Mac, pas depuis GitHub :** le projet Vercel créé par Stripe Projects n'est pas relié au dépôt GitHub (le relier demanderait d'installer l'application Vercel sur GitHub). On déploie donc depuis la machine avec la CLI Vercel. Le jeton vient de `.env` et passe par une **variable d'environnement**, jamais en argument de commande, où il serait visible dans la liste des processus.
@@ -183,6 +183,6 @@ node scripts/deploy.mjs               # déploie en production
 | `npm run db:generate` | Génère une migration SQL après un changement de `lib/db/schema.ts` |
 | `npm run db:migrate` | Applique les migrations à la base Neon |
 | `npm run setup:env -- --owner <github>` | Crée les variables « maison » |
-| `node scripts/push-env-to-vercel.mjs` | Envoie les variables à Vercel |
-| `node scripts/deploy.mjs` | Déploie en production |
+| `node scripts/infra/push-env-to-vercel.mjs` | Envoie les variables à Vercel |
+| `node scripts/infra/deploy.mjs` | Déploie en production |
 | `stripe projects spend` | Affiche ce que coûtent les services |

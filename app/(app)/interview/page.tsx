@@ -4,11 +4,11 @@ import { DeleteInterviewButton } from "@/components/interview/delete-interview-b
 import { InterviewerAvatar } from "@/components/interview/interviewer-avatar";
 import { TechLogo } from "@/components/interview/tech-logo";
 import { Button } from "@/components/ui/button";
-import { requireUserId } from "@/lib/auth";
+import { requireUserId } from "@/lib/server/auth";
 import { getUiCopy } from "@/lib/i18n/server";
 import { fill } from "@/lib/interview/copy";
 import { listInterviewsWithProgress } from "@/lib/data/interviews";
-import { formatDay } from "@/lib/dates";
+import { formatDay } from "@/lib/shared/dates";
 import { interviewTitle } from "@/lib/interview/practice";
 import { techLogo } from "@/lib/interview/tech-logos";
 import { parseTopic, topicTechs } from "@/lib/interview/tracks";

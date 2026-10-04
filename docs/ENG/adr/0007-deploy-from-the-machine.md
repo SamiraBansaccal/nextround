@@ -13,13 +13,13 @@ Stripe Projects does provide a Vercel token, the team id and the project id in `
 
 ## ✅ Decision
 
-- **`node scripts/deploy.mjs`** deploys to production with `vercel deploy --prod`. The token is
+- **`node scripts/infra/deploy.mjs`** deploys to production with `vercel deploy --prod`. The token is
   passed to the CLI through an **environment variable only**, never as a command-line argument
   (which would show it in the process list).
 - **`.vercelignore`** lists what is never uploaded: `.env`, `.env.*`, `.projects/`, agent folders,
   docs, tests, screenshots. Checked on 2026-10-03 through the Vercel API: the excluded folders
   arrive as **empty** directories (0 files), against 9 files for `app/` and 8 for `lib/`.
-- **`node scripts/push-env-to-vercel.mjs`** copies an explicit list of runtime variables to Vercel
+- **`node scripts/infra/push-env-to-vercel.mjs`** copies an explicit list of runtime variables to Vercel
   (production and preview), never the Vercel token itself.
 
 **Amendment (2026-10-04).** The token issued by Stripe Projects **expires** (twice in two days).

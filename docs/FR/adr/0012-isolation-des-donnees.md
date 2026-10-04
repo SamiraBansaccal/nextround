@@ -17,7 +17,7 @@ l'utilisateur A ne peut pas lire ou modifier les données de B en changeant un i
   `offer_contacts`, `questions`, `answers`), pour qu'aucune requête n'ait besoin de passer par un
   parent pour connaître le propriétaire.
 - **L'identifiant de l'utilisateur vient d'un seul endroit** : `requireUserId()` / `getAccount()`
-  dans `lib/auth.ts`, qui lisent la session Clerk côté serveur. Les *server actions* ne prennent
+  dans `lib/server/auth.ts`, qui lisent la session Clerk côté serveur. Les *server actions* ne prennent
   jamais un identifiant d'utilisateur en entrée.
 - **Chaque fonction de `lib/data/` prend `userId` en premier et le met dans chaque `WHERE`** —
   lectures, modifications et suppressions. Les identifiants venus du client sont vérifiés comme
@@ -25,7 +25,7 @@ l'utilisateur A ne peut pas lire ou modifier les données de B en changeant un i
 - **Les tests tournent sur PGlite**, un vrai Postgres en mémoire, migré avec les mêmes fichiers SQL
   que la production : l'utilisateur B, qui connaît les identifiants des lignes de A, ne peut ni les
   lire, ni les lister, ni les modifier, ni les supprimer, ni les déplacer
-  (`tests/isolation.test.ts`, `tests/isolation-all.test.ts`).
+  (`tests/data/isolation.test.ts`, `tests/data/isolation-all.test.ts`).
 - `proxy.ts` (le *middleware* renommé de Next.js 16) refuse tôt les requêtes non connectées, mais
   ce n'est qu'un premier filtre ; la garantie, c'est la couche de données.
 

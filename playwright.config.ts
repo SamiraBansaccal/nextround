@@ -1,6 +1,6 @@
 import { defineConfig, devices } from "@playwright/test";
 
-// Visual check of every screen (scripts/e2e.mjs seeds a test user, runs this, then cleans up).
+// Visual check of every screen (scripts/test/e2e.mjs seeds a test user, runs this, then cleans up).
 // Playwright starts the dev server itself and stops it at the end: no orphan browser or server.
 const PORT = 3100;
 

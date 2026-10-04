@@ -6,7 +6,7 @@ import { testAiConnection } from "@/lib/ai";
 import { listModels } from "@/lib/ai/client";
 import { aiErrorMessage } from "@/lib/ai/errors";
 import { DEFAULT_INSTANCE_MODEL, isPresetId, isValidCustomBaseUrl, PRESETS } from "@/lib/ai/providers";
-import { getAccount, requireUserId } from "@/lib/auth";
+import { getAccount, requireUserId } from "@/lib/server/auth";
 import {
   getAiSecrets,
   type PublicAiSettings,
@@ -14,7 +14,7 @@ import {
   saveAiSettings,
   saveVoiceKey,
 } from "@/lib/data/ai-settings";
-import { serverEnv } from "@/lib/env";
+import { serverEnv } from "@/lib/server/env";
 import { getUiLang } from "@/lib/i18n/server";
 import { SETTINGS_COPY } from "@/lib/i18n/settings";
 

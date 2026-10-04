@@ -1,6 +1,6 @@
 // Visual-check fixtures: a dedicated Clerk TEST user ("+clerk_test" address of the dev instance)
 // and fictional sample data for it, so that every screen can be captured with realistic content.
-// Run through scripts/e2e.mjs, which ALWAYS calls cleanup at the end. Never touches other users:
+// Run through scripts/test/e2e.mjs, which ALWAYS calls cleanup at the end. Never touches other users:
 // every table has a user_id, so cleanup deletes exactly this user's rows.
 //
 // Usage: tsx --conditions=react-server tests/e2e/fixtures.mts seed|cleanup

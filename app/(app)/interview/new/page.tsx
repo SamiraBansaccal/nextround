@@ -3,7 +3,7 @@ import Link from "next/link";
 import { InterviewSetup, type SetupContext } from "@/components/interview/interview-setup";
 import { TechLogo } from "@/components/interview/tech-logo";
 import { Button } from "@/components/ui/button";
-import { getAccount } from "@/lib/auth";
+import { getAccount } from "@/lib/server/auth";
 import { getUiCopy } from "@/lib/i18n/server";
 import { fill } from "@/lib/interview/copy";
 import { getOffer, listOffers } from "@/lib/data/offers";

@@ -1,4 +1,4 @@
-import { findQuote } from "@/lib/verify";
+import { findQuote } from "@/lib/ai/verify";
 
 /** Splits the offer text into plain parts and requirement highlights (non-overlapping, in text order). */
 export function highlightSegments(text: string, reqs: { id: string; quote: string }[]): { text: string; reqId?: string }[] {

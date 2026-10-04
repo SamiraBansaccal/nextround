@@ -46,7 +46,7 @@ _Dernière mise à jour : 2026-10-04, session cloud._
 
 ## Avatars animés (en cours)
 
-- `characters/` : par personnage, `sources.json` (wiki Fandom de la franchise), `candidates/` (images trouvées + `contact-sheet.jpg`), `selection.json` (choix motivé), `master_reference.png` et `references/`, `performance.json` (décor, tenue, tics), `clip-plan.json` (33 clips : idle, écoute, réactions, transitions, parole).
+- `assets/characters/` : par personnage, `sources.json` (wiki Fandom de la franchise), `candidates/` (images trouvées + `contact-sheet.jpg`), `selection.json` (choix motivé), `master_reference.png` et `references/`, `performance.json` (décor, tenue, tics), `clip-plan.json` (33 clips : idle, écoute, réactions, transitions, parole).
 - Scripts : `python3 scripts/avatars/collect-references.py [id…]`, `python3 scripts/avatars/prepare-references.py <id>`, `npm run avatars:plan`, `npm run avatars:el -- test <id>` (ElevenLabs : plateau fixe, voix, 4 clips). `DRY_RUN=1` pour tout vérifier sans crédit.
 - Périmètre : personnages animés + Dark Vador et Yoda (53). Pas de vidéo de personnes réelles ni de personnages joués par des acteurs (visage réel). Les 12 originaux et archétypes seront dessinés plus tard.
 - Images en pause (demande du 2026-10-04). Kratos : notes de jeu et plan prêts, références pas encore collectées.

@@ -2,7 +2,7 @@ import "server-only";
 import { and, desc, eq } from "drizzle-orm";
 import { getDb } from "@/lib/db";
 import { profileFacts } from "@/lib/db/schema";
-import { isUuid } from "@/lib/ids";
+import { isUuid } from "@/lib/shared/ids";
 
 // Data access for profile facts. Every function takes the userId from requireUserId()
 // (server-side session) and applies it to EVERY query, reads and writes alike: changing
