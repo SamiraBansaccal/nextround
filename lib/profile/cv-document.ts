@@ -1,5 +1,6 @@
 import "server-only";
 import { z } from "zod";
+import { lenientArray } from "@/lib/ai/lenient";
 import { type AiContext, aiJson } from "@/lib/ai";
 import type { CvContact, CvDocument, CvEntry, CvLanguage } from "@/lib/types";
 import { isQuoteIn } from "@/lib/verify";
@@ -21,37 +22,25 @@ const optional = (max: number) =>
     .catch(null)
     .transform((v) => v || null);
 
-/** Weak models break arrays one item at a time: keep the valid items instead of failing the whole answer. */
-function lenientArray<T extends z.ZodType>(item: T, max: number) {
-  return z
-    .array(z.unknown())
-    .catch([])
-    .transform((items) =>
-      items
-        .flatMap((x) => {
-          const parsed = item.safeParse(x);
-          return parsed.success ? [parsed.data as z.output<T>] : [];
-        })
-        .slice(0, max),
-    );
-}
+/** An optional list: missing or not an array = empty, invalid items dropped. */
+const lenientList = <T extends z.ZodType>(item: T, max: number) => lenientArray(item, max).catch([]);
 
 const entry = z.object({
   title: text(200),
   organisation: optional(200),
   location: optional(120),
   period: optional(80),
-  details: lenientArray(text(500), 15),
+  details: lenientList(text(500), 15),
 });
 
 export const cvDocumentSchema = z.object({
   language: z.string().trim().toLowerCase().catch("en"),
   name: optional(120),
   headline: optional(200),
-  contacts: lenientArray(z.object({ kind: z.enum(KINDS).catch("other"), label: optional(40), value: text(200) }), 12),
-  experiences: lenientArray(entry, 25),
-  education: lenientArray(entry, 20),
-  languages: lenientArray(
+  contacts: lenientList(z.object({ kind: z.enum(KINDS).catch("other"), label: optional(40), value: text(200) }), 12),
+  experiences: lenientList(entry, 25),
+  education: lenientList(entry, 20),
+  languages: lenientList(
     z.object({
       name: text(60),
       level: optional(80),
@@ -63,7 +52,7 @@ export const cvDocumentSchema = z.object({
     }),
     12,
   ),
-  skills: lenientArray(text(80), 40),
+  skills: lenientList(text(80), 40),
 });
 
 function escapeRegExp(value: string): string {

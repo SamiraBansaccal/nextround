@@ -1,5 +1,5 @@
 import { describe, expect, it } from "vitest";
-import { factKey, verifyProposedFacts } from "@/lib/profile/extract-facts";
+import { factKey, proposedFactsSchema, verifyProposedFacts } from "@/lib/profile/extract-facts";
 
 // Facts proposed from a CV or the onboarding chat: kept only with a verbatim quote from the source.
 
@@ -28,5 +28,20 @@ describe("factKey (no duplicates across CVs)", () => {
   it("ignores case, punctuation and spacing", () => {
     expect(factKey("React — TypeScript!")).toBe(factKey("react typescript"));
     expect(factKey("Node.js")).not.toBe(factKey("React"));
+  });
+});
+
+describe("proposedFactsSchema (weak models)", () => {
+  it("keeps the valid facts when some are broken or there are too many", () => {
+    const good = { type: "skill", text: "Knows Docker", quote: "Docker" };
+    const parsed = proposedFactsSchema.parse({
+      facts: [good, { type: "skill", text: "x".repeat(301), quote: "Docker" }, { text: "No quote" }, ...Array(50).fill(good)],
+    });
+    expect(parsed.facts).toHaveLength(40);
+    expect(parsed.facts[0]).toEqual(good);
+  });
+
+  it("still rejects an answer without a facts list, so the model is asked again", () => {
+    expect(proposedFactsSchema.safeParse({ items: [] }).success).toBe(false);
   });
 });

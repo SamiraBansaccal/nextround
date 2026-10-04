@@ -1,6 +1,7 @@
 import "server-only";
 import { z } from "zod";
 import { type AiContext, aiJson } from "@/lib/ai";
+import { lenientArray } from "@/lib/ai/lenient";
 import type { FactType } from "@/lib/types";
 import { isQuoteIn } from "@/lib/verify";
 
@@ -11,15 +12,15 @@ import { isQuoteIn } from "@/lib/verify";
 const TYPES = ["experience", "skill", "project", "education", "language", "achievement"] as const;
 
 export const proposedFactsSchema = z.object({
-  facts: z
-    .array(
-      z.object({
-        type: z.enum(TYPES).catch("skill"),
-        text: z.string().trim().min(3).max(300),
-        quote: z.string().trim().min(3).max(400),
-      }),
-    )
-    .max(40),
+  // A long CV can yield more than 40 facts, or one fact too long: keep the valid ones instead of failing.
+  facts: lenientArray(
+    z.object({
+      type: z.enum(TYPES).catch("skill"),
+      text: z.string().trim().min(3).max(300),
+      quote: z.string().trim().min(3).max(400),
+    }),
+    40,
+  ),
 });
 
 export interface ProposedFact {

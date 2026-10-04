@@ -1,4 +1,5 @@
-import { existsSync } from "node:fs";
+import { existsSync, readdirSync } from "node:fs";
+import { PICTURES } from "@/lib/interviewers/pictures";
 import { describe, expect, it } from "vitest";
 import { DEFAULT_INTERVIEWER_ID, findInterviewer, getInterviewer, INTERVIEWERS, interviewersIn, listCategories } from "@/lib/interviewers";
 import { initials, placeholderTone } from "@/lib/interviewers/avatar";
@@ -89,5 +90,16 @@ describe("interview style, shown before joining", () => {
     expect(getInterviewer("mr-burns").copy.en.style).toBe("Cold, formal and extremely demanding");
     expect(getInterviewer("mr-burns").copy.fr.name).toBe("M. Burns");
     expect(getInterviewer("rick-sanchez").copy.fr.style).toBe("Génial, cynique et chaotique");
+  });
+});
+
+describe("interviewer pictures", () => {
+  it("lists exactly the pictures in public/interviewers (run node scripts/interviewer-pictures.mjs)", () => {
+    const files = readdirSync("public/interviewers").filter((f) => /\.(webp|jpe?g|png)$/.test(f));
+    expect(Object.values(PICTURES).sort()).toEqual(files.map((f) => `/interviewers/${f}`).sort());
+  });
+
+  it("only names pictures after interviewers of the catalog", () => {
+    for (const id of Object.keys(PICTURES)) expect(findInterviewer(id), id).not.toBeNull();
   });
 });
