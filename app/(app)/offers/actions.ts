@@ -6,6 +6,9 @@ import { aiErrorMessage, AiError } from "@/lib/ai/errors";
 import { consumeInstanceQuota } from "@/lib/ai/usage";
 import { getAccount, requireUserId } from "@/lib/auth";
 import { listFacts } from "@/lib/data/facts";
+import { OFFERS_COPY } from "@/lib/i18n/offers";
+import { getUiLang } from "@/lib/i18n/server";
+import { fill } from "@/lib/interview/copy";
 import { createOffer, getOfferDetail, markApplied, setOfferStatus, setRequirementFacts } from "@/lib/data/offers";
 import { serverEnv } from "@/lib/env";
 import { extractOffer } from "@/lib/offers/extract";
@@ -19,18 +22,18 @@ const addSchema = z.object({
   text: z.string().trim().max(MAX_PAGE_TEXT * 2).optional(),
 });
 
-const NEED_TEXT = "This page blocks access or needs a login. Paste the offer text instead.";
-
 /** Add an offer by URL (main flow) or by pasted text; the AI scans it and the code verifies every quote. */
 export async function addOfferAction(input: unknown): Promise<AddOfferResult> {
   const account = await getAccount();
+  const lang = await getUiLang(); // messages in the site's language
+  const t = OFFERS_COPY[lang];
   const parsed = addSchema.safeParse(input);
-  if (!parsed.success) return { ok: false, error: "Please check the link or the text." };
+  if (!parsed.success) return { ok: false, error: t.checkLinkOrText };
   const url = parsed.data.url || null;
   let text = parsed.data.text ?? "";
 
   if (!text) {
-    if (!url) return { ok: false, error: "Paste a link to the offer, or its text." };
+    if (!url) return { ok: false, error: t.pasteLinkOrText };
     try {
       const firecrawlKey = serverEnv().FIRECRAWL_API_API_KEY;
       if (firecrawlKey) {
@@ -41,20 +44,17 @@ export async function addOfferAction(input: unknown): Promise<AddOfferResult> {
       }
     } catch (error) {
       if (error instanceof PageFetchError && (error.reason === "invalid_url" || error.reason === "blocked_address")) {
-        return { ok: false, error: "Only public http(s) links are accepted." };
+        return { ok: false, error: t.publicLinksOnly };
       }
       if (error instanceof AiError) {
-        const message =
-          error.code === "rate_limited"
-            ? "Too many pages read this minute. Wait a moment, or paste the offer text instead."
-            : "Daily page-reading limit reached. Paste the offer text instead.";
+        const message = error.code === "rate_limited" ? t.tooManyPages : t.dailyPageLimit;
         return { ok: false, error: message, needText: true };
       }
-      return { ok: false, error: NEED_TEXT, needText: true };
+      return { ok: false, error: t.needText, needText: true };
     }
-    if (looksBlocked(text)) return { ok: false, error: NEED_TEXT, needText: true };
+    if (looksBlocked(text)) return { ok: false, error: t.needText, needText: true };
   } else if (text.length < 200) {
-    return { ok: false, error: "This text is too short to be a job offer." };
+    return { ok: false, error: t.tooShort };
   }
   text = text.slice(0, MAX_PAGE_TEXT);
 
@@ -62,13 +62,13 @@ export async function addOfferAction(input: unknown): Promise<AddOfferResult> {
   try {
     const extraction = await extractOffer({ userId: account.userId, isOwner: account.isOwner }, text, facts);
     if (extraction.requirements.length === 0) {
-      return { ok: false, error: "No requirement could be verified in this text. Try pasting the full offer text." };
+      return { ok: false, error: t.noRequirement };
     }
     const offer = await createOffer(account.userId, { sourceUrl: url, sourceSite: sourceSiteFor(url), rawText: text, extraction });
     revalidatePath("/", "layout");
     return { ok: true, offerId: offer.id, dropped: extraction.dropped };
   } catch (error) {
-    return { ok: false, error: aiErrorMessage(error) };
+    return { ok: false, error: aiErrorMessage(error, lang) };
   }
 }
 
@@ -94,18 +94,20 @@ export async function setOfferStatusAction(input: unknown): Promise<{ ok: boolea
  */
 export async function rematchOfferAction(offerId: unknown): Promise<{ ok: true; message: string } | { ok: false; error: string }> {
   const account = await getAccount();
-  if (typeof offerId !== "string") return { ok: false, error: "Offer not found." };
+  const lang = await getUiLang();
+  const t = OFFERS_COPY[lang];
+  if (typeof offerId !== "string") return { ok: false, error: t.offerNotFound };
   const detail = await getOfferDetail(account.userId, offerId);
-  if (!detail) return { ok: false, error: "Offer not found." };
+  if (!detail) return { ok: false, error: t.offerNotFound };
   const facts = await listFacts(account.userId);
-  if (!facts.some((f) => f.validated)) return { ok: false, error: "Validate some facts in your profile first: only validated facts count." };
+  if (!facts.some((f) => f.validated)) return { ok: false, error: t.validateFirst };
   try {
     const links = await matchRequirements({ userId: account.userId, isOwner: account.isOwner }, detail.requirements, facts);
     await setRequirementFacts(account.userId, detail.offer.id, links);
     revalidatePath("/", "layout");
     const covered = [...links.values()].filter((ids) => ids.length > 0).length;
-    return { ok: true, message: `${covered} of ${links.size} requirements covered by your validated facts.` };
+    return { ok: true, message: fill(t.rematchDone, { covered, total: links.size }) };
   } catch (error) {
-    return { ok: false, error: aiErrorMessage(error) };
+    return { ok: false, error: aiErrorMessage(error, lang) };
   }
 }

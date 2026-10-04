@@ -5,6 +5,7 @@ import { useRouter } from "next/navigation";
 import { useState, useTransition } from "react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
+import type { OffersCopy } from "@/lib/i18n/offers";
 import { cn } from "@/lib/utils";
 
 type Result = { ok: true; offerId: string; dropped: number } | { ok: false; error: string; needText?: boolean };
@@ -13,9 +14,11 @@ type Result = { ok: true; offerId: string; dropped: number } | { ok: false; erro
 // Two layouts from the Lovable prototype: "card" (offers page) and "bar" (dashboard band).
 export function AddOfferForm({
   addOffer,
+  t,
   variant = "card",
 }: {
   addOffer: (input: { url?: string; text?: string }) => Promise<Result>;
+  t: OffersCopy;
   variant?: "card" | "bar";
 }) {
   const router = useRouter();
@@ -51,19 +54,18 @@ export function AddOfferForm({
     >
       {bar ? (
         <p id="add-offer-title" className="mb-3 text-sm font-semibold text-primary">
-          Add an opportunity
+          {t.addOpportunity}
         </p>
       ) : (
         <>
           <p className="flex items-center gap-2 text-xs font-bold text-terracotta uppercase">
-            <Link2 className="size-4" aria-hidden="true" /> Add an offer
+            <Link2 className="size-4" aria-hidden="true" /> {t.addOffer}
           </p>
           <h2 id="add-offer-title" className="mt-1 text-2xl text-earth dark:text-foreground">
-            Paste the link of an offer you like
+            {t.addTitle}
           </h2>
           <p className="mt-1 mb-4 max-w-3xl text-sm text-muted-foreground">
-            Indeed, Actiris, Le Forem, LinkedIn, a company site… The AI reads it; every requirement, stack item and contact is kept only if
-            its quote is found word for word in the offer.
+            {t.addIntro}
           </p>
         </>
       )}
@@ -81,51 +83,51 @@ export function AddOfferForm({
             inputMode="url"
             value={url}
             onChange={(e) => setUrl(e.target.value)}
-            placeholder="Paste a job offer link (Indeed, Actiris, LinkedIn…)"
-            aria-label="Job offer link"
+            placeholder={t.linkPlaceholder}
+            aria-label={t.linkLabel}
             className="h-11 bg-background pl-9"
           />
         </div>
         <Button size="lg" className="h-11" disabled={pending || (!url.trim() && !text.trim())}>
           {pending ? (
             <>
-              <Loader2 className="size-4 animate-spin" aria-hidden="true" /> Reading the offer…
+              <Loader2 className="size-4 animate-spin" aria-hidden="true" /> {t.readingOffer}
             </>
           ) : (
             <>
-              <ScanLine className="size-4" aria-hidden="true" /> Scan
+              <ScanLine className="size-4" aria-hidden="true" /> {t.scan}
             </>
           )}
         </Button>
       </form>
       {!showText && (
         <button type="button" className="mt-3 w-fit text-sm text-muted-foreground underline" onClick={() => setShowText(true)}>
-          Or paste the offer text
+          {t.orPasteText}
         </button>
       )}
       {showText && (
         <div className={cn("mt-4 space-y-2 rounded-xl p-4", blocked ? "bg-warning-soft" : "bg-muted/60")}>
           {blocked && (
             <p className="flex items-center gap-2 text-sm font-medium">
-              <ShieldAlert className="size-4 text-warning" aria-hidden="true" /> This page blocks access — paste the offer text instead
+              <ShieldAlert className="size-4 text-warning" aria-hidden="true" /> {t.pageBlocked}
             </p>
           )}
           <textarea
             rows={5}
             className="w-full rounded-md border bg-card p-3 text-sm"
-            placeholder="Paste the full offer text here"
+            placeholder={t.textPlaceholder}
             value={text}
             maxLength={30000}
             onChange={(e) => setText(e.target.value)}
-            aria-label="Offer text"
+            aria-label={t.textLabel}
           />
           <Button size="sm" disabled={pending || text.trim().length === 0} onClick={submit}>
-            Use this text
+            {t.useText}
           </Button>
         </div>
       )}
       <p aria-live="polite" className="mt-2 min-h-5 text-sm">
-        {pending && <span className="text-muted-foreground">Reading the offer and checking every quote… up to a minute with free models.</span>}
+        {pending && <span className="text-muted-foreground">{t.readingHint}</span>}
         {!pending && error && !blocked && <span className="text-destructive">{error}</span>}
       </p>
     </section>
