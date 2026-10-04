@@ -7,7 +7,7 @@ import { FLAVOR_FIELDS } from "@/lib/interviewers/flavor/types";
 
 // What interviewers say around the questions: data checks, and how the lines are assembled.
 
-const pieces = (pack: FlavorPack) => FLAVOR_FIELDS.flatMap((field) => pack[field] ?? []);
+const pieces = (pack: FlavorPack) => [...FLAVOR_FIELDS.flatMap((field) => pack[field] ?? []), ...Object.values(pack.topicOpeners ?? {}).flat()];
 const always = (value: number) => () => value;
 
 describe("interviewer lines (data)", () => {

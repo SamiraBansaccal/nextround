@@ -3,7 +3,7 @@ import { inRegister, registerOf } from "@/lib/interview/register";
 import type { Interviewer, Lang, Localized } from "../types";
 import { CATEGORY_PACKS, CHARACTER_PACKS } from "./packs";
 import { NEUTRAL, registerPacks } from "./registers";
-import type { FlavorField, FlavorPack } from "./types";
+import type { FlavorField, FlavorPack, FlavorTopic } from "./types";
 
 // What an interviewer says around each question, assembled from small pieces: the character's own lines
 // first, then its category's, then lines that fit its temperament (lib/interviewers/flavor/registers.ts).
@@ -11,12 +11,14 @@ import type { FlavorField, FlavorPack } from "./types";
 // humorous, energetic character interjects often, a cold one rarely. Each piece is used at most once
 // per interview. Pure once `random` is given (tests/interview/flavor.test.ts).
 
-export type { FlavorPack } from "./types";
+export type { FlavorPack, FlavorTopic } from "./types";
 export { CATEGORY_PACKS, CHARACTER_PACKS } from "./packs";
 
 export interface FlavorSlot {
   /** The technology of a technical question, already in the interview's language ("C++"); else null. */
   tech: string | null;
+  /** What the question is about (its type: "salary", "troubleshoot"…), for lines that react to it. */
+  topic?: FlavorTopic | null;
 }
 
 export interface Flavor {
@@ -46,14 +48,15 @@ export function flavorInterview(interviewer: Interviewer, slots: readonly Flavor
   const closerChance = clamp(0.15 + 0.06 * (t.pressure - 1) + 0.04 * (t.warmth - 1));
   const used = new Set<string>();
 
-  function take(field: FlavorField): Localized | null {
+  function take(field: FlavorField | `topic:${FlavorTopic}`): Localized | null {
     const options: { key: string; piece: Localized; weight: number }[] = [];
-    layers.forEach(({ pack, weight }, l) =>
-      (pack[field] ?? []).forEach((piece, i) => {
+    layers.forEach(({ pack, weight }, l) => {
+      const pieces = field.startsWith("topic:") ? (pack.topicOpeners?.[field.slice(6) as FlavorTopic] ?? []) : (pack[field as FlavorField] ?? []);
+      pieces.forEach((piece, i) => {
         const key = `${l}:${field}:${i}`;
         if (!used.has(key)) options.push({ key, piece, weight });
-      }),
-    );
+      });
+    });
     const total = options.reduce((sum, o) => sum + o.weight, 0);
     if (!total) return null;
     let roll = random() * total;
@@ -67,7 +70,10 @@ export function flavorInterview(interviewer: Interviewer, slots: readonly Flavor
     const intro: (string | null)[] = [];
     if (i === 0) intro.push(say(take("greetings")));
     if (random() < interjectionChance) intro.push(say(take("interjections")));
-    if (slot.tech && random() < 0.55) intro.push(say(take("techOpeners")));
+    // A line about the question's topic when the interviewer has one, else a technology or generic lead-in.
+    const topical = slot.topic && random() < 0.7 ? say(take(`topic:${slot.topic}`)) : null;
+    if (topical) intro.push(topical);
+    else if (slot.tech && random() < 0.55) intro.push(say(take("techOpeners")));
     else if (i > 0 && random() < 0.35) intro.push(say(take("openers")));
     const outro = random() < closerChance ? say(take("closers")) : null;
     const lines = intro.filter((line): line is string => !!line);

@@ -15,6 +15,7 @@ import { buildQuestions, type OfferForInterview } from "@/lib/interview/generate
 import { hrAnswerText } from "@/lib/interview/hr-bank";
 import { INTERVIEW_KINDS, practiceFocus, practiceOffer } from "@/lib/interview/practice";
 import { parseTopic, type Topic, topicValue } from "@/lib/interview/tracks";
+import { questionType } from "@/lib/interview/question-types";
 import { registerOf } from "@/lib/interview/register";
 import { FOCUSES } from "@/lib/interview/session";
 import { findInterviewer } from "@/lib/interviewers";
@@ -86,7 +87,7 @@ export async function startInterviewAction(input: unknown): Promise<{ ok: true; 
     });
     if (generated.length === 0) return fail("No question could be prepared for this interview.", "Aucune question n'a pu être préparée pour cet entretien.");
     // What the interviewer says around each question (greeting, catchphrases, lead-ins): code, not AI.
-    const lines = flavorInterview(interviewer, generated.map((q) => ({ tech: q.group === "technical" ? (q.techLabel ?? null) : null })), language);
+    const lines = flavorInterview(interviewer, generated.map((q) => ({ tech: q.group === "technical" ? (q.techLabel ?? null) : null, topic: q.type ?? null })), language);
     const questions = generated.map((q, i) => ({ ...q, intro: lines[i].intro, outro: lines[i].outro }));
     const interviewId = await createInterview(
       account.userId,
@@ -162,7 +163,10 @@ export async function switchInterviewerAction(input: unknown): Promise<{ ok: boo
   const data = await getInterview(userId, parsed.data.interviewId);
   if (!data) return { ok: false };
   const lang = toLang(data.interview.language);
-  const slots = data.questions.map((q) => ({ tech: q.group === "technical" ? (findTech(findBankQuestion(q.bankId)?.tech)?.label[lang] ?? null) : null }));
+  const slots = data.questions.map((q) => ({
+    tech: q.group === "technical" ? (findTech(findBankQuestion(q.bankId)?.tech)?.label[lang] ?? null) : null,
+    topic: questionType(q.group, q.type),
+  }));
   const flavor = flavorInterview(interviewer, slots, lang);
   const lines = new Map(data.questions.map((q, i) => [q.id, { intro: flavor[i].intro, outro: flavor[i].outro }]));
   const ok = await switchInterviewer(userId, data.interview.id, interviewer.id, lines);
