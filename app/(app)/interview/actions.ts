@@ -5,7 +5,7 @@ import { z } from "zod";
 import { aiErrorMessage } from "@/lib/ai/errors";
 import { getAccount, requireUserId } from "@/lib/auth";
 import { listFacts } from "@/lib/data/facts";
-import { createInterview, deleteInterview, getInterview, getQuestionWithOffer, listAskedBankIds, saveAnswer, switchInterviewer } from "@/lib/data/interviews";
+import { createInterview, deleteInterview, findSavedFeedback, getInterview, getQuestionWithOffer, listAskedBankIds, saveAnswer, switchInterviewer } from "@/lib/data/interviews";
 import { getOfferDetail } from "@/lib/data/offers";
 import { bankAnswerText, findBankQuestion, findTech } from "@/lib/interview/bank";
 import { answerFeedback, MAX_ANSWER } from "@/lib/interview/feedback";
@@ -113,7 +113,9 @@ export async function submitAnswerAction(input: unknown): Promise<{ ok: true; fe
   // A bank question's model answer guides the technical part of the feedback ("experience" ones have none).
   const bank = findBankQuestion(found.question.bankId);
   try {
-    const feedback = await answerFeedback(
+    // The same answer to the same question already has feedback: reuse it, no new AI call.
+    const saved = await findSavedFeedback(account.userId, found.question.text, parsed.data.answer);
+    const feedback = saved ?? await answerFeedback(
       { userId: account.userId, isOwner: account.isOwner },
       {
         question: found.question.text,

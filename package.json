@@ -24,6 +24,7 @@
     "owner:import-offers": "tsx --conditions=react-server scripts/owner/import-offers.mts"
   },
   "dependencies": {
+    "@anthropic-ai/sdk": "^0.131.0",
     "@clerk/nextjs": "^7.9.10",
     "@neondatabase/serverless": "^1.2.0",
     "class-variance-authority": "^0.7.1",

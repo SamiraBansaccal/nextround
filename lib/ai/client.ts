@@ -1,9 +1,11 @@
 import "server-only";
+import { anthropicChat, anthropicModels } from "./anthropic";
 import { AiError } from "./errors";
 import { isPresetBaseUrl, isValidCustomBaseUrl, PRESETS } from "./providers";
 
 // The ONE server-side LLM client: OpenAI-compatible chat completions (base URL + API key + model).
 // Works with OpenRouter, OpenAI, Mistral, Groq, and any compatible server when self-hosting.
+// Anthropic is the one exception: its calls go through its own SDK (lib/ai/anthropic.ts).
 
 export interface LlmConfig {
   baseUrl: string;
@@ -38,6 +40,7 @@ export function assertAllowedBaseUrl(baseUrl: string, allowCustomBaseUrl: boolea
 
 export async function chatCompletion(config: LlmConfig, messages: ChatMessage[], options: ChatOptions): Promise<string> {
   assertAllowedBaseUrl(config.baseUrl, options.allowCustomBaseUrl);
+  if (config.baseUrl === PRESETS.anthropic.baseUrl) return anthropicChat(config, messages, options);
 
   const body: Record<string, unknown> = {
     model: config.model,
@@ -90,6 +93,10 @@ function errorCodeForStatus(status: number) {
 /** Lists model ids from GET {baseUrl}/models (all presets support it). */
 export async function listModels(baseUrl: string, apiKey: string | null, allowCustomBaseUrl: boolean): Promise<string[]> {
   assertAllowedBaseUrl(baseUrl, allowCustomBaseUrl);
+  if (baseUrl === PRESETS.anthropic.baseUrl) {
+    if (!apiKey) throw new AiError("no_key");
+    return (await anthropicModels(apiKey)).sort();
+  }
   let response: Response;
   try {
     response = await fetch(`${baseUrl.replace(/\/+$/, "")}/models`, {

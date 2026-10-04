@@ -117,6 +117,21 @@ export async function getQuestionWithOffer(userId: string, questionId: string) {
   return { question, interview: interview ?? null, offer: offer ?? null };
 }
 
+/**
+ * Feedback already given to this user for exactly this answer to exactly this question text (in any of
+ * their interviews): reused instead of paying for a new AI call.
+ */
+export async function findSavedFeedback(userId: string, questionText: string, answer: string): Promise<Feedback | null> {
+  const [row] = await getDb()
+    .select({ feedback: answers.feedback })
+    .from(answers)
+    .innerJoin(questions, eq(answers.questionId, questions.id))
+    .where(and(eq(answers.userId, userId), eq(questions.userId, userId), eq(questions.text, questionText), eq(answers.answer, answer.trim())))
+    .orderBy(desc(answers.createdAt))
+    .limit(1);
+  return row?.feedback ?? null;
+}
+
 export async function saveAnswer(userId: string, questionId: string, answer: string, feedback: Feedback) {
   const [row] = await getDb().insert(answers).values({ userId, questionId, answer, feedback }).returning();
   return row;

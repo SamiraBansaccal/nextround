@@ -43,7 +43,9 @@ export function VoiceSettingsForm({ hasKey: initialHasKey, keyLast4, isOwner, cu
         </CardTitle>
         <CardDescription>
           Used to read questions aloud in the interview call. Without an ElevenLabs key, NextRound uses your browser&apos;s voice, for free.
-          {isOwner && " As the owner, the instance's ElevenLabs key is used when you have none."}
+          {isOwner &&
+            " As the owner, the instance's ElevenLabs key is only used when INSTANCE_VOICE_ENABLED=true is set on the server: it spends paid credits, so it is off by default."}
+          {" ElevenLabs spends credits on each new sentence; a sentence already read in the same voice is reused, not paid again."}
         </CardDescription>
       </CardHeader>
       <CardContent className="space-y-3">
