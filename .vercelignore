@@ -19,3 +19,5 @@ test-results/
 playwright-report/
 # Personal, machine-only files (your own CVs, offers, import scripts)
 .local/
+# Avatar sources and generated clips: not part of the app build
+characters/

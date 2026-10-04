@@ -1,0 +1,9 @@
+{
+  "master": {"file": "c01", "erase": [[0.58, 0.93, 1.0, 1.0]]},
+  "references": [
+    {"file": "c01", "erase": [[0.58, 0.93, 1.0, 1.0]]},
+    {"file": "c01", "crop": [0.0, 0.0, 0.75, 0.45]},
+    {"file": "c01", "crop": [0.0, 0.0, 0.62, 0.26]}
+  ],
+  "notes": "c01 is the official Matt Groening render: canonical teal suit, pink tie, front three-quarter, transparent background (signature removed). Full body, head and shoulders, and face close-up are cut from it so every reference shows the same canonical outfit. Show frames found on the wiki (c02-c16) show other outfits or crowded scenes and were left out."
+}

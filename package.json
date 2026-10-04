@@ -16,6 +16,8 @@
     "setup:env": "node scripts/setup-env.mjs",
     "bootstrap": "node scripts/bootstrap.mjs",
     "e2e": "node scripts/e2e.mjs",
+    "avatars:plan": "tsx scripts/avatars/behaviours.mts",
+    "avatars:el": "tsx --conditions=react-server scripts/avatars/elevenlabs.mts",
     "owner:whoami": "tsx --conditions=react-server scripts/owner/whoami.mts",
     "owner:import-cv": "tsx --conditions=react-server scripts/owner/import-cv.mts",
     "offers:actiris": "tsx scripts/offers/actiris.mts",
