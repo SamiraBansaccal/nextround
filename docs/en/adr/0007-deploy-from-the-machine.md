@@ -43,3 +43,6 @@ Fresh Vercel token in .env." then a successful deployment.
   The habit (and the scripts' order) is to commit first, then deploy — a habit, not a guarantee.
 - `env --pull` rewrites `.env` during the rotation (the app's own variables come back from Stripe
   Projects, so nothing is lost, but local hand edits to `.env` would be).
+
+**Amendment (2026-10-04, evening).** `deploy.mjs` first runs `npm run db:migrate` (idempotent) and stops
+if it fails: the code that goes online never meets a database that is behind it.

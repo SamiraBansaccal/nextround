@@ -1,17 +1,18 @@
 import { Briefcase } from "lucide-react";
 import Image from "next/image";
 import { AddOfferForm } from "@/components/offers/add-offer-form";
-import { OfferCard } from "@/components/offers/offer-card";
+import { Opportunities } from "@/components/dashboard/opportunities";
 import { PageHeading } from "@/components/layout/page-heading";
 import { requireUserId } from "@/lib/server/auth";
 import { listFacts } from "@/lib/data/facts";
+import { DASHBOARD_COPY } from "@/lib/i18n/dashboard";
 import { OFFERS_COPY } from "@/lib/i18n/offers";
 import { getUiLang } from "@/lib/i18n/server";
 import { countInterviewsByOffer } from "@/lib/data/interviews";
 import { listOffers, listRequirementsForUser } from "@/lib/data/offers";
 import { factIndex } from "@/lib/offers/coverage";
 import { buildPipelineCards } from "@/lib/offers/pipeline";
-import { addOfferAction } from "./actions";
+import { addOfferAction, setOfferStatusAction } from "./actions";
 
 export const maxDuration = 120; // AI scans with free models can be slow
 
@@ -46,11 +47,7 @@ export default async function OffersPage() {
           <p className="text-sm text-muted-foreground">{t.noOffersHint}</p>
         </div>
       ) : (
-        <div className="grid gap-4 sm:grid-cols-2 xl:grid-cols-3">
-          {cards.map((card) => (
-            <OfferCard key={card.id} card={card} lang={lang} />
-          ))}
-        </div>
+        <Opportunities cards={cards} move={setOfferStatusAction} lang={lang} t={DASHBOARD_COPY[lang]} heading={false} grid="sm:grid-cols-2 xl:grid-cols-3" />
       )}
     </div>
   );

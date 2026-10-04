@@ -46,6 +46,7 @@ export async function importGithubAction(): Promise<ActionResult> {
       validated: true,
     });
   }
+  await addSource(account.userId, "github", account.githubLogin); // remembers when the repositories were last read
   revalidatePath("/", "layout");
   return {
     ok: true,
