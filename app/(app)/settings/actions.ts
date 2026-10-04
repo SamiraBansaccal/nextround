@@ -15,6 +15,14 @@ import {
   saveVoiceKey,
 } from "@/lib/data/ai-settings";
 import { serverEnv } from "@/lib/env";
+import { getUiLang } from "@/lib/i18n/server";
+import { SETTINGS_COPY } from "@/lib/i18n/settings";
+
+/** Messages in the site's language. */
+async function uiCopy() {
+  const ui = await getUiLang();
+  return { ui, t: SETTINGS_COPY[ui] };
+}
 
 // Server actions for /settings. Each one re-checks the session (requireUserId) and validates its
 // input with zod: the browser is untrusted. Keys travel browser -> server only, never back.
@@ -43,13 +51,14 @@ function resolveBaseUrl(provider: z.infer<typeof providerSchema>, customBaseUrl?
 
 export async function saveAiSettingsAction(input: unknown): Promise<ActionResult<PublicAiSettings>> {
   const userId = await requireUserId();
+  const { t } = await uiCopy();
   const parsed = saveSchema.safeParse(input);
-  if (!parsed.success) return { ok: false, error: "Please check the form: model is required, keys are at least 8 characters." };
+  if (!parsed.success) return { ok: false, error: t.checkForm };
   const baseUrl = resolveBaseUrl(parsed.data.provider, parsed.data.baseUrl);
   if (!baseUrl) {
     return {
       ok: false,
-      error: allowCustom() ? "Enter a valid http(s) base URL." : "Custom base URLs are disabled on this instance.",
+      error: allowCustom() ? t.validUrl : t.customDisabled,
     };
   }
   const settings = await saveAiSettings(userId, {
@@ -71,11 +80,12 @@ export async function removeAiKeyAction(): Promise<ActionResult> {
 
 export async function testConnectionAction(): Promise<ActionResult<{ model: string; source: "user" | "instance" }>> {
   const account = await getAccount();
+  const { ui } = await uiCopy();
   try {
     const result = await testAiConnection({ userId: account.userId, isOwner: account.isOwner });
     return { ok: true, data: result };
   } catch (error) {
-    return { ok: false, error: aiErrorMessage(error) };
+    return { ok: false, error: aiErrorMessage(error, ui) };
   }
 }
 
@@ -83,20 +93,21 @@ const loadModelsSchema = z.object({ provider: providerSchema, baseUrl: z.string(
 
 export async function loadModelsAction(input: unknown): Promise<ActionResult<string[]>> {
   const userId = await requireUserId();
+  const { ui, t } = await uiCopy();
   const parsed = loadModelsSchema.safeParse(input);
-  if (!parsed.success) return { ok: false, error: "Unknown provider." };
+  if (!parsed.success) return { ok: false, error: t.unknownProvider };
   const baseUrl = resolveBaseUrl(parsed.data.provider, parsed.data.baseUrl);
-  if (!baseUrl) return { ok: false, error: "This base URL is not allowed on this instance." };
+  if (!baseUrl) return { ok: false, error: t.urlNotAllowed };
 
   // Use the user's saved key for this provider; OpenRouter's list is public.
   const saved = await getAiSecrets(userId);
   const key = saved?.baseUrl === baseUrl ? saved.apiKey : null;
   const publicList = isPresetId(parsed.data.provider) && PRESETS[parsed.data.provider].publicModels;
-  if (!key && !publicList) return { ok: false, error: "Save your API key first, then load the models." };
+  if (!key && !publicList) return { ok: false, error: t.saveKeyFirst };
   try {
     return { ok: true, data: await listModels(baseUrl, key, allowCustom()) };
   } catch (error) {
-    return { ok: false, error: aiErrorMessage(error) };
+    return { ok: false, error: aiErrorMessage(error, ui) };
   }
 }
 
@@ -105,7 +116,7 @@ const voiceKeySchema = z.string().trim().min(10).max(300);
 export async function saveVoiceKeyAction(input: unknown): Promise<ActionResult> {
   const userId = await requireUserId();
   const parsed = voiceKeySchema.safeParse(input);
-  if (!parsed.success) return { ok: false, error: "This does not look like an ElevenLabs key." };
+  if (!parsed.success) return { ok: false, error: (await uiCopy()).t.notElevenLabs };
   await saveVoiceKey(userId, parsed.data, {
     provider: "openrouter",
     baseUrl: PRESETS.openrouter.baseUrl,

@@ -6,8 +6,11 @@ import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
+import { WithCode } from "@/components/with-code";
 import type { ProviderId } from "@/lib/ai/providers";
 import type { PublicAiSettings } from "@/lib/data/ai-settings";
+import type { SettingsCopy } from "@/lib/i18n/settings";
+import { fill } from "@/lib/interview/copy";
 import { cn } from "@/lib/utils";
 
 type Result<T = null> = { ok: true; data: T } | { ok: false; error: string };
@@ -26,13 +29,14 @@ interface Props {
   isOwner: boolean;
   suggestedModel: string;
   actions: AiSettingsActions;
+  t: SettingsCopy;
 }
 
 type Message = { kind: "success" | "error"; text: string } | null;
 
 // "AI provider" card (layout from the Lovable prototype). The API key only travels
 // browser -> server; the server only ever sends back its last 4 characters.
-export function AiSettingsForm({ initial, presets, allowCustom, isOwner, suggestedModel, actions }: Props) {
+export function AiSettingsForm({ initial, presets, allowCustom, isOwner, suggestedModel, actions, t }: Props) {
   const [saved, setSaved] = useState(initial);
   const [provider, setProvider] = useState<ProviderId>(initial?.provider ?? "openrouter");
   const [baseUrl, setBaseUrl] = useState(initial?.provider === "custom" ? initial.baseUrl : "");
@@ -47,7 +51,7 @@ export function AiSettingsForm({ initial, presets, allowCustom, isOwner, suggest
 
   const preset = presets.find((p) => p.id === provider);
   const keyOnFile = saved?.hasKey && saved.provider === provider && !replacing;
-  const options = [...presets.map((p) => ({ id: p.id, label: p.label })), ...(allowCustom ? [{ id: "custom" as const, label: "Custom URL" }] : [])];
+  const options = [...presets.map((p) => ({ id: p.id, label: p.label })), ...(allowCustom ? [{ id: "custom" as const, label: t.customUrl }] : [])];
 
   function run<T>(action: () => Promise<Result<T>>, onSuccess: (data: T) => string, target: "message" | "test" = "message") {
     const set = target === "test" ? setTestResult : setMessage;
@@ -75,7 +79,7 @@ export function AiSettingsForm({ initial, presets, allowCustom, isOwner, suggest
         setSaved(settings);
         setApiKey("");
         setReplacing(false);
-        return settings.hasKey ? "Saved. Your key is stored encrypted." : "Saved. Add a key to use your own AI.";
+        return settings.hasKey ? t.savedWithKey : t.savedNoKey;
       },
     );
   }
@@ -83,19 +87,17 @@ export function AiSettingsForm({ initial, presets, allowCustom, isOwner, suggest
   return (
     <Card className="border-0 shadow-soft">
       <CardHeader>
-        <CardTitle className="font-display text-xl font-medium">AI provider</CardTitle>
+        <CardTitle className="font-display text-xl font-medium">{t.aiTitle}</CardTitle>
         <CardDescription>
-          Your key stays yours. Free models work fine: OpenRouter lists them with ids ending in <code>:free</code>.
-          {isOwner && " As the instance owner, NextRound uses the instance key whenever you have no key saved."}
+          <WithCode text={t.aiIntro} />
+          {isOwner && t.aiOwner}
         </CardDescription>
         <p className="rounded-xl bg-warning-soft px-4 py-3 text-sm text-foreground">
-          The AI is only used to give feedback on your answers: questions and model answers are written in advance and cost nothing.
-          Each feedback is one call billed by your provider (free on OpenRouter&apos;s <code>:free</code> models), and the same answer to
-          the same question is never sent twice.
+          <WithCode text={t.aiCost} />
         </p>
       </CardHeader>
       <CardContent className="space-y-6">
-        <div className={cn("grid grid-cols-2 gap-2", options.length > 4 ? "sm:grid-cols-5" : "sm:grid-cols-4")} role="group" aria-label="Provider">
+        <div className={cn("grid grid-cols-2 gap-2", options.length > 4 ? "sm:grid-cols-5" : "sm:grid-cols-4")} role="group" aria-label={t.provider}>
           {options.map((x) => (
             <Button
               key={x.id}
@@ -111,32 +113,30 @@ export function AiSettingsForm({ initial, presets, allowCustom, isOwner, suggest
         </div>
         {!allowCustom && (
           <p className="-mt-3 text-xs text-muted-foreground">
-            A custom base URL (e.g. a local model) is off on this public instance, so the server never calls arbitrary hosts. Self-hosters
-            turn it on with <code>ALLOW_CUSTOM_LLM_BASE_URL=true</code>.
+            <WithCode text={t.customOff} />
           </p>
         )}
 
         {provider === "anthropic" && (
           <p className="-mt-3 text-sm text-muted-foreground">
-            To use Claude, create an API key in the Anthropic Console. A Claude.ai subscription (Pro, Max) can&apos;t be used by an app:
-            API usage is billed separately, per call, as prepaid credits.
+            {t.claudeNote}
           </p>
         )}
 
         {provider === "custom" && (
           <div className="space-y-2">
-            <Label htmlFor="base-url">Base URL</Label>
+            <Label htmlFor="base-url">{t.baseUrl}</Label>
             <Input id="base-url" placeholder="http://localhost:11434/v1" value={baseUrl} onChange={(e) => setBaseUrl(e.target.value)} />
           </div>
         )}
 
         <div className="space-y-2">
-          <Label htmlFor="model">Model</Label>
+          <Label htmlFor="model">{t.model}</Label>
           <div className="flex flex-col gap-2 sm:flex-row">
             <Input
               id="model"
               list={listId}
-              placeholder="Model id, e.g. provider/model-name"
+              placeholder={t.modelPlaceholder}
               value={model}
               onChange={(e) => setModel(e.target.value)}
               className="sm:flex-1"
@@ -150,12 +150,12 @@ export function AiSettingsForm({ initial, presets, allowCustom, isOwner, suggest
                   () => actions.loadModels({ provider, baseUrl: provider === "custom" ? baseUrl : undefined }),
                   (list) => {
                     setModels(list);
-                    return `${list.length} models loaded: start typing to pick one.`;
+                    return fill(t.modelsLoaded, { count: list.length });
                   },
                 )
               }
             >
-              Load models
+              {t.loadModels}
             </Button>
           </div>
           <datalist id={listId}>
@@ -166,12 +166,12 @@ export function AiSettingsForm({ initial, presets, allowCustom, isOwner, suggest
         </div>
 
         <div className="space-y-2">
-          <Label htmlFor="api-key">API key</Label>
+          <Label htmlFor="api-key">{t.apiKey}</Label>
           {keyOnFile ? (
             <div className="grid gap-2 sm:grid-cols-[minmax(0,1fr)_auto_auto] sm:items-center">
               <code className="min-w-0 rounded-md border bg-muted px-3 py-2 text-sm break-all">••••{saved?.keyLast4}</code>
               <Button type="button" variant="outline" onClick={() => setReplacing(true)}>
-                Replace
+                {t.replace}
               </Button>
               <Button
                 type="button"
@@ -180,23 +180,23 @@ export function AiSettingsForm({ initial, presets, allowCustom, isOwner, suggest
                 onClick={() =>
                   run(actions.removeKey, () => {
                     setSaved((s) => (s ? { ...s, hasKey: false, keyLast4: null } : s));
-                    return "Key removed.";
+                    return t.keyRemoved;
                   })
                 }
               >
-                Remove
+                {t.remove}
               </Button>
             </div>
           ) : (
-            <Input id="api-key" type="password" autoComplete="off" placeholder="Paste your key" value={apiKey} onChange={(e) => setApiKey(e.target.value)} />
+            <Input id="api-key" type="password" autoComplete="off" placeholder={t.pasteKey} value={apiKey} onChange={(e) => setApiKey(e.target.value)} />
           )}
           <p className="text-xs text-muted-foreground">
-            Stored encrypted (AES-256-GCM), used only by the server, never shown again.
+            {t.stored}
             {preset && (
               <>
                 {" "}
                 <a href={preset.keysUrl} target="_blank" rel="noopener noreferrer" className="inline-flex items-center gap-1 underline">
-                  Get a {preset.label} key <ExternalLink className="size-3" aria-hidden="true" />
+                  {fill(t.getKey, { provider: preset.label })} <ExternalLink className="size-3" aria-hidden="true" />
                 </a>
               </>
             )}
@@ -205,7 +205,7 @@ export function AiSettingsForm({ initial, presets, allowCustom, isOwner, suggest
 
         <div className="flex flex-wrap items-center gap-3">
           <Button disabled={pending || !model.trim()} onClick={save}>
-            {pending && <Loader2 className="size-4 animate-spin" aria-hidden="true" />} Save
+            {pending && <Loader2 className="size-4 animate-spin" aria-hidden="true" />} {t.save}
           </Button>
           <Button
             variant="secondary"
@@ -213,12 +213,12 @@ export function AiSettingsForm({ initial, presets, allowCustom, isOwner, suggest
             onClick={() =>
               run(
                 actions.test,
-                (r) => (r.source === "user" ? `Connected — ${r.model} answered with your key.` : `Connected — ${r.model} answered with the instance key.`),
+                (r) => fill(r.source === "user" ? t.connectedOwn : t.connectedInstance, { model: r.model }),
                 "test",
               )
             }
           >
-            Test connection
+            {t.test}
           </Button>
         </div>
         <div aria-live="polite" className="space-y-1">

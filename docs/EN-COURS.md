@@ -11,11 +11,11 @@ _Dernière mise à jour : 2026-10-04, session cloud._
 | `claude/intelligent-einstein-58bqoh` | cloud | Entretiens sans offre (techno / RH), parcours de création, choix de l'intervieweur, caméra, langue du site, couleurs, réglages IA | [#2](https://github.com/SamiraBansaccal/nextround/pull/2) (fusionnée) |
 | `claude/owner-data-deploy` | local | Projets vibe-codés, « Update with my validated facts » | [#3](https://github.com/SamiraBansaccal/nextround/pull/3) (fusionnée) |
 | `claude/tailored-documents` | local | CV et lettre par offre (EN/FR), ajoutés au profil ; faits validés sur place dans le CV | [#4](https://github.com/SamiraBansaccal/nextround/pull/4) (fusionnée) |
-| `claude/intelligent-einstein-58bqoh` | cloud | Traduction FR/EN du site : offres, page d'offre, CV et lettre, profil, tableau de bord, messages des actions | PR à venir (e2e et captures à faire sur le Mac) |
+| `claude/intelligent-einstein-58bqoh` | cloud | Traduction FR/EN du site : offres, page d'offre, CV et lettre, profil, tableau de bord, réglages, messages des actions | [#6](https://github.com/SamiraBansaccal/nextround/pull/6) (fusionnée) et #8 (Réglages) |
 
 ## Fait récemment
 
-- Cloud, après les PR #3 à #5 : les pages Offres, page d'une offre, CV et lettre, Profil et Tableau de bord suivent la langue du site (bouton EN/FR), messages des actions serveur compris. Les documents gardent leur propre langue (`DOC_HEADINGS`), comme l'entretien garde la sienne. Textes dans `lib/i18n/{offers,profile,documents,dashboard}.ts` ; un test vérifie que l'anglais et le français ont les mêmes textes et les mêmes `{variables}`. Reste en anglais : la page Réglages.
+- Cloud, après les PR #3 à #5 : les pages Offres, page d'une offre, CV et lettre, Profil et Tableau de bord suivent la langue du site (bouton EN/FR), messages des actions serveur compris. Les documents gardent leur propre langue (`DOC_HEADINGS`), comme l'entretien garde la sienne. Textes dans `lib/i18n/{offers,profile,documents,dashboard}.ts` ; un test vérifie que l'anglais et le français ont les mêmes textes et les mêmes `{variables}`. Réglages aussi (PR #8). Restent en anglais : la page d'accueil publique et la connexion (pas de bouton de langue hors de l'app). E2e et captures en français pas encore faits (secrets absents du cloud).
 
 - Session locale du 2026-10-04 (PR #3 et #4, déployées, migrations `0005` et `0006` appliquées) :
   - Projets « vibe-codés » : marqués « Built with AI » dans le profil (NextRound, TrustLint, hopodoo pour la propriétaire). Ils restent dans le profil (intérêt pour l'IA, créativité, hackathons) mais ne couvrent **jamais** une exigence technique : règle unique `lib/offers/coverage.ts`, aussi appliquée aux entretiens et aux CV.
@@ -56,5 +56,5 @@ _Dernière mise à jour : 2026-10-04, session cloud._
 
 - Avatars : images à fournir (liste générée depuis le catalogue). Animation pendant l'entretien : plus tard (pistes : boucles vidéo, ElevenLabs Avatars, synchro labiale en temps réel).
 - Relier Vercel à GitHub pour déployer sans le Mac.
-- Traduire la page Réglages (le reste du site suit la langue choisie).
+- Lancer les e2e et regarder quelques écrans en français (cookie `nextround-ui-lang=fr`).
 - Cache audio durable (Vercel Blob ou S3) quand ElevenLabs sera activé pour de bon.

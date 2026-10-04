@@ -3,6 +3,7 @@ import { DASHBOARD_COPY } from "@/lib/i18n/dashboard";
 import { DOCUMENTS_COPY } from "@/lib/i18n/documents";
 import { OFFERS_COPY } from "@/lib/i18n/offers";
 import { PROFILE_COPY } from "@/lib/i18n/profile";
+import { SETTINGS_COPY } from "@/lib/i18n/settings";
 import { UI_COPY } from "@/lib/i18n/ui";
 
 // The site's interface in English and French: every text exists in both, with the same placeholders.
@@ -22,6 +23,7 @@ describe.each([
   ["profile", PROFILE_COPY],
   ["documents", DOCUMENTS_COPY],
   ["dashboard", DASHBOARD_COPY],
+  ["settings", SETTINGS_COPY],
 ] as const)("%s copy", (_, copy) => {
   const en = new Map(flatten(copy.en));
   const fr = new Map(flatten(copy.fr));
