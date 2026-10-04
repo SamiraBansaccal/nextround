@@ -1,10 +1,13 @@
 import { describe, expect, it } from "vitest";
-import { bankQuestionText, pickTechnicalQuestions } from "@/lib/interview/bank";
+import { findBankQuestion } from "@/lib/interview/bank";
+import { buildQuestions, type OfferForInterview } from "@/lib/interview/generate";
+import { findHrQuestion } from "@/lib/interview/hr-bank";
+import { practiceOffer } from "@/lib/interview/practice";
 import { questionLabel, questionType } from "@/lib/interview/question-types";
-import { type OfferForInterview, questionsSchema, verifyQuestions } from "@/lib/interview/generate";
+import { PLANS } from "@/lib/interview/session";
+import { parseTopic } from "@/lib/interview/tracks";
 
-// Interview questions: sources rebuilt from verified offer data, suggested answers only from validated
-// facts, and the question type kept only when it fits the question's group.
+// Interview questions are built by code from the question banks: no AI, always in the session's language.
 
 const OFFER: OfferForInterview = {
   title: "Junior developer",
@@ -14,113 +17,67 @@ const OFFER: OfferForInterview = {
   requirements: [
     { text: "React", quote: "We use React", covered: true },
     { text: "Docker", quote: "Docker is a plus", covered: false },
+    { text: "Team spirit", quote: "You enjoy working in a team", covered: false },
   ],
 };
 
-describe("verifyQuestions", () => {
-  it("rebuilds sources, keeps valid types and fact-backed sentences only", () => {
-    const raw = questionsSchema.parse({
-      questions: [
-        { group: "hr", type: "motivation", text: "Why do you want to join us?", ref: null, suggested_answer: [{ text: "I built a React app.", fact_ids: ["F1"] }, { text: "I love Kubernetes.", fact_ids: ["F9"] }] },
-        { group: "technical", type: "skill_gap", text: "How does React render?", ref: "S1", suggested_answer: [] },
-        { group: "gap", type: "Skill gap", text: "Have you used Docker?", ref: "R1", suggested_answer: [] },
-        { group: "gap", type: "skill_gap", text: "Tell me about Kubernetes.", ref: "R7", suggested_answer: [] },
-        { group: "hr", text: "Introduce yourself.", ref: null, suggested_answer: [] },
-        { group: "hr", type: "strengths", text: "What are your strengths?", ref: null, suggested_answer: [] },
-      ],
-    });
-    const questions = verifyQuestions(raw, OFFER, new Map([["F1", "fact-1"]]), new Set(["fact-1"]));
+const seeded = (seed = 7) => () => {
+  seed = (seed * 16807) % 2147483647;
+  return (seed - 1) / 2147483646;
+};
 
-    const motivation = questions.find((q) => q.text.startsWith("Why"))!;
-    expect(motivation.type).toBe("motivation");
-    expect(motivation.suggestedAnswer).toEqual([{ text: "I built a React app.", factIds: ["fact-1"] }]); // F9 is not a validated fact
+describe("buildQuestions", () => {
+  it("follows the session's plan: HR, then technical from the stack, then the offer's gaps", () => {
+    const qs = buildQuestions(OFFER, [], { language: "en", focus: "both", random: seeded() });
+    const groups = qs.map((q) => q.group);
+    expect(groups.filter((g) => g === "hr")).toHaveLength(PLANS.both.hr);
+    expect(groups.filter((g) => g === "gap")).toHaveLength(2);
+    expect(groups.indexOf("technical")).toBeGreaterThan(groups.lastIndexOf("hr"));
+    for (const q of qs.filter((x) => x.group === "hr")) expect(findHrQuestion(q.bankId)).toBeDefined();
+    for (const q of qs.filter((x) => x.group === "technical")) expect(findBankQuestion(q.bankId)?.tech).toBe("react");
+  });
 
-    const technical = questions.find((q) => q.text.startsWith("How does"))!;
-    expect(technical.source).toBe("From the offer's stack: React — “We use React”");
-    expect(technical.type).toBeNull(); // "skill_gap" does not fit a technical question
+  it("writes everything in the interview's language and register, with no placeholder left", () => {
+    const fr = buildQuestions(OFFER, [], { language: "fr", focus: "both", register: "casual", random: seeded(3) });
+    for (const q of fr) {
+      expect(q.text).not.toMatch(/[{}]/);
+      expect(q.text).not.toMatch(/(?<!\p{L})(vous|votre|vos)(?!\p{L})/iu);
+    }
+    const gap = fr.find((q) => q.group === "gap" && q.techLabel === "Docker");
+    expect(gap?.text).toContain("Docker");
+    expect(fr.find((q) => q.group === "gap" && !q.techLabel)?.text).toContain("You enjoy working in a team"); // a quote stays as written
+  });
 
-    const docker = questions.find((q) => q.text.includes("Docker"))!;
-    expect(docker.source).toBe("From a gap in your profile: “Docker is a plus”");
-    expect(docker.type).toBe("skill_gap"); // "Skill gap" normalised
+  it("asks only HR questions for a general interview, only technical ones for a technical one", () => {
+    expect(new Set(buildQuestions(OFFER, [], { language: "en", focus: "general", random: seeded() }).map((q) => q.group))).toEqual(new Set(["hr"]));
+    expect(buildQuestions(OFFER, [], { language: "en", focus: "technical", random: seeded() }).some((q) => q.group === "hr")).toBe(false);
+  });
 
-    const unknownGap = questions.find((q) => q.text.includes("Kubernetes"))!;
-    expect(unknownGap.group).toBe("technical"); // no verifiable gap behind R7
-    expect(questions.find((q) => q.text === "Introduce yourself.")!.type).toBeNull();
-    expect(questions.map((q) => q.group)).toEqual(["hr", "hr", "hr", "technical", "technical", "gap"]);
+  it("keeps a practice interview on its topic, whatever the profile", () => {
+    const topic = parseTopic("tech:docker")!;
+    const qs = buildQuestions(practiceOffer(topic), ["Built a React app (React)"], { language: "en", focus: "technical", stackOnly: true, random: seeded() });
+    expect(qs.length).toBeGreaterThan(3);
+    for (const q of qs) expect(findBankQuestion(q.bankId)?.tech).toBe("docker");
+    expect(qs[0].source).toBe("Practice on Docker");
+  });
+
+  it("falls back on the foundations when nothing in the offer or the profile is known to the bank", () => {
+    const qs = buildQuestions({ ...OFFER, stack: [], requirements: [] }, [], { language: "en", focus: "technical", random: seeded() });
+    expect(qs.length).toBeGreaterThan(0);
+    expect(new Set(qs.map((q) => q.bankId)).size).toBe(qs.length);
   });
 });
 
 describe("question types", () => {
   it("keeps a type only when it fits the group", () => {
-    expect(questionType("hr", "introduction")).toBe("introduction");
-    expect(questionType("hr", "technical")).toBeNull();
-    expect(questionType("gap", "Skill Gap")).toBe("skill_gap");
-    expect(questionType("technical", null)).toBeNull();
+    expect(questionType("hr", "motivation")).toBe("motivation");
+    expect(questionType("hr", "inappropriate")).toBe("inappropriate");
+    expect(questionType("technical", "motivation")).toBeNull();
+    expect(questionType("gap", "Skill gap")).toBe("skill_gap");
   });
 
   it("labels a question by its type, else by its group", () => {
-    expect(questionLabel("hr", "motivation")).toBe("Motivation");
+    expect(questionLabel("hr", "tricky", "fr")).toBe("Question piège");
     expect(questionLabel("hr", null)).toBe("General");
-    expect(questionLabel("gap", "nonsense")).toBe("Skill gap");
-  });
-});
-
-describe("verifyQuestions follows the session", () => {
-  const raw = questionsSchema.parse({
-    questions: [
-      { group: "hr", type: "introduction", text: "Introduce yourself.", ref: null, suggested_answer: [] },
-      { group: "hr", type: "motivation", text: "Why us?", ref: null, suggested_answer: [] },
-      { group: "technical", type: "technical", text: "How does React render?", ref: "S1", suggested_answer: [] },
-      { group: "gap", type: "skill_gap", text: "Have you used Docker?", ref: "R1", suggested_answer: [] },
-    ],
-  });
-
-  it("asks only general questions for a general interview, only technical ones for a technical one", () => {
-    const general = verifyQuestions(raw, OFFER, new Map(), new Set(), { language: "en", focus: "general" });
-    expect(general.map((q) => q.group)).toEqual(["hr", "hr"]);
-    const technical = verifyQuestions(raw, OFFER, new Map(), new Set(), { language: "en", focus: "technical" });
-    expect(technical.map((q) => q.group)).toEqual(["technical", "gap"]);
-  });
-
-  it("writes the sources in the interview's language, quotes untouched", () => {
-    const fr = verifyQuestions(raw, OFFER, new Map(), new Set(), { language: "fr", focus: "both" });
-    expect(fr.find((q) => q.group === "hr")!.source).toBe("Question RH classique");
-    expect(fr.find((q) => q.group === "technical")!.source).toBe("Tirée de la stack de l'offre : React — « We use React »");
-    expect(fr.find((q) => q.group === "gap")!.source).toBe("Tirée d'une lacune de ton profil : « Docker is a plus »");
-    expect(questionLabel("hr", "strengths", "fr")).toBe("Qualités");
-    expect(questionLabel("technical", null, "fr")).toBe("Technique");
-  });
-});
-
-describe("verifyQuestions with questions from the bank", () => {
-  const picks = pickTechnicalQuestions({ stack: OFFER.stack, facts: ["Built a React app (React)"], count: 3, random: () => 0 });
-
-  it("asks the bank's own text, keeps the fact-backed answer, and adds the bank questions the AI skipped", () => {
-    expect(picks.map((p) => p.tech.id)).toEqual(["react", "react", "react"]);
-    const raw = questionsSchema.parse({
-      questions: [
-        { group: "hr", type: "introduction", text: "Introduce yourself.", ref: null, suggested_answer: [] },
-        { group: "technical", text: "A rewritten question the AI should not have changed", ref: "B2", suggested_answer: [{ text: "I built a React app.", fact_ids: ["F1"] }] },
-        { group: "technical", text: "The same bank question twice", ref: "B2", suggested_answer: [] },
-        { group: "gap", type: "skill_gap", text: "Have you used Docker?", ref: "R1", suggested_answer: [] },
-      ],
-    });
-    const questions = verifyQuestions(raw, OFFER, new Map([["F1", "fact-1"]]), new Set(["fact-1"]), { language: "fr", focus: "both", register: "casual" }, picks);
-
-    expect(questions.map((q) => q.group)).toEqual(["hr", "technical", "technical", "technical", "gap"]);
-    const bank = questions.filter((q) => q.bankId);
-    expect(bank.map((q) => q.bankId)).toEqual(picks.map((p) => p.question.id)); // in the order chosen by code
-    expect(bank[1].text).toBe(bankQuestionText(picks[1].question, "fr", "casual"));
-    expect(bank[1].suggestedAnswer).toEqual([{ text: "I built a React app.", factIds: ["fact-1"] }]);
-    expect(bank[0].suggestedAnswer).toEqual([]); // skipped by the AI, asked anyway
-    expect(bank[0].source).toBe("Tirée de la stack de l'offre : React — « We use React »");
-    expect(bank[0].techLabel).toBe("React");
-  });
-
-  it("cites the profile fact behind a question on the candidate's own technology", () => {
-    const fromProfile = pickTechnicalQuestions({ stack: [], facts: ["Docker labs at school (Docker)"], count: 1, random: () => 0 });
-    const [question] = verifyQuestions({ questions: [] }, OFFER, new Map(), new Set(), { language: "en", focus: "technical" }, fromProfile);
-    expect(question.source).toBe("From your profile: “Docker labs at school (Docker)”");
-    expect(question.type).toBe("experience");
   });
 });

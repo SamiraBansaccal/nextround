@@ -28,9 +28,8 @@ export async function POST(request: Request) {
     text: [intro, text, outro].filter(Boolean).join(" "), // the interviewer's lines around the question, then the question
     language: found.interview?.language ?? found.offer?.language ?? null, // the session's language
     voice: getInterviewer(found.interview?.interviewerId).voice,
-    // Still "dynamic": the AI writes part of the questions. Bank questions and interviewer lines are fixed
-    // texts, so they could later be cached once per voice and assembled ("static").
-    content: "dynamic",
+    // Questions and interviewer lines are written in advance (no AI): read once per voice, then reused.
+    content: "static",
   };
   try {
     const key = isCacheable(speech) ? audioCacheKey(tts.provider.id, speech) : null;

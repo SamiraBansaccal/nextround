@@ -1,9 +1,11 @@
 import "server-only";
+import { anthropicChat, anthropicModels } from "./anthropic";
 import { AiError } from "./errors";
 import { isPresetBaseUrl, isValidCustomBaseUrl, PRESETS } from "./providers";
 
 // The ONE server-side LLM client: OpenAI-compatible chat completions (base URL + API key + model).
 // Works with OpenRouter, OpenAI, Mistral, Groq, and any compatible server when self-hosting.
+// Anthropic is the one exception: its calls go through its own SDK (lib/ai/anthropic.ts).
 
 export interface LlmConfig {
   baseUrl: string;
@@ -38,6 +40,7 @@ export function assertAllowedBaseUrl(baseUrl: string, allowCustomBaseUrl: boolea
 
 export async function chatCompletion(config: LlmConfig, messages: ChatMessage[], options: ChatOptions): Promise<string> {
   assertAllowedBaseUrl(config.baseUrl, options.allowCustomBaseUrl);
+  if (config.baseUrl === PRESETS.anthropic.baseUrl) return anthropicChat(config, messages, options);
 
   const body: Record<string, unknown> = {
     model: config.model,
@@ -45,8 +48,11 @@ export async function chatCompletion(config: LlmConfig, messages: ChatMessage[],
     temperature: options.temperature ?? 0.2,
   };
   if (options.maxTokens) body.max_tokens = options.maxTokens;
-  if (config.baseUrl === PRESETS.openrouter.baseUrl && config.fallbackModels?.length) {
-    body.models = [config.model, ...config.fallbackModels]; // OpenRouter model fallbacks
+  if (config.baseUrl === PRESETS.openrouter.baseUrl) {
+    if (config.fallbackModels?.length) body.models = [config.model, ...config.fallbackModels]; // OpenRouter model fallbacks
+    // Free OpenRouter models are reasoning models: their thinking can use the whole time and token
+    // budget and leave the answer empty (measured: 88 s with reasoning, 10 s without, same valid JSON).
+    body.reasoning = { enabled: false };
   }
 
   let response: Response;
@@ -72,8 +78,9 @@ export async function chatCompletion(config: LlmConfig, messages: ChatMessage[],
     choices?: { message?: { content?: unknown } }[];
   } | null;
   const content = data?.choices?.[0]?.message?.content;
-  if (typeof content !== "string" || content.trim() === "") throw new AiError("invalid_output");
-  return content;
+  if (!data?.choices?.length) throw new AiError("invalid_output");
+  // An empty answer is returned as is: structured calls (lib/ai/json.ts) then ask once more.
+  return typeof content === "string" ? content : "";
 }
 
 function errorCodeForStatus(status: number) {
@@ -86,6 +93,10 @@ function errorCodeForStatus(status: number) {
 /** Lists model ids from GET {baseUrl}/models (all presets support it). */
 export async function listModels(baseUrl: string, apiKey: string | null, allowCustomBaseUrl: boolean): Promise<string[]> {
   assertAllowedBaseUrl(baseUrl, allowCustomBaseUrl);
+  if (baseUrl === PRESETS.anthropic.baseUrl) {
+    if (!apiKey) throw new AiError("no_key");
+    return (await anthropicModels(apiKey)).sort();
+  }
   let response: Response;
   try {
     response = await fetch(`${baseUrl.replace(/\/+$/, "")}/models`, {

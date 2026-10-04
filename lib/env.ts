@@ -13,6 +13,11 @@ const serverEnvSchema = z.object({
   OPENROUTER_API_API_KEY: z.string().optional(),
   FIRECRAWL_API_API_KEY: z.string().optional(),
   ELEVENLABS_API_KEY: z.string().optional(),
+  // The instance's ElevenLabs key spends paid credits: used for the owner only when this is "true".
+  INSTANCE_VOICE_ENABLED: z.enum(["true", "false"]).default("false"),
+  // The owner's Anthropic API key (Console, not a Claude.ai subscription): preferred over OpenRouter when set.
+  ANTHROPIC_API_KEY: z.string().optional(),
+  INSTANCE_ANTHROPIC_MODEL: z.string().optional(),
   // Instance model on OpenRouter (defaults in lib/ai/providers.ts); fallbacks are comma-separated.
   INSTANCE_LLM_MODEL: z.string().optional(),
   INSTANCE_LLM_FALLBACK_MODELS: z.string().optional(),

@@ -2,17 +2,21 @@
 
 Mis à jour à la fin de chaque session de travail avec Claude (local ou cloud). Le lire en premier.
 
-_Dernière mise à jour : 2026-10-04, session locale (Mac)._
+_Dernière mise à jour : 2026-10-04, session cloud._
 
 ## Branches en cours
 
-- `claude/owner-data-deploy` (session locale, Mac) : projets « vibecodés » (marqués « Built with AI » dans le profil : ils montrent l'intérêt pour l'IA, la créativité, les hackathons, mais ne prouvent **jamais** la maîtrise de leur stack), règle unique de couverture `lib/offers/coverage.ts`, bouton « Update with my validated facts » sur une offre (`lib/offers/match.ts`). **Attend la PR #2** : sa migration `0005` crée `profile_facts.ai_assisted`. Ensuite : fusionner `main`, `npm run db:migrate` depuis le Mac, écarter les faits vibecodés dans `buildQuestions` et le `covered` des entretiens, e2e, déploiement.
-- `claude/intelligent-einstein-58bqoh` (session cloud, PR #2) : entretiens sans offre, nouveau parcours, langue de l'interface, réglages IA, appels OpenRouter sans raisonnement.
+| Branche | Session | Sujet | PR |
+|---|---|---|---|
+| `claude/intelligent-einstein-58bqoh` | cloud | Entretiens sans offre (techno / RH), parcours de création, choix de l'intervieweur, caméra, langue du site, couleurs, réglages IA | [#2](https://github.com/SamiraBansaccal/nextround/pull/2) (fusionnée) |
+| `claude/owner-data-deploy` | local | Projets vibe-codés, « mettre à jour avec mes faits validés » | [#3](https://github.com/SamiraBansaccal/nextround/pull/3) |
 
 ## Fait récemment
 
-- Session locale du 2026-10-04 : CV `cv-fev2026.pdf` importé (15 faits proposés, mis en page), 6 dépôts GitHub de plus (18 projets), 10 offres Actiris importées (5953957 C++, 5843176 Java, 5965434 et 5949141 et 5952000 DevOps, 5905968 admin système, 5947174, 5947193, 5959174, 5964627 junior). Rien n'est encore validé : à faire dans Profil. Production déployée (`1ea6f1a`, banque de questions et avatars visibles).
-- Les modèles gratuits d'OpenRouter sont des modèles « à raisonnement » : 90 s ou plus par appel, réponse parfois vide (d'où « This model could not return valid output »). Avec `reasoning: { enabled: false }` : 10 s. Corrigé dans la PR #2 ; d'ici là, les imports du Mac passent par un lanceur local qui ajoute cette option.
+- PR #2 (cloud) : entretiens sans offre (par technologie, regroupées en parcours, ou RH seul), nouveau parcours de création (type → offre/techno → intervieweur en pleine page → test caméra → appel), caméra vraiment éteinte (LED), palette plus chaude, bouton supprimer rouge, langue du site EN/FR (anglais par défaut, séparée de la langue de l'entretien).
+- Questions sans IA : banque RH écrite à l'avance (classiques, variantes, pièges, questions illégales), banque technique, en anglais et en français corrects (pas de traduction mot à mot). L'IA ne sert plus qu'au retour sur les réponses.
+- Réglages : fournisseur Anthropic (Claude, clé de l'Anthropic Console ; un abonnement Claude.ai ne marche pas pour une app). Côté propriétaire, `ANTHROPIC_API_KEY` passe avant OpenRouter s'il est défini. ElevenLabs de l'instance coupé par défaut (`INSTANCE_VOICE_ENABLED=true` pour l'activer). Avertissements de coût, retour réutilisé pour une réponse identique, audio réutilisé (mémoire du serveur + onglet).
+- **Avant de déployer #2** : `npm run db:migrate` (migration `0005` : entretiens sans offre + `profile_facts.ai_assisted`).
 
 - Banque de questions techniques (42 technologies, réponses types EN/FR) et répliques des intervieweurs (`c4ec9fc`). Migration `0004` déjà appliquée à Neon.
 - Import de CV plus tolérant aux réponses imparfaites de l'IA ; avatars pris automatiquement dans `public/interviewers/<id>.webp` (PR #1).
@@ -40,3 +44,5 @@ _Dernière mise à jour : 2026-10-04, session locale (Mac)._
 
 - Avatars : images à fournir (liste générée depuis le catalogue). Animation pendant l'entretien : plus tard (pistes : boucles vidéo, ElevenLabs Avatars, synchro labiale en temps réel).
 - Relier Vercel à GitHub pour déployer sans le Mac.
+- Traduire les pages Tableau de bord, Offres, Profil et Réglages (seuls la navigation et le parcours d'entretien suivent la langue du site).
+- Cache audio durable (Vercel Blob ou S3) quand ElevenLabs sera activé pour de bon.

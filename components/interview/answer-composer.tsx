@@ -14,6 +14,7 @@ interface ComposerCopy {
   micOffForAnswer: string;
   skip: string;
   submit: string;
+  submitCost: string;
   previousAnswer: string;
 }
 
@@ -97,6 +98,7 @@ export function AnswerComposer(props: Props) {
         </div>
       </div>
 
+      <p className="mt-2 text-right text-xs text-muted-foreground">{copy.submitCost}</p>
       <p className="mt-3 min-h-5 text-sm" aria-live="polite">
         {pending && status && <span className="text-muted-foreground">{status}</span>}
         {error && <span className="font-semibold text-destructive">{error}</span>}

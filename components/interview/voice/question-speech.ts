@@ -6,10 +6,20 @@ export interface Playback {
   stop(): void;
 }
 
+// Audio already received in this tab, per question: "read again" replays it without asking the server.
+const played = new Map<string, Blob>();
+
 export async function speakQuestion(questionId: string, text: string, locale: string, onEnd: () => void): Promise<Playback> {
-  const response = await fetch("/api/tts", { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ questionId }) });
-  if (response.status === 200) {
-    const url = URL.createObjectURL(await response.blob());
+  let blob = played.get(questionId) ?? null;
+  if (!blob) {
+    const response = await fetch("/api/tts", { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ questionId }) });
+    if (response.status === 200) {
+      blob = await response.blob();
+      played.set(questionId, blob);
+    }
+  }
+  if (blob) {
+    const url = URL.createObjectURL(blob);
     const audio = new Audio(url);
     audio.onended = () => {
       URL.revokeObjectURL(url);

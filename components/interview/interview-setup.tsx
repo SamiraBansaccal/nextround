@@ -1,70 +1,67 @@
 "use client";
 
-import {
-  Check,
-  Code2,
-  Layers,
-  Loader2,
-  MessagesSquare,
-  Mic,
-  MicOff,
-  PhoneCall,
-  UserRound,
-  Video,
-  VideoOff,
-} from "lucide-react";
+import { ArrowLeft, ArrowRight, Check, Code2, Layers, Loader2, MessagesSquare, Mic, MicOff, PhoneCall, UserRound, Video, VideoOff } from "lucide-react";
 import { useRouter } from "next/navigation";
 import { useEffect, useState, useTransition } from "react";
 import { Button } from "@/components/ui/button";
 import { fill, type InterviewCopy, LANGUAGES } from "@/lib/interview/copy";
+import type { InterviewKind } from "@/lib/interview/practice";
 import type { Focus } from "@/lib/interview/session";
-import { KIND_LABEL, KIND_NOTICE, LEVEL_OF, TRAIT_LABELS } from "@/lib/interviewers/labels";
 import type { Interviewer, InterviewerCategory, Lang } from "@/lib/interviewers/types";
 import { cn } from "@/lib/utils";
 import { InterviewerAvatar } from "./interviewer-avatar";
-import { InterviewerChooser } from "./interviewer-chooser";
+import { InterviewerBrowser } from "./interviewer-chooser";
+import { InterviewerProfile } from "./interviewer-profile";
 import { SelfPreview } from "./media/self-preview";
 import { saveMediaChoice, useLocalMedia } from "./media/use-local-media";
 
-// "Ready to join?": the pre-call screen. Configure the session (interviewer, language, questions),
-// check the camera and microphone, then start: only then is the interview created and the call shown.
-// The screen itself switches to the chosen language, like the whole interview will.
+// Before the call, in two steps: choose the interviewer (with the interview's language and, for an
+// offer, which questions), then check the camera and microphone and start. The camera is only opened
+// at the second step. The screen switches to the interview's language, like the whole interview.
+
+export interface SetupContext {
+  kind: InterviewKind;
+  offerId: string | null;
+  topic: string | null; // technology interviews: "track:<id>" or "tech:<id>"
+  title: string; // what the interview is about: the offer, the technology, or "HR interview"
+}
 
 interface Props {
-  offer: { id: string; title: string };
+  context: SetupContext;
   me: { name: string; imageUrl: string | null };
   categories: InterviewerCategory[];
   interviewers: Interviewer[];
   defaultInterviewerId: string;
   defaultLanguage: Lang;
   copies: Record<Lang, InterviewCopy>;
-  start: (input: { offerId: string; interviewerId: string; language: Lang; focus: Focus }) => Promise<{ ok: true; interviewId: string } | { ok: false; error: string }>;
+  start: (input: { kind: InterviewKind; offerId: string | null; topic: string | null; interviewerId: string; language: Lang; focus: Focus }) => Promise<{ ok: true; interviewId: string } | { ok: false; error: string }>;
 }
 
-export function InterviewSetup({ offer, me, categories, interviewers, defaultInterviewerId, defaultLanguage, copies, start }: Props) {
+export function InterviewSetup({ context, me, categories, interviewers, defaultInterviewerId, defaultLanguage, copies, start }: Props) {
   const router = useRouter();
+  const [step, setStep] = useState<"interviewer" | "devices">("interviewer");
   const [language, setLanguage] = useState<Lang>(defaultLanguage);
   const [focus, setFocus] = useState<Focus>("both");
   const [interviewerId, setInterviewerId] = useState(defaultInterviewerId);
-  const [chooserOpen, setChooserOpen] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [pending, startTransition] = useTransition();
   const media = useLocalMedia({ microphone: true, camera: true });
   const t = copies[language];
   const interviewer = interviewers.find((i) => i.id === interviewerId) ?? interviewers[0];
   const copy = interviewer.copy[language];
-  const notice = KIND_NOTICE[interviewer.kind];
-  const { start: startMedia } = media;
+  const { start: startMedia, stop: stopMedia } = media;
 
+  // The camera and microphone are only asked for at the call check, and released when going back.
   useEffect(() => {
-    void startMedia(); // like a video call's pre-join screen: ask for the camera and microphone right away
-  }, [startMedia]);
+    if (step === "devices") void startMedia();
+    else stopMedia();
+  }, [step, startMedia, stopMedia]);
 
   function join() {
     setError(null);
     saveMediaChoice({ microphone: media.microphone && media.hasAudio, camera: media.camera && media.hasVideo });
     startTransition(async () => {
-      const result = await start({ offerId: offer.id, interviewerId: interviewer.id, language, focus });
+      const result = await start({ kind: context.kind, offerId: context.offerId, topic: context.topic, interviewerId: interviewer.id, language, focus });
       if (result.ok) {
         media.stop(); // the call page opens its own preview
         router.push(`/interview/${result.interviewId}`);
@@ -77,17 +74,90 @@ export function InterviewSetup({ offer, me, categories, interviewers, defaultInt
     { id: "technical", label: t.focusTechnical, hint: t.focusTechnicalHint, Icon: Code2 },
     { id: "both", label: t.focusBoth, hint: t.focusBothHint, Icon: Layers },
   ];
-  const live = media.camera && media.hasVideo;
+  const live = media.videoLive;
+
+  if (step === "interviewer") {
+    return (
+      <div className="space-y-8" lang={language}>
+        <header className="max-w-3xl">
+          <p className="text-sm font-semibold text-terracotta">{context.title}</p>
+          <h1 className="mt-1 text-4xl leading-tight sm:text-5xl">{t.interviewerStepTitle}</h1>
+          <p className="mt-3 leading-relaxed text-muted-foreground">{t.interviewerStepIntro}</p>
+        </header>
+        <div className="grid items-start gap-8 lg:grid-cols-[minmax(0,1fr)_minmax(0,27rem)]">
+          <InterviewerBrowser categories={categories} interviewers={interviewers} selectedId={interviewer.id} language={language} t={t} onChoose={setInterviewerId} />
+          <aside className="space-y-5 lg:sticky lg:top-24">
+            <InterviewerProfile interviewer={interviewer} language={language} t={t} />
+            <section className="space-y-5 rounded-3xl border-2 border-dashed border-border p-5" aria-label={t.settingsHeading}>
+              <div>
+                <h2 className="font-sans text-sm font-bold">{t.languageHeading}</h2>
+                <div className="mt-2 inline-flex rounded-full bg-muted p-1" role="group" aria-label={t.languageHeading}>
+                  {LANGUAGES.map((l) => (
+                    <button
+                      key={l.id}
+                      type="button"
+                      aria-pressed={language === l.id}
+                      onClick={() => setLanguage(l.id)}
+                      lang={l.id}
+                      className={cn("rounded-full px-5 py-2 text-sm font-semibold transition-colors", language === l.id ? "bg-ink text-white" : "text-muted-foreground hover:text-foreground")}
+                    >
+                      {l.label}
+                    </button>
+                  ))}
+                </div>
+                <p className="mt-2 text-sm text-muted-foreground">{t.languageHint}</p>
+              </div>
+              {context.kind === "offer" && (
+                <div>
+                  <h2 className="font-sans text-sm font-bold">{t.questionsHeading}</h2>
+                  <div className="mt-2 grid gap-2" role="group" aria-label={t.questionsHeading}>
+                    {focusOptions.map(({ id, label, hint, Icon }) => {
+                      const active = focus === id;
+                      return (
+                        <button
+                          key={id}
+                          type="button"
+                          onClick={() => setFocus(id)}
+                          aria-pressed={active}
+                          className={cn("flex items-start gap-3 rounded-2xl border-2 p-3 text-left transition-colors", active ? "border-ink bg-ink-soft" : "border-transparent bg-card hover:border-ink/40")}
+                        >
+                          <span className={cn("grid size-9 shrink-0 place-items-center rounded-full", active ? "bg-ink text-white" : "bg-muted text-muted-foreground")}>
+                            <Icon className="size-4" aria-hidden="true" />
+                          </span>
+                          <span>
+                            <span className="block text-sm font-semibold">{label}</span>
+                            <span className="block text-sm text-muted-foreground">{hint}</span>
+                          </span>
+                        </button>
+                      );
+                    })}
+                  </div>
+                </div>
+              )}
+            </section>
+            <Button variant="action" size="xl" className="w-full" onClick={() => setStep("devices")}>
+              {t.continueToCall} <ArrowRight aria-hidden="true" />
+            </Button>
+          </aside>
+        </div>
+      </div>
+    );
+  }
 
   return (
     <div className="space-y-8" lang={language}>
-      <header>
-        <p className="text-sm text-muted-foreground">{fill(t.setupEyebrow, { offer: offer.title })}</p>
-        <h1 className="text-3xl leading-tight sm:text-4xl">{t.setupTitle}</h1>
-        <p className="mt-2 max-w-3xl text-sm leading-relaxed text-muted-foreground">{t.setupIntro}</p>
+      <header className="flex flex-wrap items-end justify-between gap-4">
+        <div className="max-w-3xl">
+          <p className="text-sm font-semibold text-terracotta">{context.title}</p>
+          <h1 className="mt-1 text-4xl leading-tight sm:text-5xl">{t.setupTitle}</h1>
+          <p className="mt-3 leading-relaxed text-muted-foreground">{t.setupIntro}</p>
+        </div>
+        <Button variant="outline" className="rounded-full" onClick={() => setStep("interviewer")}>
+          <ArrowLeft aria-hidden="true" /> {t.backToInterviewer}
+        </Button>
       </header>
 
-      <div className="grid items-start gap-8 lg:grid-cols-[minmax(0,1fr)_420px]">
+      <div className="grid items-start gap-8 lg:grid-cols-[minmax(0,1fr)_380px]">
         {/* ---------- Camera and microphone check ---------- */}
         <section className="space-y-3" aria-labelledby="devices-title">
           <h2 id="devices-title" className="sr-only">
@@ -151,120 +221,34 @@ export function InterviewSetup({ offer, me, categories, interviewers, defaultInt
           </div>
         </section>
 
-        {/* ---------- The session's configuration ---------- */}
-        <section className="space-y-6 rounded-xl border border-earth/20 bg-card p-5 shadow-soft sm:p-6" aria-label={t.setupTitle}>
-          {/* Interviewer */}
-          <div>
-            <div className="flex items-center justify-between gap-3">
-              <h2 className="font-sans text-xs font-bold text-terracotta uppercase">{t.interviewerHeading}</h2>
-              <Button size="sm" variant="outline" onClick={() => setChooserOpen(true)}>
-                {t.change}
-              </Button>
-            </div>
-            <div className="mt-3 flex items-center gap-3">
-              <InterviewerAvatar interviewer={interviewer} className="size-14 text-xl" />
-              <div className="min-w-0">
-                <p id="setup-interviewer" className="truncate font-display text-xl">
-                  {copy.name}
-                </p>
-                <p className="flex flex-wrap items-center gap-2 text-xs text-muted-foreground">
-                  {copy.role && <span>{copy.role}</span>}
-                  <span className="rounded-full bg-muted px-2 py-0.5 font-semibold text-foreground">{KIND_LABEL[interviewer.kind][language]}</span>
-                </p>
-              </div>
-            </div>
-            <p className="mt-3 rounded-md bg-primary-soft/50 p-3 text-sm">
-              <span className="block text-xs font-bold text-primary uppercase">{t.styleLabel}</span>
-              <span className="font-semibold">{copy.style}</span>
-            </p>
-            <p className="mt-2 text-sm text-muted-foreground">{copy.description}</p>
-            <ul className="mt-3 grid grid-cols-2 gap-x-4 gap-y-2" aria-label={t.styleLabel}>
-              {TRAIT_LABELS.map(({ key, label }) => {
-                const level = interviewer.traits[key];
-                return (
-                  <li key={key} className="text-xs">
-                    <span className="text-muted-foreground">
-                      {label[language]}
-                      <span className="sr-only"> : {fill(LEVEL_OF[language], { level })}</span>
-                    </span>
-                    <span className="mt-1 flex gap-0.5" aria-hidden="true">
-                      {[1, 2, 3, 4, 5].map((n) => (
-                        <span key={n} className={cn("h-1.5 flex-1 rounded-full", n <= level ? "bg-primary" : "bg-muted")} />
-                      ))}
-                    </span>
-                  </li>
-                );
-              })}
-            </ul>
-            {notice && <p className="mt-3 text-xs text-muted-foreground">{notice[language]}</p>}
-          </div>
-
-          {/* Language */}
-          <div className="border-t border-earth/15 pt-5">
-            <h2 className="font-sans text-xs font-bold text-terracotta uppercase">{t.languageHeading}</h2>
-            <div className="mt-3 grid grid-cols-2 gap-2" role="group" aria-label={t.languageHeading}>
-              {LANGUAGES.map((l) => (
-                <Button key={l.id} variant={language === l.id ? "default" : "outline"} aria-pressed={language === l.id} onClick={() => setLanguage(l.id)} lang={l.id}>
-                  {language === l.id && <Check className="size-4" aria-hidden="true" />} {l.label}
-                </Button>
-              ))}
-            </div>
-            <p className="mt-2 text-xs text-muted-foreground">{t.languageHint}</p>
-          </div>
-
-          {/* Questions */}
-          <div className="border-t border-earth/15 pt-5">
-            <h2 className="font-sans text-xs font-bold text-terracotta uppercase">{t.questionsHeading}</h2>
-            <div className="mt-3 grid gap-2" role="group" aria-label={t.questionsHeading}>
-              {focusOptions.map(({ id, label, hint, Icon }) => {
-                const active = focus === id;
-                return (
-                  <button
-                    key={id}
-                    type="button"
-                    onClick={() => setFocus(id)}
-                    aria-pressed={active}
-                    className={cn(
-                      "flex items-start gap-3 rounded-lg border p-3 text-left transition-colors",
-                      active ? "border-primary bg-primary-soft/60" : "border-earth/20 hover:border-primary/50",
-                    )}
-                  >
-                    <span className={cn("grid size-9 shrink-0 place-items-center rounded-md", active ? "bg-primary text-primary-foreground" : "bg-muted text-muted-foreground")}>
-                      <Icon className="size-4" aria-hidden="true" />
-                    </span>
-                    <span>
-                      <span className="block text-sm font-semibold">{label}</span>
-                      <span className="block text-xs text-muted-foreground">{hint}</span>
-                    </span>
-                  </button>
-                );
-              })}
+        {/* ---------- Summary and start ---------- */}
+        <section className="space-y-5 lg:sticky lg:top-24" aria-label={t.settingsHeading}>
+          <div className="flex items-center gap-4 rounded-3xl bg-card p-5 shadow-soft">
+            <InterviewerAvatar interviewer={{ id: interviewer.id, name: copy.name, image: interviewer.image }} className="size-16 text-xl" />
+            <div className="min-w-0">
+              <p className="font-display text-2xl leading-tight">{copy.name}</p>
+              <p className="text-sm font-semibold text-terracotta">{copy.style}</p>
             </div>
           </div>
-
-          <Button size="lg" className="h-12 w-full text-base" onClick={join} disabled={pending}>
-            {pending ? <Loader2 className="size-5 animate-spin" aria-hidden="true" /> : <PhoneCall className="size-5" aria-hidden="true" />} {t.start}
+          <ul className="space-y-2 text-sm">
+            <li className="flex items-center gap-2">
+              <Check className="size-4 text-success" aria-hidden="true" /> {LANGUAGES.find((l) => l.id === language)?.label}
+            </li>
+            {context.kind === "offer" && (
+              <li className="flex items-center gap-2">
+                <Check className="size-4 text-success" aria-hidden="true" /> {focusOptions.find((f) => f.id === focus)?.label}
+              </li>
+            )}
+          </ul>
+          <Button variant="action" size="xl" className="w-full" onClick={join} disabled={pending}>
+            {pending ? <Loader2 className="animate-spin" aria-hidden="true" /> : <PhoneCall aria-hidden="true" />} {t.start}
           </Button>
-          <p className="-mt-3 min-h-5 text-sm" aria-live="polite">
+          <p className="min-h-5 text-sm" aria-live="polite">
             {pending && <span className="text-muted-foreground">{fill(t.joining, { name: copy.name })}</span>}
             {error && <span className="font-semibold text-destructive">{error}</span>}
           </p>
         </section>
       </div>
-
-      <InterviewerChooser
-        open={chooserOpen}
-        onOpenChange={setChooserOpen}
-        categories={categories}
-        interviewers={interviewers}
-        selectedId={interviewer.id}
-        language={language}
-        t={t}
-        onChoose={(id) => {
-          setInterviewerId(id);
-          setChooserOpen(false);
-        }}
-      />
     </div>
   );
 }

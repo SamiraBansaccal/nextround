@@ -5,61 +5,94 @@ import { z } from "zod";
 import { aiErrorMessage } from "@/lib/ai/errors";
 import { getAccount, requireUserId } from "@/lib/auth";
 import { listFacts } from "@/lib/data/facts";
-import { createInterview, deleteInterview, getInterview, getQuestionWithOffer, listAskedBankIds, saveAnswer, switchInterviewer } from "@/lib/data/interviews";
+import { createInterview, deleteInterview, findSavedFeedback, getInterview, getQuestionWithOffer, listAskedBankIds, saveAnswer, switchInterviewer } from "@/lib/data/interviews";
 import { getOfferDetail } from "@/lib/data/offers";
 import { bankAnswerText, findBankQuestion, findTech } from "@/lib/interview/bank";
 import { answerFeedback, MAX_ANSWER } from "@/lib/interview/feedback";
 import { toLang } from "@/lib/interview/copy";
-import { generateQuestions } from "@/lib/interview/generate";
+import { buildQuestions, type OfferForInterview } from "@/lib/interview/generate";
+import { hrAnswerText } from "@/lib/interview/hr-bank";
+import { INTERVIEW_KINDS, practiceFocus, practiceOffer } from "@/lib/interview/practice";
+import { parseTopic, type Topic, topicValue } from "@/lib/interview/tracks";
 import { registerOf } from "@/lib/interview/register";
 import { FOCUSES } from "@/lib/interview/session";
 import { findInterviewer } from "@/lib/interviewers";
 import { flavorInterview } from "@/lib/interviewers/flavor";
-import { personaInstructions } from "@/lib/interviewers/persona";
 import type { Feedback } from "@/lib/types";
 
 const startSchema = z.object({
-  offerId: z.string().uuid(),
+  kind: z.enum(INTERVIEW_KINDS).default("offer"),
+  offerId: z.string().uuid().nullish(),
+  topic: z.string().trim().max(80).nullish(), // technology interviews: "track:<id>" or "tech:<id>"
   interviewerId: z.string().trim().min(1).max(80),
   language: z.enum(["en", "fr"]),
-  focus: z.enum(FOCUSES),
+  focus: z.enum(FOCUSES).default("both"), // offer interviews only
 });
 
+export type StartInterviewInput = z.input<typeof startSchema>;
+
 /**
- * Turns the setup screen's configuration into an interview session: questions of the chosen kind, in
+ * Turns the setup screen's configuration into an interview session: on an offer (general, technical or
+ * both), on a technology or a track (technical questions from the bank), or general HR questions; in
  * the chosen language, phrased in the chosen interviewer's style.
  */
 export async function startInterviewAction(input: unknown): Promise<{ ok: true; interviewId: string } | { ok: false; error: string }> {
   const account = await getAccount();
   const parsed = startSchema.safeParse(input);
-  if (!parsed.success) return { ok: false, error: "Offer not found." };
-  const { language, focus } = parsed.data;
+  if (!parsed.success) return { ok: false, error: "Invalid interview settings." };
+  const { kind, language } = parsed.data;
   const fail = (en: string, fr: string) => ({ ok: false as const, error: language === "fr" ? fr : en });
   const interviewer = findInterviewer(parsed.data.interviewerId);
   if (!interviewer) return fail("Choose an interviewer first.", "Choisis d'abord qui mène l'entretien.");
-  const detail = await getOfferDetail(account.userId, parsed.data.offerId);
-  if (!detail) return fail("Offer not found.", "Offre introuvable.");
+
+  let offer: OfferForInterview;
+  let offerId: string | null = null;
+  let focus = parsed.data.focus;
+  let topic: Topic | null = null;
+  let requirements: { text: string; quote: string; factIds: string[] }[] = [];
+  if (kind === "offer") {
+    const detail = parsed.data.offerId ? await getOfferDetail(account.userId, parsed.data.offerId) : null;
+    if (!detail) return fail("Offer not found.", "Offre introuvable.");
+    offerId = detail.offer.id;
+    offer = {
+      title: detail.offer.title,
+      company: detail.offer.company,
+      language: detail.offer.language,
+      stack: detail.offer.stack,
+      requirements: [], // filled below, once the validated facts are known
+    };
+    requirements = detail.requirements;
+  } else {
+    topic = kind === "technology" ? parseTopic(parsed.data.topic) : null;
+    if (kind === "technology" && !topic) return fail("Choose a technology first.", "Choisis d'abord une technologie.");
+    offer = practiceOffer(topic);
+    focus = practiceFocus(kind);
+  }
+
   const [allFacts, askedBefore] = await Promise.all([listFacts(account.userId), listAskedBankIds(account.userId)]);
   const facts = allFacts.filter((f) => f.validated);
   const valid = new Set(facts.map((f) => f.id));
+  offer.requirements = requirements.map((r) => ({ text: r.text, quote: r.quote, covered: r.factIds.some((id) => valid.has(id)) }));
   try {
-    const generated = await generateQuestions(
-      { userId: account.userId, isOwner: account.isOwner },
-      {
-        title: detail.offer.title,
-        company: detail.offer.company,
-        language: detail.offer.language,
-        stack: detail.offer.stack,
-        requirements: detail.requirements.map((r) => ({ text: r.text, quote: r.quote, covered: r.factIds.some((id) => valid.has(id)) })),
-      },
-      facts,
-      { language, focus, persona: personaInstructions(interviewer), register: registerOf(interviewer.traits), askedBefore },
-    );
-    if (generated.length < 4) return fail("This model could not return valid output — try another model.", "Ce modèle n'a pas renvoyé de réponse valide — essaie un autre modèle.");
+    // Written in advance (question banks), so no AI call here: instant and in correct English or French.
+    const generated = buildQuestions(offer, facts.map((f) => f.text), {
+      language,
+      focus,
+      register: registerOf(interviewer.traits),
+      askedBefore,
+      stackOnly: kind === "technology",
+    });
+    if (generated.length === 0) return fail("No question could be prepared for this interview.", "Aucune question n'a pu être préparée pour cet entretien.");
     // What the interviewer says around each question (greeting, catchphrases, lead-ins): code, not AI.
     const lines = flavorInterview(interviewer, generated.map((q) => ({ tech: q.group === "technical" ? (q.techLabel ?? null) : null })), language);
     const questions = generated.map((q, i) => ({ ...q, intro: lines[i].intro, outro: lines[i].outro }));
-    const interviewId = await createInterview(account.userId, detail.offer.id, questions, { interviewerId: interviewer.id, language, focus });
+    const interviewId = await createInterview(
+      account.userId,
+      offerId,
+      questions,
+      { interviewerId: interviewer.id, language, focus },
+      kind === "offer" ? null : { kind, topic: topic ? topicValue(topic) : null },
+    );
     revalidatePath("/", "layout");
     return { ok: true, interviewId };
   } catch (error) {
@@ -80,7 +113,9 @@ export async function submitAnswerAction(input: unknown): Promise<{ ok: true; fe
   // A bank question's model answer guides the technical part of the feedback ("experience" ones have none).
   const bank = findBankQuestion(found.question.bankId);
   try {
-    const feedback = await answerFeedback(
+    // The same answer to the same question already has feedback: reuse it, no new AI call.
+    const saved = await findSavedFeedback(account.userId, found.question.text, parsed.data.answer);
+    const feedback = saved ?? await answerFeedback(
       { userId: account.userId, isOwner: account.isOwner },
       {
         question: found.question.text,
@@ -89,7 +124,7 @@ export async function submitAnswerAction(input: unknown): Promise<{ ok: true; fe
         offerTitle: found.offer?.title ?? null,
         company: found.offer?.company ?? null,
         language: lang,
-        reference: bank && bank.kind !== "experience" ? bankAnswerText(bank, lang) : null,
+        reference: bank && bank.kind !== "experience" ? bankAnswerText(bank, lang) : hrAnswerText(found.question.bankId ?? "", lang),
       },
       facts,
     );

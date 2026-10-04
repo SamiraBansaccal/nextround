@@ -6,6 +6,9 @@ import { listFacts } from "@/lib/data/facts";
 import { getInterview } from "@/lib/data/interviews";
 import { bankAnswerText, findBankQuestion, findTech } from "@/lib/interview/bank";
 import { INTERVIEW_COPY, toLang } from "@/lib/interview/copy";
+import { interviewTitle } from "@/lib/interview/practice";
+import { parseTopic } from "@/lib/interview/tracks";
+import { findHrQuestion } from "@/lib/interview/hr-bank";
 import { bankQuestionLabel, questionLabel } from "@/lib/interview/question-types";
 import { getInterviewer, INTERVIEWERS, listCategories } from "@/lib/interviewers";
 import { KIND_NOTICE } from "@/lib/interviewers/labels";
@@ -35,7 +38,7 @@ export default async function InterviewPage({ params, searchParams }: PageProps<
       interviewId={data.interview.id}
       offerId={data.offer?.id ?? null}
       me={{ name: account.fullName, imageUrl: account.imageUrl }}
-      offerTitle={[data.offer?.title, data.offer?.company].filter(Boolean).join(" · ")}
+      offerTitle={interviewTitle({ kind: data.interview.kind, topic: parseTopic(data.interview.topic), offerTitle: data.offer?.title ?? null, company: data.offer?.company }, lang)}
       lang={lang}
       copy={copy}
       interviewer={{ id: interviewer.id, name: who.name, role: who.role, image: interviewer.image, notice: KIND_NOTICE[interviewer.kind]?.[lang] ?? null }}
@@ -51,7 +54,12 @@ export default async function InterviewPage({ params, searchParams }: PageProps<
           intro: question.intro,
           outro: question.outro,
           source: question.source,
-          model: bank ? { text: bankAnswerText(bank, lang), method: bank.kind === "experience" } : null,
+          model: bank
+            ? { text: bankAnswerText(bank, lang), method: bank.kind === "experience" }
+            : (() => {
+                const hr = findHrQuestion(question.bankId);
+                return hr ? { text: hr.answer[lang], method: true } : null;
+              })(),
           suggestedAnswer: question.suggestedAnswer,
           lastAnswer: answer ? { answer: answer.answer, feedback: answer.feedback ?? null } : null,
         };

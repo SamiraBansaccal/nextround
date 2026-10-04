@@ -53,29 +53,43 @@ test("every signed-in screen", async ({ page }, info) => {
     await page.goto(path);
     await check(page, name, info.project.name);
   }
-  // Before the call: "Ready to join?". The offer is in French, so the screen starts in French.
+  // New interview, step 1: what to practise; step 2: a track and its technologies.
+  await page.goto("/interview/new");
+  await expect(page.getByRole("heading", { level: 1, name: "What do you want to practise?" })).toBeVisible();
+  await check(page, "06a-new-interview", info.project.name);
+  await page.goto("/interview/new?kind=technology&track=devops");
+  await expect(page.getByRole("link", { name: /Docker/ })).toBeVisible();
+  await check(page, "06b-track", info.project.name);
+
+  // Step 3, from an offer: the interviewer, on a full page, in English by default.
   await page.goto(`/interview/new?offer=${ids.offerId}`);
-  await expect(page.getByRole("heading", { level: 1, name: "Tout est prêt pour l'appel ?" })).toBeVisible();
-  await expect(page.locator("video").first()).toBeVisible(); // the (fake) camera preview
-  await expect(page.getByRole("meter", { name: "Micro" })).toBeVisible();
+  await expect(page.getByRole("heading", { level: 1, name: "Who will interview you?" })).toBeVisible();
+  await expect(page.locator("video")).toHaveCount(0); // the camera is not opened before the call check
   // Switching the language switches the whole screen.
+  await page.getByRole("button", { name: "Français", exact: true }).click();
+  await expect(page.getByRole("heading", { level: 1, name: "Qui va te faire passer l'entretien ?" })).toBeVisible();
   await page.getByRole("button", { name: "English", exact: true }).click();
-  await expect(page.getByRole("heading", { level: 1, name: "Ready to join?" })).toBeVisible();
   await expect(page.getByText("The whole interview will be in English")).toBeVisible();
   // Questions: technical only.
   await page.getByRole("button", { name: /^Technical/ }).click();
   await expect(page.getByRole("button", { name: /^Technical/ })).toHaveAttribute("aria-pressed", "true");
-  // The interviewer, chosen in the side panel; the style is visible before joining.
-  await page.getByRole("button", { name: "Change" }).click();
+  // The interviewer: a category, then a tile; the profile shows the style and the traits.
   await page.getByRole("button", { name: /The Simpsons/ }).click();
-  await page.getByRole("button", { name: /^Mr\. Burns/ } /* not its "Hide Mr. Burns" button */).click();
-  await expect(page.locator("#setup-interviewer")).toHaveText("Mr. Burns");
+  await page.getByRole("button", { name: /^Mr\. Burns/ }).click();
+  await expect(page.getByRole("heading", { level: 2, name: "Mr. Burns" })).toBeVisible();
   await expect(page.getByText("Cold, formal and extremely demanding").first()).toBeVisible();
+  await check(page, "06c-interviewer", info.project.name);
+
+  // Step 4: the camera and microphone check.
+  await page.getByRole("button", { name: /Continue to the call check/ }).click();
+  await expect(page.getByRole("heading", { level: 1, name: "Ready to join?" })).toBeVisible();
+  await expect(page.locator("video").first()).toBeVisible(); // the (fake) camera preview
+  await expect(page.getByRole("meter", { name: "Microphone" })).toBeVisible();
   // Real microphone switch.
   await page.getByRole("button", { name: "Mute" }).click();
   await expect(page.getByText("Your microphone is muted.")).toBeVisible();
   await expect(page.getByRole("button", { name: "Start interview" })).toBeEnabled();
-  await check(page, "06b-ready-to-join", info.project.name);
+  await check(page, "06d-ready-to-join", info.project.name);
 
   // The call (a French session with M. Burns): everything in French.
   await page.goto(`/interview/${ids.interviewId}`);
@@ -90,6 +104,7 @@ test("every signed-in screen", async ({ page }, info) => {
   // Camera control: turning it on shows the candidate's own (fake) camera.
   await page.getByRole("button", { name: "Activer la caméra" }).click();
   await expect(page.getByRole("button", { name: "Couper la caméra" })).toBeVisible();
+  await expect(page.getByRole("button", { name: "Changer d'intervieweur" })).toBeVisible();
 
   // Dark mode on the two richest screens.
   for (const [name, path] of [["04-offer", `/offers/${ids.offerId}`], ["07-interview-call", `/interview/${ids.interviewId}`]] as const) {

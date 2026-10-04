@@ -1,11 +1,11 @@
-// OpenAI-compatible providers offered in Settings. Base URLs checked in each provider's docs
+// Providers offered in Settings: OpenAI-compatible ones, and Anthropic (Claude, through its own SDK). Base URLs checked in each provider's docs
 // (OpenAI: official openai-node SDK, whose docs block automated access). All four expose GET /models.
 //
 // Only these presets are allowed on the public instance. A custom base URL (e.g. Ollama on
 // localhost) is accepted ONLY when ALLOW_CUSTOM_LLM_BASE_URL=true (self-hosting): otherwise any
 // user could make our server call arbitrary hosts (SSRF).
 
-export const PRESET_IDS = ["openrouter", "openai", "mistral", "groq"] as const;
+export const PRESET_IDS = ["anthropic", "openrouter", "openai", "mistral", "groq"] as const;
 export type PresetId = (typeof PRESET_IDS)[number];
 export type ProviderId = PresetId | "custom";
 
@@ -18,6 +18,13 @@ export interface ProviderPreset {
 }
 
 export const PRESETS: Record<PresetId, ProviderPreset> = {
+  anthropic: {
+    id: "anthropic",
+    label: "Anthropic (Claude)",
+    baseUrl: "https://api.anthropic.com",
+    keysUrl: "https://console.anthropic.com/settings/keys",
+    publicModels: false,
+  },
   openrouter: {
     id: "openrouter",
     label: "OpenRouter",
@@ -70,3 +77,6 @@ export function isValidCustomBaseUrl(value: string): boolean {
 /** Default model of the instance key (OpenRouter free models, checked against /models on 2026-10-03). */
 export const DEFAULT_INSTANCE_MODEL = "qwen/qwen3.8-27b:free";
 export const DEFAULT_INSTANCE_FALLBACK_MODELS = ["nvidia/nemotron-3-super-120b-a12b:free"];
+
+/** Default Claude model, for a user's own Anthropic key and the owner's instance key. */
+export const DEFAULT_ANTHROPIC_MODEL = "claude-opus-5-5";

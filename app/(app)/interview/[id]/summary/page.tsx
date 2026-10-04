@@ -6,6 +6,8 @@ import { Button } from "@/components/ui/button";
 import { getAccount } from "@/lib/auth";
 import { getInterview } from "@/lib/data/interviews";
 import { fill, INTERVIEW_COPY, toLang } from "@/lib/interview/copy";
+import { interviewTitle } from "@/lib/interview/practice";
+import { parseTopic } from "@/lib/interview/tracks";
 import { findBankQuestion, findTech } from "@/lib/interview/bank";
 import { bankQuestionLabel, questionLabel } from "@/lib/interview/question-types";
 import { summarizeInterview } from "@/lib/interview/summary";
@@ -23,7 +25,7 @@ export default async function SummaryPage({ params }: PageProps<"/interview/[id]
   const t = INTERVIEW_COPY[lang];
   const summary = summarizeInterview(data.questions, data.answers, lang);
   const interviewerName = getInterviewer(data.interview.interviewerId).copy[lang].name;
-  const offer = [data.offer?.title, data.offer?.company].filter(Boolean).join(" · ");
+  const offer = interviewTitle({ kind: data.interview.kind, topic: parseTopic(data.interview.topic), offerTitle: data.offer?.title ?? null, company: data.offer?.company }, lang);
   const label = (question: (typeof data.questions)[number]) => {
     const tech = findTech(findBankQuestion(question.bankId)?.tech);
     return tech ? bankQuestionLabel(tech.label[lang], question.type, lang) : questionLabel(question.group, question.type, lang);

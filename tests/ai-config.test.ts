@@ -9,6 +9,7 @@ const env = {
   APP_ENCRYPTION_KEY: randomBytes(32).toString("base64"),
   OPENROUTER_API_API_KEY: "instance-key",
   ELEVENLABS_API_KEY: "instance-voice-key",
+  INSTANCE_VOICE_ENABLED: "true",
   ALLOW_CUSTOM_LLM_BASE_URL: "false",
 } as Record<string, string | undefined>;
 vi.mock("@/lib/db", () => ({ getDb: () => testDb }));
@@ -45,6 +46,24 @@ describe("who pays", () => {
     expect(await resolveVoiceConfig("user_voice", false)).toMatchObject({ provider: "elevenlabs", source: "user" });
     expect(await resolveVoiceConfig("user_owner", true)).toMatchObject({ provider: "elevenlabs", source: "instance" });
     expect(await resolveVoiceConfig("user_nokey", false)).toEqual({ provider: "browser" });
+  });
+
+  it("voice: the instance's ElevenLabs credits are off unless INSTANCE_VOICE_ENABLED=true", async () => {
+    env.INSTANCE_VOICE_ENABLED = "false";
+    try {
+      expect(await resolveVoiceConfig("user_owner", true)).toEqual({ provider: "browser" });
+    } finally {
+      env.INSTANCE_VOICE_ENABLED = "true";
+    }
+  });
+
+  it("owner: the instance Anthropic key is preferred over OpenRouter when set", async () => {
+    env.ANTHROPIC_API_KEY = "sk-ant-instance";
+    try {
+      expect(await resolveLlmConfig("user_owner_claude", true)).toMatchObject({ baseUrl: PRESETS.anthropic.baseUrl, model: "claude-opus-5-5", source: "instance" });
+    } finally {
+      delete env.ANTHROPIC_API_KEY;
+    }
   });
 });
 

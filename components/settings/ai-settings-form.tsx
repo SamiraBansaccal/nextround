@@ -63,7 +63,7 @@ export function AiSettingsForm({ initial, presets, allowCustom, isOwner, suggest
     setModels([]);
     setReplacing(false);
     setApiKey("");
-    setModel(next === saved?.provider ? saved.model : next === "openrouter" ? suggestedModel : "");
+    setModel(next === saved?.provider ? saved.model : next === "openrouter" ? suggestedModel : next === "anthropic" ? "claude-opus-5-5" : "");
     setMessage(null);
     setTestResult(null);
   }
@@ -88,6 +88,11 @@ export function AiSettingsForm({ initial, presets, allowCustom, isOwner, suggest
           Your key stays yours. Free models work fine: OpenRouter lists them with ids ending in <code>:free</code>.
           {isOwner && " As the instance owner, NextRound uses the instance key whenever you have no key saved."}
         </CardDescription>
+        <p className="rounded-xl bg-warning-soft px-4 py-3 text-sm text-foreground">
+          The AI is only used to give feedback on your answers: questions and model answers are written in advance and cost nothing.
+          Each feedback is one call billed by your provider (free on OpenRouter&apos;s <code>:free</code> models), and the same answer to
+          the same question is never sent twice.
+        </p>
       </CardHeader>
       <CardContent className="space-y-6">
         <div className={cn("grid grid-cols-2 gap-2", options.length > 4 ? "sm:grid-cols-5" : "sm:grid-cols-4")} role="group" aria-label="Provider">
@@ -108,6 +113,13 @@ export function AiSettingsForm({ initial, presets, allowCustom, isOwner, suggest
           <p className="-mt-3 text-xs text-muted-foreground">
             A custom base URL (e.g. a local model) is off on this public instance, so the server never calls arbitrary hosts. Self-hosters
             turn it on with <code>ALLOW_CUSTOM_LLM_BASE_URL=true</code>.
+          </p>
+        )}
+
+        {provider === "anthropic" && (
+          <p className="-mt-3 text-sm text-muted-foreground">
+            To use Claude, create an API key in the Anthropic Console. A Claude.ai subscription (Pro, Max) can&apos;t be used by an app:
+            API usage is billed separately, per call, as prepaid credits.
           </p>
         )}
 

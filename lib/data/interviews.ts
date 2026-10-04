@@ -12,11 +12,22 @@ import type { Feedback } from "@/lib/types";
 
 const DEFAULT_CONFIG: InterviewConfig = { interviewerId: DEFAULT_INTERVIEWER_ID, language: "en", focus: "both" };
 
-/** Stores an interview session: its configuration (interviewer, language, questions) and its questions. */
-export async function createInterview(userId: string, offerId: string, generated: GeneratedQuestion[], config: Partial<InterviewConfig> = {}): Promise<string> {
+/**
+ * Stores an interview session: its configuration (interviewer, language, questions) and its questions.
+ * `offerId` null = a practice interview (`practice`: on a technology topic, or general HR questions).
+ */
+export async function createInterview(
+  userId: string,
+  offerId: string | null,
+  generated: GeneratedQuestion[],
+  config: Partial<InterviewConfig> = {},
+  practice: { kind: "technology" | "hr"; topic: string | null } | null = null,
+): Promise<string> {
   const { interviewerId, language, focus } = { ...DEFAULT_CONFIG, ...config };
   const db = getDb();
-  const [interview] = await db.insert(interviews).values({ userId, offerId, mode: "text", interviewerId, language, focus }).returning({ id: interviews.id });
+  const kind = offerId ? "offer" : (practice?.kind ?? "hr");
+  const topic = offerId ? null : (practice?.topic ?? null);
+  const [interview] = await db.insert(interviews).values({ userId, offerId, kind, topic, mode: "text", interviewerId, language, focus }).returning({ id: interviews.id });
   await db.insert(questions).values(
     generated.map((q, i) => ({
       userId,
@@ -32,7 +43,7 @@ export async function createInterview(userId: string, offerId: string, generated
       outro: q.outro ?? null,
     })),
   );
-  await db.update(offers).set({ status: "interview" }).where(and(eq(offers.id, offerId), eq(offers.userId, userId), eq(offers.status, "applied")));
+  if (offerId) await db.update(offers).set({ status: "interview" }).where(and(eq(offers.id, offerId), eq(offers.userId, userId), eq(offers.status, "applied")));
   return interview.id;
 }
 
@@ -64,11 +75,13 @@ export async function getInterview(userId: string, interviewId: string) {
     .where(and(eq(interviews.id, interviewId), eq(interviews.userId, userId)))
     .limit(1);
   if (!interview) return null;
-  const [offer] = await db
-    .select()
-    .from(offers)
-    .where(and(eq(offers.id, interview.offerId), eq(offers.userId, userId)))
-    .limit(1);
+  const [offer] = interview.offerId
+    ? await db
+        .select()
+        .from(offers)
+        .where(and(eq(offers.id, interview.offerId), eq(offers.userId, userId)))
+        .limit(1)
+    : [];
   const qs = await db
     .select()
     .from(questions)
@@ -98,10 +111,25 @@ export async function getQuestionWithOffer(userId: string, questionId: string) {
     .from(interviews)
     .where(and(eq(interviews.id, question.interviewId), eq(interviews.userId, userId)))
     .limit(1);
-  const [offer] = interview
+  const [offer] = interview?.offerId
     ? await db.select().from(offers).where(and(eq(offers.id, interview.offerId), eq(offers.userId, userId))).limit(1)
     : [];
   return { question, interview: interview ?? null, offer: offer ?? null };
+}
+
+/**
+ * Feedback already given to this user for exactly this answer to exactly this question text (in any of
+ * their interviews): reused instead of paying for a new AI call.
+ */
+export async function findSavedFeedback(userId: string, questionText: string, answer: string): Promise<Feedback | null> {
+  const [row] = await getDb()
+    .select({ feedback: answers.feedback })
+    .from(answers)
+    .innerJoin(questions, eq(answers.questionId, questions.id))
+    .where(and(eq(answers.userId, userId), eq(questions.userId, userId), eq(questions.text, questionText), eq(answers.answer, answer.trim())))
+    .orderBy(desc(answers.createdAt))
+    .limit(1);
+  return row?.feedback ?? null;
 }
 
 export async function saveAnswer(userId: string, questionId: string, answer: string, feedback: Feedback) {
@@ -113,13 +141,15 @@ export async function saveAnswer(userId: string, questionId: string, answer: str
 export async function countInterviewsByOffer(userId: string): Promise<Map<string, number>> {
   const rows = await getDb().select({ offerId: interviews.offerId }).from(interviews).where(eq(interviews.userId, userId));
   const counts = new Map<string, number>();
-  for (const r of rows) counts.set(r.offerId, (counts.get(r.offerId) ?? 0) + 1);
+  for (const r of rows) if (r.offerId) counts.set(r.offerId, (counts.get(r.offerId) ?? 0) + 1);
   return counts;
 }
 
 export interface InterviewListItem {
   id: string;
-  offerId: string;
+  offerId: string | null;
+  kind: string; // "offer" | "technology" | "hr"
+  topic: string | null;
   interviewerId: string;
   offerTitle: string | null;
   company: string | null;
@@ -132,9 +162,9 @@ export interface InterviewListItem {
 export async function listInterviewsWithProgress(userId: string): Promise<InterviewListItem[]> {
   const db = getDb();
   const rows = await db
-    .select({ id: interviews.id, offerId: interviews.offerId, interviewerId: interviews.interviewerId, createdAt: interviews.createdAt, title: offers.title, company: offers.company })
+    .select({ id: interviews.id, offerId: interviews.offerId, kind: interviews.kind, topic: interviews.topic, interviewerId: interviews.interviewerId, createdAt: interviews.createdAt, title: offers.title, company: offers.company })
     .from(interviews)
-    .innerJoin(offers, and(eq(offers.id, interviews.offerId), eq(offers.userId, userId)))
+    .leftJoin(offers, and(eq(offers.id, interviews.offerId), eq(offers.userId, userId)))
     .where(eq(interviews.userId, userId))
     .orderBy(desc(interviews.createdAt));
   if (rows.length === 0) return [];
@@ -157,6 +187,8 @@ export async function listInterviewsWithProgress(userId: string): Promise<Interv
     return {
       id: r.id,
       offerId: r.offerId,
+      kind: r.kind,
+      topic: r.topic,
       interviewerId: r.interviewerId,
       offerTitle: r.title,
       company: r.company,

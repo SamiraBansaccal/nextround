@@ -3,28 +3,30 @@
 import { Briefcase, LayoutDashboard, Menu, MessagesSquare, PanelLeftClose, PanelLeftOpen, Settings, UserRound } from "lucide-react";
 import Image from "next/image";
 import Link from "next/link";
-import { usePathname } from "next/navigation";
-import { type ReactNode, useState } from "react";
+import { usePathname, useRouter } from "next/navigation";
+import { type ReactNode, useState, useTransition } from "react";
 import { Logo } from "@/components/brand/logo";
 import { ThemeToggle } from "@/components/theme-toggle";
 import { Button } from "@/components/ui/button";
 import { Sheet, SheetContent, SheetTitle, SheetTrigger } from "@/components/ui/sheet";
+import type { UiCopy, UiLang } from "@/lib/i18n/ui";
 import { cn } from "@/lib/utils";
 
 // App shell from the Lovable prototype: collapsible sidebar with tinted icons, sticky header.
 const NAV = [
-  { href: "/dashboard", label: "Dashboard", Icon: LayoutDashboard, tint: "bg-primary-soft text-primary" },
-  { href: "/offers", label: "Offers", Icon: Briefcase, tint: "bg-warning-soft text-warning" },
-  { href: "/interview", label: "Interviews", Icon: MessagesSquare, tint: "bg-terracotta-soft text-terracotta" },
-  { href: "/profile", label: "Profile", Icon: UserRound, tint: "bg-success-soft text-success" },
-  { href: "/settings", label: "Settings", Icon: Settings, tint: "bg-secondary text-secondary-foreground" },
+  { href: "/dashboard", key: "navDashboard", Icon: LayoutDashboard, tint: "bg-ink-soft text-ink" },
+  { href: "/offers", key: "navOffers", Icon: Briefcase, tint: "bg-warning-soft text-warning" },
+  { href: "/interview", key: "navInterviews", Icon: MessagesSquare, tint: "bg-action text-action-foreground" },
+  { href: "/profile", key: "navProfile", Icon: UserRound, tint: "bg-terracotta-soft text-terracotta" },
+  { href: "/settings", key: "navSettings", Icon: Settings, tint: "bg-secondary text-secondary-foreground" },
 ] as const;
 
-function NavLinks({ compact = false, onNavigate }: { compact?: boolean; onNavigate?: () => void }) {
+function NavLinks({ t, compact = false, onNavigate }: { t: UiCopy; compact?: boolean; onNavigate?: () => void }) {
   const path = usePathname();
   return (
-    <nav className={cn("space-y-2", compact && "flex flex-col items-center")} aria-label="Main navigation">
-      {NAV.map(({ href, label, Icon, tint }) => {
+    <nav className={cn("space-y-2", compact && "flex flex-col items-center")} aria-label={t.navMenu}>
+      {NAV.map(({ href, key, Icon, tint }) => {
+        const label = t[key];
         const active = path.startsWith(href);
         return (
           <Link
@@ -51,7 +53,35 @@ function NavLinks({ compact = false, onNavigate }: { compact?: boolean; onNaviga
   );
 }
 
-export function AppShell({ children, userButton }: { children: ReactNode; userButton: ReactNode }) {
+/** The site's language (not the interviews'): two segments, saved in a cookie by the server action. */
+function LanguageSwitch({ lang, t, setLanguage }: { lang: UiLang; t: UiCopy; setLanguage: (lang: UiLang) => Promise<void> }) {
+  const router = useRouter();
+  const [pending, startTransition] = useTransition();
+  return (
+    <div className="inline-flex rounded-full bg-muted p-1" role="group" aria-label={t.siteLanguage}>
+      {(["en", "fr"] as const).map((l) => (
+        <button
+          key={l}
+          type="button"
+          lang={l}
+          aria-pressed={lang === l}
+          disabled={pending}
+          onClick={() =>
+            startTransition(async () => {
+              await setLanguage(l);
+              router.refresh();
+            })
+          }
+          className={cn("rounded-full px-3 py-1 text-xs font-bold transition-colors", lang === l ? "bg-ink text-white" : "text-muted-foreground hover:text-foreground")}
+        >
+          {l.toUpperCase()}
+        </button>
+      ))}
+    </div>
+  );
+}
+
+export function AppShell({ children, userButton, lang, t, setLanguage }: { children: ReactNode; userButton: ReactNode; lang: UiLang; t: UiCopy; setLanguage: (lang: UiLang) => Promise<void> }) {
   const [expanded, setExpanded] = useState(true);
   const [open, setOpen] = useState(false);
   return (
@@ -74,16 +104,16 @@ export function AppShell({ children, userButton }: { children: ReactNode; userBu
             variant="ghost"
             size="icon"
             onClick={() => setExpanded((v) => !v)}
-            aria-label={expanded ? "Collapse menu" : "Expand menu"}
+            aria-label={expanded ? t.collapseMenu : t.expandMenu}
             className="text-sidebar-foreground"
           >
             {expanded ? <PanelLeftClose /> : <PanelLeftOpen />}
           </Button>
         </div>
-        <NavLinks compact={!expanded} />
+        <NavLinks t={t} compact={!expanded} />
         {expanded && (
           <p className="mt-auto border-t border-sidebar-border pt-5 text-xs leading-relaxed text-sidebar-foreground/80">
-            Every sentence NextRound writes points to a fact you validated.
+            {t.shellNote}
           </p>
         )}
       </aside>
@@ -91,7 +121,7 @@ export function AppShell({ children, userButton }: { children: ReactNode; userBu
         <header className="no-print sticky top-0 z-20 flex h-16 items-center gap-2 border-b bg-background/90 px-3 backdrop-blur sm:px-5 md:px-8 lg:px-10">
           <Sheet open={open} onOpenChange={setOpen}>
             <SheetTrigger asChild>
-              <Button variant="ghost" size="icon" className="md:hidden" aria-label="Open menu">
+              <Button variant="ghost" size="icon" className="md:hidden" aria-label={t.openMenu}>
                 <Menu className="size-4" />
               </Button>
             </SheetTrigger>
@@ -99,10 +129,11 @@ export function AppShell({ children, userButton }: { children: ReactNode; userBu
               <SheetTitle className="mb-6">
                 <Logo href="/dashboard" />
               </SheetTitle>
-              <NavLinks onNavigate={() => setOpen(false)} />
+              <NavLinks t={t} onNavigate={() => setOpen(false)} />
             </SheetContent>
           </Sheet>
           <div className="flex-1" />
+          <LanguageSwitch lang={lang} t={t} setLanguage={setLanguage} />
           <ThemeToggle />
           {userButton}
         </header>
