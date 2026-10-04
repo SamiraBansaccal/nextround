@@ -44,10 +44,15 @@ Dans l'app Claude : menu de l'environnement cloud dans la barre de titre de la s
 
 Si, mais **depuis une machine connectée à ton compte Stripe**. Stripe Projects a créé les comptes chez les *providers* (Vercel, Neon, Clerk, OpenRouter, Firecrawl, ElevenLabs) et garde leurs clés dans son coffre. `stripe projects env --pull` les écrit dans `.env` ; `scripts/infra/push-env-to-vercel.mjs` les envoie à Vercel. C'est pour ça que la production marche sans rien faire.
 
-Le conteneur cloud, lui, n'a **ni la Stripe CLI ni ta session Stripe** : le repo ne contient que le manifeste `.projects/state.json` (quels services, aucune clé). Deux options :
+Le conteneur cloud n'a ni la Stripe CLI ni ta session Stripe au départ : le repo ne contient que le manifeste `.projects/state.json` (quels services, aucune clé). Deux façons de lui donner les clés :
 
-- ✅ **Simple :** copier les valeurs de `.env` dans les *env vars* de l'environnement cloud (tableau ci-dessus).
-- 🔧 **Plus tard :** installer la Stripe CLI dans le conteneur et lui donner un accès au compte Stripe — plus fragile, et ça met un accès à ton compte Stripe dans le cloud.
+- ✅ **Par Stripe (testé le 2026-10-04)**, à refaire à chaque nouveau conteneur :
+  1. Claude installe la Stripe CLI et lance `stripe login` ; il te donne un lien et un code.
+  2. Tu ouvres le lien, tu te connectes à Stripe, tu vérifies le code et tu cliques sur « Autoriser ».
+  3. Claude passe en *live mode* (`stripe switch <account> --live`), installe le plugin (`stripe plugin install projects`), fait `stripe projects pull <projectId>` **dans un dossier à part** (pour ne pas toucher au repo), relie les variables du projet (`stripe projects env add <variable> --variable --env-key <NOM>`), puis copie `.env` dans le repo (ignoré par git).
+- 🔑 **Par les *env vars* de l'environnement cloud** : copier les valeurs de `.env` une fois pour toutes (tableau ci-dessus). Plus durable, et ça ne donne accès qu'aux services de l'app.
+
+💸 **Règle :** tout reste gratuit. Claude ne lance jamais `stripe projects add`, `upgrade` ni rien qui passe un service en payant ; `stripe projects spend` doit afficher « No charges found ».
 
 ## 🤖 Ce que Claude peut faire pour toi
 

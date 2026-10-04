@@ -20,6 +20,7 @@ This repository is initialized for the Stripe project "nextround".
 
 ## NextRound rules
 
+- Never spend money: every provider stays on its free plan. Never run `stripe projects add`, `upgrade` or any command that provisions or switches to a paid service, and keep paid APIs (ElevenLabs instance voice, Anthropic) off unless the owner turns them on.
 - Files go in the folder of their domain, never loose in `lib/`, `components/`, `scripts/` or `tests/`: see `docs/en/guides/architecture.md`. Displayed text goes in `lib/i18n/` (EN + FR).
 - UI and logic stay separate: business logic, AI calls and verification live in `lib/` and server code; components only render data passed as props.
 - Every server query filters by the user id from the server-side session (`requireUserId()`), never from the client.

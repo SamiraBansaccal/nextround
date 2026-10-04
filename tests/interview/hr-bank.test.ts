@@ -1,6 +1,7 @@
 import { describe, expect, it } from "vitest";
 import { findHrQuestion, HR_BANK, HR_PLANS, hrAskedId, hrQuestionText, HR_TYPES, pickHrQuestions } from "@/lib/interview/hr-bank";
 import { HR_ENTRIES } from "@/lib/interview/hr-bank/data";
+import { MORE_HR_ENTRIES } from "@/lib/interview/hr-bank/data-more";
 import { inRegister } from "@/lib/interview/register";
 
 const seeded = (seed = 1) => () => {
@@ -12,15 +13,15 @@ describe("HR question bank (data)", () => {
   it("has unique ids, a known type, the same number of phrasings in English and French", () => {
     const ids = HR_BANK.map((q) => q.id);
     expect(new Set(ids).size).toBe(ids.length);
-    for (const [slug, type, en, fr] of HR_ENTRIES) {
+    for (const [slug, type, en, fr] of [...HR_ENTRIES, ...MORE_HR_ENTRIES]) {
       expect(HR_TYPES, slug).toContain(type);
       expect(en.length, slug).toBeGreaterThan(0);
       expect(fr.length, slug).toBe(en.length);
     }
   });
 
-  it("is well stocked: every type has questions, at least 50 questions in all", () => {
-    expect(HR_BANK.length).toBeGreaterThanOrEqual(50);
+  it("is well stocked: every type has questions, at least 90 questions in all", () => {
+    expect(HR_BANK.length).toBeGreaterThanOrEqual(90);
     for (const type of HR_TYPES) expect(HR_BANK.filter((q) => q.type === type).length, type).toBeGreaterThan(0);
   });
 

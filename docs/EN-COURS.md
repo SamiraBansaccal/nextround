@@ -18,7 +18,7 @@ Règle : chaque session a sa *branch*, s'inscrit ici, ouvre une PR, et met la li
 
 | *Branch* | Session | Sujet | PR |
 |---|---|---|---|
-| `claude/intelligent-einstein-58bqoh` | cloud | 🔍 Audit sécurité et code, corrections | [#10](https://github.com/SamiraBansaccal/nextround/pull/10) (fusionnée) |
+| `claude/intelligent-einstein-58bqoh` | cloud | 🎭 Répliques des personnages, banques de questions enrichies, Stripe dans le cloud | PR à venir |
 
 <details>
 <summary>📦 Branches déjà fusionnées</summary>
@@ -29,12 +29,20 @@ Règle : chaque session a sa *branch*, s'inscrit ici, ouvre une PR, et met la li
 | `claude/owner-data-deploy` | local | Projets vibe-codés, « Update with my validated facts » | [#3](https://github.com/SamiraBansaccal/nextround/pull/3) |
 | `claude/tailored-documents` | local | CV et lettre par offre (EN/FR), ajoutés au profil ; faits validés sur place | [#4](https://github.com/SamiraBansaccal/nextround/pull/4) |
 | `claude/intelligent-einstein-58bqoh` | cloud | Réorganisation des dossiers, doc revue en profondeur, nouveaux ADR | [#9](https://github.com/SamiraBansaccal/nextround/pull/9) |
+| `claude/intelligent-einstein-58bqoh` | cloud | Audit sécurité et code, corrections | [#10](https://github.com/SamiraBansaccal/nextround/pull/10) |
 | `claude/remove-interviewers` | local | Retrait des 38 intervieweurs masqués par la propriétaire | [#7](https://github.com/SamiraBansaccal/nextround/pull/7) |
 | `claude/intelligent-einstein-58bqoh` | cloud | Traduction EN/FR de tout le site | [#6](https://github.com/SamiraBansaccal/nextround/pull/6), [#8](https://github.com/SamiraBansaccal/nextround/pull/8) |
 
 </details>
 
 ## ✅ Fait récemment
+
+### 🎭 Contenu (cloud)
+
+- **Répliques** : les 58 personnages fictifs ont un vrai jeu de répliques EN/FR (salutations, tics, transitions, conclusions) et des répliques qui **réagissent au sujet de la question** (Homer avant le salaire, Yoda avant les points faibles…) : `lib/interviewers/flavor/lines/`. Les 52 personnes réelles n'en ont toujours aucune.
+- **Questions** : 100 questions RH (60 avant), dont 14 inappropriées avec la façon d'y répondre ; 467 questions techniques (416 avant), au moins 8 par technologie.
+- **Stripe dans le cloud** : la Stripe CLI se connecte par `stripe login` (lien à valider dans le navigateur), puis `stripe projects pull` dans un dossier à part et `env add` des variables du projet. Tous les services restent gratuits (`stripe projects spend` : aucune facturation).
+- **e2e dans le cloud** : `PLAYWRIGHT_CHROMIUM_PATH=/opt/pw-browsers/chromium-1194/chrome-linux/chrome npm run e2e`. L'accueil passe ; les écrans connectés bloquent encore sur la connexion de test Clerk derrière le proxy.
 
 ### 🔍 Audit (cloud, PR #10)
 

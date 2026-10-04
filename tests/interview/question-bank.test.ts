@@ -26,7 +26,8 @@ describe("question bank data", () => {
       expect(questions.length, id).toBeGreaterThanOrEqual(5);
       expect(new Set(questions.map((q) => q.kind)).size, id).toBeGreaterThanOrEqual(3);
     }
-    for (const tech of TECHS) expect(BANK.filter((q) => q.tech === tech.id).length, tech.id).toBeGreaterThanOrEqual(3);
+    for (const tech of TECHS) expect(BANK.filter((q) => q.tech === tech.id).length, tech.id).toBeGreaterThanOrEqual(8);
+    expect(BANK.length).toBeGreaterThanOrEqual(450);
   });
 
   it("writes every question and model answer in both languages, with known kinds only", () => {
