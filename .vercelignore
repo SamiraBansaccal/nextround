@@ -21,3 +21,4 @@ playwright-report/
 .local/
 # Avatar sources and generated clips: not part of the app build
 characters/
+.preview/

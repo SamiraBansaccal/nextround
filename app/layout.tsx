@@ -3,6 +3,7 @@ import type { Metadata } from "next";
 import { Geist_Mono, Lora, Nunito_Sans } from "next/font/google";
 import { ThemeProvider } from "@/components/theme-provider";
 import { TooltipProvider } from "@/components/ui/tooltip";
+import { getUiLang } from "@/lib/i18n/server";
 import "./globals.css";
 
 // Fonts of the design (Lovable prototype): Lora for titles, Nunito Sans for text.
@@ -15,10 +16,11 @@ export const metadata: Metadata = {
   description: "Interview practice on the company's stack. Every claim traced to your profile. Bring your own AI.",
 };
 
-export default function RootLayout({ children }: LayoutProps<"/">) {
+export default async function RootLayout({ children }: LayoutProps<"/">) {
+  const lang = await getUiLang(); // the site's interface language (cookie, English by default)
   return (
     <html
-      lang="en"
+      lang={lang}
       suppressHydrationWarning
       className={`${lora.variable} ${nunito.variable} ${geistMono.variable} h-full antialiased`}
     >

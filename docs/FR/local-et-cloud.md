@@ -20,6 +20,7 @@ Dans l'app Claude : menu de l'environnement cloud dans la barre de titre de la s
 
 - obligatoires pour les scripts propriétaire : `DB_CONNECTION_STRING`, `CLERK_SECRET_KEY`, `NEXT_PUBLIC_CLERK_PUBLISHABLE_KEY`, `APP_ENCRYPTION_KEY`, `OWNER_GITHUB_LOGIN` ;
 - pour l'IA et les services : `OPENROUTER_API_API_KEY`, `FIRECRAWL_API_API_KEY`, `ELEVENLABS_API_KEY` (et `INSTANCE_LLM_MODEL` si tu l'as changé) ;
+- optionnel : `ANTHROPIC_API_KEY` (clé de l'Anthropic Console : Claude remplace alors OpenRouter pour toi) et `INSTANCE_VOICE_ENABLED=true` (sans lui, la clé ElevenLabs de l'instance n'est jamais utilisée par l'app : pas de crédits dépensés) ;
 - optionnel : `OWNER_USER_ID` (ton id Clerk, donné par `npm run owner:whoami`) évite une recherche à chaque script.
 
 Une **nouvelle** session cloud les voit. Ne jamais coller une clé dans le chat.

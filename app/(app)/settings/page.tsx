@@ -39,7 +39,7 @@ export default async function SettingsPage() {
           keyLast4={settings?.voiceKeyLast4 ?? null}
           isOwner={account.isOwner}
           currentVoice={status.voice}
-          fallbackVoice={account.isOwner && env.ELEVENLABS_API_KEY ? "instance" : "browser"}
+          fallbackVoice={account.isOwner && env.ELEVENLABS_API_KEY && env.INSTANCE_VOICE_ENABLED === "true" ? "instance" : "browser"}
           actions={{ save: saveVoiceKeyAction, remove: removeVoiceKeyAction }}
         />
       </div>

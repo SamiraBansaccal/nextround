@@ -21,7 +21,7 @@ import { serverEnv } from "@/lib/env";
 
 export type ActionResult<T = null> = { ok: true; data: T } | { ok: false; error: string };
 
-const providerSchema = z.enum(["openrouter", "openai", "mistral", "groq", "custom"]);
+const providerSchema = z.enum(["anthropic", "openrouter", "openai", "mistral", "groq", "custom"]);
 
 const saveSchema = z.object({
   provider: providerSchema,

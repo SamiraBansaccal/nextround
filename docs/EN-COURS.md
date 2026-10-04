@@ -4,7 +4,19 @@ Mis à jour à la fin de chaque session de travail avec Claude (local ou cloud).
 
 _Dernière mise à jour : 2026-10-04, session cloud._
 
+## Branches en cours
+
+| Branche | Session | Sujet | PR |
+|---|---|---|---|
+| `claude/intelligent-einstein-58bqoh` | cloud | Entretiens sans offre (techno / RH), parcours de création, choix de l'intervieweur, caméra, langue du site, couleurs, réglages IA | [#2](https://github.com/SamiraBansaccal/nextround/pull/2) (fusionnée) |
+| `claude/owner-data-deploy` | local | Projets vibe-codés, « mettre à jour avec mes faits validés » | [#3](https://github.com/SamiraBansaccal/nextround/pull/3) |
+
 ## Fait récemment
+
+- PR #2 (cloud) : entretiens sans offre (par technologie, regroupées en parcours, ou RH seul), nouveau parcours de création (type → offre/techno → intervieweur en pleine page → test caméra → appel), caméra vraiment éteinte (LED), palette plus chaude, bouton supprimer rouge, langue du site EN/FR (anglais par défaut, séparée de la langue de l'entretien).
+- Questions sans IA : banque RH écrite à l'avance (classiques, variantes, pièges, questions illégales), banque technique, en anglais et en français corrects (pas de traduction mot à mot). L'IA ne sert plus qu'au retour sur les réponses.
+- Réglages : fournisseur Anthropic (Claude, clé de l'Anthropic Console ; un abonnement Claude.ai ne marche pas pour une app). Côté propriétaire, `ANTHROPIC_API_KEY` passe avant OpenRouter s'il est défini. ElevenLabs de l'instance coupé par défaut (`INSTANCE_VOICE_ENABLED=true` pour l'activer). Avertissements de coût, retour réutilisé pour une réponse identique, audio réutilisé (mémoire du serveur + onglet).
+- **Avant de déployer #2** : `npm run db:migrate` (migration `0005` : entretiens sans offre + `profile_facts.ai_assisted`).
 
 - Banque de questions techniques (42 technologies, réponses types EN/FR) et répliques des intervieweurs (`c4ec9fc`). Migration `0004` déjà appliquée à Neon.
 - Import de CV plus tolérant aux réponses imparfaites de l'IA ; avatars pris automatiquement dans `public/interviewers/<id>.webp` (PR #1).
@@ -32,3 +44,5 @@ _Dernière mise à jour : 2026-10-04, session cloud._
 
 - Avatars : images à fournir (liste générée depuis le catalogue). Animation pendant l'entretien : plus tard (pistes : boucles vidéo, ElevenLabs Avatars, synchro labiale en temps réel).
 - Relier Vercel à GitHub pour déployer sans le Mac.
+- Traduire les pages Tableau de bord, Offres, Profil et Réglages (seuls la navigation et le parcours d'entretien suivent la langue du site).
+- Cache audio durable (Vercel Blob ou S3) quand ElevenLabs sera activé pour de bon.
