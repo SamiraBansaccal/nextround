@@ -2,16 +2,25 @@
 
 Mis à jour à la fin de chaque session de travail avec Claude (local ou cloud). Le lire en premier.
 
-_Dernière mise à jour : 2026-10-04, session cloud._
+_Dernière mise à jour : 2026-10-04, session locale (Mac)._
 
 ## Branches en cours
 
 | Branche | Session | Sujet | PR |
 |---|---|---|---|
 | `claude/intelligent-einstein-58bqoh` | cloud | Entretiens sans offre (techno / RH), parcours de création, choix de l'intervieweur, caméra, langue du site, couleurs, réglages IA | [#2](https://github.com/SamiraBansaccal/nextround/pull/2) (fusionnée) |
-| `claude/owner-data-deploy` | local | Projets vibe-codés, « mettre à jour avec mes faits validés » | [#3](https://github.com/SamiraBansaccal/nextround/pull/3) |
+| `claude/owner-data-deploy` | local | Projets vibe-codés, « Update with my validated facts » | [#3](https://github.com/SamiraBansaccal/nextround/pull/3) (fusionnée) |
+| `claude/tailored-documents` | local | CV et lettre par offre (EN/FR), ajoutés au profil ; faits validés sur place dans le CV | [#4](https://github.com/SamiraBansaccal/nextround/pull/4) (fusionnée) |
 
 ## Fait récemment
+
+- Session locale du 2026-10-04 (PR #3 et #4, déployées, migrations `0005` et `0006` appliquées) :
+  - Projets « vibe-codés » : marqués « Built with AI » dans le profil (NextRound, TrustLint, hopodoo pour la propriétaire). Ils restent dans le profil (intérêt pour l'IA, créativité, hackathons) mais ne couvrent **jamais** une exigence technique : règle unique `lib/offers/coverage.ts`, aussi appliquée aux entretiens et aux CV.
+  - « Update with my validated facts » sur une offre : relie à nouveau ses exigences aux faits validés (avant, seulement à l'ajout de l'offre).
+  - CV par offre au format d'un CV tech (titre, profil, tableau de compétences, projets avec technos, formations, expérience, langues), en anglais ou en français, chaque élément vérifié contre les faits validés ; lettre de motivation EN/FR. Un CV ou une lettre peut être **ajouté au profil** (bibliothèque) et servir de point de départ (« Start from »).
+  - Profil : les faits proposés se valident **sur place**, sous la ligne du CV dont ils viennent (`lib/profile/place-facts.ts`) ; les projets GitHub dans la section GitHub.
+  - Données de la propriétaire : 2 CV importés (`cv-fev2026.pdf`, `resume_sabansac.pdf` de collabr), 19 projets GitHub (dont hopodoo, dépôt privé), 11 offres. **Rien n'est encore validé.** Les brouillons de `collabr/anciennes-versions` (textes de modèle) n'ont pas été importés.
+  - Reste à savoir de la propriétaire : « cookie » (introuvable sur GitHub) et l'app du hackathon (2e place) : nom et description.
 
 - PR #2 (cloud) : entretiens sans offre (par technologie, regroupées en parcours, ou RH seul), nouveau parcours de création (type → offre/techno → intervieweur en pleine page → test caméra → appel), caméra vraiment éteinte (LED), palette plus chaude, bouton supprimer rouge, langue du site EN/FR (anglais par défaut, séparée de la langue de l'entretien).
 - Questions sans IA : banque RH écrite à l'avance (classiques, variantes, pièges, questions illégales), banque technique, en anglais et en français corrects (pas de traduction mot à mot). L'IA ne sert plus qu'au retour sur les réponses.
