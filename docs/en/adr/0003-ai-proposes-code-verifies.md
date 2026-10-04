@@ -1,6 +1,6 @@
 # 🔎 ADR 0003 — The AI proposes, the code verifies
 
-> 🇫🇷 French version: [FR/adr/0003](../../fr/adr/0003-l-ia-propose-le-code-verifie.md)
+> 🇫🇷 French version: [fr/adr/0003](../../fr/adr/0003-l-ia-propose-le-code-verifie.md)
 
 - **Date:** 2026-10-03
 - **Status:** ✅ accepted — the product's core promise

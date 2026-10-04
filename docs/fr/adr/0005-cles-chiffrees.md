@@ -1,13 +1,13 @@
-# 🔐 ADR 0005 — Les clés d'API des utilisateurs sont chiffrées au repos avec une clé d'application
+# 🔐 ADR 0005 — Les API keys des utilisateurs sont chiffrées au repos avec une clé d'application
 
-> 🇬🇧 Version anglaise : [ENG/adr/0005](../../en/adr/0005-encrypted-user-keys.md)
+> 🇬🇧 Version anglaise : [en/adr/0005](../../en/adr/0005-encrypted-user-keys.md)
 
 - **Date :** 2026-10-03
 - **Statut :** ✅ acceptée
 
 ## 🎯 Contexte
 
-Les utilisateurs collent des clés d'API (IA et ElevenLabs) dans les Réglages. Ces clés peuvent leur
+Les utilisateurs collent des API keys (IA et ElevenLabs) dans les Réglages. Ces clés peuvent leur
 coûter de l'argent. Elles doivent être utilisables par le serveur, ne plus jamais être visibles dans
 le navigateur, et inutiles à quelqu'un qui lirait la base.
 
@@ -17,11 +17,11 @@ le navigateur, et inutiles à quelqu'un qui lirait la base.
   par `scripts/infra/setup-env.mjs` et stockée comme *project variable* Stripe Projects. Format :
   `v1:` + base64(IV de 12 octets | *tag* de 16 octets | texte chiffré). Un IV aléatoire neuf à
   chaque chiffrement ; le *tag* GCM fait échouer toute modification.
-- **Le navigateur ne reçoit jamais que `PublicAiSettings`** : le fournisseur, le modèle, « a une
+- **Le navigateur ne reçoit jamais que `PublicAiSettings`** : le provider, le modèle, « a une
   clé » et les **4 derniers caractères** (`••••a3F9`). La clé déchiffrée n'existe que dans la
   fonction serveur qui fait l'appel.
-- Changer de fournisseur sans donner de nouvelle clé **efface** l'ancienne : elle appartenait à un
-  autre fournisseur.
+- Changer de provider sans donner de nouvelle clé **efface** l'ancienne : elle appartenait à un
+  autre provider.
 - `setup-env.mjs` ne crée la clé de chiffrement **que si elle manque**.
 
 ## 📊 Conséquences

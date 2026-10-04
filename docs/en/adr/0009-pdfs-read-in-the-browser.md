@@ -1,6 +1,6 @@
 # 📄 ADR 0009 — CV PDFs are read in the browser; only their text reaches the server
 
-> 🇫🇷 French version: [FR/adr/0009](../../fr/adr/0009-pdf-lus-dans-le-navigateur.md)
+> 🇫🇷 French version: [fr/adr/0009](../../fr/adr/0009-pdf-lus-dans-le-navigateur.md)
 
 - **Date:** 2026-10-03
 - **Status:** ✅ accepted

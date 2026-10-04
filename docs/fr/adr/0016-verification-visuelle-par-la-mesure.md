@@ -1,6 +1,6 @@
 # 📏 ADR 0016 — Les écrans sont vérifiés par la mesure, avec un utilisateur de test jetable
 
-> 🇬🇧 Version anglaise : [ENG/adr/0016](../../en/adr/0016-visual-check-by-measurement.md)
+> 🇬🇧 Version anglaise : [en/adr/0016](../../en/adr/0016-visual-check-by-measurement.md)
 
 - **Date :** 2026-10-04
 - **Statut :** ✅ acceptée

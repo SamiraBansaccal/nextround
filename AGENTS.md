@@ -20,6 +20,7 @@ This repository is initialized for the Stripe project "nextround".
 
 ## NextRound rules
 
+- Files go in the folder of their domain, never loose in `lib/`, `components/`, `scripts/` or `tests/`: see `docs/en/guides/architecture.md`. Displayed text goes in `lib/i18n/` (EN + FR).
 - UI and logic stay separate: business logic, AI calls and verification live in `lib/` and server code; components only render data passed as props.
 - Every server query filters by the user id from the server-side session (`requireUserId()`), never from the client.
 - AI output is untrusted: validate it with zod and verify quotes and fact ids in code before showing it.

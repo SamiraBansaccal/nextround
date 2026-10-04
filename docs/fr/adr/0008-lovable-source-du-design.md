@@ -1,13 +1,13 @@
 # 🎨 ADR 0008 — Lovable est la source du design, reporté à la main, dans un seul sens
 
-> 🇬🇧 Version anglaise : [ENG/adr/0008](../../en/adr/0008-lovable-design-source.md)
+> 🇬🇧 Version anglaise : [en/adr/0008](../../en/adr/0008-lovable-design-source.md)
 
 - **Date :** 2026-10-03
 - **Statut :** ✅ acceptée — **étendue le 2026-10-04** : tous les écrans suivent maintenant le prototype
 
 ## 🎯 Contexte
 
-L'auteur du projet dessine l'interface dans Lovable, dans un dépôt privé séparé
+L'auteur du projet dessine l'interface dans Lovable, dans un repo privé séparé
 (`SamiraBansaccal/nextround-39ef068d`) : un prototype React + TanStack Router avec des **données
 fictives**. NextRound est une app Next.js avec de vraies données, des *server actions* et de la
 vérification. La spec demandait de **séparer l'interface de la logique**, pour que le design puisse

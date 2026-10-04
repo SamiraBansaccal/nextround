@@ -1,9 +1,9 @@
 # 🔌 ADR 0004 — One OpenAI-compatible client; only presets on the public instance
 
-> 🇫🇷 French version: [FR/adr/0004](../../fr/adr/0004-un-client-compatible-openai.md)
+> 🇫🇷 French version: [fr/adr/0004](../../fr/adr/0004-un-client-compatible-openai.md)
 
 - **Date:** 2026-10-03
-- **Status:** ✅ accepted
+- **Status:** ✅ accepted — **amended** by [ADR 0018](0018-claude-through-its-own-sdk.md) (Claude through its own SDK)
 
 ## 🎯 Context
 

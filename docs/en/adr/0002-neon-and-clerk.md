@@ -1,6 +1,6 @@
 # 🐘 ADR 0002 — Neon (Postgres) + Clerk (sign-in) rather than Supabase
 
-> 🇫🇷 French version: [FR/adr/0002](../../fr/adr/0002-neon-et-clerk.md)
+> 🇫🇷 French version: [fr/adr/0002](../../fr/adr/0002-neon-et-clerk.md)
 
 - **Date:** 2026-10-03
 - **Status:** ✅ accepted

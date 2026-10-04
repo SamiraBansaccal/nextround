@@ -1,6 +1,6 @@
 # 🗄️ ADR 0014 — Une seule base pour le développement local, les tests sur l'app et la production
 
-> 🇬🇧 Version anglaise : [ENG/adr/0014](../../en/adr/0014-one-database.md)
+> 🇬🇧 Version anglaise : [en/adr/0014](../../en/adr/0014-one-database.md)
 
 - **Date :** 2026-10-03
 - **Statut :** ⚠️ acceptée comme **dette**
@@ -38,7 +38,7 @@ n'est pas un usage réel :
   local tournerait sur la base en ligne.
 - **Un nettoyage interrompu laisse des lignes de test** en production jusqu'au lancement suivant
   (qui commence par nettoyer le même utilisateur).
-- La bonne correction est connue : une **branche** Neon pour le développement et les tests
+- La bonne correction est connue : une **branch** Neon pour le développement et les tests
   (copie à l'écriture, instantanée), avec sa propre chaîne de connexion dans un second
   environnement Stripe Projects (`stripe projects env create development --output .env.dev`). Pas
   encore fait.

@@ -1,6 +1,6 @@
 # 🚦 ADR 0006 — Instance-key limits are counted in Postgres
 
-> 🇫🇷 French version: [FR/adr/0006](../../fr/adr/0006-limites-dans-postgres.md)
+> 🇫🇷 French version: [fr/adr/0006](../../fr/adr/0006-limites-dans-postgres.md)
 
 - **Date:** 2026-10-03
 - **Status:** ✅ accepted

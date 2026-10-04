@@ -1,6 +1,6 @@
 # 🐘 ADR 0002 — Neon (Postgres) + Clerk (connexion) plutôt que Supabase
 
-> 🇬🇧 Version anglaise : [ENG/adr/0002](../../en/adr/0002-neon-and-clerk.md)
+> 🇬🇧 Version anglaise : [en/adr/0002](../../en/adr/0002-neon-and-clerk.md)
 
 - **Date :** 2026-10-03
 - **Statut :** ✅ acceptée
@@ -18,7 +18,7 @@ GitHub), Google est facultatif. L'app devait rester démontrable devant un jury 
 |---|---|---|
 | Le plan gratuit se met en pause ? | **Oui** : un projet gratuit est mis en pause après une semaine sans activité | Non : Neon ne suspend que le calcul, qui se réveille en une fraction de seconde |
 | Connexion GitHub en développement | Demande une *OAuth App* GitHub créée à la main, recopiée dans le tableau de bord | Les instances de développement Clerk fournissent des identifiants OAuth partagés |
-| Fournisseurs | Un | Deux |
+| Providers | Un | Deux |
 
 ## ✅ Décision
 
@@ -36,7 +36,7 @@ GitHub a été activé avec la CLI Clerk (`clerk config patch … connection_oau
 
 **Mauvaises** 👎
 
-- **Deux fournisseurs au lieu d'un** — deux tableaux de bord, deux jeux d'identifiants.
+- **Deux providers au lieu d'un** — deux tableaux de bord, deux jeux d'identifiants.
 - **L'instance Clerk est une instance de développement** : un badge « Development mode », des
   identifiants OAuth partagés et les limites d'usage du développement. Passer en production demande
   un nom de domaine à soi et ses propres identifiants OAuth (`npx clerk deploy` guide les étapes).

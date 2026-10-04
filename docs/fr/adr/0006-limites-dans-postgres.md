@@ -1,6 +1,6 @@
 # 🚦 ADR 0006 — Les limites des clés de l'instance sont comptées dans Postgres
 
-> 🇬🇧 Version anglaise : [ENG/adr/0006](../../en/adr/0006-instance-limits-in-postgres.md)
+> 🇬🇧 Version anglaise : [en/adr/0006](../../en/adr/0006-instance-limits-in-postgres.md)
 
 - **Date :** 2026-10-03
 - **Statut :** ✅ acceptée
@@ -8,12 +8,12 @@
 ## 🎯 Contexte
 
 Le propriétaire de l'instance se rabat sur les clés de l'instance (OpenRouter, ElevenLabs,
-Firecrawl). Les modèles gratuits d'OpenRouter autorisent **50 requêtes par jour** à un compte qui
+Firecrawl). Les modèles gratuits d'OpenRouter autorisent **50 requests par jour** à un compte qui
 n'a jamais acheté de crédits, 1 000 avec au moins 10 dollars de crédits (vérifié dans la doc
 d'OpenRouter). La spec demande une limite de débit et un plafond quotidien **seulement sur les
 appels faits avec les clés de l'instance**. Vercel fait tourner l'app en fonctions *serverless* :
 plusieurs instances peuvent tourner en même temps, et aucune ne garde de mémoire entre deux
-requêtes.
+requests.
 
 ## ✅ Décision
 
@@ -24,7 +24,7 @@ requêtes.
 - Valeurs par défaut (`lib/ai/usage.ts`) : IA 8 par minute et **40 par jour** (sous les 50
   d'OpenRouter, qui comptent aussi les relances), voix 10/60, lecture de pages 5/30.
 - Seuls les appels faits avec les clés **de l'instance** sont comptés — chaque essai, relances
-  comprises. Les utilisateurs qui ont leur propre clé ne sont limités que par leur fournisseur.
+  comprises. Les utilisateurs qui ont leur propre clé ne sont limités que par leur provider.
 
 ## 📊 Conséquences
 

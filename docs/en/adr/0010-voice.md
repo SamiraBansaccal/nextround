@@ -1,9 +1,9 @@
 # 🔊 ADR 0010 — ElevenLabs reads only the user's own questions; dictation stays in the browser
 
-> 🇫🇷 French version: [FR/adr/0010](../../fr/adr/0010-la-voix.md)
+> 🇫🇷 French version: [fr/adr/0010](../../fr/adr/0010-la-voix.md)
 
 - **Date:** 2026-10-03
-- **Status:** ✅ accepted
+- **Status:** ✅ accepted — **amended** by [ADR 0020](0020-paid-voice-is-opt-in.md) (instance voice is opt-in)
 
 ## 🎯 Context
 

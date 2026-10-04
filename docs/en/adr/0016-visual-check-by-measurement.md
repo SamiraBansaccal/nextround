@@ -1,6 +1,6 @@
 # 📏 ADR 0016 — Screens are checked by measurement, with a disposable test user
 
-> 🇫🇷 French version: [FR/adr/0016](../../fr/adr/0016-verification-visuelle-par-la-mesure.md)
+> 🇫🇷 French version: [fr/adr/0016](../../fr/adr/0016-verification-visuelle-par-la-mesure.md)
 
 - **Date:** 2026-10-04
 - **Status:** ✅ accepted

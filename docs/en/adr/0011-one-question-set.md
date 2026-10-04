@@ -1,9 +1,9 @@
 # 🎯 ADR 0011 — One question set per interview; the focus selector filters it
 
-> 🇫🇷 French version: [FR/adr/0011](../../fr/adr/0011-une-seule-serie-de-questions.md)
+> 🇫🇷 French version: [fr/adr/0011](../../fr/adr/0011-une-seule-serie-de-questions.md)
 
 - **Date:** 2026-10-03
-- **Status:** ✅ accepted
+- **Status:** 🔁 superseded by [ADR 0017](0017-questions-written-in-advance.md) (questions are now written in advance)
 
 ## 🎯 Context
 

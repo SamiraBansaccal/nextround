@@ -1,13 +1,13 @@
 # 🚚 ADR 0007 — On déploie depuis la machine avec la CLI Vercel, pas depuis GitHub
 
-> 🇬🇧 Version anglaise : [ENG/adr/0007](../../en/adr/0007-deploy-from-the-machine.md)
+> 🇬🇧 Version anglaise : [en/adr/0007](../../en/adr/0007-deploy-from-the-machine.md)
 
 - **Date :** 2026-10-03
 - **Statut :** ✅ acceptée — **amendée le 2026-10-04** : le script renouvelle lui-même un token expiré
 
 ## 🎯 Contexte
 
-Le projet Vercel créé par Stripe Projects **n'est pas relié au dépôt GitHub**. Le relier demande
+Le projet Vercel créé par Stripe Projects **n'est pas relié au repo GitHub**. Le relier demande
 d'installer l'application Vercel sur le compte GitHub de l'auteur — une étape dans le navigateur.
 Stripe Projects fournit en revanche un token Vercel, l'identifiant de l'équipe et celui du projet
 dans `.env`.
@@ -15,7 +15,7 @@ dans `.env`.
 ## ✅ Décision
 
 - **`node scripts/infra/deploy.mjs`** déploie en production avec `vercel deploy --prod`. Le token est
-  passé à la CLI **uniquement par une variable d'environnement**, jamais en argument de commande
+  passé à la CLI **uniquement par une env var**, jamais en argument de commande
   (où il apparaîtrait dans la liste des processus).
 - **`.vercelignore`** liste ce qui n'est jamais envoyé : `.env`, `.env.*`, `.projects/`, les
   dossiers d'agents, la doc, les tests, les captures. Vérifié le 2026-10-03 par l'API Vercel : les
@@ -27,7 +27,7 @@ dans `.env`.
 jours). `deploy.mjs` le teste maintenant sur `GET /v2/user` ; s'il est refusé, il lance
 `stripe projects rotate <projet vercel>` puis `stripe projects env --pull` — la correction
 documentée pour des identifiants périmés — et continue. Observé : « The Vercel token expired:
-rotating the credentials… Fresh Vercel token in .env. », puis un déploiement réussi.
+rotating the credentials… Fresh Vercel token in .env. », puis un deploy réussi.
 
 ## 📊 Conséquences
 
@@ -38,8 +38,8 @@ rotating the credentials… Fresh Vercel token in .env. », puis un déploiement
 
 **Mauvaises** 👎
 
-- **Pas de déploiement automatique au push**, pas de preview par branche. Un commit poussé sur
-  GitHub n'est pas en ligne tant que personne ne lance le script. Relier le dépôt
+- **Pas de deploy automatique au push**, pas de preview par branch. Un commit poussé sur
+  GitHub n'est pas en ligne tant que personne ne lance le script. Relier le repo
   (`vercel git connect`) réglerait ça.
 - Ce qui est déployé, c'est **le dossier de travail**, pas un commit : des modifications non
   commitées peuvent partir en ligne. L'habitude (et l'ordre des scripts) est de commiter d'abord,

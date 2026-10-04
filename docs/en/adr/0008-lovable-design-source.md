@@ -1,6 +1,6 @@
 # 🎨 ADR 0008 — Lovable is the design source, ported by hand, one way
 
-> 🇫🇷 French version: [FR/adr/0008](../../fr/adr/0008-lovable-source-du-design.md)
+> 🇫🇷 French version: [fr/adr/0008](../../fr/adr/0008-lovable-source-du-design.md)
 
 - **Date:** 2026-10-03
 - **Status:** ✅ accepted — **extended on 2026-10-04**: every screen now follows the prototype

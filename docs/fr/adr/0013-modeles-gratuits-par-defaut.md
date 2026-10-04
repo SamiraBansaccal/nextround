@@ -1,6 +1,6 @@
 # 🆓 ADR 0013 — Modèles gratuits par défaut : la qualité dépend du modèle, la sûreté non
 
-> 🇬🇧 Version anglaise : [ENG/adr/0013](../../en/adr/0013-free-models-by-default.md)
+> 🇬🇧 Version anglaise : [en/adr/0013](../../en/adr/0013-free-models-by-default.md)
 
 - **Date :** 2026-10-03
 - **Statut :** ✅ acceptée
@@ -15,7 +15,7 @@ format JSON.
 
 - **Modèle de l'instance** : `qwen/qwen3.8-27b:free`, avec `nvidia/nemotron-3-super-120b-a12b:free`
   en *fallback* OpenRouter (champ `models`). Choisi le 2026-10-03 parmi 17 modèles gratuits en en
-  testant trois : Gemma 4 31B a répondu **429** (saturé chez le fournisseur), Qwen a donné un JSON
+  testant trois : Gemma 4 31B a répondu **429** (saturé chez le provider), Qwen a donné un JSON
   valide en 1,0 s, Nemotron en 0,6 s. Les deux se changent sans toucher au code
   (`INSTANCE_LLM_MODEL`, `INSTANCE_LLM_FALLBACK_MODELS`).
 - **Un JSON robuste** (`lib/ai/json.ts`) : demander uniquement du JSON, l'extraire même s'il est

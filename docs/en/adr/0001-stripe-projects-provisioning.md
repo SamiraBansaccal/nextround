@@ -1,6 +1,6 @@
 # 🧰 ADR 0001 — Every service is provisioned with Stripe Projects; self-hosting means re-provisioning on your own accounts
 
-> 🇫🇷 French version: [FR/adr/0001](../../fr/adr/0001-provisionnement-stripe-projects.md)
+> 🇫🇷 French version: [fr/adr/0001](../../fr/adr/0001-provisionnement-stripe-projects.md)
 
 - **Date:** 2026-10-03
 - **Status:** ✅ accepted

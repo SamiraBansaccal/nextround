@@ -1,4 +1,21 @@
-# Phase 2 : « Bring your own AI » (chacun apporte son IA)
+# 2️⃣ Phase 2 : « Bring your own AI » (chacun apporte son IA)
+
+> 📜 **Journal historique** : il raconte la phase telle qu'elle s'est passée et n'est plus mis à jour. Les chemins de fichiers ont pu changer depuis (voir le [guide d'architecture](../guides/architecture.md)).
+
+## 🧭 Sommaire
+
+- [1. Un seul client, au format « OpenAI-compatible »](#1-un-seul-client-au-format--openai-compatible-)
+- [2. Qui paie ? (`lib/ai/config.ts`)](#2-qui-paie--libaiconfigts)
+- [3. Les clés des utilisateurs](#3-les-clés-des-utilisateurs)
+- [4. « Custom base URL » désactivée sur l'instance publique](#4--custom-base-url--désactivée-sur-linstance-publique)
+- [5. Survivre aux modèles faibles ou gratuits (`lib/ai/json.ts`)](#5-survivre-aux-modèles-faibles-ou-gratuits-libaijsonts)
+- [6. Limites sur la clé de l'instance (`lib/ai/usage.ts`)](#6-limites-sur-la-clé-de-linstance-libaiusagets)
+- [7. Le modèle par défaut de l'instance](#7-le-modèle-par-défaut-de-linstance)
+- [8. La page Réglages](#8-la-page-réglages)
+- [9. Les tests (`npm test` : 29 tests)](#9-les-tests-npm-test--29-tests)
+- [10. Reprendre le projet avec ses propres comptes](#10-reprendre-le-projet-avec-ses-propres-comptes)
+- [11. Limites connues](#11-limites-connues)
+
 
 **But de la phase :** toutes les fonctionnalités d'IA des phases suivantes passent par **une seule couche**, qui sait avec quelle IA parler, qui paie, comment protéger les clés et comment survivre aux modèles faibles.
 
@@ -6,25 +23,25 @@
 
 ## 1. Un seul client, au format « OpenAI-compatible »
 
-`lib/ai/client.ts` parle le format **chat completions** d'OpenAI : `POST {base_url}/chat/completions` avec une clé et un nom de modèle. Presque tous les fournisseurs l'acceptent, donc une seule fonction suffit pour tous.
+`lib/ai/client.ts` parle le format **chat completions** d'OpenAI : `POST {base_url}/chat/completions` avec une clé et un nom de modèle. Presque tous les providers l'acceptent, donc une seule fonction suffit pour tous.
 
-| Fournisseur | Base URL | Où elle a été vérifiée |
+| Provider | Base URL | Où elle a été vérifiée |
 |---|---|---|
 | OpenRouter | `https://openrouter.ai/api/v1` | Doc OpenRouter (quickstart) |
-| OpenAI | `https://api.openai.com/v1` | SDK officiel `openai-node` (la doc web bloque les requêtes automatiques) |
+| OpenAI | `https://api.openai.com/v1` | SDK officiel `openai-node` (la doc web bloque les requests automatiques) |
 | Mistral | `https://api.mistral.ai/v1` | Doc API Mistral |
 | Groq | `https://api.groq.com/openai/v1` | Doc Groq « OpenAI compatibility » |
 
 Les quatre exposent `GET /models`, vérifié : 401 sans clé, sauf OpenRouter qui est public. C'est ce qu'utilise le bouton **Load models** de la page Réglages.
 
-Les erreurs du fournisseur sont transformées en **messages génériques** (`lib/ai/errors.ts`) : « clé refusée », « modèle inconnu », « trop de requêtes »… On ne montre et on ne journalise jamais la réponse brute, car certains fournisseurs y recopient une partie de la clé.
+Les erreurs du provider sont transformées en **messages génériques** (`lib/ai/errors.ts`) : « clé refusée », « modèle inconnu », « trop de requests »… On ne montre et on ne journalise jamais la réponse brute, car certains providers y recopient une partie de la clé.
 
 ## 2. Qui paie ? (`lib/ai/config.ts`)
 
 | Situation | IA utilisée | Limites |
 |---|---|---|
-| L'utilisateur a enregistré sa clé | **Sa** clé, son fournisseur, son modèle | Celles de son fournisseur ; NextRound n'en ajoute pas |
-| Pas de clé, mais c'est **le propriétaire** (`OWNER_GITHUB_LOGIN`) | La clé de l'instance (OpenRouter, modèle gratuit) | 8 requêtes par minute, 40 par jour |
+| L'utilisateur a enregistré sa clé | **Sa** clé, son provider, son modèle | Celles de son provider ; NextRound n'en ajoute pas |
+| Pas de clé, mais c'est **le propriétaire** (`OWNER_GITHUB_LOGIN`) | La clé de l'instance (OpenRouter, modèle gratuit) | 8 requests par minute, 40 par jour |
 | Pas de clé, pas propriétaire | Aucune : « Add your AI key in Settings to use AI features » | — |
 
 **La voix suit la même logique :** la clé ElevenLabs de l'utilisateur, sinon celle de l'instance pour le propriétaire, sinon la voix **du navigateur**, gratuite. Le mode vocal lui-même arrive en Phase 5.
@@ -35,16 +52,16 @@ Toutes les fonctionnalités appelleront `aiJson(ctx, { schema, system, user })` 
 
 - **Chiffrées** avec AES-256-GCM (`lib/server/crypto.ts`). Chaque chiffrement tire un IV aléatoire, donc la même clé donne un résultat différent à chaque fois. Le « tag » GCM détecte toute modification : une valeur trafiquée en base ne se déchiffre pas.
 - La clé de chiffrement est `APP_ENCRYPTION_KEY` (32 octets aléatoires, créée par `setup-env.mjs`). **Il ne faut jamais la changer** : les clés déjà enregistrées deviendraient illisibles.
-- **Jamais renvoyées au navigateur.** Le serveur ne transmet que `PublicAiSettings` : le fournisseur, le modèle, « a une clé » et les **4 derniers caractères** (`••••a3F9`). Le texte en clair n'existe que côté serveur, au moment de l'appel.
+- **Jamais renvoyées au navigateur.** Le serveur ne transmet que `PublicAiSettings` : le provider, le modèle, « a une clé » et les **4 derniers caractères** (`••••a3F9`). Le texte en clair n'existe que côté serveur, au moment de l'appel.
 - **Jamais journalisées :** aucun `console.log` de clé, et les erreurs sont génériques.
-- Changer de fournisseur sans donner de nouvelle clé **efface** l'ancienne, qui appartenait à l'autre fournisseur.
+- Changer de provider sans donner de nouvelle clé **efface** l'ancienne, qui appartenait à l'autre provider.
 
 ## 4. « Custom base URL » désactivée sur l'instance publique
 
 Si n'importe qui pouvait saisir une adresse, il pourrait faire appeler **par notre serveur** des machines internes, par exemple `http://169.254.169.254` (l'adresse des métadonnées d'un hébergeur cloud). C'est une attaque **SSRF**. Donc :
 
 - seuls les 4 presets sont acceptés ;
-- l'URL est **décidée par le serveur** à partir du nom du fournisseur ; celle envoyée par le navigateur est ignorée ;
+- l'URL est **décidée par le serveur** à partir du nom du provider ; celle envoyée par le navigateur est ignorée ;
 - la vérification est faite **deux fois** : à l'enregistrement et à chaque appel (`assertAllowedBaseUrl`) ;
 - un auto-hébergeur l'active avec `ALLOW_CUSTOM_LLM_BASE_URL=true`, par exemple pour Ollama sur `http://localhost:11434/v1`.
 

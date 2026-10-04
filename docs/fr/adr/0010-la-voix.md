@@ -1,9 +1,9 @@
 # 🔊 ADR 0010 — ElevenLabs ne lit que les questions de l'utilisateur ; la dictée reste dans le navigateur
 
-> 🇬🇧 Version anglaise : [ENG/adr/0010](../../en/adr/0010-voice.md)
+> 🇬🇧 Version anglaise : [en/adr/0010](../../en/adr/0010-voice.md)
 
 - **Date :** 2026-10-03
-- **Statut :** ✅ acceptée
+- **Statut :** ✅ acceptée — **amendée** par l'[ADR 0020](0020-voix-payante-sur-demande.md) (voix de l'instance sur demande)
 
 ## 🎯 Contexte
 
@@ -19,7 +19,7 @@ le propriétaire, sinon la voix gratuite du navigateur. Stripe Projects ne propo
   « Sarah », modèle `eleven_flash_v2_5`, tous deux repris de la skill officielle d'ElevenLabs). Il
   ne peut pas servir à faire lire un texte quelconque avec notre clé.
 - **204 veut dire « utilise la voix du navigateur »** : pas de clé, quota atteint ou erreur du
-  fournisseur. Le client retombe alors sur `speechSynthesis`, dans la langue de l'offre.
+  provider. Le client retombe alors sur `speechSynthesis`, dans la langue de l'offre.
 - **La dictée utilise la reconnaissance vocale du navigateur** (Web Speech API, Chrome et Edge),
   dans la langue de l'offre. La transcription s'ajoute à la zone de réponse et **reste modifiable**
   avant l'envoi.

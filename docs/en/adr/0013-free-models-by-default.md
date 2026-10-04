@@ -1,6 +1,6 @@
 # 🆓 ADR 0013 — Free models by default: quality depends on the model, safety does not
 
-> 🇫🇷 French version: [FR/adr/0013](../../fr/adr/0013-modeles-gratuits-par-defaut.md)
+> 🇫🇷 French version: [fr/adr/0013](../../fr/adr/0013-modeles-gratuits-par-defaut.md)
 
 - **Date:** 2026-10-03
 - **Status:** ✅ accepted

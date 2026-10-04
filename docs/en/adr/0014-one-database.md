@@ -1,6 +1,6 @@
 # 🗄️ ADR 0014 — One database for local development, tests against the app and production
 
-> 🇫🇷 French version: [FR/adr/0014](../../fr/adr/0014-une-seule-base.md)
+> 🇫🇷 French version: [fr/adr/0014](../../fr/adr/0014-une-seule-base.md)
 
 - **Date:** 2026-10-03
 - **Status:** ⚠️ accepted as **debt**

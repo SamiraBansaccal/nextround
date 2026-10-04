@@ -1,6 +1,6 @@
 # 🧱 ADR 0012 — A `user_id` on every table, enforced in `lib/data`, tested on an in-memory Postgres
 
-> 🇫🇷 French version: [FR/adr/0012](../../fr/adr/0012-isolation-des-donnees.md)
+> 🇫🇷 French version: [fr/adr/0012](../../fr/adr/0012-isolation-des-donnees.md)
 
 - **Date:** 2026-10-03
 - **Status:** ✅ accepted

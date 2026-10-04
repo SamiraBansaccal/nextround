@@ -1,6 +1,6 @@
 # 🚚 ADR 0007 — Deploy from the machine with the Vercel CLI, not from GitHub
 
-> 🇫🇷 French version: [FR/adr/0007](../../fr/adr/0007-deployer-depuis-la-machine.md)
+> 🇫🇷 French version: [fr/adr/0007](../../fr/adr/0007-deployer-depuis-la-machine.md)
 
 - **Date:** 2026-10-03
 - **Status:** ✅ accepted — **amended on 2026-10-04**: the script now renews an expired token itself

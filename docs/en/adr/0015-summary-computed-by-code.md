@@ -1,6 +1,6 @@
 # 🧮 ADR 0015 — The interview summary is computed by code, not written by the AI
 
-> 🇫🇷 French version: [FR/adr/0015](../../fr/adr/0015-resume-calcule-par-le-code.md)
+> 🇫🇷 French version: [fr/adr/0015](../../fr/adr/0015-resume-calcule-par-le-code.md)
 
 - **Date:** 2026-10-03
 - **Status:** ✅ accepted

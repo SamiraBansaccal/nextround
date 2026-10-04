@@ -1,6 +1,6 @@
 # 🧮 ADR 0015 — Le résumé d'entretien est calculé par le code, pas écrit par l'IA
 
-> 🇬🇧 Version anglaise : [ENG/adr/0015](../../en/adr/0015-summary-computed-by-code.md)
+> 🇬🇧 Version anglaise : [en/adr/0015](../../en/adr/0015-summary-computed-by-code.md)
 
 - **Date :** 2026-10-03
 - **Statut :** ✅ acceptée

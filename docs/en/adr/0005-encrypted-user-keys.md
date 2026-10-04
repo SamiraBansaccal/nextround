@@ -1,6 +1,6 @@
 # 🔐 ADR 0005 — User API keys are encrypted at rest with one application key
 
-> 🇫🇷 French version: [FR/adr/0005](../../fr/adr/0005-cles-chiffrees.md)
+> 🇫🇷 French version: [fr/adr/0005](../../fr/adr/0005-cles-chiffrees.md)
 
 - **Date:** 2026-10-03
 - **Status:** ✅ accepted

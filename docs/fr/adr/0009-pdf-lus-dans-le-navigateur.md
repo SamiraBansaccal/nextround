@@ -1,6 +1,6 @@
 # 📄 ADR 0009 — Les CV PDF sont lus dans le navigateur ; seul leur texte part au serveur
 
-> 🇬🇧 Version anglaise : [ENG/adr/0009](../../en/adr/0009-pdfs-read-in-the-browser.md)
+> 🇬🇧 Version anglaise : [en/adr/0009](../../en/adr/0009-pdfs-read-in-the-browser.md)
 
 - **Date :** 2026-10-03
 - **Statut :** ✅ acceptée
@@ -10,7 +10,7 @@
 La spec demande l'import de CV ou d'exports LinkedIn en PDF (PDF seulement, jusqu'à 5 Mo), et
 l'auteur du projet veut ajouter **autant de CV qu'il en a** — un par candidature envoyée — pour que
 tous alimentent une seule base de faits. Les fonctions Vercel acceptent **au plus 4,5 Mo** par
-corps de requête, en dessous de la limite de 5 Mo de la spec ; les *server actions* de Next.js
+corps de request, en dessous de la limite de 5 Mo de la spec ; les *server actions* de Next.js
 s'arrêtent à 1 Mo par défaut.
 
 ## ✅ Décision
@@ -33,7 +33,7 @@ s'arrêtent à 1 Mo par défaut.
 
 - **Le PDF ne quitte jamais l'ordinateur de l'utilisateur** : un gain de confidentialité qui mérite
   d'être dit.
-- Aucune limite de taille de requête à combattre, quel que soit le poids du PDF.
+- Aucune limite de taille de request à combattre, quel que soit le poids du PDF.
 - Mesuré : un PDF de 19 Ko a donné 408 caractères de texte et 11 faits proposés, tous avec une
   citation vérifiée.
 

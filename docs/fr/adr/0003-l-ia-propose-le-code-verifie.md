@@ -1,6 +1,6 @@
 # 🔎 ADR 0003 — L'IA propose, le code vérifie
 
-> 🇬🇧 Version anglaise : [ENG/adr/0003](../../en/adr/0003-ai-proposes-code-verifies.md)
+> 🇬🇧 Version anglaise : [en/adr/0003](../../en/adr/0003-ai-proposes-code-verifies.md)
 
 - **Date :** 2026-10-03
 - **Statut :** ✅ acceptée — c'est la promesse centrale du produit

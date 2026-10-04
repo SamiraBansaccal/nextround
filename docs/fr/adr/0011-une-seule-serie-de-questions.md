@@ -1,9 +1,9 @@
 # 🎯 ADR 0011 — Une seule série de questions par entretien ; le *focus* la filtre
 
-> 🇬🇧 Version anglaise : [ENG/adr/0011](../../en/adr/0011-one-question-set.md)
+> 🇬🇧 Version anglaise : [en/adr/0011](../../en/adr/0011-one-question-set.md)
 
 - **Date :** 2026-10-03
-- **Statut :** ✅ acceptée
+- **Statut :** 🔁 remplacée par l'[ADR 0017](0017-questions-ecrites-a-l-avance.md) (les questions sont désormais écrites à l'avance)
 
 ## 🎯 Contexte
 
