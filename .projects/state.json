@@ -140,6 +140,10 @@
           "envKey": "CLERK_SECRET_KEY"
         },
         {
+          "variableName": "owner-github-id",
+          "envKey": "OWNER_GITHUB_ID"
+        },
+        {
           "variableName": "owner-github-login",
           "envKey": "OWNER_GITHUB_LOGIN"
         }
@@ -158,6 +162,10 @@
     "clerk-secret-key": {
       "name": "clerk-secret-key",
       "backendId": "fprjvar_61VVrZMfHG1Uol1bh16VVqpc4H9CbgD1HiTIaKN4qQbI"
+    },
+    "owner-github-id": {
+      "name": "owner-github-id",
+      "backendId": "fprjvar_61VWMk7GkpoEzdEiR16VVqpc4H9CbgD1HiTIaKN4qQ5Y"
     },
     "owner-github-login": {
       "name": "owner-github-login",

@@ -1,6 +1,6 @@
 import type { UiLang } from "./ui";
 
-// The Settings page (AI provider, voice) and its server actions, in the SITE's language.
+// The Settings page (AI provider, voice, offer pages) and its server actions, in the SITE's language.
 // Text between `backticks` is shown as code.
 
 const en = {
@@ -18,13 +18,18 @@ const en = {
   voiceBrowserNote: "free, nothing to set up",
   voiceElevenOwn: "ElevenLabs",
   voiceElevenInstance: "ElevenLabs (instance key)",
+  pagesLabel: "Offer pages",
+  pagesBuiltin: "Built-in reader",
+  pagesBuiltinNote: "free; if a site blocks it, paste the offer's text",
+  pagesFirecrawl: "Firecrawl",
+  pagesFirecrawlInstance: "Firecrawl (instance key)",
   usageToday: "Today: {used} of {max} AI calls on the instance key",
   openRouterTitle: "What is OpenRouter?",
   openRouterText:
     "One door to hundreds of AI models (Qwen, Llama, Mistral…): one account, one key, and some models are free, their id ends in `:free`. NextRound sends it your answer and gets the coach's feedback back.",
-  instanceTitle: "The instance key",
+  instanceTitle: "The instance keys",
   instanceText:
-    "The key the owner of this site set on the server. Only the owner's account uses it, and only while no personal key is saved: at most {perMinute} calls a minute and {perDay} a day, to stay within OpenRouter's free allowance. Every other account brings its own key.",
+    "The keys the owner of this site set on the server (AI, offer pages). Only the owner's account uses them, and only while no personal key is saved: for the AI, at most {perMinute} calls a minute and {perDay} a day, to stay within OpenRouter's free allowance. Every other account brings its own keys.",
   aiUsedFor: "Where the AI works",
   aiUses: {
     interviews: "Interviews: the coach's feedback on each answer.",
@@ -78,10 +83,27 @@ const en = {
   voiceEmpty: "Leave empty to use the browser voice",
   voiceSaved: "Saved, stored encrypted.",
   voiceRemoved: "Voice key removed.",
-  currently: "Currently using: {voice}",
+  currently: "Currently using: {current}",
   currentOwn: "ElevenLabs, with your key",
   currentInstance: "ElevenLabs, with the instance key (you are the owner)",
   currentBrowser: "Browser voice (free)",
+  // Offer pages (Firecrawl)
+  pagesTitle: "Offer pages",
+  pagesIntro:
+    "When you add an offer by its link, NextRound reads the page itself, for free. Some sites block that (sign-in wall, anti-robot check): a Firecrawl key gets through most of them. Without one, you paste the offer's text.",
+  pagesOwner: " As the owner, the instance's Firecrawl key reads your pages while no personal key is saved: at most {perDay} pages a day.",
+  pagesUsedFor: "Where it works",
+  pagesUses: { add: "Offers: reading the page of an offer you add by its link." },
+  pagesKey: "Firecrawl key (optional)",
+  pagesSavedKey: "Saved key ••••{last4} — paste a new one to replace it",
+  pagesEmpty: "Leave empty to use the built-in reader",
+  pagesSaved: "Saved, stored encrypted.",
+  pagesRemoved: "Firecrawl key removed.",
+  pagesCurrently: "Pages read with: {current}",
+  pagesCurrentOwn: "Firecrawl, with your key",
+  pagesCurrentInstance: "Firecrawl, with the instance key (you are the owner)",
+  pagesCurrentBuiltin: "the built-in reader (free)",
+  getFirecrawlKey: "Get a Firecrawl key",
   // Server actions
   checkForm: "Please check the form: model is required, keys are at least 8 characters.",
   validUrl: "Enter a valid http(s) base URL.",
@@ -90,6 +112,7 @@ const en = {
   urlNotAllowed: "This base URL is not allowed on this instance.",
   saveKeyFirst: "Save your API key first, then load the models.",
   notElevenLabs: "This does not look like an ElevenLabs key.",
+  notFirecrawl: "This does not look like a Firecrawl key.",
 };
 
 export type SettingsCopy = typeof en;
@@ -108,13 +131,18 @@ const fr: SettingsCopy = {
   voiceBrowserNote: "gratuite, rien à régler",
   voiceElevenOwn: "ElevenLabs",
   voiceElevenInstance: "ElevenLabs (clé de l'instance)",
+  pagesLabel: "Pages d'offres",
+  pagesBuiltin: "Lecteur intégré",
+  pagesBuiltinNote: "gratuit ; si un site le bloque, colle le texte de l'offre",
+  pagesFirecrawl: "Firecrawl",
+  pagesFirecrawlInstance: "Firecrawl (clé de l'instance)",
   usageToday: "Aujourd'hui : {used} appels d'IA sur {max} avec la clé de l'instance",
   openRouterTitle: "C'est quoi, OpenRouter ?",
   openRouterText:
     "Une seule porte d'entrée vers des centaines de modèles d'IA (Qwen, Llama, Mistral…) : un compte, une clé, et certains modèles sont gratuits, leur identifiant finit par `:free`. NextRound lui envoie ta réponse et reçoit le retour du coach.",
-  instanceTitle: "La clé de l'instance",
+  instanceTitle: "Les clés de l'instance",
   instanceText:
-    "La clé que la propriétaire de ce site a mise sur le serveur. Seul son compte l'utilise, et seulement tant qu'aucune clé personnelle n'est enregistrée : au plus {perMinute} appels par minute et {perDay} par jour, pour rester dans le quota gratuit d'OpenRouter. Tout autre compte apporte sa propre clé.",
+    "Les clés que la propriétaire de ce site a mises sur le serveur (IA, pages d'offres). Seul son compte les utilise, et seulement tant qu'aucune clé personnelle n'est enregistrée : pour l'IA, au plus {perMinute} appels par minute et {perDay} par jour, pour rester dans le quota gratuit d'OpenRouter. Tout autre compte apporte ses propres clés.",
   aiUsedFor: "Où l'IA travaille",
   aiUses: {
     interviews: "Entretiens : le retour du coach sur chaque réponse.",
@@ -166,10 +194,26 @@ const fr: SettingsCopy = {
   voiceEmpty: "Laisse vide pour utiliser la voix du navigateur",
   voiceSaved: "Enregistrée, stockée chiffrée.",
   voiceRemoved: "Clé de voix retirée.",
-  currently: "Voix utilisée : {voice}",
+  currently: "Voix utilisée : {current}",
   currentOwn: "ElevenLabs, avec ta clé",
   currentInstance: "ElevenLabs, avec la clé de l'instance (tu en es propriétaire)",
   currentBrowser: "Voix du navigateur (gratuite)",
+  pagesTitle: "Pages d'offres",
+  pagesIntro:
+    "Quand tu ajoutes une offre par son lien, NextRound lit la page lui-même, gratuitement. Certains sites le bloquent (connexion obligatoire, contrôle anti-robot) : une clé Firecrawl passe sur la plupart. Sans clé, tu colles le texte de l'offre.",
+  pagesOwner: " En tant que propriétaire, la clé Firecrawl de l'instance lit tes pages tant que tu n'as pas de clé perso : au plus {perDay} pages par jour.",
+  pagesUsedFor: "Où elle sert",
+  pagesUses: { add: "Offres : la lecture de la page d'une offre ajoutée par son lien." },
+  pagesKey: "Clé Firecrawl (facultative)",
+  pagesSavedKey: "Clé enregistrée ••••{last4} : colles-en une nouvelle pour la remplacer",
+  pagesEmpty: "Laisse vide pour utiliser le lecteur intégré",
+  pagesSaved: "Enregistrée, stockée chiffrée.",
+  pagesRemoved: "Clé Firecrawl retirée.",
+  pagesCurrently: "Pages lues avec : {current}",
+  pagesCurrentOwn: "Firecrawl, avec ta clé",
+  pagesCurrentInstance: "Firecrawl, avec la clé de l'instance (tu en es propriétaire)",
+  pagesCurrentBuiltin: "le lecteur intégré (gratuit)",
+  getFirecrawlKey: "Obtenir une clé Firecrawl",
   checkForm: "Vérifie le formulaire : le modèle est obligatoire et les clés font au moins 8 caractères.",
   validUrl: "Entre une base URL http(s) valide.",
   customDisabled: "Les base URL personnalisées sont désactivées sur cette instance.",
@@ -177,6 +221,7 @@ const fr: SettingsCopy = {
   urlNotAllowed: "Cette base URL n'est pas autorisée sur cette instance.",
   saveKeyFirst: "Enregistre d'abord ta clé d'API, puis charge les modèles.",
   notElevenLabs: "Ça ne ressemble pas à une clé ElevenLabs.",
+  notFirecrawl: "Ça ne ressemble pas à une clé Firecrawl.",
 };
 
 export const SETTINGS_COPY: Record<UiLang, SettingsCopy> = { en, fr };

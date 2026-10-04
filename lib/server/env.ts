@@ -8,7 +8,9 @@ const serverEnvSchema = z.object({
   CLERK_SECRET_KEY: z.string().min(1),
   NEXT_PUBLIC_CLERK_PUBLISHABLE_KEY: z.string().min(1),
   APP_ENCRYPTION_KEY: z.string().min(1),
-  OWNER_GITHUB_LOGIN: z.string().min(1),
+  // The owner's NUMERIC GitHub id (api.github.com/users/<login> -> id): stable, unlike a username that can
+  // be changed and then taken by someone else. Missing = nobody is the owner (fail closed).
+  OWNER_GITHUB_ID: z.string().regex(/^\d+$/).optional(),
   // Instance AI and services (optional: features degrade gracefully without them).
   OPENROUTER_API_API_KEY: z.string().optional(),
   FIRECRAWL_API_API_KEY: z.string().optional(),

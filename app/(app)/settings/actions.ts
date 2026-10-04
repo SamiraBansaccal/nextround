@@ -12,7 +12,8 @@ import {
   type PublicAiSettings,
   removeAiKey,
   saveAiSettings,
-  saveVoiceKey,
+  saveServiceKey,
+  type ServiceKey,
 } from "@/lib/data/ai-settings";
 import { serverEnv } from "@/lib/server/env";
 import { getUiLang } from "@/lib/i18n/server";
@@ -111,24 +112,42 @@ export async function loadModelsAction(input: unknown): Promise<ActionResult<str
   }
 }
 
-const voiceKeySchema = z.string().trim().min(10).max(300);
+// Optional keys for the other services: ElevenLabs (voice) and Firecrawl (offer pages).
+const serviceKeySchema = z.string().trim().min(10).max(300).regex(/^\S+$/);
+// Used when the row does not exist yet (no AI settings saved): the AI part stays without a key.
+const rowDefaults = { provider: "openrouter" as const, baseUrl: PRESETS.openrouter.baseUrl, model: DEFAULT_INSTANCE_MODEL };
 
-export async function saveVoiceKeyAction(input: unknown): Promise<ActionResult> {
+async function saveKey(service: ServiceKey, input: unknown): Promise<ActionResult> {
   const userId = await requireUserId();
-  const parsed = voiceKeySchema.safeParse(input);
-  if (!parsed.success) return { ok: false, error: (await uiCopy()).t.notElevenLabs };
-  await saveVoiceKey(userId, parsed.data, {
-    provider: "openrouter",
-    baseUrl: PRESETS.openrouter.baseUrl,
-    model: DEFAULT_INSTANCE_MODEL,
-  });
+  const parsed = serviceKeySchema.safeParse(input);
+  if (!parsed.success) {
+    const { t } = await uiCopy();
+    return { ok: false, error: service === "voice" ? t.notElevenLabs : t.notFirecrawl };
+  }
+  await saveServiceKey(userId, service, parsed.data, rowDefaults);
   revalidatePath("/", "layout");
   return { ok: true, data: null };
 }
 
-export async function removeVoiceKeyAction(): Promise<ActionResult> {
+async function removeKey(service: ServiceKey): Promise<ActionResult> {
   const userId = await requireUserId();
-  await saveVoiceKey(userId, null, { provider: "openrouter", baseUrl: PRESETS.openrouter.baseUrl, model: DEFAULT_INSTANCE_MODEL });
+  await saveServiceKey(userId, service, null, rowDefaults);
   revalidatePath("/", "layout");
   return { ok: true, data: null };
+}
+
+export async function saveVoiceKeyAction(input: unknown): Promise<ActionResult> {
+  return saveKey("voice", input);
+}
+
+export async function removeVoiceKeyAction(): Promise<ActionResult> {
+  return removeKey("voice");
+}
+
+export async function saveFirecrawlKeyAction(input: unknown): Promise<ActionResult> {
+  return saveKey("firecrawl", input);
+}
+
+export async function removeFirecrawlKeyAction(): Promise<ActionResult> {
+  return removeKey("firecrawl");
 }

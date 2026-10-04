@@ -226,6 +226,8 @@ export const aiSettings = pgTable("ai_settings", {
   apiKeyLast4: text("api_key_last4"), // only for the masked display
   elevenlabsKeyEncrypted: text("elevenlabs_key_encrypted"),
   elevenlabsKeyLast4: text("elevenlabs_key_last4"),
+  firecrawlKeyEncrypted: text("firecrawl_key_encrypted"), // reads offer pages that block a plain fetch
+  firecrawlKeyLast4: text("firecrawl_key_last4"),
   updatedAt: timestamp("updated_at", { withTimezone: true }).notNull().defaultNow(),
 });
 

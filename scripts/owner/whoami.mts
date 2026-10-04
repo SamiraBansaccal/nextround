@@ -2,11 +2,10 @@
 // Usage: npm run owner:whoami
 import { createClerkClient } from "@clerk/backend";
 import { neon } from "@neondatabase/serverless";
-import "./owner.mjs";
+import { isOwnerAccount } from "./owner.mjs";
 
 const clerk = createClerkClient({ secretKey: process.env.CLERK_SECRET_KEY });
 const { data: users } = await clerk.users.getUserList({ limit: 100 });
-const owner = process.env.OWNER_GITHUB_LOGIN!.toLowerCase();
 const sql = neon(process.env.DB_CONNECTION_STRING!);
 for (const u of users) {
   const gh = u.externalAccounts.find((a) => a.provider.includes("github"))?.username ?? null;
@@ -16,5 +15,5 @@ for (const u of users) {
     (select count(*) from sources where user_id = ${u.id}) as sources,
     (select count(*) from offers where user_id = ${u.id}) as offers,
     (select count(*) from interviews where user_id = ${u.id}) as interviews`;
-  console.log(JSON.stringify({ id: u.id, github: gh, isOwner: gh?.toLowerCase() === owner, created: new Date(u.createdAt).toISOString().slice(0, 10), ...counts }));
+  console.log(JSON.stringify({ id: u.id, github: gh, isOwner: isOwnerAccount(u), created: new Date(u.createdAt).toISOString().slice(0, 10), ...counts }));
 }

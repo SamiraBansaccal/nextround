@@ -18,13 +18,14 @@ Règle : chaque session a sa *branch*, s'inscrit ici, ouvre une PR, et met la li
 
 | *Branch* | Session | Sujet | PR |
 |---|---|---|---|
-| `claude/local-settings` | local | ⚙️ Page Réglages (pleine largeur, encart « ce qui est branché », IA et voix côte à côte), bouton EN/FR aux couleurs de la DA, écrans e2e en français | [#16](https://github.com/SamiraBansaccal/nextround/pull/16) (fusionnée) |
+| `claude/local-owner-only` | local | 🔐 Toutes les clés de l'instance pour la propriétaire seule (Firecrawl compris ; clé Firecrawl perso dans les Réglages), propriétaire reconnue par son id GitHub numérique, inscription Clerk fermée. Migration `0008`. Fichiers : `lib/ai/config.ts`, `lib/server/{auth,env}.ts`, `lib/data/ai-settings.ts`, `components/settings/**`, `app/(app)/settings/**`, `app/(app)/offers/actions.ts`, `scripts/{infra,owner}/**`, `tests/e2e/fixtures.mts` | PR à venir |
 
 <details>
 <summary>📦 Branches déjà fusionnées</summary>
 
 | *Branch* | Session | Sujet | PR |
 |---|---|---|---|
+| `claude/local-settings` | local | ⚙️ Page Réglages (pleine largeur, encart « ce qui est branché », IA et voix côte à côte), bouton EN/FR aux couleurs de la DA, écrans e2e en français | [#16](https://github.com/SamiraBansaccal/nextround/pull/16) |
 | `claude/intelligent-einstein-58bqoh` | cloud | Entretiens sans offre, parcours de création, caméra, langue du site, couleurs, réglages IA | [#2](https://github.com/SamiraBansaccal/nextround/pull/2) |
 | `claude/owner-data-deploy` | local | Projets vibe-codés, « Update with my validated facts » | [#3](https://github.com/SamiraBansaccal/nextround/pull/3) |
 | `claude/tailored-documents` | local | CV et lettre par offre (EN/FR), ajoutés au profil ; faits validés sur place | [#4](https://github.com/SamiraBansaccal/nextround/pull/4) |
@@ -39,6 +40,16 @@ Règle : chaque session a sa *branch*, s'inscrit ici, ouvre une PR, et met la li
 </details>
 
 ## ✅ Fait récemment
+
+### 🔐 Clés de l'instance pour la propriétaire seule, inscription fermée (local, 2026-10-05)
+
+Décision : [ADR 0023](fr/adr/0023-cles-de-l-instance-pour-la-proprietaire.md).
+
+- **Toutes** les clés de l'instance ne servent qu'au compte de la propriétaire, Firecrawl compris (avant : tout compte connecté, 30 pages par jour). Les autres comptes mettent leurs propres clés dans les Réglages : nouvelle carte « Pages d'offres » avec une clé Firecrawl facultative (chiffrée, migration `0008_firecrawl_key`, appliquée à Neon). Sans clé : le lecteur intégré, gratuit, ou le texte collé.
+- La propriétaire est reconnue par son **identifiant GitHub numérique** (`OWNER_GITHUB_ID` = 96707268, variable Stripe Projects `owner-github-id`), plus par son pseudo. Sans la variable, personne n'est propriétaire.
+- **Inscription fermée** (instance Clerk de dev) : *allowlist* avec la seule adresse de la propriétaire. `npm run clerk:signup -- status | close | open | probe` ; `probe` joue un inconnu et reçoit `403 not_allowed_access`. L'adresse e2e n'est autorisée que pendant les tests (le *seed* l'ajoute, le *cleanup* la retire).
+- Réglages : carte voix et carte pages d'offres faites du même composant (`components/settings/service-key-form.tsx`) ; troisième case « Pages d'offres » dans l'encart du haut.
+- Vérifié : 202 tests unitaires, e2e 4/4 (écrans FR compris).
 
 ### ⚙️ Réglages et reprise de la to-do du cloud (local, 2026-10-05)
 
@@ -103,6 +114,7 @@ Règle : chaque session a sa *branch*, s'inscrit ici, ouvre une PR, et met la li
 
 ## 🚧 En cours
 
+- 🚀 **Deploy en attente** : le *token* Vercel donné par Stripe Projects a expiré (HTTP 403), et son renouvellement écrit dans le coffre de Stripe : à lancer par la propriétaire (`stripe projects rotate nextround` puis `stripe projects env --pull`). Ensuite : `node scripts/infra/push-env-to-vercel.mjs` (envoie `OWNER_GITHUB_ID` à Vercel, **avant** le *deploy*, sinon la propriétaire perd les clés de l'instance) puis `node scripts/infra/deploy.mjs`.
 - 🔑 **Secrets absents du cloud** : sans eux, ni l'app ni les e2e ne tournent dans une session cloud. Liste : [guide local et cloud](fr/guides/local-et-cloud.md#-les-secrets-dans-le-cloud).
 - 💼 25 offres Actiris (Bruxelles, IT, accessibles à un junior) choisies le 2026-10-04 : à importer avec `npm run owner:import-offers -- .local/offers/*.txt` une fois les secrets en place. Si `.local/offers/` n'existe plus : `npm run offers:actiris -- search`, puis `npm run offers:actiris -- fetch <ref:type> …` (refs : 5953957 5965434 5949141 5952000 5952031 5951701:Select 5947174:Select 5947193 5949293:DirectOnline 5945294 5936584 5947954 5907687 5962926 5959174:DirectOnline 5966908 5964627 5966116 5969827 5934580 5887917 5843176 5905968:Select 5869183 5869129).
 - 🚫 Indeed bloque les robots (Cloudflare, 403) et l'interdit : on ne le contourne pas. Offres Indeed : lien ou texte collé dans l'app.

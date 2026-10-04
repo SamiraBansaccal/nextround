@@ -15,10 +15,10 @@ const env = {
 vi.mock("@/lib/db", () => ({ getDb: () => testDb }));
 vi.mock("@/lib/server/env", () => ({ serverEnv: () => env }));
 
-const { resolveLlmConfig, resolveVoiceConfig } = await import("@/lib/ai/config");
+const { getAiStatus, resolveLlmConfig, resolvePageReader, resolveVoiceConfig } = await import("@/lib/ai/config");
 const { assertAllowedBaseUrl } = await import("@/lib/ai/client");
 const { consumeInstanceQuota } = await import("@/lib/ai/usage");
-const { getPublicAiSettings, saveAiSettings, saveVoiceKey } = await import("@/lib/data/ai-settings");
+const { getPublicAiSettings, saveAiSettings, saveServiceKey } = await import("@/lib/data/ai-settings");
 const { PRESETS } = await import("@/lib/ai/providers");
 
 beforeAll(async () => {
@@ -42,7 +42,7 @@ describe("who pays", () => {
   });
 
   it("voice: user key, else owner instance key, else the free browser voice", async () => {
-    await saveVoiceKey("user_voice", "el_userkey_abc", { provider: "openrouter", baseUrl: PRESETS.openrouter.baseUrl, model: "m" });
+    await saveServiceKey("user_voice", "voice", "el_userkey_abc", { provider: "openrouter", baseUrl: PRESETS.openrouter.baseUrl, model: "m" });
     expect(await resolveVoiceConfig("user_voice", false)).toMatchObject({ provider: "elevenlabs", source: "user" });
     expect(await resolveVoiceConfig("user_owner", true)).toMatchObject({ provider: "elevenlabs", source: "instance" });
     expect(await resolveVoiceConfig("user_nokey", false)).toEqual({ provider: "browser" });
@@ -54,6 +54,23 @@ describe("who pays", () => {
       expect(await resolveVoiceConfig("user_owner", true)).toEqual({ provider: "browser" });
     } finally {
       env.INSTANCE_VOICE_ENABLED = "true";
+    }
+  });
+
+  it("offer pages: user Firecrawl key, else the instance key for the OWNER only, else the free built-in reader", async () => {
+    env.FIRECRAWL_API_API_KEY = "fc-instance";
+    try {
+      await saveServiceKey("user_pages", "firecrawl", "fc-userkey-1234", { provider: "openrouter", baseUrl: PRESETS.openrouter.baseUrl, model: "m" });
+      expect(await resolvePageReader("user_pages", false)).toEqual({ provider: "firecrawl", apiKey: "fc-userkey-1234", source: "user" });
+      expect(await resolvePageReader("user_owner", true)).toEqual({ provider: "firecrawl", apiKey: "fc-instance", source: "instance" });
+      // Another account never gets the instance key: the built-in reader costs nobody anything.
+      expect(await resolvePageReader("user_nokey", false)).toEqual({ provider: "builtin" });
+      expect(await getAiStatus("user_nokey", false)).toMatchObject({ mode: "none", voice: "browser", pages: "builtin" });
+      expect(await getPublicAiSettings("user_pages")).toMatchObject({ hasFirecrawlKey: true, firecrawlKeyLast4: "1234", hasKey: false });
+      await saveServiceKey("user_pages", "firecrawl", null, { provider: "openrouter", baseUrl: PRESETS.openrouter.baseUrl, model: "m" });
+      expect(await resolvePageReader("user_pages", false)).toEqual({ provider: "builtin" });
+    } finally {
+      delete env.FIRECRAWL_API_API_KEY;
     }
   });
 

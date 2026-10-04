@@ -17,6 +17,8 @@ export interface PublicAiSettings {
   keyLast4: string | null;
   hasVoiceKey: boolean;
   voiceKeyLast4: string | null;
+  hasFirecrawlKey: boolean;
+  firecrawlKeyLast4: string | null;
 }
 
 type Row = typeof aiSettings.$inferSelect;
@@ -30,6 +32,8 @@ function toPublic(row: Row): PublicAiSettings {
     keyLast4: row.apiKeyLast4,
     hasVoiceKey: row.elevenlabsKeyEncrypted !== null,
     voiceKeyLast4: row.elevenlabsKeyLast4,
+    hasFirecrawlKey: row.firecrawlKeyEncrypted !== null,
+    firecrawlKeyLast4: row.firecrawlKeyLast4,
   };
 }
 
@@ -50,6 +54,7 @@ export async function getAiSecrets(userId: string): Promise<{
   model: string;
   apiKey: string | null;
   voiceKey: string | null;
+  firecrawlKey: string | null;
 } | null> {
   const row = await getRow(userId);
   if (!row) return null;
@@ -59,6 +64,7 @@ export async function getAiSecrets(userId: string): Promise<{
     model: row.model,
     apiKey: row.apiKeyEncrypted ? decryptSecret(row.apiKeyEncrypted) : null,
     voiceKey: row.elevenlabsKeyEncrypted ? decryptSecret(row.elevenlabsKeyEncrypted) : null,
+    firecrawlKey: row.firecrawlKeyEncrypted ? decryptSecret(row.firecrawlKeyEncrypted) : null,
   };
 }
 
@@ -97,12 +103,17 @@ export async function removeAiKey(userId: string): Promise<void> {
     .where(eq(aiSettings.userId, userId));
 }
 
-/** Stores (or removes, with null) the user's ElevenLabs key. Creates the row if needed. */
-export async function saveVoiceKey(userId: string, voiceKey: string | null, defaults: Omit<SaveAiSettingsInput, "apiKey">): Promise<void> {
+/** The optional keys for services other than the AI: ElevenLabs (voice) and Firecrawl (offer pages). */
+export type ServiceKey = "voice" | "firecrawl";
+
+/** Stores (or removes, with null) the user's key for a service. Creates the row if needed. */
+export async function saveServiceKey(userId: string, service: ServiceKey, key: string | null, defaults: Omit<SaveAiSettingsInput, "apiKey">): Promise<void> {
+  const encrypted = key === null ? null : encryptSecret(key);
+  const shown = key === null ? null : last4(key);
   const keyFields =
-    voiceKey === null
-      ? { elevenlabsKeyEncrypted: null, elevenlabsKeyLast4: null }
-      : { elevenlabsKeyEncrypted: encryptSecret(voiceKey), elevenlabsKeyLast4: last4(voiceKey) };
+    service === "voice"
+      ? { elevenlabsKeyEncrypted: encrypted, elevenlabsKeyLast4: shown }
+      : { firecrawlKeyEncrypted: encrypted, firecrawlKeyLast4: shown };
   await getDb()
     .insert(aiSettings)
     .values({ userId, ...defaults, ...keyFields })

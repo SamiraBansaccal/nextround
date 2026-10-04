@@ -57,6 +57,13 @@
       "when": 1791150431827,
       "tag": "0007_leetcode_source",
       "breakpoints": true
+    },
+    {
+      "idx": 8,
+      "version": "7",
+      "when": 1791156120539,
+      "tag": "0008_firecrawl_key",
+      "breakpoints": true
     }
   ]
 }

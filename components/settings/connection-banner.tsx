@@ -1,11 +1,11 @@
-import { KeyRound, Plug, Sparkles, Volume2 } from "lucide-react";
+import { FileSearch, KeyRound, Plug, Sparkles, Volume2 } from "lucide-react";
 import { WithCode } from "@/components/shared/with-code";
 import type { AiStatus } from "@/lib/ai/config";
 import type { SettingsCopy } from "@/lib/i18n/settings";
 import { fill } from "@/lib/interview/copy";
 
-// The top of the Settings page: what is connected right now (AI and voice), with a plain word on
-// OpenRouter and on the instance key's limits, so nobody has to guess what the big words mean.
+// The top of the Settings page: what is connected right now (AI, voice, offer pages), with a plain word on
+// OpenRouter and on the instance keys' limits, so nobody has to guess what the big words mean.
 
 interface Props {
   status: AiStatus;
@@ -17,6 +17,7 @@ interface Props {
 
 export function ConnectionBanner({ status, usage, limits, t }: Props) {
   const voice = status.voice === "browser" ? t.voiceBrowser : status.voice === "own_key" ? t.voiceElevenOwn : t.voiceElevenInstance;
+  const pages = status.pages === "builtin" ? t.pagesBuiltin : status.pages === "own_key" ? t.pagesFirecrawl : t.pagesFirecrawlInstance;
   return (
     <section aria-labelledby="connected-title" className="overflow-hidden rounded-2xl bg-earth text-earth-foreground shadow-soft">
       <div className="grid gap-8 p-6 sm:p-8 lg:grid-cols-[minmax(0,1.15fr)_minmax(0,1fr)]">
@@ -52,6 +53,15 @@ export function ConnectionBanner({ status, usage, limits, t }: Props) {
               </dt>
               <dd className="mt-1 font-display text-xl">{voice}</dd>
               {status.voice === "browser" && <dd className="mt-1.5 text-sm opacity-85">{t.voiceBrowserNote}</dd>}
+            </div>
+            <div className="rounded-xl bg-white/10 p-4 sm:col-span-2">
+              <dt className="flex items-center gap-1.5 text-xs font-semibold tracking-wide uppercase opacity-75">
+                <FileSearch className="size-3.5" aria-hidden="true" /> {t.pagesLabel}
+              </dt>
+              <dd className="mt-1 flex flex-wrap items-baseline gap-x-3 gap-y-1">
+                <span className="font-display text-xl">{pages}</span>
+                {status.pages === "builtin" && <span className="text-sm opacity-85">{t.pagesBuiltinNote}</span>}
+              </dd>
             </div>
           </dl>
           {usage && (

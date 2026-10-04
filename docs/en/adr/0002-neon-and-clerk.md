@@ -3,7 +3,7 @@
 > 🇫🇷 French version: [fr/adr/0002](../../fr/adr/0002-neon-et-clerk.md)
 
 - **Date:** 2026-10-03
-- **Status:** ✅ accepted
+- **Status:** ✅ accepted, amended by [ADR 0023](0023-instance-keys-for-the-owner-only.md) (the owner is recognised by her numeric GitHub id; sign-up closed during development)
 
 ## 🎯 Context
 

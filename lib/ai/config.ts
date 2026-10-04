@@ -49,17 +49,35 @@ export async function resolveVoiceConfig(userId: string, isOwner: boolean): Prom
   return { provider: "browser" };
 }
 
+export type PageReader =
+  | { provider: "firecrawl"; apiKey: string; source: "user" | "instance" }
+  | { provider: "builtin" }; // free: the server fetches the page itself (lib/offers/fetch-page.ts)
+
+/**
+ * Who reads an offer's page from its link: the user's Firecrawl key, else the instance key for the owner
+ * ONLY (rate limited), else the built-in reader, which some sites block (then the user pastes the text).
+ */
+export async function resolvePageReader(userId: string, isOwner: boolean): Promise<PageReader> {
+  const saved = await getAiSecrets(userId);
+  if (saved?.firecrawlKey) return { provider: "firecrawl", apiKey: saved.firecrawlKey, source: "user" };
+  const instanceKey = serverEnv().FIRECRAWL_API_API_KEY;
+  if (isOwner && instanceKey) return { provider: "firecrawl", apiKey: instanceKey, source: "instance" };
+  return { provider: "builtin" };
+}
+
 /** What the UI may know about the AI in use (never a key). */
 export interface AiStatus {
   mode: "own_key" | "instance" | "none";
   providerLabel: string | null;
   model: string | null;
   voice: "own_key" | "instance" | "browser";
+  pages: "own_key" | "instance" | "builtin";
 }
 
 export async function getAiStatus(userId: string, isOwner: boolean): Promise<AiStatus> {
-  const voice = await resolveVoiceConfig(userId, isOwner);
+  const [voice, reader] = await Promise.all([resolveVoiceConfig(userId, isOwner), resolvePageReader(userId, isOwner)]);
   const voiceMode = voice.provider === "browser" ? "browser" : voice.source === "user" ? "own_key" : "instance";
+  const pages = reader.provider === "builtin" ? "builtin" : reader.source === "user" ? "own_key" : "instance";
   try {
     const llm = await resolveLlmConfig(userId, isOwner);
     const preset = Object.values(PRESETS).find((p) => p.baseUrl === llm.baseUrl);
@@ -68,8 +86,9 @@ export async function getAiStatus(userId: string, isOwner: boolean): Promise<AiS
       providerLabel: preset?.label ?? "Custom",
       model: llm.model,
       voice: voiceMode,
+      pages,
     };
   } catch {
-    return { mode: "none", providerLabel: null, model: null, voice: voiceMode };
+    return { mode: "none", providerLabel: null, model: null, voice: voiceMode, pages };
   }
 }
