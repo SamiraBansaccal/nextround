@@ -25,10 +25,7 @@ import {
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { type ReactNode, useRef, useState, useTransition } from "react";
-import {
-  TailoredCvDocument,
-  TailoredLetterDocument,
-} from "@/components/documents/tailored-document";
+import { TailoredCvDocument, TailoredLetterDocument } from "@/components/documents/tailored-document";
 import { PageHeading, SectionHeading } from "@/components/layout/page-heading";
 import { CvDocumentView } from "@/components/profile/cv-document";
 import { EditableLine } from "@/components/shared/editable-line";
@@ -36,13 +33,9 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import type { ProfileCopy } from "@/lib/i18n/profile";
 import { fill } from "@/lib/interview/copy";
+import type { DocEditPath } from "@/lib/documents/edit";
 import type { CvEditPath } from "@/lib/profile/cv-edit";
-import type {
-  CvDocument,
-  FactType,
-  TailoredCv,
-  TailoredLetter,
-} from "@/lib/types";
+import type { CvDocument, FactType, TailoredCv, TailoredLetter } from "@/lib/types";
 import { cn } from "@/lib/utils";
 
 // The profile: every CV the candidate added, one of them shown as a document, and the profile merged
@@ -85,9 +78,7 @@ export interface SelectedCv {
   hasText: boolean; // false for CVs added before the text was kept: they must be added again
 }
 
-type Result =
-  | { ok: true; message: string; sourceId?: string }
-  | { ok: false; error: string };
+type Result = { ok: true; message: string; sourceId?: string } | { ok: false; error: string };
 
 interface Props {
   t: ProfileCopy;
@@ -115,34 +106,16 @@ interface Props {
     importGithub: () => Promise<Result>;
     importCodewars: (username: string) => Promise<Result>;
     importLeetcode: (username: string) => Promise<Result>;
-    importCvText: (input: {
-      fileName: string;
-      text: string;
-    }) => Promise<Result>;
+    importCvText: (input: { fileName: string; text: string }) => Promise<Result>;
     removeCv: (sourceId: string) => Promise<Result>;
     structureCv: (sourceId: string) => Promise<Result>;
-    editCvLine: (input: {
-      sourceId: string;
-      path: CvEditPath;
-      value: string;
-    }) => Promise<Result>;
-    chatFacts: (
-      answers: { question: string; answer: string }[],
-    ) => Promise<Result>;
+    editCvLine: (input: { sourceId: string; path: CvEditPath; value: string }) => Promise<Result>;
+    chatFacts: (answers: { question: string; answer: string }[]) => Promise<Result>;
     reject: (ids: string[]) => Promise<Result>;
-    edit: (input: {
-      id: string;
-      text: string;
-      mergedIds: string[];
-    }) => Promise<Result>;
-    setAiAssisted: (input: {
-      id: string;
-      aiAssisted: boolean;
-    }) => Promise<Result>;
-    keepDocument: (input: {
-      id: string;
-      kept: boolean;
-    }) => Promise<{ ok: true } | { ok: false; error: string }>;
+    edit: (input: { id: string; text: string; mergedIds: string[] }) => Promise<Result>;
+    setAiAssisted: (input: { id: string; aiAssisted: boolean }) => Promise<Result>;
+    keepDocument: (input: { id: string; kept: boolean }) => Promise<{ ok: true } | { ok: false; error: string }>;
+    editDocumentLine: (input: { id: string; path: DocEditPath; value: string }) => Promise<{ ok: true } | { ok: false; error: string }>;
     addManual: (input: { type: FactType; text: string }) => Promise<Result>;
   };
 }
@@ -169,17 +142,7 @@ async function pdfToText(file: File): Promise<string> {
   return (Array.isArray(text) ? text.join("\n") : text).trim();
 }
 
-export function ProfileLibrary({
-  t,
-  candidate,
-  cvs,
-  keptDocuments,
-  selectedCv,
-  selectedDocument,
-  facts,
-  factTexts,
-  actions,
-}: Props) {
+export function ProfileLibrary({ t, candidate, cvs, keptDocuments, selectedCv, selectedDocument, facts, factTexts, actions }: Props) {
   const router = useRouter();
   const fileInput = useRef<HTMLInputElement>(null);
   const [pending, startTransition] = useTransition();
@@ -200,23 +163,16 @@ export function ProfileLibrary({
     type: "skill",
     text: "",
   });
-  const uploading = uploads.some(
-    (u) => u.status === "reading" || u.status === "analysing",
-  );
+  const uploading = uploads.some((u) => u.status === "reading" || u.status === "analysing");
   const lineCopy = { editLine: t.editLine, save: t.save, cancel: t.cancel };
 
-  const selectCv = (id: string) =>
-    router.push(`/profile?cv=${id}`, { scroll: false });
+  const selectCv = (id: string) => router.push(`/profile?cv=${id}`, { scroll: false });
 
   function run(action: () => Promise<Result>, after?: () => void) {
     setMessage(null);
     startTransition(async () => {
       const result = await action();
-      setMessage(
-        result.ok
-          ? { kind: "success", text: result.message }
-          : { kind: "error", text: result.error },
-      );
+      setMessage(result.ok ? { kind: "success", text: result.message } : { kind: "error", text: result.error });
       if (result.ok) after?.();
     });
   }
@@ -230,6 +186,16 @@ export function ProfileLibrary({
     return result.ok;
   }
 
+  /** The pencil on each sentence of a kept CV or letter: saved in place. */
+  const documentEditing = (id: string) => ({
+    t: { ...lineCopy, emptyRemoves: t.emptyRemoves },
+    save: (path: DocEditPath, value: string) =>
+      saveLine(async () => {
+        const result = await actions.editDocumentLine({ id, path, value });
+        return result.ok ? { ok: true, message: "" } : result;
+      }),
+  });
+
   async function handleFiles(list: FileList | null) {
     const files = Array.from(list ?? []);
     if (fileInput.current) fileInput.current.value = "";
@@ -239,17 +205,8 @@ export function ProfileLibrary({
     let added: string | undefined;
     // One CV after the other: each one is read in the browser, then analysed by the AI.
     for (const [i, file] of files.entries()) {
-      const update = (
-        status: "reading" | "analysing" | "done" | "error",
-        note?: string,
-      ) =>
-        setUploads((u) =>
-          u.map((x, j) => (j === i ? { ...x, status, note } : x)),
-        );
-      if (
-        !/\.pdf$/i.test(file.name) ||
-        (file.type && file.type !== "application/pdf")
-      ) {
+      const update = (status: "reading" | "analysing" | "done" | "error", note?: string) => setUploads((u) => u.map((x, j) => (j === i ? { ...x, status, note } : x)));
+      if (!/\.pdf$/i.test(file.name) || (file.type && file.type !== "application/pdf")) {
         update("error", t.pdfOnly);
         continue;
       }
@@ -266,10 +223,7 @@ export function ProfileLibrary({
       }
       update("analysing");
       const result = await actions.importCvText({ fileName: file.name, text });
-      update(
-        result.ok ? "done" : "error",
-        result.ok ? result.message : result.error,
-      );
+      update(result.ok ? "done" : "error", result.ok ? result.message : result.error);
       if (result.ok && result.sourceId) added = result.sourceId;
     }
     if (added) selectCv(added); // show the CV just added as a document
@@ -279,33 +233,16 @@ export function ProfileLibrary({
     <div className="space-y-8">
       <div className="no-print space-y-6">
         <PageHeading eyebrow={t.eyebrow} title={t.title}>
-          <input
-            ref={fileInput}
-            type="file"
-            accept="application/pdf,.pdf"
-            multiple
-            className="sr-only"
-            onChange={(e) => handleFiles(e.target.files)}
-            aria-label={t.addCvsLabel}
-          />
-          <Button
-            onClick={() => fileInput.current?.click()}
-            disabled={uploading}
-            className="w-full sm:w-auto"
-          >
+          <input ref={fileInput} type="file" accept="application/pdf,.pdf" multiple className="sr-only" onChange={(e) => handleFiles(e.target.files)} aria-label={t.addCvsLabel} />
+          <Button onClick={() => fileInput.current?.click()} disabled={uploading} className="w-full sm:w-auto">
             <Upload className="size-4" aria-hidden="true" /> {t.addCvs}
           </Button>
         </PageHeading>
 
-        <p className="-mt-4 max-w-3xl text-sm leading-relaxed text-muted-foreground">
-          {t.intro}
-        </p>
+        <p className="-mt-4 max-w-3xl text-sm leading-relaxed text-muted-foreground">{t.intro}</p>
 
         {message && (
-          <p
-            role="status"
-            className={`text-sm ${message.kind === "error" ? "text-destructive" : "text-success"}`}
-          >
+          <p role="status" className={`text-sm ${message.kind === "error" ? "text-destructive" : "text-success"}`}>
             {message.text}
           </p>
         )}
@@ -316,11 +253,7 @@ export function ProfileLibrary({
             eyebrow={t.libraryEyebrow}
             title={t.libraryTitle}
             id="library-title"
-            aside={
-              <span className="text-sm text-muted-foreground">
-                {fill(t.cvCount, { count: cvs.length })}
-              </span>
-            }
+            aside={<span className="text-sm text-muted-foreground">{fill(t.cvCount, { count: cvs.length })}</span>}
           />
           {uploads.length > 0 && (
             <ul className="mb-4 space-y-1 text-sm" aria-live="polite">
@@ -331,19 +264,10 @@ export function ProfileLibrary({
                   ) : u.status === "error" ? (
                     <X className="size-4 text-gap" aria-hidden="true" />
                   ) : (
-                    <Loader2
-                      className="size-4 animate-spin"
-                      aria-hidden="true"
-                    />
+                    <Loader2 className="size-4 animate-spin" aria-hidden="true" />
                   )}
                   <span className="font-medium">{u.name}</span>
-                  <span className="text-muted-foreground">
-                    {u.status === "reading"
-                      ? t.readingPdf
-                      : u.status === "analysing"
-                        ? t.analysing
-                        : u.note}
-                  </span>
+                  <span className="text-muted-foreground">{u.status === "reading" ? t.readingPdf : u.status === "analysing" ? t.analysing : u.note}</span>
                 </li>
               ))}
             </ul>
@@ -354,21 +278,13 @@ export function ProfileLibrary({
               return (
                 <article
                   key={cv.id}
-                  className={cn(
-                    "grid grid-cols-[auto_minmax(0,1fr)_auto] items-center gap-3 border p-2.5",
-                    shown
-                      ? "border-primary bg-primary-soft/45"
-                      : "border-earth/20 bg-card",
-                  )}
+                  className={cn("grid grid-cols-[auto_minmax(0,1fr)_auto] items-center gap-3 border p-2.5", shown ? "border-primary bg-primary-soft/45" : "border-earth/20 bg-card")}
                 >
                   <span className="grid size-8 shrink-0 place-items-center bg-earth text-earth-foreground">
                     <FileText className="size-4" aria-hidden="true" />
                   </span>
                   <div className="min-w-0">
-                    <h3
-                      className="truncate font-sans text-sm font-bold"
-                      title={cv.fileName}
-                    >
+                    <h3 className="truncate font-sans text-sm font-bold" title={cv.fileName}>
                       {cv.fileName.replace(/\.pdf$/i, "")}
                     </h3>
                     <p className="mt-0.5 text-xs text-muted-foreground">
@@ -379,12 +295,7 @@ export function ProfileLibrary({
                     </p>
                   </div>
                   <div className="flex items-center gap-1">
-                    <Button
-                      size="sm"
-                      variant={shown ? "default" : "outline"}
-                      onClick={() => selectCv(cv.id)}
-                      aria-pressed={shown}
-                    >
+                    <Button size="sm" variant={shown ? "default" : "outline"} onClick={() => selectCv(cv.id)} aria-pressed={shown}>
                       {shown ? t.shown : t.show}
                     </Button>
                     <Button
@@ -407,38 +318,22 @@ export function ProfileLibrary({
               return (
                 <article
                   key={doc.id}
-                  className={cn(
-                    "grid grid-cols-[auto_minmax(0,1fr)_auto] items-center gap-3 border p-2.5",
-                    shown
-                      ? "border-primary bg-primary-soft/45"
-                      : "border-earth/20 bg-card",
-                  )}
+                  className={cn("grid grid-cols-[auto_minmax(0,1fr)_auto] items-center gap-3 border p-2.5", shown ? "border-primary bg-primary-soft/45" : "border-earth/20 bg-card")}
                 >
                   <span className="grid size-8 shrink-0 place-items-center bg-terracotta text-white">
                     <FileText className="size-4" aria-hidden="true" />
                   </span>
                   <div className="min-w-0">
-                    <h3
-                      className="truncate font-sans text-sm font-bold"
-                      title={doc.title}
-                    >
+                    <h3 className="truncate font-sans text-sm font-bold" title={doc.title}>
                       {doc.title}
                     </h3>
                     <p className="mt-0.5 text-xs text-muted-foreground">
                       {doc.kind === "cv" ? t.keptCv : t.keptLetter}
-                      {doc.language &&
-                        ` · ${doc.language.toUpperCase()}`} · {doc.createdOn}
+                      {doc.language && ` · ${doc.language.toUpperCase()}`} · {doc.createdOn}
                     </p>
                   </div>
                   <div className="flex items-center gap-1">
-                    <Button
-                      size="sm"
-                      variant={shown ? "default" : "outline"}
-                      onClick={() =>
-                        router.push(`/profile?doc=${doc.id}`, { scroll: false })
-                      }
-                      aria-pressed={shown}
-                    >
+                    <Button size="sm" variant={shown ? "default" : "outline"} onClick={() => router.push(`/profile?doc=${doc.id}`, { scroll: false })} aria-pressed={shown}>
                       {shown ? t.shown : t.show}
                     </Button>
                     <Button
@@ -454,9 +349,7 @@ export function ProfileLibrary({
                             id: doc.id,
                             kept: false,
                           });
-                          return result.ok
-                            ? { ok: true, message: t.takenOut }
-                            : result;
+                          return result.ok ? { ok: true, message: t.takenOut } : result;
                         })
                       }
                     >
@@ -474,9 +367,7 @@ export function ProfileLibrary({
             >
               <FilePlus2 className="size-5 text-primary" aria-hidden="true" />
               <span className="min-w-0">
-                <span className="block text-sm font-bold text-foreground">
-                  {cvs.length ? t.addMoreCvs : t.addFirstCv}
-                </span>
+                <span className="block text-sm font-bold text-foreground">{cvs.length ? t.addMoreCvs : t.addFirstCv}</span>
                 <span className="block truncate text-xs">{t.uploadHint}</span>
               </span>
             </button>
@@ -489,35 +380,23 @@ export function ProfileLibrary({
         <section aria-labelledby="preview-title">
           <div className="no-print">
             <SectionHeading
-              eyebrow={
-                selectedDocument.content.kind === "tailored_cv"
-                  ? t.keptCv
-                  : t.keptLetter
-              }
+              eyebrow={selectedDocument.content.kind === "tailored_cv" ? t.keptCv : t.keptLetter}
               title={selectedDocument.title}
               id="preview-title"
               aside={
                 <div className="flex gap-2">
                   {selectedDocument.href && (
                     <Button size="sm" variant="outline" asChild>
-                      <Link href={selectedDocument.href}>
-                        {t.openWithOffer}
-                      </Link>
+                      <Link href={selectedDocument.href}>{t.openWithOffer}</Link>
                     </Button>
                   )}
-                  <Button
-                    size="sm"
-                    variant="outline"
-                    onClick={() => window.print()}
-                  >
+                  <Button size="sm" variant="outline" onClick={() => window.print()}>
                     <Printer className="size-4" aria-hidden="true" /> PDF
                   </Button>
                 </div>
               }
             />
-            <p className="-mt-2 mb-4 text-sm text-muted-foreground">
-              {t.keptHint}
-            </p>
+            <p className="-mt-2 mb-4 text-sm text-muted-foreground">{t.keptHint}</p>
           </div>
           {selectedDocument.content.kind === "tailored_cv" ? (
             <TailoredCvDocument
@@ -527,13 +406,11 @@ export function ProfileLibrary({
                 contacts: selectedDocument.contacts,
               }}
               facts={factTexts}
+              edit={documentEditing(selectedDocument.id)}
             />
           ) : (
             <article className="print-page bg-card p-8 shadow-soft">
-              <TailoredLetterDocument
-                letter={selectedDocument.content}
-                facts={factTexts}
-              />
+              <TailoredLetterDocument letter={selectedDocument.content} facts={factTexts} edit={documentEditing(selectedDocument.id)} />
             </article>
           )}
         </section>
@@ -550,38 +427,19 @@ export function ProfileLibrary({
               aside={
                 <div className="flex flex-wrap gap-2">
                   {selectedCv.hasText && (
-                    <Button
-                      size="sm"
-                      variant="outline"
-                      disabled={pending}
-                      onClick={() =>
-                        run(() => actions.structureCv(selectedCv.id))
-                      }
-                    >
-                      <RefreshCw
-                        className={cn("size-4", pending && "animate-spin")}
-                        aria-hidden="true"
-                      />{" "}
-                      {selectedCv.document ? t.layOutAgain : t.layOut}
+                    <Button size="sm" variant="outline" disabled={pending} onClick={() => run(() => actions.structureCv(selectedCv.id))}>
+                      <RefreshCw className={cn("size-4", pending && "animate-spin")} aria-hidden="true" /> {selectedCv.document ? t.layOutAgain : t.layOut}
                     </Button>
                   )}
                   {selectedCv.document && (
-                    <Button
-                      size="sm"
-                      variant="outline"
-                      onClick={() => window.print()}
-                    >
+                    <Button size="sm" variant="outline" onClick={() => window.print()}>
                       <Printer className="size-4" aria-hidden="true" /> PDF
                     </Button>
                   )}
                 </div>
               }
             />
-            {selectedCv.document && (
-              <p className="-mt-2 mb-4 text-sm text-muted-foreground">
-                {t.cvHint}
-              </p>
-            )}
+            {selectedCv.document && <p className="-mt-2 mb-4 text-sm text-muted-foreground">{t.cvHint}</p>}
           </div>
           {selectedCv.document ? (
             <CvDocumentView
@@ -601,9 +459,7 @@ export function ProfileLibrary({
               }}
             />
           ) : (
-            <div className="no-print border border-dashed border-earth/30 p-8 text-center text-sm text-muted-foreground">
-              {selectedCv.hasText ? t.notLaidOut : t.noText}
-            </div>
+            <div className="no-print border border-dashed border-earth/30 p-8 text-center text-sm text-muted-foreground">{selectedCv.hasText ? t.notLaidOut : t.noText}</div>
           )}
         </section>
       )}
@@ -611,49 +467,21 @@ export function ProfileLibrary({
       <div className="no-print space-y-8">
         {/* ---------- The merged profile ---------- */}
         <section aria-labelledby="base-title">
-          <SectionHeading
-            eyebrow={t.baseEyebrow}
-            title={t.baseTitle}
-            id="base-title"
-            aside={
-              <span className="text-sm text-muted-foreground">
-                {fill(t.factCount, { count: facts.length })}
-              </span>
-            }
-          />
-          <p className="-mt-2 mb-4 max-w-3xl text-sm text-muted-foreground">
-            {t.baseHint}
-          </p>
-          <article
-            className="overflow-hidden border border-earth/20 bg-card shadow-soft"
-            aria-label={fill(t.baseOf, { name: candidate.name })}
-          >
+          <SectionHeading eyebrow={t.baseEyebrow} title={t.baseTitle} id="base-title" aside={<span className="text-sm text-muted-foreground">{fill(t.factCount, { count: facts.length })}</span>} />
+          <p className="-mt-2 mb-4 max-w-3xl text-sm text-muted-foreground">{t.baseHint}</p>
+          <article className="overflow-hidden border border-earth/20 bg-card shadow-soft" aria-label={fill(t.baseOf, { name: candidate.name })}>
             <header className="flex items-center gap-4 bg-primary-soft/55 px-5 py-4 sm:px-8">
               {candidate.imageUrl && (
                 // eslint-disable-next-line @next/next/no-img-element -- remote avatar from Clerk
-                <img
-                  src={candidate.imageUrl}
-                  width={56}
-                  height={56}
-                  alt=""
-                  className="aspect-square w-14 shrink-0 border-2 border-primary object-cover"
-                />
+                <img src={candidate.imageUrl} width={56} height={56} alt="" className="aspect-square w-14 shrink-0 border-2 border-primary object-cover" />
               )}
               <div className="min-w-0">
-                <h3 className="truncate text-2xl text-earth dark:text-foreground">
-                  {candidate.name}
-                </h3>
-                {candidate.githubLogin && (
-                  <p className="mt-1 text-sm text-muted-foreground">
-                    github.com/{candidate.githubLogin}
-                  </p>
-                )}
+                <h3 className="truncate text-2xl text-earth dark:text-foreground">{candidate.name}</h3>
+                {candidate.githubLogin && <p className="mt-1 text-sm text-muted-foreground">github.com/{candidate.githubLogin}</p>}
               </div>
             </header>
             <div className="px-5 py-2 sm:px-8">
-              {facts.length === 0 && (
-                <p className="text-sm text-muted-foreground">{t.nothingYet}</p>
-              )}
+              {facts.length === 0 && <p className="text-sm text-muted-foreground">{t.nothingYet}</p>}
               {SECTIONS.map(({ type, Icon }) => {
                 const all = facts.filter((f) => f.type === type);
                 if (all.length === 0) return null;
@@ -674,18 +502,12 @@ export function ProfileLibrary({
                         }),
                       )
                     }
-                    onDelete={() =>
-                      run(() => actions.reject([fact.id, ...fact.mergedIds]))
-                    }
+                    onDelete={() => run(() => actions.reject([fact.id, ...fact.mergedIds]))}
                     onToggleAi={
                       type === "project"
                         ? (aiAssisted) =>
                             run(async () => {
-                              const results = await Promise.all(
-                                [fact.id, ...fact.mergedIds].map((id) =>
-                                  actions.setAiAssisted({ id, aiAssisted }),
-                                ),
-                              );
+                              const results = await Promise.all([fact.id, ...fact.mergedIds].map((id) => actions.setAiAssisted({ id, aiAssisted })));
                               return results.find((r) => !r.ok) ?? results[0];
                             })
                         : undefined
@@ -696,22 +518,15 @@ export function ProfileLibrary({
                 return (
                   <section key={type} className="py-3">
                     <h4 className="mb-2 flex items-center gap-2 border-b-2 border-primary pb-1.5 font-sans text-base font-bold text-earth uppercase dark:text-foreground">
-                      <Icon
-                        className="size-4 text-primary"
-                        aria-hidden="true"
-                      />{" "}
-                      {t.sections[type]}
+                      <Icon className="size-4 text-primary" aria-hidden="true" /> {t.sections[type]}
                     </h4>
                     <ul className="space-y-1">{own.map(row)}</ul>
                     {vibe.length > 0 && (
                       <div className="mt-3 rounded-lg border border-dashed border-earth/30 p-3">
                         <p className="flex items-center gap-2 text-xs font-bold text-muted-foreground uppercase">
-                          <Sparkles className="size-3.5" aria-hidden="true" />{" "}
-                          {t.builtWithAiTitle}
+                          <Sparkles className="size-3.5" aria-hidden="true" /> {t.builtWithAiTitle}
                         </p>
-                        <p className="mt-1 text-xs text-muted-foreground">
-                          {t.builtWithAiHint}
-                        </p>
+                        <p className="mt-1 text-xs text-muted-foreground">{t.builtWithAiHint}</p>
                         <ul className="mt-2 space-y-1">{vibe.map(row)}</ul>
                       </div>
                     )}
@@ -728,79 +543,31 @@ export function ProfileLibrary({
             icon={<FolderGit2 className="size-4" aria-hidden="true" />}
             eyebrow={t.githubEyebrow}
             title={t.githubTitle}
-            body={
-              candidate.githubLogin
-                ? fill(t.githubBody, { login: candidate.githubLogin })
-                : t.githubSignIn
-            }
+            body={candidate.githubLogin ? fill(t.githubBody, { login: candidate.githubLogin }) : t.githubSignIn}
           >
-            <Button
-              variant="outline"
-              className="w-fit"
-              disabled={pending || !candidate.githubLogin}
-              onClick={() => run(actions.importGithub)}
-            >
-              {pending ? (
-                <RefreshCw className="size-4 animate-spin" aria-hidden="true" />
-              ) : (
-                <FolderGit2 className="size-4" aria-hidden="true" />
-              )}{" "}
-              {t.importRepos}
+            <Button variant="outline" className="w-fit" disabled={pending || !candidate.githubLogin} onClick={() => run(actions.importGithub)}>
+              {pending ? <RefreshCw className="size-4 animate-spin" aria-hidden="true" /> : <FolderGit2 className="size-4" aria-hidden="true" />} {t.importRepos}
             </Button>
           </ImportSection>
 
           {/* ---------- Codewars and LeetCode ---------- */}
-          <ImportSection
-            icon={<Swords className="size-4" aria-hidden="true" />}
-            eyebrow={t.challengesEyebrow}
-            title={t.challengesTitle}
-            body={t.challengesBody}
-          >
+          <ImportSection icon={<Swords className="size-4" aria-hidden="true" />} eyebrow={t.challengesEyebrow} title={t.challengesTitle} body={t.challengesBody}>
             <div className="grid gap-2 sm:grid-cols-2">
-              <ChallengeInput
-                label={t.codewarsUser}
-                value={codewars}
-                onChange={setCodewars}
-                button={t.import}
-                disabled={pending}
-                onImport={() =>
-                  run(() => actions.importCodewars(codewars.trim()))
-                }
-              />
-              <ChallengeInput
-                label={t.leetcodeUser}
-                value={leetcode}
-                onChange={setLeetcode}
-                button={t.import}
-                disabled={pending}
-                onImport={() =>
-                  run(() => actions.importLeetcode(leetcode.trim()))
-                }
-              />
+              <ChallengeInput label={t.codewarsUser} value={codewars} onChange={setCodewars} button={t.import} disabled={pending} onImport={() => run(() => actions.importCodewars(codewars.trim()))} />
+              <ChallengeInput label={t.leetcodeUser} value={leetcode} onChange={setLeetcode} button={t.import} disabled={pending} onImport={() => run(() => actions.importLeetcode(leetcode.trim()))} />
             </div>
           </ImportSection>
 
           {/* ---------- Onboarding chat ---------- */}
-          <OnboardingChat
-            t={t}
-            pending={pending}
-            onFinish={(answers) => run(() => actions.chatFacts(answers))}
-          />
+          <OnboardingChat t={t} pending={pending} onFinish={(answers) => run(() => actions.chatFacts(answers))} />
 
           {/* ---------- By hand ---------- */}
-          <ImportSection
-            icon={<Plus className="size-4" aria-hidden="true" />}
-            eyebrow={t.manualEyebrow}
-            title={t.manualTitle}
-            body={t.manualBody}
-          >
+          <ImportSection icon={<Plus className="size-4" aria-hidden="true" />} eyebrow={t.manualEyebrow} title={t.manualTitle} body={t.manualBody}>
             <div className="flex w-full flex-col gap-2 sm:flex-row">
               <select
                 className="h-9 rounded-md border bg-transparent px-2 text-sm"
                 value={manual.type}
-                onChange={(e) =>
-                  setManual((m) => ({ ...m, type: e.target.value as FactType }))
-                }
+                onChange={(e) => setManual((m) => ({ ...m, type: e.target.value as FactType }))}
                 aria-label={t.factType}
               >
                 {SECTIONS.map((s) => (
@@ -809,15 +576,7 @@ export function ProfileLibrary({
                   </option>
                 ))}
               </select>
-              <Input
-                placeholder={t.factPlaceholder}
-                value={manual.text}
-                onChange={(e) =>
-                  setManual((m) => ({ ...m, text: e.target.value }))
-                }
-                aria-label={t.factText}
-                className="sm:flex-1"
-              />
+              <Input placeholder={t.factPlaceholder} value={manual.text} onChange={(e) => setManual((m) => ({ ...m, text: e.target.value }))} aria-label={t.factText} className="sm:flex-1" />
               <Button
                 disabled={pending || manual.text.trim().length < 3}
                 onClick={() =>
@@ -866,8 +625,7 @@ function FactRow({
         <EditableLine value={fact.text} onSave={onSave} t={lineCopy} />{" "}
         <span className="text-xs text-muted-foreground">
           · {fact.origin}
-          {also > 0 &&
-            ` · ${also === 1 ? t.alsoInOne : fill(t.alsoInMany, { count: also })}`}
+          {also > 0 && ` · ${also === 1 ? t.alsoInOne : fill(t.alsoInMany, { count: also })}`}
         </span>
       </span>
       <span className="flex shrink-0 items-center gap-1">
@@ -880,13 +638,10 @@ function FactRow({
             title={fact.aiAssisted ? t.aiToggleOn : t.aiToggleOff}
             className={cn(
               "inline-flex h-6 items-center gap-1 rounded-full border px-2 text-[11px] transition-colors disabled:opacity-50",
-              fact.aiAssisted
-                ? "border-terracotta/40 bg-terracotta-soft text-terracotta"
-                : "border-earth/20 text-muted-foreground hover:text-foreground",
+              fact.aiAssisted ? "border-terracotta/40 bg-terracotta-soft text-terracotta" : "border-earth/20 text-muted-foreground hover:text-foreground",
             )}
           >
-            <Sparkles className="size-3" aria-hidden="true" />{" "}
-            {fact.aiAssisted ? t.aiOn : t.aiOff}
+            <Sparkles className="size-3" aria-hidden="true" /> {fact.aiAssisted ? t.aiOn : t.aiOff}
           </button>
         )}
         <button
@@ -920,64 +675,30 @@ function ChallengeInput({
 }) {
   return (
     <div className="flex gap-2">
-      <Input
-        placeholder={label}
-        value={value}
-        onChange={(e) => onChange(e.target.value)}
-        aria-label={label}
-        className="min-w-0"
-      />
-      <Button
-        variant="outline"
-        disabled={disabled || !value.trim()}
-        onClick={onImport}
-      >
+      <Input placeholder={label} value={value} onChange={(e) => onChange(e.target.value)} aria-label={label} className="min-w-0" />
+      <Button variant="outline" disabled={disabled || !value.trim()} onClick={onImport}>
         {button}
       </Button>
     </div>
   );
 }
 
-function ImportSection({
-  icon,
-  eyebrow,
-  title,
-  body,
-  children,
-}: {
-  icon: ReactNode;
-  eyebrow: string;
-  title: string;
-  body: string;
-  children: ReactNode;
-}) {
+function ImportSection({ icon, eyebrow, title, body, children }: { icon: ReactNode; eyebrow: string; title: string; body: string; children: ReactNode }) {
   return (
     <section className="flex flex-col gap-3 border-b border-earth/20 py-4">
       <div>
         <p className="flex items-center gap-2 text-xs font-bold text-terracotta uppercase">
           {icon} {eyebrow}
         </p>
-        <h2 className="mt-1 text-lg text-earth dark:text-foreground">
-          {title}
-        </h2>
-        <p className="mt-0.5 text-sm leading-relaxed text-muted-foreground">
-          {body}
-        </p>
+        <h2 className="mt-1 text-lg text-earth dark:text-foreground">{title}</h2>
+        <p className="mt-0.5 text-sm leading-relaxed text-muted-foreground">{body}</p>
       </div>
       {children}
     </section>
   );
 }
 
-function OnboardingChat({
-  t,
-  pending,
-  onFinish,
-}: {
-  t: ProfileCopy;
-  pending: boolean;
-  onFinish: (answers: { question: string; answer: string }[]) => void;
-}) {
+function OnboardingChat({ t, pending, onFinish }: { t: ProfileCopy; pending: boolean; onFinish: (answers: { question: string; answer: string }[]) => void }) {
   const questions = t.chatQuestions;
   const [open, setOpen] = useState(false);
   const [answers, setAnswers] = useState<string[]>([]);
@@ -990,62 +711,34 @@ function OnboardingChat({
   };
 
   return (
-    <section
-      className="flex flex-col gap-3 border-b border-earth/20 py-4"
-      aria-labelledby="chat-title"
-    >
+    <section className="flex flex-col gap-3 border-b border-earth/20 py-4" aria-labelledby="chat-title">
       <div className="flex flex-col gap-3">
         <div>
           <p className="flex items-center gap-2 text-xs font-bold text-terracotta uppercase">
-            <MessageCircle className="size-4" aria-hidden="true" />{" "}
-            {t.chatEyebrow}
+            <MessageCircle className="size-4" aria-hidden="true" /> {t.chatEyebrow}
           </p>
-          <h2
-            id="chat-title"
-            className="mt-1 text-lg text-earth dark:text-foreground"
-          >
+          <h2 id="chat-title" className="mt-1 text-lg text-earth dark:text-foreground">
             {t.chatTitle}
           </h2>
-          <p className="mt-0.5 text-sm leading-relaxed text-muted-foreground">
-            {t.chatBody}
-          </p>
+          <p className="mt-0.5 text-sm leading-relaxed text-muted-foreground">{t.chatBody}</p>
         </div>
         {!open && (
-          <Button
-            variant="outline"
-            className="w-fit"
-            onClick={() => setOpen(true)}
-          >
+          <Button variant="outline" className="w-fit" onClick={() => setOpen(true)}>
             <MessageCircle className="size-4" aria-hidden="true" /> {t.start}
           </Button>
         )}
       </div>
       {open && (
         <div className="flex flex-col gap-3">
-          {questions
-            .slice(0, Math.min(step + 1, questions.length))
-            .map((q, i) => (
-              <div key={q} className="flex flex-col gap-2">
-                <p className="w-fit max-w-[85%] rounded-lg rounded-tl-none bg-primary-soft px-3 py-2 text-sm">
-                  {q}
-                </p>
-                {answers[i] !== undefined && (
-                  <p className="ml-auto w-fit max-w-[85%] rounded-lg rounded-tr-none bg-earth px-3 py-2 text-sm text-earth-foreground">
-                    {answers[i] || t.skipped}
-                  </p>
-                )}
-              </div>
-            ))}
+          {questions.slice(0, Math.min(step + 1, questions.length)).map((q, i) => (
+            <div key={q} className="flex flex-col gap-2">
+              <p className="w-fit max-w-[85%] rounded-lg rounded-tl-none bg-primary-soft px-3 py-2 text-sm">{q}</p>
+              {answers[i] !== undefined && <p className="ml-auto w-fit max-w-[85%] rounded-lg rounded-tr-none bg-earth px-3 py-2 text-sm text-earth-foreground">{answers[i] || t.skipped}</p>}
+            </div>
+          ))}
           {!done ? (
             <div className="flex gap-2">
-              <Input
-                autoFocus
-                value={draft}
-                placeholder={t.answerPlaceholder}
-                onChange={(e) => setDraft(e.target.value)}
-                onKeyDown={(e) => e.key === "Enter" && next()}
-                aria-label={t.yourAnswer}
-              />
+              <Input autoFocus value={draft} placeholder={t.answerPlaceholder} onChange={(e) => setDraft(e.target.value)} onKeyDown={(e) => e.key === "Enter" && next()} aria-label={t.yourAnswer} />
               <Button onClick={next} aria-label={t.send}>
                 <Send className="size-4" />
               </Button>
@@ -1063,10 +756,7 @@ function OnboardingChat({
                   )
                 }
               >
-                {pending && (
-                  <Loader2 className="size-4 animate-spin" aria-hidden="true" />
-                )}{" "}
-                {t.extract}
+                {pending && <Loader2 className="size-4 animate-spin" aria-hidden="true" />} {t.extract}
               </Button>
               <Button variant="ghost" onClick={() => setAnswers([])}>
                 {t.startAgain}

@@ -43,6 +43,12 @@ const en = {
   offerNotFound: "Offer not found.",
   validateFirst: "Validate some facts in your profile first: documents are built only from them.",
   documentNotFound: "Document not found.",
+  editLine: "Edit this sentence",
+  save: "Save",
+  cancel: "Cancel",
+  emptyRemoves: "Leave it empty to remove the sentence. It keeps the facts it cites.",
+  lineInvalid: "This sentence can't be changed like that.",
+  editHint: "Change any sentence with the pencil next to it: no need to write the document again.",
 };
 
 export type DocumentsCopy = typeof en;
@@ -85,6 +91,12 @@ const fr: DocumentsCopy = {
   offerNotFound: "Offre introuvable.",
   validateFirst: "Valide d'abord des faits dans ton profil : les documents sont construits uniquement à partir d'eux.",
   documentNotFound: "Document introuvable.",
+  editLine: "Modifier cette phrase",
+  save: "Enregistrer",
+  cancel: "Annuler",
+  emptyRemoves: "Laisse vide pour retirer la phrase. Elle garde les faits qu'elle cite.",
+  lineInvalid: "Cette phrase ne peut pas être modifiée comme ça.",
+  editHint: "Modifie n'importe quelle phrase avec le crayon à côté : pas besoin de réécrire le document.",
 };
 
 export const DOCUMENTS_COPY: Record<UiLang, DocumentsCopy> = { en, fr };

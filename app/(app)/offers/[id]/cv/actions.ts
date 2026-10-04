@@ -4,10 +4,11 @@ import { revalidatePath } from "next/cache";
 import { z } from "zod";
 import { aiErrorMessage } from "@/lib/ai/errors";
 import { getAccount, requireUserId } from "@/lib/server/auth";
-import { getDocument, saveDocumentVersion, setDocumentKept } from "@/lib/data/documents";
+import { getDocument, saveDocumentVersion, setDocumentKept, updateDocumentContent } from "@/lib/data/documents";
 import { listFacts } from "@/lib/data/facts";
 import { getOfferDetail } from "@/lib/data/offers";
 import { generateCoverLetter } from "@/lib/documents/cover-letter";
+import { applyDocEdit, docEditPathSchema } from "@/lib/documents/edit";
 import { documentSentences } from "@/lib/documents/render";
 import { generateTailoredCv, type OfferForDocuments } from "@/lib/documents/tailored-cv";
 import { factIndex, isCovered } from "@/lib/offers/coverage";
@@ -86,6 +87,23 @@ export async function keepDocumentAction(input: unknown): Promise<Result> {
   const userId = await requireUserId();
   const parsed = keepSchema.safeParse(input);
   if (!parsed.success || !(await setDocumentKept(userId, parsed.data.id, parsed.data.kept))) return { ok: false, error: DOCUMENTS_COPY[await getUiLang()].documentNotFound };
+  revalidatePath("/", "layout");
+  return { ok: true };
+}
+
+const editSchema = z.object({ id: z.string().uuid(), path: docEditPathSchema, value: z.string().max(2000) });
+
+/** Changes one sentence of a CV or a letter by hand, in the same version: nothing is written again by the AI. */
+export async function editDocumentLineAction(input: unknown): Promise<Result> {
+  const userId = await requireUserId();
+  const t = DOCUMENTS_COPY[await getUiLang()];
+  const parsed = editSchema.safeParse(input);
+  if (!parsed.success) return { ok: false, error: t.lineInvalid };
+  const document = await getDocument(userId, parsed.data.id);
+  if (!document?.content) return { ok: false, error: t.documentNotFound };
+  const next = applyDocEdit(document.content, parsed.data.path, parsed.data.value);
+  if (!next) return { ok: false, error: t.lineInvalid };
+  await updateDocumentContent(userId, document.id, next, documentSentences(next));
   revalidatePath("/", "layout");
   return { ok: true };
 }

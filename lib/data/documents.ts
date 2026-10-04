@@ -73,3 +73,14 @@ export async function listKeptDocuments(userId: string) {
     .where(and(eq(documents.userId, userId), eq(documents.kept, true)))
     .orderBy(desc(documents.createdAt));
 }
+
+/** Saves a sentence edited by hand into the same version (no new version: nothing was written again). */
+export async function updateDocumentContent(userId: string, documentId: string, content: TailoredDocument, sentences: SourcedSentence[]): Promise<boolean> {
+  if (!isUuid(documentId)) return false;
+  const rows = await getDb()
+    .update(documents)
+    .set({ content, sentences })
+    .where(and(eq(documents.id, documentId), eq(documents.userId, userId)))
+    .returning({ id: documents.id });
+  return rows.length > 0;
+}

@@ -13,7 +13,8 @@ import { fill } from "@/lib/interview/copy";
 import type { DocumentLanguage, SourcedSentence, TailoredCv, TailoredLetter } from "@/lib/types";
 import { shorten } from "@/lib/shared/text";
 import { cn } from "@/lib/utils";
-import { TailoredCvDocument, TailoredLetterDocument } from "./tailored-document";
+import type { DocEditPath } from "@/lib/documents/edit";
+import { type DocEditing, TailoredCvDocument, TailoredLetterDocument } from "./tailored-document";
 
 type CvSentence = SourcedSentence & { section?: string };
 type Result = { ok: true } | { ok: false; error: string };
@@ -46,6 +47,7 @@ interface Props {
     generateCv: (input: { offerId: string; language: DocumentLanguage; baseId: string | null }) => Promise<Result>;
     generateLetter: (input: { offerId: string; language: DocumentLanguage; baseId: string | null }) => Promise<Result>;
     keep: (input: { id: string; kept: boolean }) => Promise<Result>;
+    editLine: (input: { id: string; path: DocEditPath; value: string }) => Promise<Result>;
   };
 }
 
@@ -104,6 +106,18 @@ export function CvView({ ui, t, offerId, offerLabel, language, candidate, cv, le
     a.click();
     URL.revokeObjectURL(url);
   }
+
+  /** The pencil on each sentence of a document: saves it in place, no new version. */
+  const editing = (id: string): DocEditing => ({
+    t: { editLine: t.editLine, save: t.save, cancel: t.cancel, emptyRemoves: t.emptyRemoves },
+    save: async (path, value) => {
+      setError(null);
+      const result = await actions.editLine({ id, path, value });
+      if (!result.ok) setError(result.error);
+      else router.refresh();
+      return result.ok;
+    },
+  });
 
   const keepButton = (doc: ShownDocument<unknown>) => (
     <Button size="sm" variant={doc.kept ? "secondary" : "outline"} disabled={pending} onClick={() => run("cv", () => actions.keep({ id: doc.id, kept: !doc.kept }))}>
@@ -193,6 +207,8 @@ export function CvView({ ui, t, offerId, offerLabel, language, candidate, cv, le
               </p>
             )}
 
+            {(cv?.content || letter?.content) && <p className="no-print text-sm text-muted-foreground">{t.editHint}</p>}
+
             {cv && (
               <div className="space-y-3">
                 <div className="no-print flex flex-wrap items-center justify-between gap-2">
@@ -208,7 +224,7 @@ export function CvView({ ui, t, offerId, offerLabel, language, candidate, cv, le
                   </div>
                 </div>
                 {cv.content ? (
-                  <TailoredCvDocument cv={cv.content} candidate={candidate} facts={facts} />
+                  <TailoredCvDocument cv={cv.content} candidate={candidate} facts={facts} edit={editing(cv.id)} />
                 ) : (
                   <LegacyCv sentences={cv.sentences} candidate={candidate} offerLabel={offerLabel} facts={facts} t={t} />
                 )}
@@ -230,7 +246,7 @@ export function CvView({ ui, t, offerId, offerLabel, language, candidate, cv, le
                   </div>
                 </div>
                 {letter.content ? (
-                  <TailoredLetterDocument letter={letter.content} facts={facts} />
+                  <TailoredLetterDocument letter={letter.content} facts={facts} edit={editing(letter.id)} />
                 ) : (
                   <div className="space-y-3">
                     {letter.sentences.map((s, i) => (
