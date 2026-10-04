@@ -1,1 +1,162 @@
-[]
+[
+ {
+  "file": "c01.png",
+  "source": "https://static.wikia.nocookie.net/johnnybravo/images/0/01/Johnny_Bravo_1.png/revision/latest?cb=20201117072618",
+  "wiki_file": "File:Johnny Bravo 1.png",
+  "size": [
+   1092,
+   1288
+  ],
+  "transparent_border": 0.99
+ },
+ {
+  "file": "c02.png",
+  "source": "https://static.wikia.nocookie.net/johnnybravo/images/b/b4/Johnny_Bravo_%28character%29.png/revision/latest?cb=20250901153533",
+  "wiki_file": "File:Johnny Bravo (character).png",
+  "size": [
+   842,
+   1024
+  ],
+  "transparent_border": 1.0
+ },
+ {
+  "file": "c03.png",
+  "source": "https://static.wikia.nocookie.net/johnnybravo/images/3/35/Johnny_Bravo_Cake_Page_1.png/revision/latest?cb=20240328104034",
+  "wiki_file": "File:Johnny Bravo Cake Page 1.png",
+  "size": [
+   1252,
+   1542
+  ],
+  "transparent_border": 0.0
+ },
+ {
+  "file": "c04.png",
+  "source": "https://static.wikia.nocookie.net/johnnybravo/images/f/f3/Johnny_Bravo_Cake_Page_4.png/revision/latest?cb=20240328104034",
+  "wiki_file": "File:Johnny Bravo Cake Page 4.png",
+  "size": [
+   1248,
+   1548
+  ],
+  "transparent_border": 0.0
+ },
+ {
+  "file": "c05.png",
+  "source": "https://static.wikia.nocookie.net/johnnybravo/images/e/e0/Johnny_Bravo_Cake_Page_2.png/revision/latest?cb=20240328104033",
+  "wiki_file": "File:Johnny Bravo Cake Page 2.png",
+  "size": [
+   1244,
+   1548
+  ],
+  "transparent_border": 0.0
+ },
+ {
+  "file": "c06.png",
+  "source": "https://static.wikia.nocookie.net/johnnybravo/images/e/ea/Johnny_Bravo_Cake_Page_3.png/revision/latest?cb=20240328104033",
+  "wiki_file": "File:Johnny Bravo Cake Page 3.png",
+  "size": [
+   1230,
+   1548
+  ],
+  "transparent_border": 0.0
+ },
+ {
+  "file": "c07.png",
+  "source": "https://static.wikia.nocookie.net/johnnybravo/images/4/4b/Bravo_Bravo_BG_Graphic.png/revision/latest?cb=20220226045449",
+  "wiki_file": "File:Bravo Bravo BG Graphic.png",
+  "size": [
+   772,
+   775
+  ],
+  "transparent_border": 0.0
+ },
+ {
+  "file": "c08.png",
+  "source": "https://static.wikia.nocookie.net/johnnybravo/images/3/33/Johnny_BravOwO.png/revision/latest?cb=20220629233259",
+  "wiki_file": "File:Johnny BravOwO.png",
+  "size": [
+   2048,
+   1536
+  ],
+  "transparent_border": 0.0
+ },
+ {
+  "file": "c09.png",
+  "source": "https://static.wikia.nocookie.net/johnnybravo/images/9/9a/Johnny_Bravo.png/revision/latest?cb=20140427092733",
+  "wiki_file": "File:Johnny Bravo.png",
+  "size": [
+   1976,
+   1500
+  ],
+  "transparent_border": 0.0
+ },
+ {
+  "file": "c10.png",
+  "source": "https://static.wikia.nocookie.net/johnnybravo/images/1/14/Johnny_Bravo_Breathing_Fire.png/revision/latest?cb=20220517064414",
+  "wiki_file": "File:Johnny Bravo Breathing Fire.png",
+  "size": [
+   1415,
+   1080
+  ],
+  "transparent_border": 0.0
+ },
+ {
+  "file": "c11.png",
+  "source": "https://static.wikia.nocookie.net/johnnybravo/images/b/bf/Johnny_Bravo_Pilot.png/revision/latest?cb=20171225042711",
+  "wiki_file": "File:Johnny Bravo Pilot.png",
+  "size": [
+   1422,
+   1080
+  ],
+  "transparent_border": 0.0
+ },
+ {
+  "file": "c12.png",
+  "source": "https://static.wikia.nocookie.net/johnnybravo/images/5/58/Johnny_Bravo_and_The_Amazon_Women.png/revision/latest?cb=20171225043440",
+  "wiki_file": "File:Johnny Bravo and The Amazon Women.png",
+  "size": [
+   1416,
+   1076
+  ],
+  "transparent_border": 0.0
+ },
+ {
+  "file": "c13.png",
+  "source": "https://static.wikia.nocookie.net/johnnybravo/images/a/af/Team_Johnny_Bravo.png/revision/latest?cb=20220310195229",
+  "wiki_file": "File:Team Johnny Bravo.png",
+  "size": [
+   1396,
+   1061
+  ],
+  "transparent_border": 0.0
+ },
+ {
+  "file": "c14.png",
+  "source": "https://static.wikia.nocookie.net/johnnybravo/images/c/cc/Melvin.png/revision/latest?cb=20230330235953",
+  "wiki_file": "File:Melvin.png",
+  "size": [
+   1104,
+   902
+  ],
+  "transparent_border": 0.0
+ },
+ {
+  "file": "c15.png",
+  "source": "https://static.wikia.nocookie.net/johnnybravo/images/d/d3/Big_Brother.png/revision/latest?cb=20230312225808",
+  "wiki_file": "File:Big Brother.png",
+  "size": [
+   1220,
+   894
+  ],
+  "transparent_border": 0.0
+ },
+ {
+  "file": "c16.png",
+  "source": "https://static.wikia.nocookie.net/johnnybravo/images/0/03/Female_Johnny_Bravo_%26_Johnny.png/revision/latest?cb=20230219125422",
+  "wiki_file": "File:Female Johnny Bravo & Johnny.png",
+  "size": [
+   1050,
+   878
+  ],
+  "transparent_border": 0.0
+ }
+]

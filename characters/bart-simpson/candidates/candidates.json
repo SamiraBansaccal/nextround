@@ -1,16 +1,106 @@
 [
  {
   "file": "c01.png",
-  "source": "https://static.wikia.nocookie.net/simpsons/images/6/6d/Bart%27s_Brain_-_Panorama.png/revision/latest?cb=20240524014954",
-  "wiki_file": "File:Bart's Brain - Panorama.png",
+  "source": "https://upload.wikimedia.org/wikipedia/en/a/aa/Bart_Simpson_200px.png",
+  "wiki_file": "Wikipedia: Bart Simpson",
   "size": [
-   1920,
-   2160
+   200,
+   298
   ],
-  "transparent_border": 0.0
+  "transparent_border": 1.0
  },
  {
   "file": "c02.png",
+  "source": "https://static.wikia.nocookie.net/simpsons/images/1/1e/Bart_Simpson_in_The_Great_Phatsby.png/revision/latest?cb=20201129173410",
+  "wiki_file": "File:Bart Simpson in The Great Phatsby.png",
+  "size": [
+   1046,
+   1236
+  ],
+  "transparent_border": 1.0
+ },
+ {
+  "file": "c03.png",
+  "source": "https://static.wikia.nocookie.net/simpsons/images/c/c5/Bart_Simpson_-_shading.png/revision/latest?cb=20201222184029",
+  "wiki_file": "File:Bart Simpson - shading.png",
+  "size": [
+   579,
+   1219
+  ],
+  "transparent_border": 1.0
+ },
+ {
+  "file": "c04.png",
+  "source": "https://static.wikia.nocookie.net/simpsons/images/a/a0/The_Simpsons%27_Big_Musical_Movie_-_Bart_Simpson.png/revision/latest?cb=20201224170534",
+  "wiki_file": "File:The Simpsons' Big Musical Movie - Bart Simpson.png",
+  "size": [
+   579,
+   1219
+  ],
+  "transparent_border": 1.0
+ },
+ {
+  "file": "c05.png",
+  "source": "https://static.wikia.nocookie.net/simpsons/images/8/81/Bart_Simpson_%28Bart_to_the_Future%29.png/revision/latest?cb=20200805005846",
+  "wiki_file": "File:Bart Simpson (Bart to the Future).png",
+  "size": [
+   558,
+   1616
+  ],
+  "transparent_border": 1.0
+ },
+ {
+  "file": "c06.png",
+  "source": "https://static.wikia.nocookie.net/simpsons/images/6/6f/Bart_Simpson_%28Mountain_of_Madness%29.png/revision/latest?cb=20210101153151",
+  "wiki_file": "File:Bart Simpson (Mountain of Madness).png",
+  "size": [
+   476,
+   1003
+  ],
+  "transparent_border": 1.0
+ },
+ {
+  "file": "c07.png",
+  "source": "https://static.wikia.nocookie.net/simpsons/images/b/b5/Bart_Simpson_%28Future-Drama%29.png/revision/latest?cb=20200805015107",
+  "wiki_file": "File:Bart Simpson (Future-Drama).png",
+  "size": [
+   468,
+   1737
+  ],
+  "transparent_border": 1.0
+ },
+ {
+  "file": "c08.png",
+  "source": "https://static.wikia.nocookie.net/simpsons/images/a/aa/Bart_simpson.png/revision/latest?cb=20130815081755",
+  "wiki_file": "File:Bart simpson.png",
+  "size": [
+   350,
+   400
+  ],
+  "transparent_border": 1.0
+ },
+ {
+  "file": "c09.png",
+  "source": "https://static.wikia.nocookie.net/simpsons/images/6/67/Bart_Simpson_in_The_Simpsons_Movie.png/revision/latest?cb=20200805165733",
+  "wiki_file": "File:Bart Simpson in The Simpsons Movie.png",
+  "size": [
+   486,
+   606
+  ],
+  "transparent_border": 0.89
+ },
+ {
+  "file": "c10.png",
+  "source": "https://static.wikia.nocookie.net/simpsons/images/8/85/1987_Bart_Simpson.png/revision/latest?cb=20180529133745",
+  "wiki_file": "File:1987 Bart Simpson.png",
+  "size": [
+   1024,
+   768
+  ],
+  "transparent_border": 1.0
+ },
+ {
+  "file": "c11.png",
   "source": "https://static.wikia.nocookie.net/simpsons/images/0/03/Steal_This_Episode_%283%29.png/revision/latest?cb=20161205202104",
   "wiki_file": "File:Steal This Episode (3).png",
   "size": [
@@ -20,7 +110,7 @@
   "transparent_border": 0.0
  },
  {
-  "file": "c03.png",
+  "file": "c12.png",
   "source": "https://static.wikia.nocookie.net/simpsons/images/9/90/Steal_This_Episode_%285%29.png/revision/latest?cb=20161205203714",
   "wiki_file": "File:Steal This Episode (5).png",
   "size": [
@@ -30,7 +120,7 @@
   "transparent_border": 0.0
  },
  {
-  "file": "c04.png",
+  "file": "c13.png",
   "source": "https://static.wikia.nocookie.net/simpsons/images/4/4b/Steal_This_Episode_%289%29.png/revision/latest?cb=20161205203115",
   "wiki_file": "File:Steal This Episode (9).png",
   "size": [
@@ -40,7 +130,7 @@
   "transparent_border": 0.0
  },
  {
-  "file": "c05.png",
+  "file": "c14.png",
   "source": "https://static.wikia.nocookie.net/simpsons/images/f/f4/Manger_Things_promo_8.png/revision/latest?cb=20210228024813",
   "wiki_file": "File:Manger Things promo 8.png",
   "size": [
@@ -50,7 +140,7 @@
   "transparent_border": 0.0
  },
  {
-  "file": "c06.png",
+  "file": "c15.png",
   "source": "https://static.wikia.nocookie.net/simpsons/images/0/0e/Steal_This_Episode_%281%29.png/revision/latest?cb=20161205205443",
   "wiki_file": "File:Steal This Episode (1).png",
   "size": [
@@ -60,102 +150,12 @@
   "transparent_border": 0.0
  },
  {
-  "file": "c07.png",
+  "file": "c16.png",
   "source": "https://static.wikia.nocookie.net/simpsons/images/9/92/The_Simpsons_-_The_Day_of_the_Jack-up_%2833%29.png/revision/latest?cb=20260325152028",
   "wiki_file": "File:The Simpsons - The Day of the Jack-up (33).png",
   "size": [
    3840,
    2160
-  ],
-  "transparent_border": 0.0
- },
- {
-  "file": "c08.png",
-  "source": "https://static.wikia.nocookie.net/simpsons/images/8/88/Steal_This_Episode_%286%29.png/revision/latest?cb=20161206043947",
-  "wiki_file": "File:Steal This Episode (6).png",
-  "size": [
-   3912,
-   2128
-  ],
-  "transparent_border": 0.0
- },
- {
-  "file": "c09.png",
-  "source": "https://static.wikia.nocookie.net/simpsons/images/e/ea/Apocalypse_Cow_2.png/revision/latest?cb=20180521230110",
-  "wiki_file": "File:Apocalypse Cow 2.png",
-  "size": [
-   2628,
-   1941
-  ],
-  "transparent_border": 0.0
- },
- {
-  "file": "c10.png",
-  "source": "https://static.wikia.nocookie.net/simpsons/images/1/1f/Steal_This_Episode_%282%29.png/revision/latest?cb=20161205192949",
-  "wiki_file": "File:Steal This Episode (2).png",
-  "size": [
-   2911,
-   1615
-  ],
-  "transparent_border": 0.0
- },
- {
-  "file": "c11.png",
-  "source": "https://static.wikia.nocookie.net/simpsons/images/1/12/Steal_This_Episode_%287%29.png/revision/latest?cb=20161205192808",
-  "wiki_file": "File:Steal This Episode (7).png",
-  "size": [
-   2852,
-   1597
-  ],
-  "transparent_border": 0.0
- },
- {
-  "file": "c12.png",
-  "source": "https://static.wikia.nocookie.net/simpsons/images/3/35/Lisa%27s_First_Word_-_Bart_dislikes_Lisa.png/revision/latest?cb=20191016024357",
-  "wiki_file": "File:Lisa's First Word - Bart dislikes Lisa.png",
-  "size": [
-   2048,
-   1536
-  ],
-  "transparent_border": 0.0
- },
- {
-  "file": "c13.png",
-  "source": "https://static.wikia.nocookie.net/simpsons/images/e/ea/Bart%2C_Lisa%2C_and_Maggie_in_House_of_Cards.PNG/revision/latest?cb=20170921161651",
-  "wiki_file": "File:Bart, Lisa, and Maggie in House of Cards.PNG",
-  "size": [
-   2048,
-   1536
-  ],
-  "transparent_border": 0.0
- },
- {
-  "file": "c14.png",
-  "source": "https://static.wikia.nocookie.net/simpsons/images/a/a8/089CE157-977A-4674-84CA-5ABE2F47133C.png/revision/latest?cb=20180315210607",
-  "wiki_file": "File:089CE157-977A-4674-84CA-5ABE2F47133C.png",
-  "size": [
-   2048,
-   1536
-  ],
-  "transparent_border": 0.0
- },
- {
-  "file": "c15.png",
-  "source": "https://static.wikia.nocookie.net/simpsons/images/d/d3/09B8B30E-B669-4DA0-AA8E-5CB01A4AD7C3.png/revision/latest?cb=20180303042624",
-  "wiki_file": "File:09B8B30E-B669-4DA0-AA8E-5CB01A4AD7C3.png",
-  "size": [
-   2048,
-   1536
-  ],
-  "transparent_border": 0.0
- },
- {
-  "file": "c16.png",
-  "source": "https://static.wikia.nocookie.net/simpsons/images/8/80/0DD61F9C-743F-4C00-BC04-B0EC130ABBEF.png/revision/latest?cb=20180225201651",
-  "wiki_file": "File:0DD61F9C-743F-4C00-BC04-B0EC130ABBEF.png",
-  "size": [
-   2048,
-   1536
   ],
   "transparent_border": 0.0
  }
