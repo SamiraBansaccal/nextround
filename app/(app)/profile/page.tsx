@@ -1,6 +1,6 @@
 import { ProfileLibrary } from "@/components/profile/profile-library";
 import { getAccount } from "@/lib/server/auth";
-import { listFacts } from "@/lib/data/facts";
+import { listFacts, validateLegacyFacts } from "@/lib/data/facts";
 import { listKeptDocuments } from "@/lib/data/documents";
 import { cvRef, listSources } from "@/lib/data/sources";
 import { formatDay } from "@/lib/shared/dates";
@@ -29,6 +29,8 @@ export default async function ProfilePage({ searchParams }: PageProps<"/profile"
   const account = await getAccount();
   const t = PROFILE_COPY[await getUiLang()];
   const { cv, doc } = await searchParams;
+  // Everything the candidate imports is theirs, so validated: facts from before that rule are validated once here.
+  await validateLegacyFacts(account.userId);
   const [facts, cvSources, kept] = await Promise.all([listFacts(account.userId), listSources(account.userId, "cv_upload"), listKeptDocuments(account.userId)]);
   const cvName = new Map(cvSources.map((s) => [cvRef(s.id), s.ref]));
   // The CV shown as a document: the one chosen in the library (?cv=), else the latest one.

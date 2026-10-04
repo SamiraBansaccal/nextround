@@ -38,6 +38,7 @@ défaire sans savoir pourquoi il a été pris.
 | 🌍 [0019](0019-trois-langues.md) | Trois langues indépendantes : le site, chaque entretien, chaque document | ✅ acceptée |
 | 🔊 [0020](0020-voix-payante-sur-demande.md) | La voix payante est sur demande, et une phrase n'est jamais payée deux fois | ✅ acceptée |
 | 🗂️ [0021](0021-un-dossier-par-domaine.md) | Un dossier par domaine, aucun fichier en vrac | ✅ acceptée |
+| 👤 [0022](0022-le-profil-est-la-base.md) | Le profil est la base : tout validé, fusionné, modifiable | ✅ acceptée |
 
 > 📌 **Lisez les statuts.** Un ADR n'est jamais effacé : quand une décision change, l'ancien reste
 > et indique où se trouve la suite. C'est ce qui permet de comprendre *pourquoi* une décision a
