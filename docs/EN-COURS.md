@@ -18,7 +18,7 @@ Règle : chaque session a sa *branch*, s'inscrit ici, ouvre une PR, et met la li
 
 | *Branch* | Session | Sujet | PR |
 |---|---|---|---|
-| — | — | Aucune branche en cours | — |
+| `claude/intelligent-einstein-58bqoh` | cloud | 🎨 Tour des pages : cartes d'offres (logos, stack, tri par parcours), profil (catégories de CV, imports), réglages ; *deploy* qui migre. Fichiers : `components/{offers,dashboard,profile,settings,layout}/**`, `app/(app)/{dashboard,offers,profile,settings}/**`, `lib/offers/**`, `lib/i18n/**`, `scripts/infra/deploy.mjs` | PR à venir |
 
 <details>
 <summary>📦 Branches déjà fusionnées</summary>

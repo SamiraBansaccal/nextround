@@ -3,6 +3,9 @@
 //
 // Usage: node scripts/infra/deploy.mjs
 //
+// First applies the pending database migrations (`npm run db:migrate`, idempotent), so the code that goes
+// online never meets a database that is behind it. A failed migration stops the deploy.
+//
 // The Vercel token and project ids come from .env (provided by Stripe Projects) and are passed to
 // the CLI through environment variables only: never as command-line arguments, which would expose
 // them in the process list. Files listed in .vercelignore are not uploaded.
@@ -56,6 +59,13 @@ if (!(await tokenWorks(env.VERCEL_TOKEN))) {
     process.exit(1);
   }
   console.log("Fresh Vercel token in .env.");
+}
+
+console.log("Applying the database migrations…");
+const migrate = spawnSync("npm", ["run", "db:migrate"], { stdio: "inherit" });
+if (migrate.status !== 0) {
+  console.error("The migrations failed: nothing was deployed.");
+  process.exit(migrate.status ?? 1);
 }
 
 const result = spawnSync("npx", ["-y", "vercel@latest", "deploy", "--prod", "--yes"], {

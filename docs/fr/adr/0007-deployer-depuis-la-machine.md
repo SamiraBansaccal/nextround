@@ -47,3 +47,6 @@ rotating the credentials… Fresh Vercel token in .env. », puis un deploy réus
 - `env --pull` réécrit `.env` pendant la rotation (les variables propres à l'app reviennent de
   Stripe Projects, donc rien n'est perdu, mais une modification faite à la main dans `.env` le
   serait).
+
+**Amendement (2026-10-04, soir).** `deploy.mjs` lance d'abord `npm run db:migrate` (sans effet si tout est
+déjà appliqué) et s'arrête s'il échoue : le code mis en ligne ne tombe jamais sur une base en retard.

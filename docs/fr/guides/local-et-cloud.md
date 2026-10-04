@@ -82,4 +82,4 @@ Les boutons de l'app restent disponibles : les scripts appellent exactement le m
 
 ## 🚀 Deploy
 
-`node scripts/infra/deploy.mjs` depuis le Mac (il a besoin de la Stripe CLI pour renouveler le *token* Vercel). Avant un *deploy* qui contient une migration : `npm run db:migrate`. Pour ne plus dépendre du Mac : relier le projet Vercel au repo GitHub, et chaque fusion sur `main` se déploie seule.
+`node scripts/infra/deploy.mjs` depuis le Mac (il a besoin de la Stripe CLI pour renouveler le *token* Vercel). Il applique d’abord les migrations (`npm run db:migrate`) et s’arrête si elles échouent. Pour ne plus dépendre du Mac : relier le projet Vercel au repo GitHub, et chaque fusion sur `main` se déploie seule.
