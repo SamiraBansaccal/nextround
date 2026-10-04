@@ -1,16 +1,18 @@
 "use client";
 
-import { Check, ChevronRight, Copy, PhoneOff, RotateCcw, X } from "lucide-react";
+import { Check, ChevronRight, Copy, Loader2, PhoneOff, Repeat, RotateCcw, X } from "lucide-react";
 import Link from "next/link";
+import { useRouter } from "next/navigation";
 import { useEffect, useState, useTransition } from "react";
 import { Button } from "@/components/ui/button";
 import { fill, type InterviewCopy } from "@/lib/interview/copy";
-import type { Lang } from "@/lib/interviewers/types";
+import type { Interviewer, InterviewerCategory, Lang } from "@/lib/interviewers/types";
 import type { Criterion, Feedback, QuestionGroup, SourcedSentence } from "@/lib/types";
 import { shorten } from "@/lib/text";
 import { cn } from "@/lib/utils";
 import { AnswerComposer } from "./answer-composer";
 import { CallControls, CallStage } from "./call-stage";
+import { InterviewerChooser } from "./interviewer-chooser";
 import { readMediaChoice, useLocalMedia } from "./media/use-local-media";
 import { QuestionPanel } from "./question-panel";
 import { useVoice } from "./use-voice";
@@ -50,6 +52,12 @@ interface Props {
   voiceLabel: string;
   me: { name: string; imageUrl: string | null };
   submit: (input: { questionId: string; answer: string }) => Promise<{ ok: true; feedback: Feedback } | { ok: false; error: string }>;
+  /** Switching interviewer during the call: the catalog and the server action. */
+  switcher: {
+    categories: InterviewerCategory[];
+    interviewers: Interviewer[];
+    change: (input: { interviewId: string; interviewerId: string }) => Promise<{ ok: boolean }>;
+  };
 }
 
 const MAX = 3000;
@@ -58,7 +66,10 @@ const MAX = 3000;
 // language: the video (with real microphone and camera controls) on one side, the question in its own
 // readable panel on the other, the answer below.
 export function InterviewSession(props: Props) {
-  const { interviewId, offerId, offerTitle, lang, copy, interviewer, questions, facts, initialIndex, voiceLabel, me, submit } = props;
+  const { interviewId, offerId, offerTitle, lang, copy, interviewer, questions, facts, initialIndex, voiceLabel, me, submit, switcher } = props;
+  const router = useRouter();
+  const [chooserOpen, setChooserOpen] = useState(false);
+  const [switching, startSwitch] = useTransition();
   const [current, setCurrent] = useState(questions[initialIndex]?.id ?? questions[0]?.id);
   const [answers, setAnswers] = useState<Record<string, { answer: string; feedback: Feedback | null }>>(() =>
     Object.fromEntries(questions.filter((q) => q.lastAnswer).map((q) => [q.id, q.lastAnswer!])),
@@ -145,12 +156,34 @@ export function InterviewSession(props: Props) {
           <h1 className="text-3xl leading-tight sm:text-4xl">{fill(copy.callTitle, { name: interviewer.name })}</h1>
           {interviewer.notice && <p className="mt-1 max-w-2xl text-xs text-muted-foreground">{interviewer.notice}</p>}
         </div>
-        <Button asChild variant="outline">
-          <Link href={summaryHref}>
-            <PhoneOff className="size-4" aria-hidden="true" /> {copy.leaveInterview}
-          </Link>
-        </Button>
+        <div className="flex flex-wrap gap-2">
+          <Button variant="outline" onClick={() => setChooserOpen(true)} disabled={switching}>
+            {switching ? <Loader2 className="size-4 animate-spin" aria-hidden="true" /> : <Repeat className="size-4" aria-hidden="true" />} {copy.changeInterviewer}
+          </Button>
+          <Button asChild variant="outline">
+            <Link href={summaryHref}>
+              <PhoneOff className="size-4" aria-hidden="true" /> {copy.leaveInterview}
+            </Link>
+          </Button>
+        </div>
       </header>
+      <InterviewerChooser
+        open={chooserOpen}
+        onOpenChange={setChooserOpen}
+        categories={switcher.categories}
+        interviewers={switcher.interviewers}
+        selectedId={interviewer.id}
+        language={lang}
+        t={copy}
+        onChoose={(id) => {
+          setChooserOpen(false);
+          if (id === interviewer.id) return;
+          startSwitch(async () => {
+            const result = await switcher.change({ interviewId, interviewerId: id });
+            if (result.ok) router.refresh();
+          });
+        }}
+      />
 
       {/* ---------- The call: video + controls, and the question ---------- */}
       <div className="grid items-start gap-5 lg:grid-cols-[minmax(0,1fr)_380px]">

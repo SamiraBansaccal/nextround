@@ -3,11 +3,11 @@
 import { revalidatePath } from "next/cache";
 import { z } from "zod";
 import { aiErrorMessage } from "@/lib/ai/errors";
-import { getAccount } from "@/lib/auth";
+import { getAccount, requireUserId } from "@/lib/auth";
 import { listFacts } from "@/lib/data/facts";
-import { createInterview, getQuestionWithOffer, listAskedBankIds, saveAnswer } from "@/lib/data/interviews";
+import { createInterview, deleteInterview, getInterview, getQuestionWithOffer, listAskedBankIds, saveAnswer, switchInterviewer } from "@/lib/data/interviews";
 import { getOfferDetail } from "@/lib/data/offers";
-import { bankAnswerText, findBankQuestion } from "@/lib/interview/bank";
+import { bankAnswerText, findBankQuestion, findTech } from "@/lib/interview/bank";
 import { answerFeedback, MAX_ANSWER } from "@/lib/interview/feedback";
 import { toLang } from "@/lib/interview/copy";
 import { generateQuestions } from "@/lib/interview/generate";
@@ -99,4 +99,34 @@ export async function submitAnswerAction(input: unknown): Promise<{ ok: true; fe
   } catch (error) {
     return { ok: false, error: aiErrorMessage(error, lang) };
   }
+}
+
+/** Deletes one of the user's practice interviews (from the interviews list). */
+export async function deleteInterviewAction(interviewId: unknown): Promise<{ ok: boolean }> {
+  const userId = await requireUserId();
+  const ok = typeof interviewId === "string" && (await deleteInterview(userId, interviewId));
+  if (ok) revalidatePath("/", "layout");
+  return { ok };
+}
+
+const switchSchema = z.object({ interviewId: z.string().uuid(), interviewerId: z.string().trim().min(1).max(80) });
+
+/**
+ * Changes who leads an interview in progress: the call shows the new interviewer, and the lines said
+ * around the questions not answered yet are the new interviewer's. The questions themselves stay.
+ */
+export async function switchInterviewerAction(input: unknown): Promise<{ ok: boolean }> {
+  const userId = await requireUserId();
+  const parsed = switchSchema.safeParse(input);
+  const interviewer = parsed.success ? findInterviewer(parsed.data.interviewerId) : null;
+  if (!parsed.success || !interviewer) return { ok: false };
+  const data = await getInterview(userId, parsed.data.interviewId);
+  if (!data) return { ok: false };
+  const lang = toLang(data.interview.language);
+  const slots = data.questions.map((q) => ({ tech: q.group === "technical" ? (findTech(findBankQuestion(q.bankId)?.tech)?.label[lang] ?? null) : null }));
+  const flavor = flavorInterview(interviewer, slots, lang);
+  const lines = new Map(data.questions.map((q, i) => [q.id, { intro: flavor[i].intro, outro: flavor[i].outro }]));
+  const ok = await switchInterviewer(userId, data.interview.id, interviewer.id, lines);
+  if (ok) revalidatePath("/", "layout");
+  return { ok };
 }

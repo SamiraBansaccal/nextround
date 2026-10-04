@@ -1,55 +1,218 @@
 {
-  "mr-burns": ["simpsons", "Charles Montgomery Burns"],
-  "homer-simpson": ["simpsons", "Homer Simpson"],
-  "marge-simpson": ["simpsons", "Marge Simpson"],
-  "bart-simpson": ["simpsons", "Bart Simpson"],
-  "lisa-simpson": ["simpsons", "Lisa Simpson"],
-  "chief-wiggum": ["simpsons", "Clancy Wiggum"],
-  "comic-book-guy": ["simpsons", "Comic Book Guy"],
-  "krusty-the-clown": ["simpsons", "Krusty the Clown"],
-  "moe-szyslak": ["simpsons", "Moe Szyslak"],
-  "ned-flanders": ["simpsons", "Ned Flanders"],
-  "principal-skinner": ["simpsons", "Seymour Skinner"],
-  "professor-frink": ["simpsons", "John Frink"],
-  "ralph-wiggum": ["simpsons", "Ralph Wiggum"],
-  "waylon-smithers": ["simpsons", "Waylon Smithers"],
-  "chopper": ["onepiece", "Tony Tony Chopper"],
-  "luffy": ["onepiece", "Monkey D. Luffy"],
-  "nami": ["onepiece", "Nami"],
-  "robin": ["onepiece", "Nico Robin"],
-  "sanji": ["onepiece", "Sanji"],
-  "usopp": ["onepiece", "Usopp"],
-  "zoro": ["onepiece", "Roronoa Zoro"],
-  "goku": ["dragonball", "Goku"],
-  "piccolo": ["dragonball", "Piccolo"],
-  "vegeta": ["dragonball", "Vegeta"],
-  "itachi": ["naruto", "Itachi Uchiha"],
-  "kakashi": ["naruto", "Kakashi Hatake"],
-  "naruto": ["naruto", "Naruto Uzumaki"],
-  "genos": ["onepunchman", "Genos"],
-  "saitama": ["onepunchman", "Saitama"],
-  "gojo": ["jujutsu-kaisen", "Satoru Gojo"],
-  "sukuna": ["jujutsu-kaisen", "Ryomen Sukuna"],
-  "billy": ["grimadventures", "Billy"],
-  "mandy": ["grimadventures", "Mandy"],
-  "bugs-bunny": ["looneytunes", "Bugs Bunny"],
-  "daffy-duck": ["looneytunes", "Daffy Duck"],
-  "marvin-the-martian": ["looneytunes", "Marvin the Martian"],
-  "sylvester": ["looneytunes", "Sylvester"],
-  "taz": ["looneytunes", "Tasmanian Devil"],
-  "tweety": ["looneytunes", "Tweety"],
-  "courage": ["courage", "Courage"],
-  "dexter": ["dexterslab", "Dexter"],
-  "ed": ["ed", "Ed"],
-  "edd": ["ed", "Edd"],
-  "eddy": ["ed", "Eddy"],
-  "johnny-bravo": ["johnnybravo", "Johnny Bravo"],
-  "plankton": ["spongebob", "Sheldon J. Plankton"],
-  "powerpuff-girls": ["powerpuffgirls", "The Powerpuff Girls"],
-  "rick-sanchez": ["rickandmorty", "Rick Sanchez"],
-  "samurai-jack": ["samuraijack", "Jack"],
-  "scooby-doo": ["scoobydoo", "Scooby-Doo"],
-  "shaggy": ["scoobydoo", "Shaggy Rogers"],
-  "darth-vader": ["starwars", "Anakin Skywalker"],
-  "yoda": ["starwars", "Yoda"]
+ "mr-burns": [
+  "simpsons",
+  "Charles Montgomery Burns"
+ ],
+ "homer-simpson": [
+  "simpsons",
+  "Homer Simpson"
+ ],
+ "marge-simpson": [
+  "simpsons",
+  "Marge Simpson"
+ ],
+ "bart-simpson": [
+  "simpsons",
+  "Bart Simpson"
+ ],
+ "lisa-simpson": [
+  "simpsons",
+  "Lisa Simpson"
+ ],
+ "chief-wiggum": [
+  "simpsons",
+  "Clancy Wiggum"
+ ],
+ "comic-book-guy": [
+  "simpsons",
+  "Comic Book Guy"
+ ],
+ "krusty-the-clown": [
+  "simpsons",
+  "Krusty the Clown"
+ ],
+ "moe-szyslak": [
+  "simpsons",
+  "Moe Szyslak"
+ ],
+ "ned-flanders": [
+  "simpsons",
+  "Ned Flanders"
+ ],
+ "principal-skinner": [
+  "simpsons",
+  "Seymour Skinner"
+ ],
+ "professor-frink": [
+  "simpsons",
+  "John Frink"
+ ],
+ "ralph-wiggum": [
+  "simpsons",
+  "Ralph Wiggum"
+ ],
+ "waylon-smithers": [
+  "simpsons",
+  "Waylon Smithers"
+ ],
+ "chopper": [
+  "onepiece",
+  "Tony Tony Chopper"
+ ],
+ "luffy": [
+  "onepiece",
+  "Monkey D. Luffy"
+ ],
+ "nami": [
+  "onepiece",
+  "Nami"
+ ],
+ "robin": [
+  "onepiece",
+  "Nico Robin"
+ ],
+ "sanji": [
+  "onepiece",
+  "Sanji"
+ ],
+ "usopp": [
+  "onepiece",
+  "Usopp"
+ ],
+ "zoro": [
+  "onepiece",
+  "Roronoa Zoro"
+ ],
+ "goku": [
+  "dragonball",
+  "Goku"
+ ],
+ "piccolo": [
+  "dragonball",
+  "Piccolo"
+ ],
+ "vegeta": [
+  "dragonball",
+  "Vegeta"
+ ],
+ "itachi": [
+  "naruto",
+  "Itachi Uchiha"
+ ],
+ "kakashi": [
+  "naruto",
+  "Kakashi Hatake"
+ ],
+ "naruto": [
+  "naruto",
+  "Naruto Uzumaki"
+ ],
+ "genos": [
+  "onepunchman",
+  "Genos"
+ ],
+ "saitama": [
+  "onepunchman",
+  "Saitama"
+ ],
+ "gojo": [
+  "jujutsu-kaisen",
+  "Satoru Gojo"
+ ],
+ "sukuna": [
+  "jujutsu-kaisen",
+  "Ryomen Sukuna"
+ ],
+ "billy": [
+  "grimadventures",
+  "Billy"
+ ],
+ "mandy": [
+  "grimadventures",
+  "Mandy"
+ ],
+ "bugs-bunny": [
+  "looneytunes",
+  "Bugs Bunny"
+ ],
+ "daffy-duck": [
+  "looneytunes",
+  "Daffy Duck"
+ ],
+ "marvin-the-martian": [
+  "looneytunes",
+  "Marvin the Martian"
+ ],
+ "sylvester": [
+  "looneytunes",
+  "Sylvester"
+ ],
+ "taz": [
+  "looneytunes",
+  "Tasmanian Devil"
+ ],
+ "tweety": [
+  "looneytunes",
+  "Tweety"
+ ],
+ "courage": [
+  "courage",
+  "Courage"
+ ],
+ "dexter": [
+  "dexterslab",
+  "Dexter"
+ ],
+ "ed": [
+  "ed",
+  "Ed"
+ ],
+ "edd": [
+  "ed",
+  "Edd"
+ ],
+ "eddy": [
+  "ed",
+  "Eddy"
+ ],
+ "johnny-bravo": [
+  "johnnybravo",
+  "Johnny Bravo"
+ ],
+ "plankton": [
+  "spongebob",
+  "Sheldon J. Plankton"
+ ],
+ "powerpuff-girls": [
+  "powerpuffgirls",
+  "The Powerpuff Girls"
+ ],
+ "rick-sanchez": [
+  "rickandmorty",
+  "Rick Sanchez"
+ ],
+ "samurai-jack": [
+  "samuraijack",
+  "Jack"
+ ],
+ "scooby-doo": [
+  "scoobydoo",
+  "Scooby-Doo"
+ ],
+ "shaggy": [
+  "scoobydoo",
+  "Shaggy Rogers"
+ ],
+ "darth-vader": [
+  "starwars",
+  "Anakin Skywalker"
+ ],
+ "yoda": [
+  "starwars",
+  "Yoda"
+ ],
+ "kratos": [
+  "godofwar",
+  "Kratos"
+ ]
 }

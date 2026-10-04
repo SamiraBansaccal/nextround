@@ -1,5 +1,6 @@
 import { ArrowRight, MessagesSquare, PhoneCall } from "lucide-react";
 import Link from "next/link";
+import { DeleteInterviewButton } from "@/components/interview/delete-interview-button";
 import { InterviewerAvatar } from "@/components/interview/interviewer-avatar";
 import { PageHeading } from "@/components/page-heading";
 import { Button } from "@/components/ui/button";
@@ -7,6 +8,7 @@ import { requireUserId } from "@/lib/auth";
 import { listInterviewsWithProgress } from "@/lib/data/interviews";
 import { formatDay } from "@/lib/dates";
 import { getInterviewer } from "@/lib/interviewers";
+import { deleteInterviewAction } from "./actions";
 
 // All practice sessions (layout from the Lovable prototype).
 export default async function InterviewsPage() {
@@ -37,31 +39,33 @@ export default async function InterviewsPage() {
             const percent = iv.total ? Math.round((iv.answered / iv.total) * 100) : 0;
             const interviewer = getInterviewer(iv.interviewerId);
             return (
-              <Link
-                key={iv.id}
-                href={`/interview/${iv.id}`}
-                className="flex flex-wrap items-center gap-6 rounded-md border bg-card p-6 shadow-soft transition hover:border-primary/40"
-              >
-                <InterviewerAvatar interviewer={interviewer} />
-                <div className="min-w-0 flex-1">
-                  <p className="font-display text-xl">{iv.offerTitle ?? "Untitled offer"}</p>
-                  <p className="text-sm">with {interviewer.copy.en.name}</p>
-                  <p className="text-sm text-muted-foreground">
-                    {[iv.company, iv.answered === 0 ? "Ready to practise" : iv.answered === iv.total ? "Completed" : "In progress", formatDay(iv.createdAt)]
-                      .filter(Boolean)
-                      .join(" · ")}
-                  </p>
-                </div>
-                <div className="w-48">
-                  <p className="mb-1 text-xs text-muted-foreground">
-                    {iv.answered} of {iv.total} answered
-                  </p>
-                  <div className="h-2 rounded-full bg-muted" role="progressbar" aria-valuenow={percent} aria-valuemin={0} aria-valuemax={100} aria-label="Questions answered">
-                    <div className="h-2 rounded-full bg-primary" style={{ width: `${percent}%` }} />
+              <div key={iv.id} className="flex items-center rounded-md border bg-card pr-3 shadow-soft transition hover:border-primary/40">
+                <Link
+                  href={`/interview/${iv.id}`}
+                  className="flex min-w-0 flex-1 flex-wrap items-center gap-6 p-6"
+                >
+                  <InterviewerAvatar interviewer={interviewer} />
+                  <div className="min-w-0 flex-1">
+                    <p className="font-display text-xl">{iv.offerTitle ?? "Untitled offer"}</p>
+                    <p className="text-sm">with {interviewer.copy.en.name}</p>
+                    <p className="text-sm text-muted-foreground">
+                      {[iv.company, iv.answered === 0 ? "Ready to practise" : iv.answered === iv.total ? "Completed" : "In progress", formatDay(iv.createdAt)]
+                        .filter(Boolean)
+                        .join(" · ")}
+                    </p>
                   </div>
-                </div>
-                <ArrowRight className="size-5 text-muted-foreground" aria-hidden="true" />
-              </Link>
+                  <div className="w-48">
+                    <p className="mb-1 text-xs text-muted-foreground">
+                      {iv.answered} of {iv.total} answered
+                    </p>
+                    <div className="h-2 rounded-full bg-muted" role="progressbar" aria-valuenow={percent} aria-valuemin={0} aria-valuemax={100} aria-label="Questions answered">
+                      <div className="h-2 rounded-full bg-primary" style={{ width: `${percent}%` }} />
+                    </div>
+                  </div>
+                  <ArrowRight className="size-5 text-muted-foreground" aria-hidden="true" />
+                </Link>
+                {iv.answered < iv.total && <DeleteInterviewButton interviewId={iv.id} label={iv.offerTitle ?? "Untitled offer"} remove={deleteInterviewAction} />}
+              </div>
             );
           })}
         </div>
