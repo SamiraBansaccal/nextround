@@ -6,6 +6,7 @@ import type { QuestionGroup } from "@/lib/types";
 
 export const QUESTION_TYPES = [
   "introduction", "motivation", "strengths", "weaknesses", "experience", "situation",
+  "career", "salary", "tricky", "closing", "inappropriate",
   "technical", "concept", "compare", "practice", "troubleshoot", "design", "best_practice",
   "skill_gap",
 ] as const;
@@ -18,6 +19,11 @@ export const QUESTION_TYPE_LABEL: Record<QuestionType, Localized> = {
   weaknesses: { en: "Weaknesses", fr: "Points faibles" },
   experience: { en: "Experience", fr: "Expérience" },
   situation: { en: "Situation", fr: "Mise en situation" },
+  career: { en: "Career", fr: "Projet professionnel" },
+  salary: { en: "Salary & conditions", fr: "Salaire & conditions" },
+  tricky: { en: "Tricky question", fr: "Question piège" },
+  closing: { en: "Closing", fr: "Conclusion" },
+  inappropriate: { en: "Inappropriate question", fr: "Question inappropriée" },
   technical: { en: "Technical", fr: "Technique" },
   concept: { en: "Concept", fr: "Notion" },
   compare: { en: "Comparison", fr: "Comparaison" },
@@ -30,7 +36,7 @@ export const QUESTION_TYPE_LABEL: Record<QuestionType, Localized> = {
 
 /** Which types fit each group of questions. */
 export const TYPES_BY_GROUP: Record<QuestionGroup, readonly QuestionType[]> = {
-  hr: ["introduction", "motivation", "strengths", "weaknesses", "experience", "situation"],
+  hr: ["introduction", "motivation", "strengths", "weaknesses", "experience", "situation", "career", "salary", "tricky", "closing", "inappropriate"],
   // The kinds of the question bank (lib/interview/bank/types.ts), plus the generic ones.
   technical: ["concept", "compare", "practice", "troubleshoot", "design", "best_practice", "experience", "technical", "situation"],
   gap: ["skill_gap"],

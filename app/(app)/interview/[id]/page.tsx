@@ -6,6 +6,7 @@ import { listFacts } from "@/lib/data/facts";
 import { getInterview } from "@/lib/data/interviews";
 import { bankAnswerText, findBankQuestion, findTech } from "@/lib/interview/bank";
 import { INTERVIEW_COPY, toLang } from "@/lib/interview/copy";
+import { findHrQuestion } from "@/lib/interview/hr-bank";
 import { bankQuestionLabel, questionLabel } from "@/lib/interview/question-types";
 import { getInterviewer, INTERVIEWERS, listCategories } from "@/lib/interviewers";
 import { KIND_NOTICE } from "@/lib/interviewers/labels";
@@ -51,7 +52,12 @@ export default async function InterviewPage({ params, searchParams }: PageProps<
           intro: question.intro,
           outro: question.outro,
           source: question.source,
-          model: bank ? { text: bankAnswerText(bank, lang), method: bank.kind === "experience" } : null,
+          model: bank
+            ? { text: bankAnswerText(bank, lang), method: bank.kind === "experience" }
+            : (() => {
+                const hr = findHrQuestion(question.bankId);
+                return hr ? { text: hr.answer[lang], method: true } : null;
+              })(),
           suggestedAnswer: question.suggestedAnswer,
           lastAnswer: answer ? { answer: answer.answer, feedback: answer.feedback ?? null } : null,
         };

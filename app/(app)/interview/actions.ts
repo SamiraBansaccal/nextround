@@ -10,14 +10,14 @@ import { getOfferDetail } from "@/lib/data/offers";
 import { bankAnswerText, findBankQuestion, findTech } from "@/lib/interview/bank";
 import { answerFeedback, MAX_ANSWER } from "@/lib/interview/feedback";
 import { toLang } from "@/lib/interview/copy";
-import { generateQuestions, type OfferForInterview } from "@/lib/interview/generate";
-import { INTERVIEW_KINDS, practiceAbout, practiceFocus, practiceOffer } from "@/lib/interview/practice";
+import { buildQuestions, type OfferForInterview } from "@/lib/interview/generate";
+import { hrAnswerText } from "@/lib/interview/hr-bank";
+import { INTERVIEW_KINDS, practiceFocus, practiceOffer } from "@/lib/interview/practice";
 import { parseTopic, type Topic, topicValue } from "@/lib/interview/tracks";
 import { registerOf } from "@/lib/interview/register";
 import { FOCUSES } from "@/lib/interview/session";
 import { findInterviewer } from "@/lib/interviewers";
 import { flavorInterview } from "@/lib/interviewers/flavor";
-import { personaInstructions } from "@/lib/interviewers/persona";
 import type { Feedback } from "@/lib/types";
 
 const startSchema = z.object({
@@ -48,7 +48,6 @@ export async function startInterviewAction(input: unknown): Promise<{ ok: true; 
   let offer: OfferForInterview;
   let offerId: string | null = null;
   let focus = parsed.data.focus;
-  let practice: { about: string; stackOnly: boolean } | null = null;
   let topic: Topic | null = null;
   let requirements: { text: string; quote: string; factIds: string[] }[] = [];
   if (kind === "offer") {
@@ -68,7 +67,6 @@ export async function startInterviewAction(input: unknown): Promise<{ ok: true; 
     if (kind === "technology" && !topic) return fail("Choose a technology first.", "Choisis d'abord une technologie.");
     offer = practiceOffer(topic);
     focus = practiceFocus(kind);
-    practice = { about: practiceAbout(kind, topic), stackOnly: kind === "technology" };
   }
 
   const [allFacts, askedBefore] = await Promise.all([listFacts(account.userId), listAskedBankIds(account.userId)]);
@@ -76,15 +74,15 @@ export async function startInterviewAction(input: unknown): Promise<{ ok: true; 
   const valid = new Set(facts.map((f) => f.id));
   offer.requirements = requirements.map((r) => ({ text: r.text, quote: r.quote, covered: r.factIds.some((id) => valid.has(id)) }));
   try {
-    const generated = await generateQuestions({ userId: account.userId, isOwner: account.isOwner }, offer, facts, {
+    // Written in advance (question banks), so no AI call here: instant and in correct English or French.
+    const generated = buildQuestions(offer, facts.map((f) => f.text), {
       language,
       focus,
-      persona: personaInstructions(interviewer),
       register: registerOf(interviewer.traits),
       askedBefore,
-      practice,
+      stackOnly: kind === "technology",
     });
-    if (generated.length < 4) return fail("This model could not return valid output — try another model.", "Ce modèle n'a pas renvoyé de réponse valide — essaie un autre modèle.");
+    if (generated.length === 0) return fail("No question could be prepared for this interview.", "Aucune question n'a pu être préparée pour cet entretien.");
     // What the interviewer says around each question (greeting, catchphrases, lead-ins): code, not AI.
     const lines = flavorInterview(interviewer, generated.map((q) => ({ tech: q.group === "technical" ? (q.techLabel ?? null) : null })), language);
     const questions = generated.map((q, i) => ({ ...q, intro: lines[i].intro, outro: lines[i].outro }));
@@ -124,7 +122,7 @@ export async function submitAnswerAction(input: unknown): Promise<{ ok: true; fe
         offerTitle: found.offer?.title ?? null,
         company: found.offer?.company ?? null,
         language: lang,
-        reference: bank && bank.kind !== "experience" ? bankAnswerText(bank, lang) : null,
+        reference: bank && bank.kind !== "experience" ? bankAnswerText(bank, lang) : hrAnswerText(found.question.bankId ?? "", lang),
       },
       facts,
     );

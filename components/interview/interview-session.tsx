@@ -269,10 +269,13 @@ export function InterviewSession(props: Props) {
                   <p className="mt-2 text-sm leading-relaxed">{q.model.text}</p>
                 </div>
               )}
-              <div>
-                {q.model && <p className="mb-2 text-xs font-bold text-muted-foreground uppercase">{copy.fromYourFacts}</p>}
-                <Sentences sentences={q.suggestedAnswer} facts={facts} empty={copy.suggestedEmpty} copy={copy} />
-              </div>
+              {/* Answers built from the candidate's facts: only interviews created before the question banks have them. */}
+              {(q.suggestedAnswer.length > 0 || !q.model) && (
+                <div>
+                  {q.model && <p className="mb-2 text-xs font-bold text-muted-foreground uppercase">{copy.fromYourFacts}</p>}
+                  <Sentences sentences={q.suggestedAnswer} facts={facts} empty={copy.suggestedEmpty} copy={copy} />
+                </div>
+              )}
             </div>
           )}
         </section>

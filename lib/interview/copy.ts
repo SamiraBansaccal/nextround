@@ -156,6 +156,8 @@ const en = {
   retryShort: "Retry",
   // ---------- Sources of generated questions ----------
   sourceHr: "Standard HR question",
+  sourceInappropriate: "An inappropriate question: in Belgium and the EU it may not be used to choose a candidate. Practise a calm answer; you don't have to reply.",
+  sourcePractice: "Practice on {tech}",
   sourceStack: "From the offer's stack: {item} — “{quote}”",
   sourceStackShort: "From the offer's stack",
   sourceGap: "From a gap in your profile: “{quote}”",
@@ -287,6 +289,8 @@ const fr: InterviewCopy = {
   notAnswered: "(sans réponse)",
   retryShort: "Refaire",
   sourceHr: "Question RH classique",
+  sourceInappropriate: "Une question inappropriée : en Belgique et dans l'UE, elle ne peut pas servir à choisir un candidat. Entraîne-toi à une réponse calme ; tu n'es pas obligé d'y répondre.",
+  sourcePractice: "Entraînement sur {tech}",
   sourceStack: "Tirée de la stack de l'offre : {item} — « {quote} »",
   sourceStackShort: "Tirée de la stack de l'offre",
   sourceGap: "Tirée d'une lacune de ton profil : « {quote} »",
