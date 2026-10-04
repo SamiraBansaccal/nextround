@@ -67,7 +67,7 @@ export async function setDocumentKept(userId: string, documentId: string, kept: 
 /** The documents kept in the profile, newest first, with the offer they were written for. */
 export async function listKeptDocuments(userId: string) {
   return getDb()
-    .select({ document: documents, offerTitle: offers.title, company: offers.company })
+    .select({ document: documents, offerTitle: offers.title, company: offers.company, offerStack: offers.stack })
     .from(documents)
     .leftJoin(offers, and(eq(offers.id, documents.offerId), eq(offers.userId, userId)))
     .where(and(eq(documents.userId, userId), eq(documents.kept, true)))

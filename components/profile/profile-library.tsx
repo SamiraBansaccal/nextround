@@ -55,6 +55,7 @@ export interface ProfileFactView {
 
 export interface CvItem {
   id: string;
+  category: string; // a career track id (devops, web, java…) or "general"
   fileName: string;
   importedAt: string;
   facts: number;
@@ -63,6 +64,7 @@ export interface CvItem {
 /** A CV or a cover letter written for an offer and kept in the profile, to reuse it or start from it. */
 export interface KeptDocument {
   id: string;
+  category: string; // the career track of the offer it was written for, or "general"
   kind: "cv" | "cover_letter";
   title: string;
   language: string | null;
@@ -89,6 +91,10 @@ interface Props {
   };
   cvs: CvItem[];
   keptDocuments: KeptDocument[];
+  /** The CV categories present, in order, for the tabs above the library ("all" is added here). */
+  categories: { id: string; label: string }[];
+  /** GitHub projects already in the base, and when the repositories were last read (null: never). */
+  github: { projects: number; lastImport: string | null };
   selectedCv: SelectedCv | null;
   /** A document written for an offer and added to the profile, shown instead of a CV (?doc=). */
   selectedDocument: {
@@ -142,7 +148,7 @@ async function pdfToText(file: File): Promise<string> {
   return (Array.isArray(text) ? text.join("\n") : text).trim();
 }
 
-export function ProfileLibrary({ t, candidate, cvs, keptDocuments, selectedCv, selectedDocument, facts, factTexts, actions }: Props) {
+export function ProfileLibrary({ t, candidate, cvs, keptDocuments, categories, github, selectedCv, selectedDocument, facts, factTexts, actions }: Props) {
   const router = useRouter();
   const fileInput = useRef<HTMLInputElement>(null);
   const [pending, startTransition] = useTransition();
@@ -163,6 +169,8 @@ export function ProfileLibrary({ t, candidate, cvs, keptDocuments, selectedCv, s
     type: "skill",
     text: "",
   });
+  const [category, setCategory] = useState("all");
+  const inCategory = (item: { category: string }) => category === "all" || item.category === category;
   const uploading = uploads.some((u) => u.status === "reading" || u.status === "analysing");
   const lineCopy = { editLine: t.editLine, save: t.save, cancel: t.cancel };
 
@@ -272,8 +280,30 @@ export function ProfileLibrary({ t, candidate, cvs, keptDocuments, selectedCv, s
               ))}
             </ul>
           )}
+          {categories.length > 1 && (
+            <div className="mb-3 flex gap-1 overflow-x-auto" role="tablist" aria-label={t.cvCategories}>
+              {[{ id: "all", label: t.allCvs }, ...categories].map((c) => {
+                const n = c.id === "all" ? cvs.length + keptDocuments.length : [...cvs, ...keptDocuments].filter((x) => x.category === c.id).length;
+                return (
+                  <button
+                    key={c.id}
+                    type="button"
+                    role="tab"
+                    aria-selected={category === c.id}
+                    onClick={() => setCategory(c.id)}
+                    className={cn(
+                      "shrink-0 rounded-full border px-3 py-1 text-sm transition-colors",
+                      category === c.id ? "border-earth bg-earth text-earth-foreground" : "border-earth/20 text-muted-foreground hover:border-earth/50 hover:text-foreground",
+                    )}
+                  >
+                    {c.label} <span className="text-xs tabular-nums opacity-70">{n}</span>
+                  </button>
+                );
+              })}
+            </div>
+          )}
           <div className="grid gap-2 sm:grid-cols-2 xl:grid-cols-3">
-            {cvs.map((cv) => {
+            {cvs.filter(inCategory).map((cv) => {
               const shown = !selectedDocument && cv.id === selectedCv?.id;
               return (
                 <article
@@ -313,7 +343,7 @@ export function ProfileLibrary({ t, candidate, cvs, keptDocuments, selectedCv, s
                 </article>
               );
             })}
-            {keptDocuments.map((doc) => {
+            {keptDocuments.filter(inCategory).map((doc) => {
               const shown = doc.id === selectedDocument?.id;
               return (
                 <article
@@ -537,7 +567,10 @@ export function ProfileLibrary({ t, candidate, cvs, keptDocuments, selectedCv, s
           </article>
         </section>
 
-        <div className="grid gap-x-10 border-t border-earth/20 lg:grid-cols-2">
+        <section aria-labelledby="enrich-title">
+          <SectionHeading eyebrow={t.enrichEyebrow} title={t.enrichTitle} id="enrich-title" />
+          <p className="-mt-2 mb-2 max-w-3xl text-sm text-muted-foreground">{t.enrichHint}</p>
+          <div className="border-t border-earth/20">
           {/* ---------- GitHub ---------- */}
           <ImportSection
             icon={<FolderGit2 className="size-4" aria-hidden="true" />}
@@ -545,9 +578,20 @@ export function ProfileLibrary({ t, candidate, cvs, keptDocuments, selectedCv, s
             title={t.githubTitle}
             body={candidate.githubLogin ? fill(t.githubBody, { login: candidate.githubLogin }) : t.githubSignIn}
           >
-            <Button variant="outline" className="w-fit" disabled={pending || !candidate.githubLogin} onClick={() => run(actions.importGithub)}>
-              {pending ? <RefreshCw className="size-4 animate-spin" aria-hidden="true" /> : <FolderGit2 className="size-4" aria-hidden="true" />} {t.importRepos}
-            </Button>
+            <div className="flex flex-col gap-1.5 lg:items-end">
+              {github.lastImport || github.projects > 0 ? (
+                <p className="flex items-center gap-1.5 text-sm text-success">
+                  <Check className="size-4" aria-hidden="true" />
+                  {github.lastImport ? fill(t.githubDone, { date: github.lastImport, count: github.projects }) : fill(t.githubDoneNoDate, { count: github.projects })}
+                </p>
+              ) : (
+                <p className="text-sm text-muted-foreground">{t.githubNever}</p>
+              )}
+              <Button variant="outline" className="w-fit" disabled={pending || !candidate.githubLogin} onClick={() => run(actions.importGithub)}>
+                {pending ? <RefreshCw className="size-4 animate-spin" aria-hidden="true" /> : <RefreshCw className="size-4" aria-hidden="true" />}{" "}
+                {github.lastImport || github.projects > 0 ? t.updateRepos : t.importRepos}
+              </Button>
+            </div>
           </ImportSection>
 
           {/* ---------- Codewars and LeetCode ---------- */}
@@ -594,7 +638,8 @@ export function ProfileLibrary({ t, candidate, cvs, keptDocuments, selectedCv, s
               </Button>
             </div>
           </ImportSection>
-        </div>
+          </div>
+        </section>
       </div>
     </div>
   );
@@ -685,7 +730,7 @@ function ChallengeInput({
 
 function ImportSection({ icon, eyebrow, title, body, children }: { icon: ReactNode; eyebrow: string; title: string; body: string; children: ReactNode }) {
   return (
-    <section className="flex flex-col gap-3 border-b border-earth/20 py-4">
+    <section className="grid gap-3 border-b border-earth/20 py-4 lg:grid-cols-[minmax(0,1fr)_minmax(0,30rem)] lg:items-center lg:gap-10">
       <div>
         <p className="flex items-center gap-2 text-xs font-bold text-terracotta uppercase">
           {icon} {eyebrow}
@@ -712,7 +757,7 @@ function OnboardingChat({ t, pending, onFinish }: { t: ProfileCopy; pending: boo
 
   return (
     <section className="flex flex-col gap-3 border-b border-earth/20 py-4" aria-labelledby="chat-title">
-      <div className="flex flex-col gap-3">
+      <div className="grid gap-3 lg:grid-cols-[minmax(0,1fr)_minmax(0,30rem)] lg:items-center lg:gap-10">
         <div>
           <p className="flex items-center gap-2 text-xs font-bold text-terracotta uppercase">
             <MessageCircle className="size-4" aria-hidden="true" /> {t.chatEyebrow}
@@ -723,13 +768,13 @@ function OnboardingChat({ t, pending, onFinish }: { t: ProfileCopy; pending: boo
           <p className="mt-0.5 text-sm leading-relaxed text-muted-foreground">{t.chatBody}</p>
         </div>
         {!open && (
-          <Button variant="outline" className="w-fit" onClick={() => setOpen(true)}>
+          <Button variant="outline" className="w-fit lg:justify-self-end" onClick={() => setOpen(true)}>
             <MessageCircle className="size-4" aria-hidden="true" /> {t.start}
           </Button>
         )}
       </div>
       {open && (
-        <div className="flex flex-col gap-3">
+        <div className="flex max-w-3xl flex-col gap-3">
           {questions.slice(0, Math.min(step + 1, questions.length)).map((q, i) => (
             <div key={q} className="flex flex-col gap-2">
               <p className="w-fit max-w-[85%] rounded-lg rounded-tl-none bg-primary-soft px-3 py-2 text-sm">{q}</p>

@@ -18,7 +18,7 @@ Règle : chaque session a sa *branch*, s'inscrit ici, ouvre une PR, et met la li
 
 | *Branch* | Session | Sujet | PR |
 |---|---|---|---|
-| `claude/intelligent-einstein-58bqoh` | cloud | 🎨 Tour des pages : cartes d'offres (logos, stack, tri par parcours), profil (catégories de CV, imports), réglages ; *deploy* qui migre. Fichiers : `components/{offers,dashboard,profile,settings,layout}/**`, `app/(app)/{dashboard,offers,profile,settings}/**`, `lib/offers/**`, `lib/i18n/**`, `scripts/infra/deploy.mjs` | PR à venir |
+| — | — | Aucune branche en cours | — |
 
 <details>
 <summary>📦 Branches déjà fusionnées</summary>
@@ -31,6 +31,7 @@ Règle : chaque session a sa *branch*, s'inscrit ici, ouvre une PR, et met la li
 | `claude/intelligent-einstein-58bqoh` | cloud | Réorganisation des dossiers, doc revue en profondeur, nouveaux ADR | [#9](https://github.com/SamiraBansaccal/nextround/pull/9) |
 | `claude/intelligent-einstein-58bqoh` | cloud | Audit sécurité et code, corrections | [#10](https://github.com/SamiraBansaccal/nextround/pull/10) |
 | `claude/remove-interviewers` | local | Retrait des 38 intervieweurs masqués par la propriétaire | [#7](https://github.com/SamiraBansaccal/nextround/pull/7) |
+| `claude/intelligent-einstein-58bqoh` | cloud | 🎨 Tour des pages : cartes d'offres (logos, stack, tri par parcours), profil (catégories de CV, imports), réglages ; *deploy* qui migre. Fichiers : `components/{offers,dashboard,profile,settings,layout}/**`, `app/(app)/{dashboard,offers,profile,settings}/**`, `lib/offers/**`, `lib/i18n/**`, `scripts/infra/deploy.mjs` | PR #15 |
 | `claude/intelligent-einstein-58bqoh` | cloud | 👤 Profil = une base unique (CV fusionnés sans doublons, tout validé, crayon sur chaque ligne, LeetCode), CV et lettre modifiables phrase par phrase, cartes d'offres alignées. Migration `0007` | [#13](https://github.com/SamiraBansaccal/nextround/pull/13) — ⚠️ `npm run db:migrate` (0007) à lancer depuis le Mac |
 | `claude/intelligent-einstein-58bqoh` | cloud | 🎭 Répliques des personnages, banques de questions enrichies, Stripe dans le cloud | [#12](https://github.com/SamiraBansaccal/nextround/pull/12) |
 | `claude/intelligent-einstein-58bqoh` | cloud | Traduction EN/FR de tout le site | [#6](https://github.com/SamiraBansaccal/nextround/pull/6), [#8](https://github.com/SamiraBansaccal/nextround/pull/8) |
@@ -38,6 +39,12 @@ Règle : chaque session a sa *branch*, s'inscrit ici, ouvre une PR, et met la li
 </details>
 
 ## ✅ Fait récemment
+
+### 🎨 Tour des pages (cloud, PR #15)
+
+- `deploy.mjs` lance d'abord `npm run db:migrate` et s'arrête s'il échoue.
+- Cartes d'offres : bande de couleur du parcours, logos de la stack (Simple Icons), logo de la plateforme (`public/sites/`, Indeed via Simple Icons), étape choisie sur la carte. Offres triées par **parcours** (mêmes parcours que les questions techniques : `lib/offers/track.ts`), sur le tableau de bord et la page Offres.
+- Profil : onglets de catégories au-dessus des CV (Tous, Général, DevOps, Web, Java…), imports l'un sous l'autre sur toute la largeur sous « Compléter ta base », GitHub affiche « Fait le … : N projets » et « Mettre à jour ».
 
 ### 👤 Profil (cloud)
 
@@ -103,6 +110,20 @@ Règle : chaque session a sa *branch*, s'inscrit ici, ouvre une PR, et met la li
 - Test prévu : M. Burns (références prêtes), bloqué sur `ELEVENLABS_API_KEY` dans le cloud (plan Pro minimum pour l'API Image & Video).
 
 ## 🔜 Ensuite
+
+### 📋 To-do laissée par la session cloud (2026-10-04, pour la session locale)
+
+1. 🗄️ `git pull` puis `npm run db:migrate` (migration `0007_leetcode_source`), ou directement `node scripts/infra/deploy.mjs` qui migre puis déploie.
+2. 👀 Regarder `/dashboard`, `/offers` et `/profile` en vrai (FR) : nouvelles cartes, onglets par parcours, onglets de CV, bloc GitHub. Les logos Actiris/Forem sont des favicons 16–32 px : à remplacer par des logos plus nets si besoin.
+3. ⚙️ **Page Réglages** (demandée par la propriétaire, pas commencée) :
+   - prendre toute la largeur (aujourd'hui elle n'occupe qu'une partie) ;
+   - en haut, un **encart pleine largeur dans une couleur qui ressort** (brun ou orange, dans la DA) : « ce qui est branché » (fournisseur IA, modèle, voix), avec une explication simple de ce qu'est OpenRouter et de la limite de la clé de l'instance ;
+   - en dessous, **deux encarts côte à côte** : à gauche le fournisseur IA, à droite la voix ; expliquer où l'IA et la voix servent dans le site ;
+   - ElevenLabs reste coupé (voix du navigateur) tant qu'on ne fabrique pas les voix des intervieweurs ;
+   - fichiers : `app/(app)/settings/page.tsx`, `components/settings/*`, `lib/i18n/settings.ts`.
+4. 🎨 **Bouton EN/FR** : son bleu sort de la DA ; le passer en brun ou terracotta (`components/layout/*`).
+5. 🔐 **Question de la propriétaire** : quelqu'un qui trouve l'adresse Vercel et s'inscrit consomme-t-il ses requêtes IA ? Vérifier dans le code (limites de la clé de l'instance dans `lib/ai/config.ts`, inscription Clerk ouverte ou non) et lui répondre ; si oui, proposer de fermer l'inscription (liste d'autorisation Clerk) ou de réserver la clé de l'instance à la propriétaire.
+6. 📄 Profil, suite : ajouter à la base les phrases d'un CV ou d'une lettre validés ; harmoniser les dates des CV ; bouton « fusionner pour de bon » pour les doublons.
 
 - 📅 Harmoniser les dates des CV (« 2024 » / « mars 2024 » / « 03/2024 ») : aujourd'hui on les corrige au crayon ; proposer un format unique.
 - 🔁 Doublons : ils sont repliés à l'affichage ; un bouton « fusionner » pourrait les supprimer pour de bon.
