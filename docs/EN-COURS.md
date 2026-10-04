@@ -1,60 +1,85 @@
-# Où on en est
+# 🔄 Où on en est
 
-Mis à jour à la fin de chaque session de travail avec Claude (local ou cloud). Le lire en premier.
+Mis à jour à la fin de chaque session Claude (locale ou cloud). **À lire en premier.**
 
 _Dernière mise à jour : 2026-10-04, session cloud._
 
-## Branches en cours
+## 🧭 Sommaire
 
-| Branche | Session | Sujet | PR |
+- [🌿 Branches en cours](#-branches-en-cours)
+- [✅ Fait récemment](#-fait-récemment)
+- [🚧 En cours](#-en-cours)
+- [🎬 Avatars animés](#-avatars-animés)
+- [🔜 Ensuite](#-ensuite)
+
+## 🌿 Branches en cours
+
+Règle : chaque session a sa *branch*, s'inscrit ici, ouvre une PR, et met la ligne à jour quand la PR est fusionnée (voir [guide local et cloud](fr/guides/local-et-cloud.md#-plusieurs-sessions-en-même-temps)).
+
+| *Branch* | Session | Sujet | PR |
 |---|---|---|---|
-| `claude/intelligent-einstein-58bqoh` | cloud | Entretiens sans offre (techno / RH), parcours de création, choix de l'intervieweur, caméra, langue du site, couleurs, réglages IA | [#2](https://github.com/SamiraBansaccal/nextround/pull/2) (fusionnée) |
-| `claude/owner-data-deploy` | local | Projets vibe-codés, « Update with my validated facts » | [#3](https://github.com/SamiraBansaccal/nextround/pull/3) (fusionnée) |
-| `claude/tailored-documents` | local | CV et lettre par offre (EN/FR), ajoutés au profil ; faits validés sur place dans le CV | [#4](https://github.com/SamiraBansaccal/nextround/pull/4) (fusionnée) |
-| `claude/intelligent-einstein-58bqoh` | cloud | Traduction FR/EN du site : offres, page d'offre, CV et lettre, profil, tableau de bord, réglages, messages des actions | [#6](https://github.com/SamiraBansaccal/nextround/pull/6) (fusionnée) et #8 (Réglages) |
+| `claude/intelligent-einstein-58bqoh` | cloud | 🗂️ Réorganisation des dossiers, doc revue en profondeur (sommaires, emojis, franglais), nouveaux ADR, audit | PR à venir |
 
-## Fait récemment
+<details>
+<summary>📦 Branches déjà fusionnées</summary>
 
-- Cloud, après les PR #3 à #5 : les pages Offres, page d'une offre, CV et lettre, Profil et Tableau de bord suivent la langue du site (bouton EN/FR), messages des actions serveur compris. Les documents gardent leur propre langue (`DOC_HEADINGS`), comme l'entretien garde la sienne. Textes dans `lib/i18n/{offers,profile,documents,dashboard}.ts` ; un test vérifie que l'anglais et le français ont les mêmes textes et les mêmes `{variables}`. Réglages aussi (PR #8). Restent en anglais : la page d'accueil publique et la connexion (pas de bouton de langue hors de l'app). E2e et captures en français pas encore faits (secrets absents du cloud).
+| *Branch* | Session | Sujet | PR |
+|---|---|---|---|
+| `claude/intelligent-einstein-58bqoh` | cloud | Entretiens sans offre, parcours de création, caméra, langue du site, couleurs, réglages IA | [#2](https://github.com/SamiraBansaccal/nextround/pull/2) |
+| `claude/owner-data-deploy` | local | Projets vibe-codés, « Update with my validated facts » | [#3](https://github.com/SamiraBansaccal/nextround/pull/3) |
+| `claude/tailored-documents` | local | CV et lettre par offre (EN/FR), ajoutés au profil ; faits validés sur place | [#4](https://github.com/SamiraBansaccal/nextround/pull/4) |
+| `claude/remove-interviewers` | local | Retrait des 38 intervieweurs masqués par la propriétaire | [#7](https://github.com/SamiraBansaccal/nextround/pull/7) |
+| `claude/intelligent-einstein-58bqoh` | cloud | Traduction EN/FR de tout le site | [#6](https://github.com/SamiraBansaccal/nextround/pull/6), [#8](https://github.com/SamiraBansaccal/nextround/pull/8) |
 
-- Session locale du 2026-10-04 (PR #3 et #4, déployées, migrations `0005` et `0006` appliquées) :
-  - Projets « vibe-codés » : marqués « Built with AI » dans le profil (NextRound, TrustLint, hopodoo pour la propriétaire). Ils restent dans le profil (intérêt pour l'IA, créativité, hackathons) mais ne couvrent **jamais** une exigence technique : règle unique `lib/offers/coverage.ts`, aussi appliquée aux entretiens et aux CV.
-  - « Update with my validated facts » sur une offre : relie à nouveau ses exigences aux faits validés (avant, seulement à l'ajout de l'offre).
-  - CV par offre au format d'un CV tech (titre, profil, tableau de compétences, projets avec technos, formations, expérience, langues), en anglais ou en français, chaque élément vérifié contre les faits validés ; lettre de motivation EN/FR. Un CV ou une lettre peut être **ajouté au profil** (bibliothèque) et servir de point de départ (« Start from »).
-  - Profil : les faits proposés se valident **sur place**, sous la ligne du CV dont ils viennent (`lib/profile/place-facts.ts`) ; les projets GitHub dans la section GitHub.
-  - Données de la propriétaire : 2 CV importés (`cv-fev2026.pdf`, `resume_sabansac.pdf` de collabr), 19 projets GitHub (dont hopodoo, dépôt privé), 11 offres. **Rien n'est encore validé.** Les brouillons de `collabr/anciennes-versions` (textes de modèle) n'ont pas été importés.
-  - Reste à savoir de la propriétaire : « cookie » (introuvable sur GitHub) et l'app du hackathon (2e place) : nom et description.
+</details>
 
-- PR #2 (cloud) : entretiens sans offre (par technologie, regroupées en parcours, ou RH seul), nouveau parcours de création (type → offre/techno → intervieweur en pleine page → test caméra → appel), caméra vraiment éteinte (LED), palette plus chaude, bouton supprimer rouge, langue du site EN/FR (anglais par défaut, séparée de la langue de l'entretien).
-- Questions sans IA : banque RH écrite à l'avance (classiques, variantes, pièges, questions illégales), banque technique, en anglais et en français corrects (pas de traduction mot à mot). L'IA ne sert plus qu'au retour sur les réponses.
-- Réglages : fournisseur Anthropic (Claude, clé de l'Anthropic Console ; un abonnement Claude.ai ne marche pas pour une app). Côté propriétaire, `ANTHROPIC_API_KEY` passe avant OpenRouter s'il est défini. ElevenLabs de l'instance coupé par défaut (`INSTANCE_VOICE_ENABLED=true` pour l'activer). Avertissements de coût, retour réutilisé pour une réponse identique, audio réutilisé (mémoire du serveur + onglet).
-- **Avant de déployer #2** : `npm run db:migrate` (migration `0005` : entretiens sans offre + `profile_facts.ai_assisted`).
+## ✅ Fait récemment
 
-- Banque de questions techniques (42 technologies, réponses types EN/FR) et répliques des intervieweurs (`c4ec9fc`). Migration `0004` déjà appliquée à Neon.
-- Import de CV plus tolérant aux réponses imparfaites de l'IA ; avatars pris automatiquement dans `public/interviewers/<id>.webp` (PR #1).
-- Scripts propriétaire `npm run owner:whoami | owner:import-cv | owner:import-offers`, hook de démarrage cloud, guide [local et cloud](FR/local-et-cloud.md).
+### 🗂️ Rangement (cloud, en cours de PR)
 
-- Choix de l'intervieweur : bouton « masquer » sur chaque personnage (temporaire, ce navigateur seulement, réversible). Changer d'intervieweur pendant l'entretien (les répliques des questions non répondues suivent). Supprimer un entretien non terminé depuis la liste.
-- Nouveaux intervieweurs : Kratos (nouvelle catégorie « Jeux vidéo », répliques EN/FR) et Chuck Norris (personne réelle, cinéma). Procédure : skill `add-interviewer`.
-- Vignettes statiques des 53 personnages animés dans `public/interviewers/` (références choisies à la main).
+- Plus aucun fichier en vrac : `lib/server/` (auth, env, crypto), `lib/shared/` (dates, ids, text), `components/layout/`, `tests/<domaine>/`, `scripts/infra/`, `assets/characters/` (ex-`characters/`). Détails : [architecture](fr/guides/architecture.md).
+- Doc : `docs/fr/` et `docs/en/`, chacun avec `guides/` et `adr/` ; sommaires, emojis, mots techniques gardés en anglais.
 
-## En cours
+### 🌍 Langue du site (cloud, PR #6 et #8)
 
-- 25 offres Actiris (Bruxelles, informatique, accessibles à un junior) récupérées dans `.local/offers/` sur la session cloud du 2026-10-04 : à importer avec `npm run owner:import-offers -- .local/offers/*.txt` dès que les secrets sont dans l'environnement cloud. Si ce dossier n'existe plus (nouveau conteneur) : `npm run offers:actiris -- search`, puis `npm run offers:actiris -- fetch <ref:type> …` (refs retenues : 5953957 5965434 5949141 5952000 5952031 5951701:Select 5947174:Select 5947193 5949293:DirectOnline 5945294 5936584 5947954 5907687 5962926 5959174:DirectOnline 5966908 5964627 5966116 5969827 5934580 5887917 5843176 5905968:Select 5869183 5869129).
-- Indeed bloque les robots (Cloudflare, 403) et l'interdit : on ne le contourne pas. Offres Indeed : lien ou texte collé dans l'app, ou liens envoyés à Claude.
-- Importer les CV : les joindre au chat, Claude lance `owner:import-cv`.
+- Tout le site connecté suit le bouton EN/FR, messages des *server actions* compris. Textes dans `lib/i18n/*` ; un test vérifie que l'anglais et le français ont les mêmes textes et les mêmes `{variables}`.
+- Un CV, une lettre et un entretien gardent **leur propre langue**.
+- Restent en anglais : l'accueil public et la connexion (pas de bouton de langue hors de l'app).
 
-## Avatars animés (en cours)
+### 📄 Documents et profil (local, PR #3, #4, #7 — déployées, migrations `0005` et `0006` appliquées)
 
-- `assets/characters/` : par personnage, `sources.json` (wiki Fandom de la franchise), `candidates/` (images trouvées + `contact-sheet.jpg`), `selection.json` (choix motivé), `master_reference.png` et `references/`, `performance.json` (décor, tenue, tics), `clip-plan.json` (33 clips : idle, écoute, réactions, transitions, parole).
-- Scripts : `python3 scripts/avatars/collect-references.py [id…]`, `python3 scripts/avatars/prepare-references.py <id>`, `npm run avatars:plan`, `npm run avatars:el -- test <id>` (ElevenLabs : plateau fixe, voix, 4 clips). `DRY_RUN=1` pour tout vérifier sans crédit.
-- Périmètre : personnages animés + Dark Vador et Yoda (53). Pas de vidéo de personnes réelles ni de personnages joués par des acteurs (visage réel). Les 12 originaux et archétypes seront dessinés plus tard.
-- Images en pause (demande du 2026-10-04). Kratos : notes de jeu et plan prêts, références pas encore collectées.
-- Test : M. Burns, références prêtes. Bloqué sur `ELEVENLABS_API_KEY` dans l'environnement cloud (plan Pro minimum pour l'API Image & Video).
+- Projets **vibe-codés** marqués « Built with AI » : gardés dans le profil, mais ne couvrent **jamais** une exigence technique (règle unique dans `lib/offers/coverage.ts`).
+- « Update with my validated facts » sur une offre.
+- CV par offre au format CV tech, EN ou FR, chaque élément vérifié ; lettre EN/FR ; un document peut être **ajouté au profil** et servir de point de départ.
+- Les faits proposés se valident **sur place**, sous la ligne du CV d'où ils viennent.
+- 110 intervieweurs dans 10 catégories après le retrait des 38 masqués.
+- Données de la propriétaire : 2 CV, 19 projets GitHub, 11 offres importés ; **rien n'est encore validé**. À demander : « cookie » (introuvable sur GitHub) et l'app du hackathon (2e place).
 
-## Ensuite (idées validées)
+### 🎙️ Entretiens (cloud, PR #2)
 
-- Avatars : images à fournir (liste générée depuis le catalogue). Animation pendant l'entretien : plus tard (pistes : boucles vidéo, ElevenLabs Avatars, synchro labiale en temps réel).
-- Relier Vercel à GitHub pour déployer sans le Mac.
-- Lancer les e2e et regarder quelques écrans en français (cookie `nextround-ui-lang=fr`).
-- Cache audio durable (Vercel Blob ou S3) quand ElevenLabs sera activé pour de bon.
+- Entretiens sans offre : par technologie (42, regroupées en parcours) ou RH seul.
+- Parcours : type → offre ou techno → intervieweur en pleine page → test caméra → appel. Caméra vraiment coupée (LED éteinte).
+- **Questions écrites à l'avance, sans IA** : banque RH (classiques, variantes, pièges, questions illégales) et banque technique, en vrai anglais et vrai français. L'IA ne sert qu'au retour sur les réponses.
+- Réglages : *provider* Anthropic (Claude) ; `ANTHROPIC_API_KEY` passe avant OpenRouter pour la propriétaire. ElevenLabs de l'instance coupé par défaut (`INSTANCE_VOICE_ENABLED=true`). Avertissements de coût ; un retour et un audio déjà produits sont réutilisés.
+
+## 🚧 En cours
+
+- 🔑 **Secrets absents du cloud** : sans eux, ni l'app ni les e2e ne tournent dans une session cloud. Liste : [guide local et cloud](fr/guides/local-et-cloud.md#-les-secrets-dans-le-cloud).
+- 💼 25 offres Actiris (Bruxelles, IT, accessibles à un junior) choisies le 2026-10-04 : à importer avec `npm run owner:import-offers -- .local/offers/*.txt` une fois les secrets en place. Si `.local/offers/` n'existe plus : `npm run offers:actiris -- search`, puis `npm run offers:actiris -- fetch <ref:type> …` (refs : 5953957 5965434 5949141 5952000 5952031 5951701:Select 5947174:Select 5947193 5949293:DirectOnline 5945294 5936584 5947954 5907687 5962926 5959174:DirectOnline 5966908 5964627 5966116 5969827 5934580 5887917 5843176 5905968:Select 5869183 5869129).
+- 🚫 Indeed bloque les robots (Cloudflare, 403) et l'interdit : on ne le contourne pas. Offres Indeed : lien ou texte collé dans l'app.
+- 📄 Importer des CV : les joindre au chat, Claude lance `owner:import-cv`.
+
+## 🎬 Avatars animés
+
+- ⏸️ **En pause** (demande du 2026-10-04).
+- `assets/characters/<id>/` : `sources.json`, `candidates/` (+ `contact-sheet.jpg`), `selection.json`, `master_reference.png` et `references/`, `performance.json` (décor, tenue, tics), `clip-plan.json` (33 clips).
+- Scripts : voir [ajouter un personnage](fr/guides/ajouter-un-personnage.md#️-lavatar). `DRY_RUN=1` pour tout vérifier sans crédit.
+- Périmètre : personnages animés + Dark Vador et Yoda. Pas de vidéo de personnes réelles ni de personnages joués par des acteurs.
+- Test prévu : M. Burns (références prêtes), bloqué sur `ELEVENLABS_API_KEY` dans le cloud (plan Pro minimum pour l'API Image & Video).
+
+## 🔜 Ensuite
+
+- 🧪 Lancer les e2e et regarder quelques écrans en français (cookie `nextround-ui-lang=fr`).
+- 🚀 Relier Vercel à GitHub pour *deploy* sans le Mac.
+- 🔊 Cache audio durable (Vercel Blob ou S3) quand ElevenLabs sera activé pour de bon.
+- 🎬 Avatars : animation pendant l'entretien (boucles vidéo, ElevenLabs Avatars, *lip sync* en temps réel).

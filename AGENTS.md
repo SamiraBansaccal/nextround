@@ -23,5 +23,5 @@ This repository is initialized for the Stripe project "nextround".
 - UI and logic stay separate: business logic, AI calls and verification live in `lib/` and server code; components only render data passed as props.
 - Every server query filters by the user id from the server-side session (`requireUserId()`), never from the client.
 - AI output is untrusted: validate it with zod and verify quotes and fact ids in code before showing it.
-- Continuity between local and cloud sessions: read `docs/EN-COURS.md` first; before ending a session, update it (done, in progress, next) and commit it with the work. See `docs/FR/local-et-cloud.md`.
+- Continuity between local and cloud sessions: read `docs/EN-COURS.md` first; before ending a session, update it (done, in progress, next) and commit it with the work. See `docs/fr/guides/local-et-cloud.md`.
 - Several Claude sessions (local and cloud) may work at the same time: each works on its OWN branch (never on `main`), opens a pull request when done, and lists its branch, scope and PR under "Branches en cours" in `docs/EN-COURS.md` (add the line when starting, update it when the PR is opened or merged). Before starting, `git pull` and read that list to avoid editing the same files as another session.
