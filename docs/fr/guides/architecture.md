@@ -84,7 +84,7 @@ Un dossier par **zone de l'app**, plus trois dossiers communs.
 | `data/` | 📦 Accès aux données, **toujours filtré par `userId`** | `offers.ts`, `facts.ts`, `interviews.ts`, `documents.ts`… |
 | `ai/` | 🤖 Le client d'IA et la vérification | `client.ts` (OpenAI-compatible), `anthropic.ts` (Claude via son SDK), `config.ts` (qui paie), `verify.ts` (citations mot pour mot), `prompt-facts.ts` |
 | `offers/` | 💼 Offres | `extract.ts` (lecture par l'IA), `coverage.ts` (couvert ou lacune), `match.ts`, `pipeline.ts` (cartes du suivi), `fetch-page.ts` |
-| `profile/` | 👤 Profil | `extract-facts.ts`, `cv-document.ts`, `place-facts.ts`, `github.ts`, `codewars.ts` |
+| `profile/` | 👤 Profil | `extract-facts.ts`, `cv-document.ts`, `cv-edit.ts`, `dedupe-facts.ts`, `github.ts`, `codewars.ts`, `leetcode.ts` |
 | `documents/` | 📄 CV et lettre par offre | `tailored-cv.ts`, `cover-letter.ts`, `render.ts` (titres dans la langue du document) |
 | `interview/` | 🎙️ Entretiens | `generate.ts` (questions sans IA), `bank/` (questions techniques), `hr-bank/` (questions RH), `feedback.ts` (le seul appel à l'IA), `tracks.ts`, `copy.ts` |
 | `interviewers/` | 🎭 Les personnages | `catalog/` (une fiche par personnage), `flavor/` (leurs répliques), `categories.ts` |

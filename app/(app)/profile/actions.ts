@@ -11,6 +11,8 @@ import { fill } from "@/lib/interview/copy";
 import { addSource, cvRef, getCvSource, removeCvSource, setCvDocument } from "@/lib/data/sources";
 import { fetchRelevantRepos, repoToFactText } from "@/lib/profile/github";
 import { codewarsFact, codewarsProfileSchema, codewarsUsername } from "@/lib/profile/codewars";
+import { applyCvEdit, cvEditPathSchema } from "@/lib/profile/cv-edit";
+import { LEETCODE_QUERY, leetcodeFact, leetcodeResponseSchema, leetcodeUsername } from "@/lib/profile/leetcode";
 import { isEmptyCvDocument, structureCv } from "@/lib/profile/cv-document";
 import { factKey, proposeFactsFromText } from "@/lib/profile/extract-facts";
 
@@ -41,44 +43,45 @@ export async function importGithubAction(): Promise<ActionResult> {
       text: repoToFactText(repo),
       source: "github",
       sourceRef: repo.html_url,
-      validated: false,
+      validated: true,
     });
   }
   revalidatePath("/", "layout");
   return {
     ok: true,
-    message: fresh.length ? fill(t.githubProposed, { count: fresh.length }) : t.upToDate,
+    message: fresh.length ? fill(t.githubAdded, { count: fresh.length }) : t.upToDate,
   };
 }
 
-const idSchema = z.string().uuid();
+/** One fact, or a fact and the other wordings of it found in other CVs (merged on the profile). */
+const factIdsSchema = z.union([z.string().uuid(), z.array(z.string().uuid()).min(1).max(20)]);
 
-export async function validateFactAction(id: unknown): Promise<ActionResult> {
+/** Deletes a fact and, when it was merged from several CVs, its other wordings too. */
+export async function rejectFactAction(ids: unknown): Promise<ActionResult> {
   const { t } = await uiCopy();
   const userId = await requireUserId();
-  const parsed = idSchema.safeParse(id);
-  if (!parsed.success || !(await updateFact(userId, parsed.data, { validated: true }))) return { ok: false, error: t.factNotFound };
-  revalidatePath("/", "layout");
-  return { ok: true, message: t.validatedMsg };
-}
-
-export async function rejectFactAction(id: unknown): Promise<ActionResult> {
-  const { t } = await uiCopy();
-  const userId = await requireUserId();
-  const parsed = idSchema.safeParse(id);
-  if (!parsed.success || !(await deleteFact(userId, parsed.data))) return { ok: false, error: t.factNotFound };
+  const parsed = factIdsSchema.safeParse(ids);
+  if (!parsed.success) return { ok: false, error: t.factNotFound };
+  let removed = 0;
+  for (const id of [parsed.data].flat()) if (await deleteFact(userId, id)) removed++;
+  if (!removed) return { ok: false, error: t.factNotFound };
   revalidatePath("/", "layout");
   return { ok: true, message: t.removed };
 }
 
-const editSchema = z.object({ id: z.string().uuid(), text: z.string().trim().min(3).max(500) });
+const editSchema = z.object({ id: z.string().uuid(), text: z.string().trim().min(3).max(500), mergedIds: z.array(z.string().uuid()).max(20).default([]) });
 
+/**
+ * Rewrites a fact. When it was merged from several CVs, the other wordings are deleted: the candidate's
+ * edit is now the one wording of that fact.
+ */
 export async function editFactAction(input: unknown): Promise<ActionResult> {
   const { t } = await uiCopy();
   const userId = await requireUserId();
   const parsed = editSchema.safeParse(input);
   if (!parsed.success) return { ok: false, error: t.textLength };
-  if (!(await updateFact(userId, parsed.data.id, { text: parsed.data.text }))) return { ok: false, error: t.factNotFound };
+  if (!(await updateFact(userId, parsed.data.id, { text: parsed.data.text, validated: true }))) return { ok: false, error: t.factNotFound };
+  for (const id of parsed.data.mergedIds) if (id !== parsed.data.id) await deleteFact(userId, id);
   revalidatePath("/", "layout");
   return { ok: true, message: t.saved };
 }
@@ -121,11 +124,11 @@ export async function importCodewarsAction(username: unknown): Promise<ActionRes
   }
   const { text, sourceRef } = codewarsFact(profile);
   const existing = (await listFacts(userId)).find((f) => f.source === "codewars" && f.sourceRef === sourceRef);
-  if (existing) await updateFact(userId, existing.id, { text, validated: false });
-  else await createFact(userId, { type: "achievement", text, source: "codewars", sourceRef, validated: false });
+  if (existing) await updateFact(userId, existing.id, { text, validated: true });
+  else await createFact(userId, { type: "achievement", text, source: "codewars", sourceRef, validated: true });
   await addSource(userId, "codewars", sourceRef);
   revalidatePath("/", "layout");
-  return { ok: true, message: t.codewarsProposed };
+  return { ok: true, message: t.codewarsAdded };
 }
 
 const cvSchema = z.object({
@@ -154,7 +157,7 @@ export async function importCvTextAction(input: unknown): Promise<ActionResult> 
   for (const fact of result.facts) {
     if (known.has(factKey(fact.text))) continue; // already found in another CV
     known.add(factKey(fact.text));
-    await createFact(account.userId, { ...fact, source: "cv_upload", sourceRef: cvRef(source.id), validated: false });
+    await createFact(account.userId, { ...fact, source: "cv_upload", sourceRef: cvRef(source.id), validated: true });
     added++;
   }
   revalidatePath("/", "layout");
@@ -218,21 +221,12 @@ export async function chatFactsAction(input: unknown): Promise<ActionResult> {
   for (const fact of result.facts) {
     if (known.has(factKey(fact.text))) continue;
     known.add(factKey(fact.text));
-    await createFact(account.userId, { ...fact, source: "chat", validated: false });
+    await createFact(account.userId, { ...fact, source: "chat", validated: true });
     added++;
   }
   await addSource(account.userId, "chat", "onboarding");
   revalidatePath("/", "layout");
-  return { ok: true, message: fill(added === 1 ? t.chatProposedOne : t.chatProposedMany, { count: added }) };
-}
-
-export async function validateAllAction(): Promise<ActionResult> {
-  const { t } = await uiCopy();
-  const userId = await requireUserId();
-  const pending = (await listFacts(userId)).filter((f) => !f.validated);
-  for (const f of pending) await updateFact(userId, f.id, { validated: true });
-  revalidatePath("/", "layout");
-  return { ok: true, message: fill(t.validatedCount, { count: pending.length }) };
+  return { ok: true, message: fill(added === 1 ? t.chatAddedOne : t.chatAddedMany, { count: added }) };
 }
 
 const aiAssistedSchema = z.object({ id: z.string().uuid(), aiAssisted: z.boolean() });
@@ -257,16 +251,48 @@ export async function setAiAssistedAction(input: unknown): Promise<ActionResult>
   };
 }
 
-const manySchema = z.array(z.string().uuid()).min(1).max(200);
-
-/** Validates several facts at once (e.g. all the facts proposed from one CV). */
-export async function validateManyAction(ids: unknown): Promise<ActionResult> {
+/** LeetCode (public profile): one achievement fact with the problems solved, updated on each import. */
+export async function importLeetcodeAction(username: unknown): Promise<ActionResult> {
   const { t } = await uiCopy();
   const userId = await requireUserId();
-  const parsed = manySchema.safeParse(ids);
-  if (!parsed.success) return { ok: false, error: t.factsNotFound };
-  let kept = 0;
-  for (const id of parsed.data) if (await updateFact(userId, id, { validated: true })) kept++;
+  const parsed = leetcodeUsername.safeParse(username);
+  if (!parsed.success) return { ok: false, error: t.leetcodeInvalid };
+  let user;
+  try {
+    const response = await fetch("https://leetcode.com/graphql", {
+      method: "POST",
+      headers: { "Content-Type": "application/json", Referer: "https://leetcode.com", "User-Agent": "NextRound" },
+      body: JSON.stringify({ query: LEETCODE_QUERY, variables: { u: parsed.data } }),
+      signal: AbortSignal.timeout(10_000),
+      cache: "no-store",
+    });
+    user = leetcodeResponseSchema.parse(await response.json()).data.matchedUser;
+  } catch {
+    return { ok: false, error: t.leetcodeDown };
+  }
+  if (!user) return { ok: false, error: t.leetcodeUnknown };
+  const { text, sourceRef } = leetcodeFact(user);
+  const existing = (await listFacts(userId)).find((f) => f.source === "leetcode" && f.sourceRef === sourceRef);
+  if (existing) await updateFact(userId, existing.id, { text, validated: true });
+  else await createFact(userId, { type: "achievement", text, source: "leetcode", sourceRef, validated: true });
+  await addSource(userId, "leetcode", sourceRef);
   revalidatePath("/", "layout");
-  return { ok: true, message: fill(kept === 1 ? t.keptOne : t.keptMany, { count: kept }) };
+  return { ok: true, message: t.leetcodeAdded };
+}
+
+const cvEditSchema = z.object({ sourceId: z.string().uuid(), path: cvEditPathSchema, value: z.string().max(2000) });
+
+/** Changes one line of a CV laid out on the profile (a date, a typo): the candidate's own wording is kept. */
+export async function editCvLineAction(input: unknown): Promise<ActionResult> {
+  const { t } = await uiCopy();
+  const userId = await requireUserId();
+  const parsed = cvEditSchema.safeParse(input);
+  if (!parsed.success) return { ok: false, error: t.cvLineInvalid };
+  const source = await getCvSource(userId, parsed.data.sourceId);
+  if (!source?.document) return { ok: false, error: t.cvNotFound };
+  const document = applyCvEdit(source.document, parsed.data.path, parsed.data.value);
+  if (!document) return { ok: false, error: t.cvLineInvalid };
+  await setCvDocument(userId, source.id, document);
+  revalidatePath("/profile");
+  return { ok: true, message: t.saved };
 }
