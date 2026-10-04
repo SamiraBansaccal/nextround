@@ -3,7 +3,7 @@ import { findTech } from "@/lib/interview/bank";
 import { type TechLogo, techLogo } from "@/lib/interview/tech-logos";
 import type { Localized } from "@/lib/interviewers/types";
 import { type CoverageFact, matchScore } from "@/lib/offers/coverage";
-import { offerTechIds, primaryTrack } from "@/lib/offers/track";
+import { offerTechIds, offerTrack } from "@/lib/offers/track";
 import { formatDay } from "@/lib/shared/dates";
 
 // Dashboard pipeline cards (business logic, kept out of the components).
@@ -59,7 +59,7 @@ export function buildPipelineCards(
         const tech = findTech(id);
         return tech ? [{ id, label: tech.label, logo: techLogo(id) }] : [];
       }),
-      track: primaryTrack(techIds),
+      track: offerTrack(offer.stack.map((s) => s.value), offer.title),
     };
   });
 }
