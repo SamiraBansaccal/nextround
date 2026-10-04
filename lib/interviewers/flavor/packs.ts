@@ -130,17 +130,9 @@ export const CHARACTER_PACKS: Record<string, FlavorPack> = {
     greetings: [{ en: "Hey hey! It's Krusty!", fr: "Hé hé ! C'est Krusty !" }],
     interjections: [{ en: "Hey hey!", fr: "Hé hé !" }],
   },
-  "principal-skinner": {
-    openers: [{ en: "Attention, please.", fr: "Votre attention, s'il vous plaît." }],
-    closers: [{ en: "Discipline first.", fr: "La discipline avant tout." }],
-  },
   "ned-flanders": {
     greetings: [{ en: "Hi-diddly-ho!", fr: "Salut-salut !" }],
     interjections: [{ en: "Okily-dokily!", fr: "Okidoki !" }],
-  },
-  "ralph-wiggum": {
-    interjections: [{ en: "I'm learnding!", fr: "J'apprends des trucs !" }],
-    closers: [{ en: "My cat's breath smells like cat food.", fr: "L'haleine de mon chat sent la pâtée pour chat." }],
   },
   "comic-book-guy": {
     interjections: [{ en: "Ahem.", fr: "Hum hum." }],
@@ -164,12 +156,10 @@ export const CHARACTER_PACKS: Record<string, FlavorPack> = {
     interjections: [{ en: "Aaaaah!", fr: "Aaaaah !" }],
     closers: [{ en: "The things I do for this job…", fr: "Ce qu'il ne faut pas faire pour ce boulot…" }],
   },
-  ed: { interjections: [{ en: "Buttered toast!", fr: "Tartine beurrée !" }] },
   edd: {
     interjections: [{ en: "Good lord!", fr: "Grand Dieu !" }],
     openers: [{ en: "Let us proceed methodically.", fr: "Procédons avec méthode." }],
   },
-  eddy: { openers: [{ en: "Listen up, this is a sweet deal.", fr: "Écoute bien, c'est une affaire en or." }] },
   plankton: {
     interjections: [{ en: "Mwahahaha!", fr: "Mwahahaha !" }],
     techOpeners: [{ en: "The secret formula of {tech}…", fr: "La formule secrète de {tech}…" }],
@@ -188,26 +178,6 @@ export const CHARACTER_PACKS: Record<string, FlavorPack> = {
   },
   billy: { interjections: [{ en: "Yaaay!", fr: "Ouaiiis !" }] },
   mandy: { closers: [{ en: "I'm not impressed. Yet.", fr: "Je ne suis pas impressionnée. Pour l'instant." }] },
-  "powerpuff-girls": { greetings: [{ en: "Saving the day… right after this interview!", fr: "On sauve le monde… juste après cet entretien !" }] },
-  "scooby-doo": {
-    interjections: [{ en: "Ruh-roh!", fr: "Rouh-roh !" }],
-    closers: [{ en: "Scooby Snack if you get it right!", fr: "Un Scooby Snack si c'est juste !" }],
-  },
-  shaggy: {
-    interjections: [
-      { en: "Zoinks!", fr: "Zoinks !" },
-      { en: "Like, man…", fr: "Genre, mec…" },
-    ],
-  },
-  "daffy-duck": { interjections: [{ en: "Hoo-hoo! Hoo-hoo!", fr: "Hou-hou ! Hou-hou !" }] },
-  "bugs-bunny": { greetings: [{ en: "Eh, what's up, doc?", fr: "Quoi d'neuf, docteur ?" }] },
-  "marvin-the-martian": {
-    interjections: [{ en: "Oh, drat.", fr: "Oh, flûte." }],
-    closers: [{ en: "Where's the kaboom? There was supposed to be an earth-shattering kaboom!", fr: "Où est le kaboum ? Il devait y avoir un kaboum fracassant !" }],
-  },
-  sylvester: { interjections: [{ en: "Sufferin' succotash!", fr: "Sapristi saucisse !" }] },
-  tweety: { interjections: [{ en: "I tawt I taw a puddy tat!", fr: "J'ai cru voir un rominet !" }] },
-  taz: { interjections: [{ en: "Blblblbl!", fr: "Blblblbl !" }] },
   "rick-sanchez": {
     interjections: [{ en: "Wubba lubba dub dub!", fr: "Wubba lubba dub dub !" }],
     openers: [{ en: "Listen, Morty— I mean, you.", fr: "Écoute, Morty… enfin, toi." }],
@@ -241,14 +211,6 @@ export const CHARACTER_PACKS: Record<string, FlavorPack> = {
     openers: [{ en: "Focus.", fr: "Concentration." }],
     closers: [{ en: "Don't waste my time.", fr: "Ne me {faites|fais} pas perdre mon temps." }],
   },
-  saitama: {
-    interjections: [{ en: "Ok.", fr: "Ok." }],
-    closers: [{ en: "There's a sale at the supermarket in ten minutes.", fr: "Il y a des soldes au supermarché dans dix minutes." }],
-  },
-  genos: {
-    openers: [{ en: "Analysis complete. Question.", fr: "Analyse terminée. Question." }],
-    closers: [{ en: "I will record your answer for Master Saitama.", fr: "J'enregistrerai {votre|ta} réponse pour Maître Saitama." }],
-  },
   naruto: {
     greetings: [{ en: "I'm gonna be Hokage! But first, your turn!", fr: "Je vais devenir Hokage ! Mais d'abord, à toi !" }],
     interjections: [{ en: "Dattebayo!", fr: "Dattebayo !" }],
@@ -258,7 +220,6 @@ export const CHARACTER_PACKS: Record<string, FlavorPack> = {
     interjections: [{ en: "Yo.", fr: "Yo." }],
   },
   itachi: { openers: [{ en: "Look closely.", fr: "{Regardez|Regarde} bien." }] },
-  gojo: { greetings: [{ en: "Relax. I'm the strongest, so you just answer.", fr: "Détends-toi. Je suis le plus fort, toi tu réponds." }] },
   sukuna: { openers: [{ en: "Entertain me.", fr: "{Divertissez|Divertis}-moi." }] },
 
   // ---------- Film and TV characters ----------
@@ -267,24 +228,12 @@ export const CHARACTER_PACKS: Record<string, FlavorPack> = {
     openers: [{ en: "I'm going to ask you a question you can't refuse.", fr: "Je vais {vous|te} poser une question que {vous ne pourrez|tu ne pourras} pas refuser." }],
   },
   "michael-corleone": { closers: [{ en: "It's not personal. It's strictly business.", fr: "Ce n'est pas personnel, ce sont les affaires." }] },
-  "travis-bickle": { openers: [{ en: "You talkin' to me? Good. Then answer this.", fr: "C'est à moi que tu parles ? Bien. Alors réponds à ça." }] },
   "tyler-durden": { openers: [{ en: "The first rule of this interview: you answer the question.", fr: "Première règle de cet entretien : on répond à la question." }] },
   "walter-white": {
     openers: [{ en: "Say my name. …Never mind. Question.", fr: "Dis mon nom. …Laisse tomber. Question." }],
     closers: [{ en: "Apply yourself.", fr: "{Appliquez-vous|Applique-toi}." }],
   },
   "saul-goodman": { greetings: [{ en: "Better call Saul! Well, you're already here.", fr: "Better call Saul ! Bon, {vous êtes|tu es} déjà là." }] },
-  "michael-scott": {
-    greetings: [{ en: "World's best boss, at your service.", fr: "Le meilleur boss du monde, à {votre|ton} service." }],
-    openers: [{ en: "I'm not superstitious, but I am a little stitious.", fr: "Je ne suis pas superstitieux, mais je suis un peu stitieux." }],
-  },
-  "dwight-schrute": {
-    interjections: [{ en: "Bears. Beets. Battlestar Galactica.", fr: "Ours. Betteraves. Battlestar Galactica." }],
-    openers: [{ en: "Question.", fr: "Question." }],
-    closers: [{ en: "False. …Just kidding. Answer.", fr: "Faux. …Je plaisante. {Répondez|Réponds}." }],
-  },
-  "ron-swanson": { closers: [{ en: "Keep it short. I don't like small talk.", fr: "{Faites|Fais} court. Je n'aime pas les bavardages." }] },
-  "don-draper": { openers: [{ en: "Sell me your answer.", fr: "{Vendez|Vends}-moi {votre|ta} réponse." }] },
   "the-dude": {
     interjections: [{ en: "Yeah, well…", fr: "Ouais, enfin…" }],
     closers: [{ en: "The Dude abides.", fr: "Le Duc reste zen." }],
