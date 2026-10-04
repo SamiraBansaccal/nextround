@@ -18,7 +18,7 @@ Règle : chaque session a sa *branch*, s'inscrit ici, ouvre une PR, et met la li
 
 | *Branch* | Session | Sujet | PR |
 |---|---|---|---|
-| `claude/intelligent-einstein-58bqoh` | cloud | 🗂️ Réorganisation des dossiers, doc revue en profondeur (sommaires, emojis, franglais), nouveaux ADR, audit | PR à venir |
+| `claude/intelligent-einstein-58bqoh` | cloud | 🗂️ Réorganisation des dossiers, doc revue en profondeur (sommaires, emojis, franglais), nouveaux ADR | [#9](https://github.com/SamiraBansaccal/nextround/pull/9) (fusionnée) ; audit ensuite |
 
 <details>
 <summary>📦 Branches déjà fusionnées</summary>
