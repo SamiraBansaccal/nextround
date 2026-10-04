@@ -4,6 +4,12 @@ Mis à jour à la fin de chaque session de travail avec Claude (local ou cloud).
 
 _Dernière mise à jour : 2026-10-04, session cloud._
 
+## Branches en cours
+
+| Branche | Session | Sujet | PR |
+|---|---|---|---|
+| `claude/intelligent-einstein-58bqoh` | cloud | Entretiens sans offre (techno / RH), parcours de création, choix de l'intervieweur, caméra, langue du site, couleurs, réglages IA | à venir |
+
 ## Fait récemment
 
 - Banque de questions techniques (42 technologies, réponses types EN/FR) et répliques des intervieweurs (`c4ec9fc`). Migration `0004` déjà appliquée à Neon.
