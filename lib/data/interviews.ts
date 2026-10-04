@@ -1,5 +1,5 @@
 import "server-only";
-import { and, asc, desc, eq, inArray, isNotNull } from "drizzle-orm";
+import { and, asc, desc, eq, inArray, isNotNull, isNull } from "drizzle-orm";
 import { getDb } from "@/lib/db";
 import { answers, interviews, offers, questions } from "@/lib/db/schema";
 import { isUuid } from "@/lib/shared/ids";
@@ -118,15 +118,26 @@ export async function getQuestionWithOffer(userId: string, questionId: string) {
 }
 
 /**
- * Feedback already given to this user for exactly this answer to exactly this question text (in any of
- * their interviews): reused instead of paying for a new AI call.
+ * Feedback already given to this user for exactly this answer to exactly this question text, in an
+ * interview on the same offer (or, for practice without an offer, another one without an offer): the
+ * feedback judges relevance to the offer, so it is not carried from one offer to another.
  */
-export async function findSavedFeedback(userId: string, questionText: string, answer: string): Promise<Feedback | null> {
+export async function findSavedFeedback(userId: string, questionText: string, answer: string, offerId: string | null): Promise<Feedback | null> {
   const [row] = await getDb()
     .select({ feedback: answers.feedback })
     .from(answers)
     .innerJoin(questions, eq(answers.questionId, questions.id))
-    .where(and(eq(answers.userId, userId), eq(questions.userId, userId), eq(questions.text, questionText), eq(answers.answer, answer.trim())))
+    .innerJoin(interviews, eq(questions.interviewId, interviews.id))
+    .where(
+      and(
+        eq(answers.userId, userId),
+        eq(questions.userId, userId),
+        eq(interviews.userId, userId),
+        offerId ? eq(interviews.offerId, offerId) : isNull(interviews.offerId),
+        eq(questions.text, questionText),
+        eq(answers.answer, answer.trim()),
+      ),
+    )
     .orderBy(desc(answers.createdAt))
     .limit(1);
   return row?.feedback ?? null;

@@ -3,6 +3,7 @@ import type { z } from "zod";
 import { serverEnv } from "@/lib/server/env";
 import { type ChatMessage, chatCompletion, type ChatOptions, type LlmConfig } from "./client";
 import { resolveLlmConfig } from "./config";
+import { AiError } from "./errors";
 import { generateJson } from "./json";
 import { consumeInstanceQuota } from "./usage";
 
@@ -36,6 +37,7 @@ export async function aiJson<T>(ctx: AiContext, params: { schema: z.ZodType<T>; 
 export async function testAiConnection(ctx: AiContext): Promise<{ model: string; source: LlmConfig["source"] }> {
   const config = await resolveLlmConfig(ctx.userId, ctx.isOwner);
   const complete = completerFor(ctx, config);
-  await complete(config, [{ role: "user", content: "Reply with the single word: OK" }], { ...chatOptions(), maxTokens: 10 });
+  const reply = await complete(config, [{ role: "user", content: "Reply with the single word: OK" }], { ...chatOptions(), maxTokens: 10 });
+  if (!reply.trim()) throw new AiError("invalid_output"); // connected, but the model answered nothing
   return { model: config.model, source: config.source };
 }

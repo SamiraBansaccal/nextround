@@ -18,7 +18,7 @@ Règle : chaque session a sa *branch*, s'inscrit ici, ouvre une PR, et met la li
 
 | *Branch* | Session | Sujet | PR |
 |---|---|---|---|
-| `claude/intelligent-einstein-58bqoh` | cloud | 🗂️ Réorganisation des dossiers, doc revue en profondeur (sommaires, emojis, franglais), nouveaux ADR | [#9](https://github.com/SamiraBansaccal/nextround/pull/9) (fusionnée) ; audit ensuite |
+| `claude/intelligent-einstein-58bqoh` | cloud | 🔍 Audit sécurité et code, corrections | PR à venir |
 
 <details>
 <summary>📦 Branches déjà fusionnées</summary>
@@ -28,6 +28,7 @@ Règle : chaque session a sa *branch*, s'inscrit ici, ouvre une PR, et met la li
 | `claude/intelligent-einstein-58bqoh` | cloud | Entretiens sans offre, parcours de création, caméra, langue du site, couleurs, réglages IA | [#2](https://github.com/SamiraBansaccal/nextround/pull/2) |
 | `claude/owner-data-deploy` | local | Projets vibe-codés, « Update with my validated facts » | [#3](https://github.com/SamiraBansaccal/nextround/pull/3) |
 | `claude/tailored-documents` | local | CV et lettre par offre (EN/FR), ajoutés au profil ; faits validés sur place | [#4](https://github.com/SamiraBansaccal/nextround/pull/4) |
+| `claude/intelligent-einstein-58bqoh` | cloud | Réorganisation des dossiers, doc revue en profondeur, nouveaux ADR | [#9](https://github.com/SamiraBansaccal/nextround/pull/9) |
 | `claude/remove-interviewers` | local | Retrait des 38 intervieweurs masqués par la propriétaire | [#7](https://github.com/SamiraBansaccal/nextround/pull/7) |
 | `claude/intelligent-einstein-58bqoh` | cloud | Traduction EN/FR de tout le site | [#6](https://github.com/SamiraBansaccal/nextround/pull/6), [#8](https://github.com/SamiraBansaccal/nextround/pull/8) |
 
@@ -35,7 +36,11 @@ Règle : chaque session a sa *branch*, s'inscrit ici, ouvre une PR, et met la li
 
 ## ✅ Fait récemment
 
-### 🗂️ Rangement (cloud, en cours de PR)
+### 🔍 Audit (cloud)
+
+- Sécurité et *code review* : 7 corrections (*security headers*, lecture des pages limitée en *stream*, réutilisation du *feedback* seulement si ses *facts* tiennent et pour la même offre, voix après changement d'intervieweur, nouvelle version de CV affichée, relance après réponse vide). Rapport et 5 points ouverts : [audit du 2026-10-04](fr/audits/2026-10-04-audit.md).
+
+### 🗂️ Rangement (cloud, PR #9)
 
 - Plus aucun fichier en vrac : `lib/server/` (auth, env, crypto), `lib/shared/` (dates, ids, text), `components/layout/`, `tests/<domaine>/`, `scripts/infra/`, `assets/characters/` (ex-`characters/`). Détails : [architecture](fr/guides/architecture.md).
 - Doc : `docs/fr/` et `docs/en/`, chacun avec `guides/` et `adr/` ; sommaires, emojis, mots techniques gardés en anglais.
@@ -79,7 +84,8 @@ Règle : chaque session a sa *branch*, s'inscrit ici, ouvre une PR, et met la li
 
 ## 🔜 Ensuite
 
-- 🧪 Lancer les e2e et regarder quelques écrans en français (cookie `nextround-ui-lang=fr`).
+- 🧪 Lancer les e2e et regarder quelques écrans en français (cookie `nextround-ui-lang=fr`) ; vérifier que les *security headers* ne gênent pas Clerk.
+- 🔍 Points ouverts de l'audit : DNS rebinding, *owner* par id GitHub, CSP complète, `shadcn` en *devDependencies*, purge des compteurs.
 - 🚀 Relier Vercel à GitHub pour *deploy* sans le Mac.
 - 🔊 Cache audio durable (Vercel Blob ou S3) quand ElevenLabs sera activé pour de bon.
 - 🎬 Avatars : animation pendant l'entretien (boucles vidéo, ElevenLabs Avatars, *lip sync* en temps réel).

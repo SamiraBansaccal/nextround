@@ -15,6 +15,7 @@ import { CallControls, CallStage } from "./call-stage";
 import { InterviewerChooser } from "./interviewer-chooser";
 import { readMediaChoice, useLocalMedia } from "./media/use-local-media";
 import { QuestionPanel } from "./question-panel";
+import { forgetPlayedAudio } from "./voice/question-speech";
 import { useVoice } from "./voice/use-voice";
 
 export interface SessionQuestion {
@@ -180,7 +181,10 @@ export function InterviewSession(props: Props) {
           if (id === interviewer.id) return;
           startSwitch(async () => {
             const result = await switcher.change({ interviewId, interviewerId: id });
-            if (result.ok) router.refresh();
+            if (result.ok) {
+              forgetPlayedAudio(); // the new interviewer has another voice
+              router.refresh();
+            }
           });
         }}
       />

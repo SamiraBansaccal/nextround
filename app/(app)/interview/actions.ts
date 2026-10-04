@@ -117,7 +117,7 @@ export async function submitAnswerAction(input: unknown): Promise<{ ok: true; fe
   try {
     // The same answer to the same question already has feedback: reuse it (no new AI call), unless the
     // validated facts it relies on have changed since.
-    const saved = await findSavedFeedback(account.userId, found.question.text, parsed.data.answer);
+    const saved = await findSavedFeedback(account.userId, found.question.text, parsed.data.answer, found.interview?.offerId ?? null);
     const reusable = saved && isReusableFeedback(saved, new Set(facts.map((f) => f.id))) ? saved : null;
     const feedback = reusable ?? await answerFeedback(
       { userId: account.userId, isOwner: account.isOwner },
