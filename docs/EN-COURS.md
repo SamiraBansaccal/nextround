@@ -18,7 +18,7 @@ Règle : chaque session a sa *branch*, s'inscrit ici, ouvre une PR, et met la li
 
 | *Branch* | Session | Sujet | PR |
 |---|---|---|---|
-| `claude/intelligent-einstein-58bqoh` | cloud | 🔍 Audit sécurité et code, corrections | PR à venir |
+| `claude/intelligent-einstein-58bqoh` | cloud | 🔍 Audit sécurité et code, corrections | [#10](https://github.com/SamiraBansaccal/nextround/pull/10) (fusionnée) |
 
 <details>
 <summary>📦 Branches déjà fusionnées</summary>
@@ -36,7 +36,7 @@ Règle : chaque session a sa *branch*, s'inscrit ici, ouvre une PR, et met la li
 
 ## ✅ Fait récemment
 
-### 🔍 Audit (cloud)
+### 🔍 Audit (cloud, PR #10)
 
 - Sécurité et *code review* : 7 corrections (*security headers*, lecture des pages limitée en *stream*, réutilisation du *feedback* seulement si ses *facts* tiennent et pour la même offre, voix après changement d'intervieweur, nouvelle version de CV affichée, relance après réponse vide). Rapport et 5 points ouverts : [audit du 2026-10-04](fr/audits/2026-10-04-audit.md).
 
