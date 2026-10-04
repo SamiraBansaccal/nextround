@@ -32,7 +32,7 @@ Dans l'app Claude : menu de l'environnement cloud dans la barre de titre de la s
 
 | Pour… | *Env vars* |
 |---|---|
-| 🧱 Lancer l'app, les tests e2e, les scripts *owner* | `DB_CONNECTION_STRING`, `CLERK_SECRET_KEY`, `NEXT_PUBLIC_CLERK_PUBLISHABLE_KEY`, `APP_ENCRYPTION_KEY`, `OWNER_GITHUB_LOGIN` |
+| 🧱 Lancer l'app, les tests e2e, les scripts *owner* | `DB_CONNECTION_STRING`, `CLERK_SECRET_KEY`, `NEXT_PUBLIC_CLERK_PUBLISHABLE_KEY`, `APP_ENCRYPTION_KEY`, `OWNER_GITHUB_ID` (ton identifiant GitHub **numérique** : l'`id` de `https://api.github.com/users/<pseudo>`) |
 | 🤖 L'IA de l'instance (une des deux) | `OPENROUTER_API_API_KEY` (modèles gratuits) ou `ANTHROPIC_API_KEY` (Claude, payant ; passe avant OpenRouter) |
 | 🌐 Lire les pages d'offres | `FIRECRAWL_API_API_KEY` (facultatif) |
 | 🔊 La voix ElevenLabs | `ELEVENLABS_API_KEY` **et** `INSTANCE_VOICE_ENABLED=true` — sans ce second, l'app ne dépense jamais de crédits ElevenLabs |

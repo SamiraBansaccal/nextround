@@ -19,6 +19,15 @@ async function findUser() {
   return data[0] ?? null;
 }
 
+// Sign-up is closed on the instance (allowlist, scripts/infra/clerk-signup.mts), and Clerk applies it to
+// accounts created through the Backend API too: the test address is allowed only while the tests run.
+async function allowTestAddress(allow: boolean) {
+  const { data } = await clerk.allowlistIdentifiers.getAllowlistIdentifierList();
+  const entry = data.find((e) => e.identifier === E2E_EMAIL);
+  if (allow && !entry) await clerk.allowlistIdentifiers.createAllowlistIdentifier({ identifier: E2E_EMAIL, notify: false });
+  if (!allow && entry) await clerk.allowlistIdentifiers.deleteAllowlistIdentifier(entry.id);
+}
+
 const OFFER_TEXT = `Développeur·se Full Stack Junior (H/F) — Brussels Tech SRL
 Lieu : Bruxelles. Contrat : CDI, temps plein.
 Votre mission : développer et maintenir notre application web de réservation.
@@ -49,6 +58,7 @@ COMPÉTENCES
 React, TypeScript, Node.js, Git`;
 
 async function seed() {
+  await allowTestAddress(true);
   const user = (await findUser()) ?? (await clerk.users.createUser({ emailAddress: [E2E_EMAIL], firstName: "Alex", lastName: "Tester", skipPasswordRequirement: true }));
   const userId = user.id;
   await cleanupData(userId); // start from a clean slate
@@ -211,11 +221,12 @@ async function cleanupData(userId: string) {
 }
 
 async function cleanup() {
+  await allowTestAddress(false);
   const user = await findUser();
-  if (!user) return console.log("no e2e user");
+  if (!user) return console.log("no e2e user (test address removed from the allowlist)");
   await cleanupData(user.id);
   await clerk.users.deleteUser(user.id);
-  console.log(`cleaned: ${user.id} (data and Clerk user deleted)`);
+  console.log(`cleaned: ${user.id} (data and Clerk user deleted, test address removed from the allowlist)`);
 }
 
 const command = process.argv[2];

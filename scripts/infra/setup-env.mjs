@@ -9,7 +9,9 @@
 //   writes for Clerk), because the Clerk SDK expects these exact names.
 // - APP_ENCRYPTION_KEY: 32 random bytes (base64), created ONLY if missing.
 //   Never rotate it by accident: stored user AI keys could no longer be decrypted.
-// - OWNER_GITHUB_LOGIN: the GitHub username of the instance owner.
+// - OWNER_GITHUB_ID: the NUMERIC GitHub id of the instance owner, looked up from the username given with
+//   --owner (public GitHub API). The app trusts this id, not the username: a username can be changed and
+//   then registered by someone else, the id never moves.
 //
 // Secret values are never printed.
 
@@ -24,6 +26,14 @@ if (!owner) {
   console.error("Usage: node scripts/infra/setup-env.mjs --owner <github-login>");
   process.exit(1);
 }
+
+const github = await fetch(`https://api.github.com/users/${encodeURIComponent(owner)}`, { headers: { Accept: "application/vnd.github+json" } });
+const ownerId = github.ok ? String((await github.json()).id ?? "") : "";
+if (!/^\d+$/.test(ownerId)) {
+  console.error(`GitHub user "${owner}" not found (HTTP ${github.status}).`);
+  process.exit(1);
+}
+console.log(`GitHub user ${owner} has id ${ownerId}.`);
 
 const env = parseEnv(readFileSync(".env", "utf8"));
 
@@ -41,7 +51,7 @@ if (!clerkDev?.publishable_key || !clerkDev?.secret_key) {
 const variables = [
   ["clerk-publishable-key", "NEXT_PUBLIC_CLERK_PUBLISHABLE_KEY", clerkDev.publishable_key],
   ["clerk-secret-key", "CLERK_SECRET_KEY", clerkDev.secret_key],
-  ["owner-github-login", "OWNER_GITHUB_LOGIN", owner],
+  ["owner-github-id", "OWNER_GITHUB_ID", ownerId],
 ];
 if (!env.APP_ENCRYPTION_KEY) {
   variables.push(["app-encryption-key", "APP_ENCRYPTION_KEY", randomBytes(32).toString("base64")]);

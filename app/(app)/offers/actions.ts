@@ -3,6 +3,7 @@
 import { revalidatePath } from "next/cache";
 import { z } from "zod";
 import { aiErrorMessage, AiError } from "@/lib/ai/errors";
+import { resolvePageReader } from "@/lib/ai/config";
 import { consumeInstanceQuota } from "@/lib/ai/usage";
 import { getAccount, requireUserId } from "@/lib/server/auth";
 import { listFacts } from "@/lib/data/facts";
@@ -10,7 +11,6 @@ import { OFFERS_COPY } from "@/lib/i18n/offers";
 import { getUiLang } from "@/lib/i18n/server";
 import { fill } from "@/lib/interview/copy";
 import { createOffer, getOfferDetail, markApplied, setOfferStatus, setRequirementFacts } from "@/lib/data/offers";
-import { serverEnv } from "@/lib/server/env";
 import { extractOffer } from "@/lib/offers/extract";
 import { fetchPageText, firecrawlPageText, looksBlocked, MAX_PAGE_TEXT, PageFetchError, sourceSiteFor } from "@/lib/offers/fetch-page";
 import { matchRequirements } from "@/lib/offers/match";
@@ -35,10 +35,11 @@ export async function addOfferAction(input: unknown): Promise<AddOfferResult> {
   if (!text) {
     if (!url) return { ok: false, error: t.pasteLinkOrText };
     try {
-      const firecrawlKey = serverEnv().FIRECRAWL_API_API_KEY;
-      if (firecrawlKey) {
-        await consumeInstanceQuota(account.userId, "scrape");
-        text = await firecrawlPageText(url, firecrawlKey).catch(() => fetchPageText(url));
+      // The instance's Firecrawl key serves the owner only (quota); other accounts use their own key or the free reader.
+      const reader = await resolvePageReader(account.userId, account.isOwner);
+      if (reader.provider === "firecrawl") {
+        if (reader.source === "instance") await consumeInstanceQuota(account.userId, "scrape");
+        text = await firecrawlPageText(url, reader.apiKey).catch(() => fetchPageText(url));
       } else {
         text = await fetchPageText(url);
       }

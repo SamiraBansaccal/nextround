@@ -9,7 +9,7 @@
 //   1. stripe projects init           (your Stripe account; browser sign-in the first time)
 //   2. stripe projects add …          (free tiers: Vercel, Neon, Clerk, OpenRouter, Firecrawl, ElevenLabs)
 //   3. stripe projects env --pull     (credentials -> .env, never committed)
-//   4. scripts/infra/setup-env.mjs          (Clerk keys, encryption key, OWNER_GITHUB_LOGIN)
+//   4. scripts/infra/setup-env.mjs          (Clerk keys, encryption key, OWNER_GITHUB_ID)
 //   5. drizzle-kit migrate            (creates the tables in your Neon database)
 //   6. Clerk: enable GitHub sign-in   (Clerk CLI: one browser approval)
 //   7. push env vars to Vercel, deploy

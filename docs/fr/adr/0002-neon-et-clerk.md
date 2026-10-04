@@ -3,7 +3,7 @@
 > 🇬🇧 Version anglaise : [en/adr/0002](../../en/adr/0002-neon-and-clerk.md)
 
 - **Date :** 2026-10-03
-- **Statut :** ✅ acceptée
+- **Statut :** ✅ acceptée, amendée par l'[ADR 0023](0023-cles-de-l-instance-pour-la-proprietaire.md) (la propriétaire est reconnue par son identifiant GitHub numérique ; inscription fermée pendant le dev)
 
 ## 🎯 Contexte
 

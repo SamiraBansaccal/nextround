@@ -14,6 +14,7 @@
     "db:generate": "drizzle-kit generate",
     "db:migrate": "drizzle-kit migrate",
     "setup:env": "node scripts/infra/setup-env.mjs",
+    "clerk:signup": "tsx scripts/infra/clerk-signup.mts",
     "bootstrap": "node scripts/infra/bootstrap.mjs",
     "e2e": "node scripts/test/e2e.mjs",
     "avatars:plan": "tsx scripts/avatars/behaviours.mts",

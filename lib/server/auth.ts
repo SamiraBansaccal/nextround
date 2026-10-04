@@ -33,13 +33,15 @@ export async function getAccount(): Promise<Account> {
   if (!user) throw new UnauthorizedError();
   const github = user.externalAccounts.find((a) => a.provider === "oauth_github" || a.provider === "github");
   const githubLogin = github?.username ?? null;
+  const ownerId = serverEnv().OWNER_GITHUB_ID;
   return {
     userId: user.id,
     displayName: user.firstName ?? githubLogin ?? user.primaryEmailAddress?.emailAddress ?? "there",
     githubLogin,
     imageUrl: user.imageUrl ?? null,
     fullName: user.fullName ?? user.firstName ?? githubLogin ?? "Candidate",
-    // The owner (OWNER_GITHUB_LOGIN) may use the instance's AI keys; other users bring their own.
-    isOwner: githubLogin !== null && githubLogin.toLowerCase() === serverEnv().OWNER_GITHUB_LOGIN.toLowerCase(),
+    // The owner (numeric GitHub id OWNER_GITHUB_ID, verified by GitHub through OAuth) may use the instance's
+    // keys; every other account brings its own.
+    isOwner: !!ownerId && github?.providerUserId === ownerId,
   };
 }

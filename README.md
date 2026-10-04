@@ -85,7 +85,7 @@ npm run bootstrap -- --owner <your-github-login>             # run
 
 ## 🤖 Bring your own AI
 
-In **Settings**: Anthropic (Claude, through its official SDK), OpenRouter (free models welcome), OpenAI, Mistral or Groq. Keys are encrypted (AES-256-GCM), never sent back to the browser (only the last 4 characters) and never logged. The instance owner falls back to the instance key (Anthropic if set, else OpenRouter) with a rate limit and a daily cap.
+In **Settings**: Anthropic (Claude, through its official SDK), OpenRouter (free models welcome), OpenAI, Mistral or Groq. Keys are encrypted (AES-256-GCM), never sent back to the browser (only the last 4 characters) and never logged. The instance owner (recognised by her numeric GitHub id, `OWNER_GITHUB_ID`) falls back to the instance key (Anthropic if set, else OpenRouter) with a rate limit and a daily cap; the instance's other keys (Firecrawl for offer pages, ElevenLabs) serve her account only too. Every other account brings its own keys. Sign-up is closed while the Clerk instance is in development: `npm run clerk:signup -- status | close | open | probe` ([ADR 0023](docs/en/adr/0023-instance-keys-for-the-owner-only.md)).
 
 The AI is only used for feedback on your answers and for reading offers and CVs: questions and model answers are written in advance. A paid voice (ElevenLabs) is opt-in, and a sentence already read is never paid twice.
 

@@ -94,6 +94,7 @@ L'index complet, avec les questions auxquelles chaque ADR répond : [fr/adr/READ
 |---|---|
 | **ADR** (*Architecture Decision Record*) | Une page qui garde une décision, son contexte et ses conséquences, bonnes et mauvaises. Jamais effacée : on la marque « remplacée » ou « amendée ». |
 | **AES-256-GCM** | Algorithme de chiffrement standard ; « GCM » détecte toute modification de la donnée chiffrée. Sert aux *API keys* des utilisateurs. |
+| **Allowlist** | La liste d'autorisation de Clerk : seules ces adresses peuvent créer un compte. Activée tant qu'on est en dev (`npm run clerk:signup -- status / close / open / probe`). |
 | **App Router** | La façon dont Next.js range les pages : un dossier par URL dans `app/`. |
 | **Branch / PR** | Chaque session Claude travaille sur sa propre *branch* et ouvre une *pull request* (PR) pour la fusionner dans `main`. |
 | **Deploy** | Mettre une version en ligne (ici sur Vercel). |
@@ -102,7 +103,7 @@ L'index complet, avec les questions auxquelles chaque ADR répond : [fr/adr/READ
 | **Fact** (fait validé) | Une phrase sur toi (expérience, projet, compétence…) que tu as acceptée. Tout ce que NextRound écrit doit s'appuyer sur des *facts* validés. |
 | **Migration** | Un fichier SQL qui crée ou modifie les tables, généré depuis `lib/db/schema.ts` et appliqué avec `npm run db:migrate`. |
 | **OAuth** | Le protocole derrière « Continue with GitHub » : GitHub confirme qui tu es sans donner ton mot de passe à l'app. |
-| **Owner** | La propriétaire de l'instance (`OWNER_GITHUB_LOGIN`) : elle peut utiliser les clés de l'instance. |
+| **Owner** | La propriétaire de l'instance, reconnue par son identifiant GitHub numérique (`OWNER_GITHUB_ID`) : seul son compte utilise les clés de l'instance ([ADR 0023](fr/adr/0023-cles-de-l-instance-pour-la-proprietaire.md)). |
 | **Provider** | Une entreprise qui fournit un service : Vercel (*hosting*), Neon (Postgres), Clerk (*auth*), OpenRouter / Anthropic (IA), ElevenLabs (voix)… |
 | **Proxy** (Next.js 16) | Code exécuté avant chaque requête (l'ancien *middleware*) : il renvoie vers la connexion. |
 | **Server action** | Fonction serveur appelée directement par l'interface ; elle revérifie la session et valide ses entrées avec zod. |
