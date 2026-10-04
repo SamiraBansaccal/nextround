@@ -1,9 +1,11 @@
-import { type ProfileFactView, ProfileLibrary } from "@/components/profile/profile-library";
+import { ProfileLibrary } from "@/components/profile/profile-library";
 import { getAccount } from "@/lib/auth";
 import { listFacts } from "@/lib/data/facts";
 import { listKeptDocuments } from "@/lib/data/documents";
 import { cvRef, listSources } from "@/lib/data/sources";
 import { formatDay } from "@/lib/dates";
+import { PROFILE_COPY } from "@/lib/i18n/profile";
+import { getUiLang } from "@/lib/i18n/server";
 import {
   addManualFactAction,
   chatFactsAction,
@@ -23,10 +25,9 @@ import { keepDocumentAction } from "../offers/[id]/cv/actions";
 
 export const maxDuration = 300; // a CV read by a free model: facts and layout take about a minute, more with a retry
 
-const ORIGIN: Record<ProfileFactView["source"], string> = { github: "GitHub", codewars: "Codewars", cv_upload: "CV", chat: "Chat", manual: "Manual" };
-
 export default async function ProfilePage({ searchParams }: PageProps<"/profile">) {
   const account = await getAccount();
+  const t = PROFILE_COPY[await getUiLang()];
   const { cv, doc } = await searchParams;
   const [facts, cvSources, kept] = await Promise.all([listFacts(account.userId), listSources(account.userId, "cv_upload"), listKeptDocuments(account.userId)]);
   const cvName = new Map(cvSources.map((s) => [cvRef(s.id), s.ref]));
@@ -39,12 +40,13 @@ export default async function ProfilePage({ searchParams }: PageProps<"/profile"
 
   return (
     <ProfileLibrary
+      t={t}
       candidate={{ name: account.fullName, imageUrl: account.imageUrl, githubLogin: account.githubLogin }}
       selectedDocument={
         shownDoc?.content
           ? {
               id: shownDoc.id,
-              title: shownDoc.title ?? (shownDoc.kind === "cv" ? "CV" : "Cover letter"),
+              title: shownDoc.title ?? (shownDoc.kind === "cv" ? t.cvTitle : t.letterTitle),
               href: shownDoc.offerId ? `/offers/${shownDoc.offerId}/cv?${shownDoc.language ? `lang=${shownDoc.language}&` : ""}${shownDoc.kind === "cv" ? "v" : "l"}=${shownDoc.version}` : null,
               content: shownDoc.content,
               contacts,
@@ -54,7 +56,7 @@ export default async function ProfilePage({ searchParams }: PageProps<"/profile"
       keptDocuments={kept.map(({ document: d, offerTitle, company }) => ({
         id: d.id,
         kind: d.kind,
-        title: d.title ?? ([offerTitle, company].filter(Boolean).join(" · ") || (d.kind === "cv" ? "CV" : "Cover letter")),
+        title: d.title ?? ([offerTitle, company].filter(Boolean).join(" · ") || (d.kind === "cv" ? t.cvTitle : t.letterTitle)),
         language: d.language ?? null,
         createdOn: formatDay(d.createdAt),
         href: d.offerId ? `/offers/${d.offerId}/cv?${d.language ? `lang=${d.language}&` : ""}${d.kind === "cv" ? "v" : "l"}=${d.version}` : null,
@@ -79,7 +81,7 @@ export default async function ProfilePage({ searchParams }: PageProps<"/profile"
         quote: f.quote,
         validated: f.validated,
         aiAssisted: f.aiAssisted,
-        origin: f.source === "cv_upload" ? `CV · ${cvName.get(f.sourceRef ?? "") ?? "removed CV"}` : ORIGIN[f.source],
+        origin: f.source === "cv_upload" ? `CV · ${cvName.get(f.sourceRef ?? "") ?? t.removedCv}` : t.origin[f.source],
       }))}
       actions={{
         importGithub: importGithubAction,

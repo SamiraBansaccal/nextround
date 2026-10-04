@@ -4,6 +4,8 @@ import { Check, PencilLine, Sparkles, Trash2, X } from "lucide-react";
 import { useState } from "react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
+import type { ProfileCopy } from "@/lib/i18n/profile";
+import { fill } from "@/lib/interview/copy";
 import { cn } from "@/lib/utils";
 
 // The facts of one place of the profile (an entry of a CV, the GitHub projects…), reviewed where they
@@ -32,18 +34,20 @@ export function FactReviewList({
   actions,
   pending,
   run,
+  t,
   className,
 }: {
   facts: ReviewFact[];
   actions: ReviewActions;
   pending: boolean;
   run: (action: () => Promise<Result>) => void;
+  t: ProfileCopy;
   className?: string;
 }) {
   const [editing, setEditing] = useState<{ id: string; text: string } | null>(null);
   if (facts.length === 0) return null;
   return (
-    <ul className={cn("no-print mt-3 space-y-1.5", className)} aria-label="Facts to review">
+    <ul className={cn("no-print mt-3 space-y-1.5", className)} aria-label={t.factsToReview}>
       {facts.map((fact) => (
         <li
           key={fact.id}
@@ -53,12 +57,12 @@ export function FactReviewList({
           )}
         >
           {fact.validated ? (
-            <Check className="size-4 shrink-0 text-success" aria-label="Validated" />
+            <Check className="size-4 shrink-0 text-success" aria-label={t.validated} />
           ) : (
-            <span className="shrink-0 rounded-full bg-terracotta px-1.5 text-[10px] font-bold text-white uppercase">to review</span>
+            <span className="shrink-0 rounded-full bg-terracotta px-1.5 text-[10px] font-bold text-white uppercase">{t.toReviewBadge}</span>
           )}
           {editing?.id === fact.id ? (
-            <Input className="h-8 min-w-0 flex-1" value={editing.text} onChange={(e) => setEditing({ id: fact.id, text: e.target.value })} aria-label="Edit fact" autoFocus />
+            <Input className="h-8 min-w-0 flex-1" value={editing.text} onChange={(e) => setEditing({ id: fact.id, text: e.target.value })} aria-label={t.editFact} autoFocus />
           ) : (
             <span className="min-w-0 flex-1">{fact.text}</span>
           )}
@@ -66,17 +70,17 @@ export function FactReviewList({
             {editing?.id === fact.id ? (
               <>
                 <Button size="sm" className="h-7" disabled={pending} onClick={() => run(async () => { const r = await actions.edit(editing); if (r.ok) setEditing(null); return r; })}>
-                  Save
+                  {t.save}
                 </Button>
                 <Button size="sm" variant="ghost" className="h-7" onClick={() => setEditing(null)}>
-                  Cancel
+                  {t.cancel}
                 </Button>
               </>
             ) : (
               <>
                 {!fact.validated && (
                   <Button size="sm" className="h-7" disabled={pending} onClick={() => run(() => actions.validate(fact.id))}>
-                    <Check className="size-3.5" aria-hidden="true" /> Keep
+                    <Check className="size-3.5" aria-hidden="true" /> {t.keep}
                   </Button>
                 )}
                 {fact.type === "project" && (
@@ -85,19 +89,19 @@ export function FactReviewList({
                     aria-pressed={fact.aiAssisted}
                     disabled={pending}
                     onClick={() => run(() => actions.setAiAssisted({ id: fact.id, aiAssisted: !fact.aiAssisted }))}
-                    title={fact.aiAssisted ? "Built with AI: never counts as mastery of its stack. Click if you wrote it yourself." : "Built with AI (vibe coding)?"}
+                    title={fact.aiAssisted ? t.aiReviewOn : t.aiReviewAsk}
                     className={cn(
                       "inline-flex h-7 items-center gap-1 rounded-full border px-2 text-xs disabled:opacity-50",
                       fact.aiAssisted ? "border-terracotta/40 bg-terracotta-soft text-terracotta" : "border-earth/20 text-muted-foreground hover:text-foreground",
                     )}
                   >
-                    <Sparkles className="size-3" aria-hidden="true" /> {fact.aiAssisted ? "Built with AI" : "AI?"}
+                    <Sparkles className="size-3" aria-hidden="true" /> {fact.aiAssisted ? t.builtWithAi : t.aiShort}
                   </button>
                 )}
-                <Button size="icon" variant="ghost" className="size-7" disabled={pending} onClick={() => setEditing({ id: fact.id, text: fact.text })} aria-label={`Edit: ${fact.text}`}>
+                <Button size="icon" variant="ghost" className="size-7" disabled={pending} onClick={() => setEditing({ id: fact.id, text: fact.text })} aria-label={fill(t.editNamed, { text: fact.text })}>
                   <PencilLine className="size-3.5" />
                 </Button>
-                <Button size="icon" variant="ghost" className="size-7" disabled={pending} onClick={() => run(() => actions.reject(fact.id))} aria-label={fact.validated ? `Remove: ${fact.text}` : `Reject: ${fact.text}`}>
+                <Button size="icon" variant="ghost" className="size-7" disabled={pending} onClick={() => run(() => actions.reject(fact.id))} aria-label={fill(fact.validated ? t.removeFact : t.rejectFact, { text: fact.text })}>
                   {fact.validated ? <Trash2 className="size-3.5" /> : <X className="size-3.5" />}
                 </Button>
               </>

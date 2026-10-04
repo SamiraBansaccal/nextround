@@ -7,6 +7,8 @@ import { getOfferDetail } from "@/lib/data/offers";
 import { listSources } from "@/lib/data/sources";
 import { formatDay } from "@/lib/dates";
 import { documentFactIds, isDocumentLanguage } from "@/lib/documents/render";
+import { DOCUMENTS_COPY } from "@/lib/i18n/documents";
+import { getUiLang } from "@/lib/i18n/server";
 import { factIndex, isCovered, provingFactIds } from "@/lib/offers/coverage";
 import type { DocumentLanguage, TailoredCv, TailoredLetter } from "@/lib/types";
 import { generateCvAction, generateLetterAction, keepDocumentAction } from "./actions";
@@ -21,6 +23,8 @@ export default async function OfferCvPage({ params, searchParams }: PageProps<"/
   const { id } = await params;
   const { v, l, lang, print } = await searchParams;
   const account = await getAccount();
+  const ui = await getUiLang(); // the interface; the documents keep their own `language`
+  const t = DOCUMENTS_COPY[ui];
   const [detail, facts, docs, kept, cvSources] = await Promise.all([
     getOfferDetail(account.userId, id),
     listFacts(account.userId),
@@ -52,8 +56,10 @@ export default async function OfferCvPage({ params, searchParams }: PageProps<"/
 
   return (
     <CvView
+      ui={ui}
+      t={t}
       offerId={detail.offer.id}
-      offerLabel={[detail.offer.title, detail.offer.company].filter(Boolean).join(" · ") || "Offer"}
+      offerLabel={[detail.offer.title, detail.offer.company].filter(Boolean).join(" · ") || t.offer}
       language={language}
       candidate={{ name: account.fullName, imageUrl: account.imageUrl, contacts }}
       cv={cv && { id: cv.id, version: cv.version, kept: cv.kept, content: cv.content?.kind === "tailored_cv" ? (cv.content as TailoredCv) : null, sentences: cv.sentences }}
