@@ -1,0 +1,14 @@
+{
+ "master": {
+  "file": "c22"
+ },
+ "references": [
+  {
+   "file": "c22"
+  },
+  {
+   "file": "c21"
+  }
+ ],
+ "notes": "Official anime infobox images; merchandise left out."
+}

@@ -158,5 +158,60 @@
    1460
   ],
   "transparent_border": 0.0
+ },
+ {
+  "file": "c17.png",
+  "source": "https://static.wikia.nocookie.net/onepiece/images/e/e1/Nami_3D_Bounty_Rush.png/revision/latest?cb=20190720180119",
+  "wiki_file": "File:Nami 3D Bounty Rush.png",
+  "size": [
+   705,
+   1578
+  ],
+  "transparent_border": 0.99,
+  "query": "Nami Anime Infobox"
+ },
+ {
+  "file": "c18.png",
+  "source": "https://static.wikia.nocookie.net/onepiece/images/6/68/Nami_Anime_Post_Timeskip_Infobox.png/revision/latest?cb=20260315214841",
+  "wiki_file": "File:Nami Anime Post Timeskip Infobox.png",
+  "size": [
+   1146,
+   1920
+  ],
+  "transparent_border": 0.0,
+  "query": "Nami Anime Infobox"
+ },
+ {
+  "file": "c19.png",
+  "source": "https://static.wikia.nocookie.net/onepiece/images/8/82/Koyama_Nami_Anime_Infobox.png/revision/latest?cb=20250401162911",
+  "wiki_file": "File:Koyama Nami Anime Infobox.png",
+  "size": [
+   1080,
+   1920
+  ],
+  "transparent_border": 0.0,
+  "query": "Nami Anime Infobox"
+ },
+ {
+  "file": "c20.png",
+  "source": "https://static.wikia.nocookie.net/onepiece/images/6/69/Bell-m%C3%A8re_Protects_Nami_and_Nojiko.png/revision/latest?cb=20230403144952",
+  "wiki_file": "File:Bell-mère Protects Nami and Nojiko.png",
+  "size": [
+   1160,
+   1063
+  ],
+  "transparent_border": 0.0,
+  "query": "Nami Anime Infobox"
+ },
+ {
+  "file": "c21.png",
+  "source": "https://static.wikia.nocookie.net/onepiece/images/d/dd/Nami_Anime_Pre_Timeskip_Infobox.png/revision/latest?cb=20230320223827",
+  "wiki_file": "File:Nami Anime Pre Timeskip Infobox.png",
+  "size": [
+   403,
+   957
+  ],
+  "transparent_border": 0.0,
+  "query": "File:Nami Anime Pre Timeskip Infobox.png"
  }
 ]

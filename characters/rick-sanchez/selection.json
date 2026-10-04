@@ -1,0 +1,17 @@
+{
+ "master": {
+  "file": "c01"
+ },
+ "references": [
+  {
+   "file": "c01"
+  },
+  {
+   "file": "c03"
+  },
+  {
+   "file": "c05"
+  }
+ ],
+ "notes": "Official renders, lab coat."
+}

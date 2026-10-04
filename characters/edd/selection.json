@@ -1,0 +1,17 @@
+{
+ "master": {
+  "file": "c07"
+ },
+ "references": [
+  {
+   "file": "c07"
+  },
+  {
+   "file": "c06"
+  },
+  {
+   "file": "c05"
+  }
+ ],
+ "notes": "Double D alone (black hat, orange shirt); group images left out."
+}

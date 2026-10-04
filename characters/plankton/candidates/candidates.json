@@ -158,5 +158,82 @@
    1080
   ],
   "transparent_border": 0.0
+ },
+ {
+  "file": "c17.png",
+  "source": "https://static.wikia.nocookie.net/spongebob/images/5/54/A_Taste_of_Plankton_008.png/revision/latest?cb=20250306071656",
+  "wiki_file": "File:A Taste of Plankton 008.png",
+  "size": [
+   1920,
+   1080
+  ],
+  "transparent_border": 0.0,
+  "query": "Plankton stock art"
+ },
+ {
+  "file": "c18.png",
+  "source": "https://static.wikia.nocookie.net/spongebob/images/c/cc/A_Taste_of_Plankton_010.png/revision/latest?cb=20250306071700",
+  "wiki_file": "File:A Taste of Plankton 010.png",
+  "size": [
+   1920,
+   1080
+  ],
+  "transparent_border": 0.0,
+  "query": "Plankton stock art"
+ },
+ {
+  "file": "c19.png",
+  "source": "https://static.wikia.nocookie.net/spongebob/images/f/fc/A_Taste_of_Plankton_017.png/revision/latest?cb=20250306071713",
+  "wiki_file": "File:A Taste of Plankton 017.png",
+  "size": [
+   1920,
+   1080
+  ],
+  "transparent_border": 0.0,
+  "query": "Plankton stock art"
+ },
+ {
+  "file": "c20.png",
+  "source": "https://static.wikia.nocookie.net/spongebob/images/0/07/A_Taste_of_Plankton_057.png/revision/latest?cb=20250306071832",
+  "wiki_file": "File:A Taste of Plankton 057.png",
+  "size": [
+   1920,
+   1080
+  ],
+  "transparent_border": 0.0,
+  "query": "Plankton stock art"
+ },
+ {
+  "file": "c21.png",
+  "source": "https://static.wikia.nocookie.net/spongebob/images/2/2a/A_Taste_of_Plankton_062.png/revision/latest?cb=20250306071842",
+  "wiki_file": "File:A Taste of Plankton 062.png",
+  "size": [
+   1920,
+   1080
+  ],
+  "transparent_border": 0.0,
+  "query": "Plankton stock art"
+ },
+ {
+  "file": "c22.png",
+  "source": "https://static.wikia.nocookie.net/spongebob/images/7/77/Plankton_stock_art.png/revision/latest?cb=20210916065141",
+  "wiki_file": "File:Plankton stock art.png",
+  "size": [
+   500,
+   500
+  ],
+  "transparent_border": 1.0,
+  "query": "File:Plankton stock art.png|File:Sheldon J. Plankton.png|File:Plankton.png"
+ },
+ {
+  "file": "c23.png",
+  "source": "https://static.wikia.nocookie.net/spongebob/images/4/47/Plankton.png/revision/latest?cb=20210131152903",
+  "wiki_file": "File:Plankton.png",
+  "size": [
+   1600,
+   1200
+  ],
+  "transparent_border": 0.0,
+  "query": "File:Plankton stock art.png|File:Sheldon J. Plankton.png|File:Plankton.png"
  }
 ]

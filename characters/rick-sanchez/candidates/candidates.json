@@ -1,0 +1,162 @@
+[
+ {
+  "file": "c01.png",
+  "source": "https://upload.wikimedia.org/wikipedia/en/a/a6/Rick_Sanchez.png",
+  "wiki_file": "Wikipedia: Rick Sanchez",
+  "size": [
+   219,
+   456
+  ],
+  "transparent_border": 1.0
+ },
+ {
+  "file": "c02.png",
+  "source": "https://static.wikia.nocookie.net/rickandmorty/images/9/90/RickSanchez-render.png/revision/latest?cb=20250927154901",
+  "wiki_file": "File:RickSanchez-render.png",
+  "size": [
+   836,
+   2064
+  ],
+  "transparent_border": 1.0
+ },
+ {
+  "file": "c03.png",
+  "source": "https://static.wikia.nocookie.net/rickandmorty/images/5/52/Rick_Sanchez_Clear.png/revision/latest?cb=20260627151059",
+  "wiki_file": "File:Rick Sanchez Clear.png",
+  "size": [
+   800,
+   1800
+  ],
+  "transparent_border": 1.0
+ },
+ {
+  "file": "c04.png",
+  "source": "https://static.wikia.nocookie.net/rickandmorty/images/0/0b/Rick_Sanchez_Transparent.png/revision/latest?cb=20260627151650",
+  "wiki_file": "File:Rick Sanchez Transparent.png",
+  "size": [
+   800,
+   1800
+  ],
+  "transparent_border": 1.0
+ },
+ {
+  "file": "c05.png",
+  "source": "https://static.wikia.nocookie.net/rickandmorty/images/b/b9/Rick_Sanchez_New.png/revision/latest?cb=20260627145907",
+  "wiki_file": "File:Rick Sanchez New.png",
+  "size": [
+   800,
+   1800
+  ],
+  "transparent_border": 0.99
+ },
+ {
+  "file": "c06.png",
+  "source": "https://static.wikia.nocookie.net/rickandmorty/images/6/68/FullBodyRick.png/revision/latest?cb=20250818125920",
+  "wiki_file": "File:FullBodyRick.png",
+  "size": [
+   696,
+   1082
+  ],
+  "transparent_border": 1.0
+ },
+ {
+  "file": "c07.png",
+  "source": "https://static.wikia.nocookie.net/rickandmorty/images/6/6f/Rick_Sanchez_Pilot.png/revision/latest?cb=20260712115607",
+  "wiki_file": "File:Rick Sanchez Pilot.png",
+  "size": [
+   550,
+   565
+  ],
+  "transparent_border": 1.0
+ },
+ {
+  "file": "c08.png",
+  "source": "https://static.wikia.nocookie.net/rickandmorty/images/b/b2/Kid_Rick.jpg/revision/latest?cb=20260925230458",
+  "wiki_file": "File:Kid Rick.jpg",
+  "size": [
+   1041,
+   1230
+  ],
+  "transparent_border": 0.0
+ },
+ {
+  "file": "c09.png",
+  "source": "https://static.wikia.nocookie.net/rickandmorty/images/3/3f/Young_Adult_Rick.png/revision/latest?cb=20260819150328",
+  "wiki_file": "File:Young Adult Rick.png",
+  "size": [
+   850,
+   1000
+  ],
+  "transparent_border": 0.0
+ },
+ {
+  "file": "c10.png",
+  "source": "https://static.wikia.nocookie.net/rickandmorty/images/a/a6/Rick_Sanchez.png/revision/latest?cb=20250817060829",
+  "wiki_file": "File:Rick Sanchez.png",
+  "size": [
+   848,
+   1080
+  ],
+  "transparent_border": 0.0
+ },
+ {
+  "file": "c11.png",
+  "source": "https://static.wikia.nocookie.net/rickandmorty/images/6/6b/Pubescent_Rick.png/revision/latest?cb=20260712122905",
+  "wiki_file": "File:Pubescent Rick.png",
+  "size": [
+   2454,
+   1620
+  ],
+  "transparent_border": 0.0
+ },
+ {
+  "file": "c12.png",
+  "source": "https://static.wikia.nocookie.net/rickandmorty/images/c/cb/Rick_Sanchez_%28Rick_and_Morty_in_Adventure_to_an_Alternate_Universe%29.png/revision/latest?cb=20160907175446",
+  "wiki_file": "File:Rick Sanchez (Rick and Morty in Adventure to an Alternate Universe).png",
+  "size": [
+   690,
+   1391
+  ],
+  "transparent_border": 0.0
+ },
+ {
+  "file": "c13.png",
+  "source": "https://static.wikia.nocookie.net/rickandmorty/images/5/58/Vlcsnap-2015-01-31-02h51m12s212_%282%29.jpg/revision/latest?cb=20150131105249",
+  "wiki_file": "File:Vlcsnap-2015-01-31-02h51m12s212 (2).jpg",
+  "size": [
+   676,
+   1080
+  ],
+  "transparent_border": 0.0
+ },
+ {
+  "file": "c14.png",
+  "source": "https://static.wikia.nocookie.net/rickandmorty/images/2/22/Rick_Sanchez_by_Charley_Fox.png/revision/latest?cb=20200529002145",
+  "wiki_file": "File:Rick Sanchez by Charley Fox.png",
+  "size": [
+   1600,
+   1200
+  ],
+  "transparent_border": 0.0
+ },
+ {
+  "file": "c15.png",
+  "source": "https://static.wikia.nocookie.net/rickandmorty/images/e/ea/Rick_and_Morty_Chris.png/revision/latest?cb=20160920070259",
+  "wiki_file": "File:Rick and Morty Chris.png",
+  "size": [
+   1920,
+   1090
+  ],
+  "transparent_border": 0.0
+ },
+ {
+  "file": "c16.png",
+  "source": "https://static.wikia.nocookie.net/rickandmorty/images/4/49/S1e10_rick_sanchez.png/revision/latest?cb=20160910213935",
+  "wiki_file": "File:S1e10 rick sanchez.png",
+  "size": [
+   1920,
+   1088
+  ],
+  "transparent_border": 0.0
+ }
+]

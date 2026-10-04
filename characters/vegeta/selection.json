@@ -1,0 +1,14 @@
+{
+ "master": {
+  "file": "c01"
+ },
+ "references": [
+  {
+   "file": "c01"
+  },
+  {
+   "file": "c03"
+  }
+ ],
+ "notes": "Official render, blue suit and armour; c03 bust."
+}

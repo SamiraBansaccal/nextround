@@ -1,0 +1,17 @@
+{
+ "master": {
+  "file": "c01"
+ },
+ "references": [
+  {
+   "file": "c01"
+  },
+  {
+   "file": "c03"
+  },
+  {
+   "file": "c07"
+  }
+ ],
+ "notes": "Official renders with apron; c07 bust. Signature on c03 erased by the crop."
+}

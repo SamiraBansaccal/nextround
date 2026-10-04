@@ -148,4 +148,5 @@ def main():
             contact_sheet(paths, ROOT / cid / "contact-sheet.jpg")
         print(f"{cid}: {len(paths)} candidates")
 
-main()
+if __name__ == "__main__":
+    main()

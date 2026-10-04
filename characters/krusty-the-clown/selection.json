@@ -1,0 +1,17 @@
+{
+ "master": {
+  "file": "c02"
+ },
+ "references": [
+  {
+   "file": "c02"
+  },
+  {
+   "file": "c04"
+  },
+  {
+   "file": "c03"
+  }
+ ],
+ "notes": "Renders in the canonical purple shirt and green trousers; costume variants left out."
+}

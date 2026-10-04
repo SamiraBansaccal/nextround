@@ -1,0 +1,17 @@
+{
+ "master": {
+  "file": "c01"
+ },
+ "references": [
+  {
+   "file": "c01"
+  },
+  {
+   "file": "c03"
+  },
+  {
+   "file": "c04"
+  }
+ ],
+ "notes": "Official renders in the canonical police uniform; c04 bust."
+}

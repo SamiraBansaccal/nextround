@@ -1,0 +1,17 @@
+{
+ "master": {
+  "file": "c03"
+ },
+ "references": [
+  {
+   "file": "c03"
+  },
+  {
+   "file": "c05"
+  },
+  {
+   "file": "c04"
+  }
+ ],
+ "notes": "Ed alone (green jacket, striped shirt); group images left out."
+}

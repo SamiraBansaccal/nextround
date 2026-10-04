@@ -1,0 +1,17 @@
+{
+ "master": {
+  "file": "c01"
+ },
+ "references": [
+  {
+   "file": "c01"
+  },
+  {
+   "file": "c04"
+  },
+  {
+   "file": "c08"
+  }
+ ],
+ "notes": "Official render, green sweater; c04 bust, c08 face."
+}

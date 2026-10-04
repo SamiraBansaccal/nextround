@@ -1,0 +1,14 @@
+{
+ "master": {
+  "file": "c05"
+ },
+ "references": [
+  {
+   "file": "c05"
+  },
+  {
+   "file": "c08"
+  }
+ ],
+ "notes": "Figures on-model in the canonical black suit (no clean official render found)."
+}

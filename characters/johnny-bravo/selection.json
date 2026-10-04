@@ -1,0 +1,14 @@
+{
+ "master": {
+  "file": "c02"
+ },
+ "references": [
+  {
+   "file": "c02"
+  },
+  {
+   "file": "c01"
+  }
+ ],
+ "notes": "Official renders, pompadour and sunglasses."
+}

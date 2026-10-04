@@ -158,5 +158,71 @@
    1200
   ],
   "transparent_border": 0.0
+ },
+ {
+  "file": "c17.png",
+  "source": "https://static.wikia.nocookie.net/onepiece/images/e/e2/Bandit_Infobox.png/revision/latest?cb=20230302001916",
+  "wiki_file": "File:Bandit Infobox.png",
+  "size": [
+   1850,
+   1079
+  ],
+  "transparent_border": 0.0,
+  "query": "Luffy Anime Infobox"
+ },
+ {
+  "file": "c18.png",
+  "source": "https://static.wikia.nocookie.net/onepiece/images/b/ba/Going_Luffy-senpai_Infobox.png/revision/latest?cb=20240731210143",
+  "wiki_file": "File:Going Luffy-senpai Infobox.png",
+  "size": [
+   957,
+   932
+  ],
+  "transparent_border": 0.0,
+  "query": "Luffy Anime Infobox"
+ },
+ {
+  "file": "c19.png",
+  "source": "https://static.wikia.nocookie.net/onepiece/images/e/ed/DXGLC1-Luffy.png/revision/latest?cb=20130726082406",
+  "wiki_file": "File:DXGLC1-Luffy.png",
+  "size": [
+   928,
+   1000
+  ],
+  "transparent_border": 0.0,
+  "query": "Luffy Anime Infobox"
+ },
+ {
+  "file": "c20.png",
+  "source": "https://static.wikia.nocookie.net/onepiece/images/6/66/Gear_5_Infobox.png/revision/latest?cb=20251221160520",
+  "wiki_file": "File:Gear 5 Infobox.png",
+  "size": [
+   730,
+   919
+  ],
+  "transparent_border": 0.0,
+  "query": "Luffy Anime Infobox"
+ },
+ {
+  "file": "c21.png",
+  "source": "https://static.wikia.nocookie.net/onepiece/images/e/e5/Monkey_D._Luffy_Anime_Pre_Timeskip_Infobox.png/revision/latest?cb=20260611005119",
+  "wiki_file": "File:Monkey D. Luffy Anime Pre Timeskip Infobox.png",
+  "size": [
+   843,
+   1080
+  ],
+  "transparent_border": 0.0,
+  "query": "File:Monkey D. Luffy Anime Post Timeskip Infobox.png|File:Monkey D. Luffy Anime Pre Timeskip Infobox.png"
+ },
+ {
+  "file": "c22.png",
+  "source": "https://static.wikia.nocookie.net/onepiece/images/6/6d/Monkey_D._Luffy_Anime_Post_Timeskip_Infobox.png/revision/latest?cb=20260611004637",
+  "wiki_file": "File:Monkey D. Luffy Anime Post Timeskip Infobox.png",
+  "size": [
+   686,
+   1435
+  ],
+  "transparent_border": 0.0,
+  "query": "File:Monkey D. Luffy Anime Post Timeskip Infobox.png|File:Monkey D. Luffy Anime Pre Timeskip Infobox.png"
  }
 ]
