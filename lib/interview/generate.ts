@@ -10,6 +10,7 @@ import type { Lang } from "@/lib/interviewers/types";
 import { factAliases, type FactForPrompt } from "@/lib/prompt-facts";
 import { shorten } from "@/lib/text";
 import type { QuestionGroup, SourcedSentence } from "@/lib/types";
+import { isOtherLanguage } from "@/lib/text-lang";
 import { keepValidFactIds } from "@/lib/verify";
 
 // Interview questions on the offer, as configured for the session: general (HR), technical (the
@@ -222,5 +223,45 @@ ${technical ? `STACK:\n${stackList}\nGAPS (requirements not covered by the candi
       bankList ? `TECHNICAL QUESTIONS ALREADY WRITTEN (copy them, add the suggested answers):\n${bankList}\n` : ""
     }CANDIDATE FACTS (validated):\n${listing || "(none yet)"}`,
   });
-  return verifyQuestions(raw, offer, aliasToId, validIds, options, picks);
+  return verifyQuestions(await inLanguage(ctx, raw, options.language, languageName), offer, aliasToId, validIds, options, picks);
+}
+
+const translationSchema = z.object({ texts: z.array(z.string().trim().min(1).max(400)) });
+
+/**
+ * Every question and suggested answer the AI wrote must be in the interview's language: the code checks
+ * it (lib/text-lang.ts); texts in another language are translated in one extra call, and whatever is
+ * still in the wrong language is dropped (a question) or left out (an answer sentence).
+ */
+async function inLanguage(ctx: AiContext, raw: z.infer<typeof questionsSchema>, lang: Lang, languageName: string): Promise<z.infer<typeof questionsSchema>> {
+  const wrong: { set: (text: string) => void; text: string }[] = [];
+  const questions = raw.questions.map((q) => ({ ...q, suggested_answer: q.suggested_answer.map((a) => ({ ...a })) }));
+  for (const q of questions) {
+    if (!isBank(q.ref) && isOtherLanguage(q.text, lang)) wrong.push({ text: q.text, set: (t) => (q.text = t) });
+    for (const a of q.suggested_answer) if (isOtherLanguage(a.text, lang)) wrong.push({ text: a.text, set: (t) => (a.text = t) });
+  }
+  if (wrong.length > 0) {
+    try {
+      const out = await aiJson(ctx, {
+        schema: translationSchema,
+        system: `Translate each text into ${languageName}. Keep the meaning, the tone and any technical term. Return {"texts": [...]} with exactly ${wrong.length} texts, in the same order.`,
+        user: JSON.stringify({ texts: wrong.map((w) => w.text) }),
+      });
+      if (out.texts.length === wrong.length) wrong.forEach((w, i) => w.set(out.texts[i]));
+    } catch {
+      // translation unavailable: the checks below drop what is still in the wrong language
+    }
+  }
+  return dropOtherLanguage({ questions }, lang);
+}
+
+const isBank = (ref: string | null | undefined) => /^B\d+$/i.test(ref?.trim() ?? "");
+
+/** Pure: drops the questions, and the answer sentences, written in another language than `lang`. */
+export function dropOtherLanguage(raw: z.infer<typeof questionsSchema>, lang: Lang): z.infer<typeof questionsSchema> {
+  return {
+    questions: raw.questions
+      .filter((q) => isBank(q.ref) || !isOtherLanguage(q.text, lang))
+      .map((q) => ({ ...q, suggested_answer: q.suggested_answer.filter((a) => !isOtherLanguage(a.text, lang)) })),
+  };
 }

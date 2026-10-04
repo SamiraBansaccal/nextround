@@ -1,7 +1,7 @@
 import { describe, expect, it } from "vitest";
 import { bankQuestionText, pickTechnicalQuestions } from "@/lib/interview/bank";
 import { questionLabel, questionType } from "@/lib/interview/question-types";
-import { type OfferForInterview, questionsSchema, verifyQuestions } from "@/lib/interview/generate";
+import { dropOtherLanguage, type OfferForInterview, questionsSchema, verifyQuestions } from "@/lib/interview/generate";
 
 // Interview questions: sources rebuilt from verified offer data, suggested answers only from validated
 // facts, and the question type kept only when it fits the question's group.
@@ -122,5 +122,21 @@ describe("verifyQuestions with questions from the bank", () => {
     const [question] = verifyQuestions({ questions: [] }, OFFER, new Map(), new Set(), { language: "en", focus: "technical" }, fromProfile);
     expect(question.source).toBe("From your profile: “Docker labs at school (Docker)”");
     expect(question.type).toBe("experience");
+  });
+});
+
+describe("dropOtherLanguage", () => {
+  it("keeps only what is written in the interview's language, and every bank question", () => {
+    const raw = questionsSchema.parse({
+      questions: [
+        { group: "hr", type: "motivation", text: "Why do you want to join our company?", ref: null, suggested_answer: [{ text: "Je veux apprendre dans une équipe solide.", fact_ids: ["F1"] }, { text: "I like building things with a team.", fact_ids: ["F1"] }] },
+        { group: "hr", type: "strengths", text: "Quelles sont vos principales qualités ?", ref: null, suggested_answer: [] },
+        { group: "technical", text: "Quelle est la différence entre un processus et un thread ?", ref: "B1", suggested_answer: [] },
+        { group: "hr", type: "introduction", text: "Tell me about yourself.", ref: null, suggested_answer: [] },
+      ],
+    });
+    const kept = dropOtherLanguage(raw, "en").questions;
+    expect(kept.map((q) => q.text)).toEqual(["Why do you want to join our company?", "Quelle est la différence entre un processus et un thread ?", "Tell me about yourself."]);
+    expect(kept[0].suggested_answer.map((a) => a.text)).toEqual(["I like building things with a team."]);
   });
 });
