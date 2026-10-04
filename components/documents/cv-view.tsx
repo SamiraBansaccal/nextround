@@ -32,7 +32,7 @@ interface Props {
   cv: ShownDocument<TailoredCv> | null;
   letter: ShownDocument<TailoredLetter> | null;
   versions: { kind: "cv" | "cover_letter"; version: number; language: DocumentLanguage; createdOn: string }[];
-  /** Documents kept in the profile, to start a new one from. */
+  /** Documents added to the profile, to start a new one from. */
   bases: { cv: { id: string; title: string }[]; letter: { id: string; title: string }[] };
   facts: Record<string, string>;
   feedback: { requirements: { text: string; covered: boolean }[]; unusedFacts: string[] };
@@ -50,7 +50,7 @@ const LANGUAGES: { id: DocumentLanguage; label: string }[] = [
 
 // The CV and the cover letter written for one offer, in English or French. The profile holds everything;
 // these keep only what serves the offer. Every line shows the facts that prove it; a document can be
-// kept in the profile, to reuse it or to start the next one from it. Print / Save as PDF uses the browser.
+// added to the profile, to reuse it or to start the next one from it. Print / Save as PDF uses the browser.
 export function CvView({ offerId, offerLabel, language, candidate, cv, letter, versions, bases, facts, feedback, actions, autoPrint = false }: Props) {
   const router = useRouter();
   const [pending, startTransition] = useTransition();
@@ -99,16 +99,19 @@ export function CvView({ offerId, offerLabel, language, candidate, cv, letter, v
   const keepButton = (doc: ShownDocument<unknown>) => (
     <Button size="sm" variant={doc.kept ? "secondary" : "outline"} disabled={pending} onClick={() => run("cv", () => actions.keep({ id: doc.id, kept: !doc.kept }))}>
       {doc.kept ? <BookmarkCheck className="size-4" aria-hidden="true" /> : <Bookmark className="size-4" aria-hidden="true" />}
-      {doc.kept ? "Kept in my profile" : "Keep in my profile"}
+      {doc.kept ? "In my profile" : "Add to my profile"}
     </Button>
   );
 
   return (
     <div className="space-y-6">
       <div className="no-print flex flex-wrap items-center justify-between gap-3">
-        <Link href={`/offers/${offerId}`} className="flex items-center gap-2 text-sm text-muted-foreground hover:text-foreground">
-          <ArrowLeft className="size-4" aria-hidden="true" /> {offerLabel}
-        </Link>
+        <div className="min-w-0">
+          <Link href={`/offers/${offerId}`} className="flex items-center gap-2 text-sm text-muted-foreground hover:text-foreground">
+            <ArrowLeft className="size-4" aria-hidden="true" /> {offerLabel}
+          </Link>
+          <h1 className="mt-1 text-3xl">CV &amp; cover letter</h1>
+        </div>
         <div className="flex items-center gap-1 rounded-full border border-earth/20 p-1" role="group" aria-label="Language of the documents">
           {LANGUAGES.map((l) => (
             <Link
@@ -147,7 +150,7 @@ export function CvView({ offerId, offerLabel, language, candidate, cv, letter, v
               <label className="flex min-w-0 flex-1 items-center gap-2 text-xs text-muted-foreground">
                 Start from
                 <select value={w.base} onChange={(e) => w.setBase(e.target.value)} className="min-w-0 flex-1 rounded-md border border-earth/20 bg-background px-2 py-1 text-xs text-foreground">
-                  <option value="">nothing (from the profile)</option>
+                  <option value="">the whole profile</option>
                   {w.options.map((o) => (
                     <option key={o.id} value={o.id}>
                       {o.title}
@@ -294,7 +297,7 @@ function LegacyCv({ sentences, candidate, offerLabel, facts }: { sentences: CvSe
   return (
     <article className="print-page bg-card p-8 shadow-soft md:p-12">
       <header>
-        <h1 className="text-4xl">{candidate.name}</h1>
+        <h2 className="text-4xl">{candidate.name}</h2>
         <p className="mt-1 text-muted-foreground">{offerLabel}</p>
       </header>
       <hr className="my-6" />

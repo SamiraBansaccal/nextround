@@ -231,3 +231,16 @@ export async function setAiAssistedAction(input: unknown): Promise<ActionResult>
       : "Marked as written by you.",
   };
 }
+
+const manySchema = z.array(z.string().uuid()).min(1).max(200);
+
+/** Validates several facts at once (e.g. all the facts proposed from one CV). */
+export async function validateManyAction(ids: unknown): Promise<ActionResult> {
+  const userId = await requireUserId();
+  const parsed = manySchema.safeParse(ids);
+  if (!parsed.success) return { ok: false, error: "Facts not found." };
+  let kept = 0;
+  for (const id of parsed.data) if (await updateFact(userId, id, { validated: true })) kept++;
+  revalidatePath("/", "layout");
+  return { ok: true, message: `${kept} fact${kept === 1 ? "" : "s"} kept.` };
+}
