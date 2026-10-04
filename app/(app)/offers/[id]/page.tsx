@@ -9,6 +9,8 @@ import { factIndex, matchScore, provingFactIds } from "@/lib/offers/coverage";
 import { highlightSegments } from "@/lib/offers/segments";
 import { markAppliedAction, rematchOfferAction } from "../actions";
 import { formatDay } from "@/lib/dates";
+import { OFFERS_COPY } from "@/lib/i18n/offers";
+import { getUiLang } from "@/lib/i18n/server";
 import { documentPlainText } from "@/lib/documents/plain-text";
 
 export const maxDuration = 120;
@@ -23,6 +25,7 @@ function docSummary(doc: { kind: "cv" | "cover_letter"; version: number; sentenc
 export default async function OfferPage({ params }: PageProps<"/offers/[id]">) {
   const { id } = await params;
   const userId = await requireUserId();
+  const lang = await getUiLang();
   const [detail, facts, interviewIds, docs] = await Promise.all([
     getOfferDetail(userId, id),
     listFacts(userId),
@@ -68,6 +71,8 @@ export default async function OfferPage({ params }: PageProps<"/offers/[id]">) {
       interviewIds={interviewIds}
       documents={{ cv: docSummary(docs.find((d) => d.kind === "cv")), letter: docSummary(docs.find((d) => d.kind === "cover_letter")) }}
       actions={{ markApplied: markAppliedAction, rematch: rematchOfferAction }}
+      lang={lang}
+      t={OFFERS_COPY[lang]}
     />
   );
 }

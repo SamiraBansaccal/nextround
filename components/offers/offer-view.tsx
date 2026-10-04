@@ -31,6 +31,9 @@ import { useState, useTransition } from "react";
 import { CoverageLabel, MatchRing, QuoteChip, SiteBadge, StatusBadge } from "@/components/source/badges";
 import { Button } from "@/components/ui/button";
 import { Sheet, SheetContent, SheetDescription, SheetHeader, SheetTitle } from "@/components/ui/sheet";
+import type { OffersCopy } from "@/lib/i18n/offers";
+import type { UiLang } from "@/lib/i18n/ui";
+import { fill } from "@/lib/interview/copy";
 import type { OfferStatus, SourceSite } from "@/lib/types";
 import { cn } from "@/lib/utils";
 
@@ -66,6 +69,8 @@ export interface OfferViewData {
 }
 
 interface Props extends OfferViewData {
+  lang: UiLang;
+  t: OffersCopy;
   actions: {
     markApplied: (offerId: string) => Promise<{ ok: boolean }>;
     /** Links the requirements again to the CURRENT validated facts. */
@@ -84,7 +89,7 @@ interface DocSummary {
 // Offer page (layout from the Lovable prototype): header, application kit, annotated offer on the
 // left; profile match, practice and apply on the right. Every highlighted requirement was verified
 // verbatim in the offer; clicking one opens the facts that prove it.
-export function OfferView({ offer, segments, requirements, contacts, score, interviewIds, documents, actions }: Props) {
+export function OfferView({ offer, segments, requirements, contacts, score, interviewIds, documents, actions, lang, t }: Props) {
   const router = useRouter();
   const [selectedId, setSelectedId] = useState<string | null>(null);
   const [matchOpen, setMatchOpen] = useState(true);
@@ -100,11 +105,11 @@ export function OfferView({ offer, segments, requirements, contacts, score, inte
           {/* ---------- Header ---------- */}
           <header className="border-b border-earth/20 pb-8">
             <div className="mb-4 flex flex-wrap items-center gap-2">
-              <StatusBadge status={offer.status} />
-              <SiteBadge site={offer.sourceSite} />
-              {offer.appliedAt && <span className="text-xs text-muted-foreground">Applied on {offer.appliedAt}</span>}
+              <StatusBadge status={offer.status} lang={lang} />
+              <SiteBadge site={offer.sourceSite} lang={lang} />
+              {offer.appliedAt && <span className="text-xs text-muted-foreground">{fill(t.appliedOn, { date: offer.appliedAt })}</span>}
             </div>
-            <h1 className="max-w-3xl text-3xl text-earth sm:text-4xl md:text-5xl dark:text-foreground">{offer.title ?? "Untitled offer"}</h1>
+            <h1 className="max-w-3xl text-3xl text-earth sm:text-4xl md:text-5xl dark:text-foreground">{offer.title ?? t.untitledOffer}</h1>
             {offer.company && <p className="mt-2 text-xl font-semibold text-terracotta">{offer.company}</p>}
             <div className="mt-5 flex flex-wrap gap-x-6 gap-y-2 text-sm text-muted-foreground">
               {offer.location && (
@@ -134,7 +139,7 @@ export function OfferView({ offer, segments, requirements, contacts, score, inte
                     className="inline-flex items-center gap-1.5 rounded-md border border-earth/20 bg-card px-3 py-1.5 text-sm font-semibold text-earth dark:text-foreground"
                   >
                     {item.value}
-                    <QuoteChip quote={item.quote} />
+                    <QuoteChip quote={item.quote} lang={lang} />
                   </span>
                 ))}
               </div>
@@ -144,28 +149,28 @@ export function OfferView({ offer, segments, requirements, contacts, score, inte
           {/* ---------- Application kit ---------- */}
           <section aria-labelledby="documents-title">
             <div className="mb-5">
-              <p className="text-xs font-bold text-terracotta uppercase">Application kit</p>
+              <p className="text-xs font-bold text-terracotta uppercase">{t.applicationKit}</p>
               <h2 id="documents-title" className="mt-1 text-2xl text-earth sm:text-3xl dark:text-foreground">
-                Documents for this opportunity
+                {t.documentsTitle}
               </h2>
             </div>
             <div className="grid gap-4 sm:grid-cols-2">
-              <DocumentPanel kind="letter" doc={documents.letter} offerId={offer.id} />
-              <DocumentPanel kind="cv" doc={documents.cv} offerId={offer.id} />
+              <DocumentPanel kind="letter" doc={documents.letter} offerId={offer.id} t={t} />
+              <DocumentPanel kind="cv" doc={documents.cv} offerId={offer.id} t={t} />
             </div>
           </section>
 
           {/* ---------- Annotated offer ---------- */}
           <section className="border-t border-earth/20 pt-8" aria-labelledby="analysis-title">
-            <p className="text-xs font-bold text-terracotta uppercase">Source analysis</p>
+            <p className="text-xs font-bold text-terracotta uppercase">{t.sourceAnalysis}</p>
             <h2 id="analysis-title" className="mt-1 text-2xl text-earth sm:text-3xl dark:text-foreground">
-              See what matches — and what does not
+              {t.analysisTitle}
             </h2>
             <div className="mt-5 rounded-md bg-card p-5">
               <div className="mb-4 flex flex-wrap items-center gap-4 text-sm">
-                <CoverageLabel covered />
-                <CoverageLabel covered={false} />
-                <span className="text-xs text-muted-foreground">Every highlight is quoted word for word from the offer. Click one.</span>
+                <CoverageLabel covered lang={lang} />
+                <CoverageLabel covered={false} lang={lang} />
+                <span className="text-xs text-muted-foreground">{t.highlightHint}</span>
               </div>
               <div className="max-h-[70vh] overflow-y-auto text-[17px] leading-[1.9] whitespace-pre-wrap">
                 {segments.map((seg, i) => {
@@ -182,9 +187,9 @@ export function OfferView({ offer, segments, requirements, contacts, score, inte
                       )}
                     >
                       {req.covered ? (
-                        <CheckCircle2 className="mr-1 inline size-3.5 align-[-2px] text-success" aria-label="Covered" />
+                        <CheckCircle2 className="mr-1 inline size-3.5 align-[-2px] text-success" aria-label={t.covered} />
                       ) : (
-                        <XCircle className="mr-1 inline size-3.5 align-[-2px] text-gap" aria-label="Gap" />
+                        <XCircle className="mr-1 inline size-3.5 align-[-2px] text-gap" aria-label={t.gap} />
                       )}
                       {seg.text}
                     </button>
@@ -200,15 +205,10 @@ export function OfferView({ offer, segments, requirements, contacts, score, inte
           <section className="border-l-4 border-terracotta bg-card p-6 shadow-soft">
             <div className="flex items-center justify-between gap-4">
               <div>
-                <p className="text-xs font-bold text-terracotta uppercase">Profile match</p>
-                <p className="mt-1 text-sm text-muted-foreground">
-                  <span className="font-semibold text-foreground">
-                    {score.covered} of {score.total}
-                  </span>{" "}
-                  requirements covered
-                </p>
+                <p className="text-xs font-bold text-terracotta uppercase">{t.profileMatch}</p>
+                <p className="mt-1 text-sm text-muted-foreground">{fill(t.requirementsCovered, { covered: score.covered, total: score.total })}</p>
               </div>
-              <MatchRing covered={score.covered} total={score.total} />
+              <MatchRing covered={score.covered} total={score.total} lang={lang} />
             </div>
             <Button
               variant="outline"
@@ -224,7 +224,7 @@ export function OfferView({ offer, segments, requirements, contacts, score, inte
                 })
               }
             >
-              <RefreshCw className={cn("size-4", pending && "animate-spin")} aria-hidden="true" /> Update with my validated facts
+              <RefreshCw className={cn("size-4", pending && "animate-spin")} aria-hidden="true" /> {t.rematch}
             </Button>
             {matchNote && (
               <p role="status" className={cn("mt-2 text-xs", matchNote.ok ? "text-muted-foreground" : "text-gap")}>
@@ -237,7 +237,7 @@ export function OfferView({ offer, segments, requirements, contacts, score, inte
               onClick={() => setMatchOpen((o) => !o)}
               aria-expanded={matchOpen}
             >
-              Covered &amp; gaps <ChevronDown className={cn("size-4 transition-transform", matchOpen && "rotate-180")} aria-hidden="true" />
+              {t.coveredAndGaps} <ChevronDown className={cn("size-4 transition-transform", matchOpen && "rotate-180")} aria-hidden="true" />
             </Button>
             {matchOpen && (
               <div className="mt-3 space-y-1 border-t pt-4">
@@ -245,12 +245,12 @@ export function OfferView({ offer, segments, requirements, contacts, score, inte
                   <Button key={r.id} variant="ghost" className="h-auto w-full justify-between gap-3 px-2 py-2 text-left" onClick={() => setSelectedId(r.id)}>
                     <span className="text-sm whitespace-normal">
                       {r.text}
-                      {r.kind === "nice" && <span className="ml-1 text-xs text-muted-foreground">(nice to have)</span>}
+                      {r.kind === "nice" && <span className="ml-1 text-xs text-muted-foreground">{t.niceToHave}</span>}
                     </span>
                     {r.covered ? (
-                      <CheckCircle2 className="size-4 shrink-0 text-success" aria-label="Covered" />
+                      <CheckCircle2 className="size-4 shrink-0 text-success" aria-label={t.covered} />
                     ) : (
-                      <XCircle className="size-4 shrink-0 text-gap" aria-label="Gap" />
+                      <XCircle className="size-4 shrink-0 text-gap" aria-label={t.gap} />
                     )}
                   </Button>
                 ))}
@@ -260,22 +260,22 @@ export function OfferView({ offer, segments, requirements, contacts, score, inte
 
           <section id="practise" className="scroll-mt-24 bg-earth p-6 text-earth-foreground shadow-soft">
             <Sparkles className="size-6 text-terracotta" aria-hidden="true" />
-            <h2 className="mt-5 text-2xl">Ready to practise?</h2>
+            <h2 className="mt-5 text-2xl">{t.readyToPractise}</h2>
             <p className="mt-2 text-sm text-earth-foreground/75">
-              A one-to-one video call, built from this offer&apos;s stack and your validated profile. Choose who interviews you.
+              {t.practiseIntro}
             </p>
             <Button asChild size="lg" className="mt-6 w-full bg-terracotta text-earth-foreground hover:bg-terracotta/90">
               <Link href={`/interview/new?offer=${offer.id}`}>
-                <Play className="size-4" aria-hidden="true" /> Start interview simulation
+                <Play className="size-4" aria-hidden="true" /> {t.startSimulation}
               </Link>
             </Button>
             {interviewIds.length > 0 && (
               <div className="mt-4 border-t border-earth-foreground/15 pt-3 text-sm">
-                <p className="mb-1 text-earth-foreground/60">Previous practice</p>
+                <p className="mb-1 text-earth-foreground/60">{t.previousPractice}</p>
                 <div className="flex flex-wrap gap-2">
                   {interviewIds.map((id, i) => (
                     <Link key={id} href={`/interview/${id}`} className="underline hover:text-earth-foreground/80">
-                      Interview #{i + 1}
+                      {fill(t.interviewNumber, { n: i + 1 })}
                     </Link>
                   ))}
                 </div>
@@ -284,12 +284,12 @@ export function OfferView({ offer, segments, requirements, contacts, score, inte
           </section>
 
           <section className="border border-earth/20 bg-card p-5" aria-labelledby="apply-title">
-            <p className="text-xs font-bold text-terracotta uppercase">Apply</p>
+            <p className="text-xs font-bold text-terracotta uppercase">{t.apply}</p>
             <h2 id="apply-title" className="mt-1 text-xl">
-              How to apply
+              {t.howToApply}
             </h2>
             {contacts.length === 0 ? (
-              <p className="mt-3 rounded-lg bg-muted p-3 text-sm text-muted-foreground">No contact details in this offer.</p>
+              <p className="mt-3 rounded-lg bg-muted p-3 text-sm text-muted-foreground">{t.noContact}</p>
             ) : (
               <ul className="mt-3 space-y-2">
                 {contacts.map((c) => {
@@ -298,18 +298,18 @@ export function OfferView({ offer, segments, requirements, contacts, score, inte
                     <li key={`${c.kind}-${c.value}`} className="flex items-center gap-2 text-sm">
                       <Icon className="size-4 shrink-0 text-muted-foreground" aria-hidden="true" />
                       <span className="min-w-0 flex-1 truncate">{c.value}</span>
-                      <QuoteChip quote={c.quote} />
+                      <QuoteChip quote={c.quote} lang={lang} />
                     </li>
                   );
                 })}
               </ul>
             )}
-            <ApplicationKit offerId={offer.id} company={offer.company} cv={documents.cv} letter={documents.letter} />
+            <ApplicationKit offerId={offer.id} company={offer.company} cv={documents.cv} letter={documents.letter} t={t} />
             <div className="mt-4 flex flex-col gap-2">
               {offer.sourceUrl && (
                 <Button variant="outline" className="w-full" asChild>
                   <a href={offer.sourceUrl} target="_blank" rel="noopener noreferrer">
-                    <ExternalLink className="size-4" aria-hidden="true" /> Open original source <ArrowUpRight className="ml-auto size-4" aria-hidden="true" />
+                    <ExternalLink className="size-4" aria-hidden="true" /> {t.openSource} <ArrowUpRight className="ml-auto size-4" aria-hidden="true" />
                   </a>
                 </Button>
               )}
@@ -317,14 +317,14 @@ export function OfferView({ offer, segments, requirements, contacts, score, inte
                 <Button
                   disabled={pending}
                   onClick={() => {
-                    if (!window.confirm("Confirm that you applied to this offer?")) return;
+                    if (!window.confirm(t.confirmApplied)) return;
                     startTransition(async () => {
                       await actions.markApplied(offer.id);
                       router.refresh();
                     });
                   }}
                 >
-                  <Send className="size-4" aria-hidden="true" /> I applied
+                  <Send className="size-4" aria-hidden="true" /> {t.iApplied}
                 </Button>
               )}
             </div>
@@ -339,16 +339,16 @@ export function OfferView({ offer, segments, requirements, contacts, score, inte
             <>
               <SheetHeader>
                 <SheetDescription className="flex gap-2 text-xs tracking-wide uppercase">
-                  {selected.kind === "must" ? "Must have" : "Nice to have"} · {selected.category}
+                  {selected.kind === "must" ? t.mustHave : t.niceToHaveLabel} · {selected.category}
                 </SheetDescription>
                 <SheetTitle className="font-display text-2xl font-medium">{selected.text}</SheetTitle>
               </SheetHeader>
               <div className="mt-6 space-y-6 px-4">
-                <CoverageLabel covered={selected.covered} />
+                <CoverageLabel covered={selected.covered} lang={lang} />
                 <blockquote className="border-l-2 border-primary pl-3 text-muted-foreground italic">“{selected.quote}”</blockquote>
                 {selected.covered ? (
                   <div>
-                    <p className="mb-2 text-sm font-semibold">Proven by</p>
+                    <p className="mb-2 text-sm font-semibold">{t.provenBy}</p>
                     <ul className="space-y-2">
                       {selected.facts.map((f) => (
                         <li key={f.id} className="rounded-md border border-success/30 bg-success-soft px-3 py-2 text-sm">
@@ -364,11 +364,11 @@ export function OfferView({ offer, segments, requirements, contacts, score, inte
                   </div>
                 ) : (
                   <div className="rounded-xl border border-gap/30 bg-gap-soft p-4">
-                    <p className="text-sm font-medium">Gap — nothing in your validated profile proves this yet</p>
-                    <p className="mt-1 text-xs text-muted-foreground">If it is true, add it as a fact: it will then count for every offer.</p>
+                    <p className="text-sm font-medium">{t.gapTitle}</p>
+                    <p className="mt-1 text-xs text-muted-foreground">{t.gapHint}</p>
                     <Button size="sm" variant="outline" className="mt-3" asChild>
                       <Link href="/profile">
-                        <Plus className="size-4" aria-hidden="true" /> Add a fact
+                        <Plus className="size-4" aria-hidden="true" /> {t.addFact}
                       </Link>
                     </Button>
                   </div>
@@ -382,7 +382,7 @@ export function OfferView({ offer, segments, requirements, contacts, score, inte
   );
 }
 
-function DocumentPanel({ kind, doc, offerId }: { kind: "cv" | "letter"; doc: DocSummary | null; offerId: string }) {
+function DocumentPanel({ kind, doc, offerId, t }: { kind: "cv" | "letter"; doc: DocSummary | null; offerId: string; t: OffersCopy }) {
   const isCv = kind === "cv";
   const Icon = isCv ? FileText : FilePenLine;
   return (
@@ -392,25 +392,23 @@ function DocumentPanel({ kind, doc, offerId }: { kind: "cv" | "letter"; doc: Doc
           <Icon className="size-5" aria-hidden="true" />
         </span>
         <div>
-          <h3 className="font-sans text-base font-bold">{isCv ? "Tailored CV" : "Cover letter"}</h3>
+          <h3 className="font-sans text-base font-bold">{isCv ? t.tailoredCv : t.coverLetter}</h3>
           <p className="mt-1 text-sm text-muted-foreground">
             {doc
-              ? doc.unsupported === 0
-                ? `Version ${doc.version} — every sentence is backed by a validated fact.`
-                : `Version ${doc.version} — ${doc.unsupported} sentence${doc.unsupported > 1 ? "s" : ""} not backed by your profile.`
+              ? fill(doc.unsupported === 0 ? t.docAllBacked : doc.unsupported === 1 ? t.docUnbackedOne : t.docUnbackedMany, { version: doc.version, count: doc.unsupported })
               : isCv
-                ? "Written for this offer from your validated facts only."
-                : "Specific to this company, built from your validated facts only."}
+                ? t.cvPitch
+                : t.letterPitch}
           </p>
         </div>
       </div>
       <Button className="mt-5" size="sm" variant={doc ? "outline" : "default"} asChild>
         <Link href={`/offers/${offerId}/cv`}>
           {doc ? (
-            "Open"
+            t.open
           ) : (
             <>
-              <Sparkles className="size-4" aria-hidden="true" /> Create {isCv ? "tailored CV" : "cover letter"}
+              <Sparkles className="size-4" aria-hidden="true" /> {isCv ? t.createCv : t.createLetter}
             </>
           )}
         </Link>
@@ -420,7 +418,7 @@ function DocumentPanel({ kind, doc, offerId }: { kind: "cv" | "letter"; doc: Doc
 }
 
 /** "Apply" panel: the tailored CV and cover letter, ready to copy or download (or the way to create them). */
-function ApplicationKit({ offerId, company, cv, letter }: { offerId: string; company: string | null; cv: DocSummary | null; letter: DocSummary | null }) {
+function ApplicationKit({ offerId, company, cv, letter, t }: { offerId: string; company: string | null; cv: DocSummary | null; letter: DocSummary | null; t: OffersCopy }) {
   const [copied, setCopied] = useState<"cv" | "letter" | null>(null);
   const slug = (company ?? "offer").toLowerCase().replace(/[^\p{L}\p{N}]+/gu, "-").replace(/^-|-$/g, "") || "offer";
 
@@ -442,10 +440,10 @@ function ApplicationKit({ offerId, company, cv, letter }: { offerId: string; com
   if (!cv && !letter) {
     return (
       <div className="mt-4 border-t border-earth/15 pt-4">
-        <p className="text-xs font-bold text-muted-foreground uppercase">Your application kit</p>
+        <p className="text-xs font-bold text-muted-foreground uppercase">{t.yourKit}</p>
         <Button variant="outline" size="sm" className="mt-2 w-full" asChild>
           <Link href={`/offers/${offerId}/cv`}>
-            <FileText className="size-4" aria-hidden="true" /> Create your CV and cover letter
+            <FileText className="size-4" aria-hidden="true" /> {t.createBoth}
           </Link>
         </Button>
       </div>
@@ -453,31 +451,31 @@ function ApplicationKit({ offerId, company, cv, letter }: { offerId: string; com
   }
 
   const rows: { kind: "cv" | "letter"; label: string; doc: DocSummary }[] = [];
-  if (letter) rows.push({ kind: "letter", label: "Cover letter", doc: letter });
-  if (cv) rows.push({ kind: "cv", label: "Tailored CV", doc: cv });
+  if (letter) rows.push({ kind: "letter", label: t.coverLetter, doc: letter });
+  if (cv) rows.push({ kind: "cv", label: t.tailoredCv, doc: cv });
 
   return (
     <div className="mt-4 border-t border-earth/15 pt-4">
-      <p className="text-xs font-bold text-muted-foreground uppercase">Your application kit</p>
+      <p className="text-xs font-bold text-muted-foreground uppercase">{t.yourKit}</p>
       <ul className="mt-2 space-y-3">
         {rows.map(({ kind, label, doc }) => (
           <li key={kind}>
             <p className="text-sm font-semibold">
-              {label} <span className="font-normal text-muted-foreground">· version {doc.version}</span>
+              {label} <span className="font-normal text-muted-foreground">· {fill(t.version, { version: doc.version })}</span>
             </p>
             {doc.unsupported > 0 && (
               <p className="mt-0.5 flex items-center gap-1 text-xs text-gap">
                 <AlertTriangle className="size-3.5 shrink-0" aria-hidden="true" />
-                {doc.unsupported} sentence{doc.unsupported > 1 ? "s" : ""} not backed by your profile: check before sending
+                {fill(doc.unsupported === 1 ? t.unbackedOne : t.unbackedMany, { count: doc.unsupported })}
               </p>
             )}
             <div className="mt-1.5 grid grid-cols-2 gap-2">
               <Button size="sm" variant="outline" onClick={() => copy(kind, doc.text)}>
-                <Copy className="size-4" aria-hidden="true" /> {copied === kind ? "Copied" : "Copy"}
+                <Copy className="size-4" aria-hidden="true" /> {copied === kind ? t.copied : t.copy}
               </Button>
               {kind === "letter" ? (
-                <Button size="sm" variant="outline" onClick={() => download(doc.text, `cover-letter-${slug}.txt`)}>
-                  <Download className="size-4" aria-hidden="true" /> Download
+                <Button size="sm" variant="outline" onClick={() => download(doc.text, `${t.letterFile}-${slug}.txt`)}>
+                  <Download className="size-4" aria-hidden="true" /> {t.download}
                 </Button>
               ) : (
                 <Button size="sm" variant="outline" asChild>

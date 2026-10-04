@@ -31,6 +31,8 @@ import { CvDocumentView } from "@/components/profile/cv-document";
 import { FactReviewList } from "@/components/profile/fact-review";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
+import type { ProfileCopy } from "@/lib/i18n/profile";
+import { fill } from "@/lib/interview/copy";
 import { type FactPlace, placeFacts } from "@/lib/profile/place-facts";
 import type { CvDocument, FactType, TailoredCv, TailoredLetter } from "@/lib/types";
 import { cn } from "@/lib/utils";
@@ -76,6 +78,7 @@ export interface SelectedCv {
 type Result = { ok: true; message: string; sourceId?: string } | { ok: false; error: string };
 
 interface Props {
+  t: ProfileCopy;
   candidate: { name: string; imageUrl: string | null; githubLogin: string | null };
   cvs: CvItem[];
   keptDocuments: KeptDocument[];
@@ -103,21 +106,13 @@ interface Props {
 
 const MAX_PDF_BYTES = 5 * 1024 * 1024;
 
-const SECTIONS: { type: FactType; label: string; Icon: typeof Briefcase }[] = [
-  { type: "experience", label: "Experience", Icon: Briefcase },
-  { type: "project", label: "Projects", Icon: FolderGit2 },
-  { type: "skill", label: "Skills", Icon: Wrench },
-  { type: "education", label: "Education", Icon: GraduationCap },
-  { type: "language", label: "Languages", Icon: Languages },
-  { type: "achievement", label: "Achievements", Icon: Award },
-];
-
-const CHAT_QUESTIONS = [
-  "Which roles are you targeting?",
-  "Which technologies do you use (your stack)?",
-  "Which projects are you proudest of, and what did you do in them?",
-  "Which languages do you speak, and at what level?",
-  "When are you available, and for which kind of contract?",
+const SECTIONS: { type: FactType; Icon: typeof Briefcase }[] = [
+  { type: "experience", Icon: Briefcase },
+  { type: "project", Icon: FolderGit2 },
+  { type: "skill", Icon: Wrench },
+  { type: "education", Icon: GraduationCap },
+  { type: "language", Icon: Languages },
+  { type: "achievement", Icon: Award },
 ];
 
 /** Text of a PDF, extracted IN THE BROWSER: the file itself never leaves the user's computer. */
@@ -131,7 +126,7 @@ async function pdfToText(file: File): Promise<string> {
   return (Array.isArray(text) ? text.join("\n") : text).trim();
 }
 
-export function ProfileLibrary({ candidate, cvs, keptDocuments, selectedCv, selectedDocument, facts, actions }: Props) {
+export function ProfileLibrary({ t, candidate, cvs, keptDocuments, selectedCv, selectedDocument, facts, actions }: Props) {
   const router = useRouter();
   const fileInput = useRef<HTMLInputElement>(null);
   const [pending, startTransition] = useTransition();
@@ -183,18 +178,18 @@ export function ProfileLibrary({ candidate, cvs, keptDocuments, selectedCv, sele
       const update = (status: "reading" | "analysing" | "done" | "error", note?: string) =>
         setUploads((u) => u.map((x, j) => (j === i ? { ...x, status, note } : x)));
       if (!/\.pdf$/i.test(file.name) || (file.type && file.type !== "application/pdf")) {
-        update("error", "PDF only");
+        update("error", t.pdfOnly);
         continue;
       }
       if (file.size > MAX_PDF_BYTES) {
-        update("error", "More than 5 MB");
+        update("error", t.tooBig);
         continue;
       }
       let text: string;
       try {
         text = await pdfToText(file);
       } catch {
-        update("error", "This file could not be read as a PDF");
+        update("error", t.unreadable);
         continue;
       }
       update("analysing");
@@ -208,7 +203,7 @@ export function ProfileLibrary({ candidate, cvs, keptDocuments, selectedCv, sele
   return (
     <div className="space-y-12">
       <div className="no-print space-y-12">
-      <PageHeading eyebrow="Your professional source library" title="All your CVs">
+      <PageHeading eyebrow={t.eyebrow} title={t.title}>
         <input
           ref={fileInput}
           type="file"
@@ -216,17 +211,19 @@ export function ProfileLibrary({ candidate, cvs, keptDocuments, selectedCv, sele
           multiple
           className="sr-only"
           onChange={(e) => handleFiles(e.target.files)}
-          aria-label="Add CVs (PDF)"
+          aria-label={t.addCvsLabel}
         />
         <Button onClick={() => fileInput.current?.click()} disabled={uploading} className="w-full sm:w-auto">
-          <Upload className="size-4" aria-hidden="true" /> Add CVs
+          <Upload className="size-4" aria-hidden="true" /> {t.addCvs}
         </Button>
       </PageHeading>
 
       <p className="-mt-6 max-w-3xl text-sm leading-relaxed text-muted-foreground">
-        Add <strong className="text-foreground">as many CVs as you want</strong>: the one you sent for each job, your LinkedIn PDF export… NextRound
-        reads them all and builds <strong className="text-foreground">one fact base</strong>. Each new application then gets its own CV, written only
-        from the facts you validate. PDFs are read in your browser: only their text is sent.
+        {t.introBefore}
+        <strong className="text-foreground">{t.introStrong1}</strong>
+        {t.introMiddle}
+        <strong className="text-foreground">{t.introStrong2}</strong>
+        {t.introAfter}
       </p>
 
       {message && (
@@ -237,7 +234,7 @@ export function ProfileLibrary({ candidate, cvs, keptDocuments, selectedCv, sele
 
       {/* ---------- CV library ---------- */}
       <section aria-labelledby="library-title">
-        <SectionHeading eyebrow="CV library" title="Choose a source CV" id="library-title" aside={<span className="text-sm text-muted-foreground">{cvs.length} CV</span>} />
+        <SectionHeading eyebrow={t.libraryEyebrow} title={t.libraryTitle} id="library-title" aside={<span className="text-sm text-muted-foreground">{fill(t.cvCount, { count: cvs.length })}</span>} />
         {uploads.length > 0 && (
           <ul className="mb-4 space-y-1 text-sm" aria-live="polite">
             {uploads.map((u) => (
@@ -251,7 +248,7 @@ export function ProfileLibrary({ candidate, cvs, keptDocuments, selectedCv, sele
                 )}
                 <span className="font-medium">{u.name}</span>
                 <span className="text-muted-foreground">
-                  {u.status === "reading" ? "reading the PDF…" : u.status === "analysing" ? "finding your facts and laying out your CV, every line checked against the PDF… a minute or two with free models" : u.note}
+                  {u.status === "reading" ? t.readingPdf : u.status === "analysing" ? t.analysing : u.note}
                 </span>
               </li>
             ))}
@@ -271,21 +268,21 @@ export function ProfileLibrary({ candidate, cvs, keptDocuments, selectedCv, sele
                       {cv.fileName.replace(/\.pdf$/i, "")}
                     </h3>
                     <p className="mt-1 text-xs text-muted-foreground">
-                      Added {cv.importedAt} · <span className="font-bold text-primary">{cv.validated}</span> validated · {cv.facts - cv.validated} to review
+                      {fill(t.cvStats, { date: cv.importedAt, validated: cv.validated, toReview: cv.facts - cv.validated })}
                     </p>
                     {selected && (
                       <span className="mt-2 inline-flex items-center gap-1 text-xs font-bold text-primary">
-                        <Check className="size-3.5" aria-hidden="true" /> Current source
+                        <Check className="size-3.5" aria-hidden="true" /> {t.currentSource}
                       </span>
                     )}
                   </div>
                 </div>
                 <div className="mt-5 grid grid-cols-[1fr_auto] gap-2">
                   <Button size="sm" variant={selected ? "default" : "outline"} onClick={() => selectCv(cv.id)} aria-pressed={selected}>
-                    {selected ? "Selected" : "Use as source"}
+                    {selected ? t.selected : t.useAsSource}
                   </Button>
-                  <Button size="sm" variant="ghost" disabled={pending} onClick={() => run(() => actions.removeCv(cv.id))} aria-label={`Remove ${cv.fileName}`}>
-                    <Trash2 className="size-4" aria-hidden="true" /> Remove
+                  <Button size="sm" variant="ghost" disabled={pending} onClick={() => run(() => actions.removeCv(cv.id))} aria-label={fill(t.removeNamed, { name: cv.fileName })}>
+                    <Trash2 className="size-4" aria-hidden="true" /> {t.remove}
                   </Button>
                 </div>
               </article>
@@ -304,27 +301,27 @@ export function ProfileLibrary({ candidate, cvs, keptDocuments, selectedCv, sele
                       {doc.title}
                     </h3>
                     <p className="mt-1 text-xs text-muted-foreground">
-                      {doc.kind === "cv" ? "CV" : "Cover letter"} written for an offer{doc.language && ` · ${doc.language.toUpperCase()}`} · {doc.createdOn}
+                      {doc.kind === "cv" ? t.keptCv : t.keptLetter}{doc.language && ` · ${doc.language.toUpperCase()}`} · {doc.createdOn}
                     </p>
                   </div>
                 </div>
                 <div className="mt-5 grid grid-cols-[1fr_auto] gap-2">
                   <Button size="sm" variant={shown ? "default" : "outline"} onClick={() => router.push(`/profile?doc=${doc.id}`, { scroll: false })} aria-pressed={shown}>
-                    {shown ? "Shown" : "Show"}
+                    {shown ? t.shown : t.show}
                   </Button>
                   <Button
                     size="sm"
                     variant="ghost"
                     disabled={pending}
-                    aria-label={`Take ${doc.title} out of the profile`}
+                    aria-label={fill(t.takeOut, { title: doc.title })}
                     onClick={() =>
                       run(async () => {
                         const result = await actions.keepDocument({ id: doc.id, kept: false });
-                        return result.ok ? { ok: true, message: "Taken out of your profile." } : result;
+                        return result.ok ? { ok: true, message: t.takenOut } : result;
                       })
                     }
                   >
-                    <Trash2 className="size-4" aria-hidden="true" /> Remove
+                    <Trash2 className="size-4" aria-hidden="true" /> {t.remove}
                   </Button>
                 </div>
               </article>
@@ -337,8 +334,8 @@ export function ProfileLibrary({ candidate, cvs, keptDocuments, selectedCv, sele
             className="flex min-h-40 flex-col items-center justify-center border border-dashed border-earth/30 p-5 text-center text-muted-foreground transition hover:border-primary hover:bg-primary-soft/40"
           >
             <FilePlus2 className="mb-3 size-7 text-primary" aria-hidden="true" />
-            <span className="font-bold text-foreground">{cvs.length ? "Add more CVs" : "Add your first CV"}</span>
-            <span className="mt-1 text-sm">PDF, up to 5 MB each · select several at once</span>
+            <span className="font-bold text-foreground">{cvs.length ? t.addMoreCvs : t.addFirstCv}</span>
+            <span className="mt-1 text-sm">{t.uploadHint}</span>
           </button>
         </div>
       </section>
@@ -348,17 +345,17 @@ export function ProfileLibrary({ candidate, cvs, keptDocuments, selectedCv, sele
         <section aria-labelledby="review-title" className="border-l-4 border-terracotta bg-card p-5 shadow-soft">
           <div className="flex flex-wrap items-start justify-between gap-3">
             <div>
-              <p className="text-xs font-bold text-terracotta uppercase">Needs your approval</p>
+              <p className="text-xs font-bold text-terracotta uppercase">{t.needsApproval}</p>
               <h2 id="review-title" className="mt-1 text-xl">
-                {proposed.length} fact{proposed.length > 1 ? "s" : ""} to review, in place
+                {fill(proposed.length === 1 ? t.toReviewOne : t.toReviewMany, { count: proposed.length })}
               </h2>
             </div>
             <Button size="sm" variant="outline" disabled={pending} onClick={() => run(actions.validateAll)}>
-              <Check className="size-4" aria-hidden="true" /> Keep all
+              <Check className="size-4" aria-hidden="true" /> {t.keepAll}
             </Button>
           </div>
           <p className="mt-2 text-sm text-muted-foreground">
-            Each fact sits under the line of the CV it comes from, or in the GitHub section: keep, edit or reject it there. Nothing is reused until you validate it.
+            {t.reviewHint}
           </p>
           <div className="mt-3 flex flex-wrap gap-2 text-sm">
             {cvs
@@ -374,7 +371,7 @@ export function ProfileLibrary({ candidate, cvs, keptDocuments, selectedCv, sele
               </a>
             )}
           </div>
-          {otherProposed.length > 0 && <FactReviewList facts={otherProposed} actions={actions} pending={pending} run={run} />}
+          {otherProposed.length > 0 && <FactReviewList facts={otherProposed} actions={actions} pending={pending} run={run} t={t} />}
         </section>
       )}
 
@@ -385,14 +382,14 @@ export function ProfileLibrary({ candidate, cvs, keptDocuments, selectedCv, sele
         <section aria-labelledby="preview-title">
           <div className="no-print">
             <SectionHeading
-              eyebrow={selectedDocument.content.kind === "tailored_cv" ? "CV written for an offer" : "Cover letter written for an offer"}
+              eyebrow={selectedDocument.content.kind === "tailored_cv" ? t.keptCv : t.keptLetter}
               title={selectedDocument.title}
               id="preview-title"
               aside={
                 <div className="flex gap-2">
                   {selectedDocument.href && (
                     <Button size="sm" variant="outline" asChild>
-                      <Link href={selectedDocument.href}>Open with its offer</Link>
+                      <Link href={selectedDocument.href}>{t.openWithOffer}</Link>
                     </Button>
                   )}
                   <Button size="sm" variant="outline" onClick={() => window.print()}>
@@ -401,7 +398,7 @@ export function ProfileLibrary({ candidate, cvs, keptDocuments, selectedCv, sele
                 </div>
               }
             />
-            <p className="-mt-2 mb-4 text-sm text-muted-foreground">Part of your profile: start a new CV or letter from it on another offer (“Start from”).</p>
+            <p className="-mt-2 mb-4 text-sm text-muted-foreground">{t.keptHint}</p>
           </div>
           {selectedDocument.content.kind === "tailored_cv" ? (
             <TailoredCvDocument cv={selectedDocument.content} candidate={{ name: candidate.name, contacts: selectedDocument.contacts }} facts={factTexts} />
@@ -418,19 +415,19 @@ export function ProfileLibrary({ candidate, cvs, keptDocuments, selectedCv, sele
         <section aria-labelledby="preview-title">
           <div className="no-print">
             <SectionHeading
-              eyebrow="Selected CV"
+              eyebrow={t.selectedCv}
               title={selectedCv.fileName.replace(/\.pdf$/i, "")}
               id="preview-title"
               aside={
                 <div className="flex flex-wrap gap-2">
                   {cvProposed.length > 0 && (
                     <Button size="sm" disabled={pending} onClick={() => run(() => actions.validateMany(cvProposed.map((f) => f.id)))}>
-                      <Check className="size-4" aria-hidden="true" /> Keep all {cvProposed.length} from this CV
+                      <Check className="size-4" aria-hidden="true" /> {fill(t.keepAllFromCv, { count: cvProposed.length })}
                     </Button>
                   )}
                   {selectedCv.hasText && (
                     <Button size="sm" variant="outline" disabled={pending} onClick={() => run(() => actions.structureCv(selectedCv.id))}>
-                      <RefreshCw className={`size-4 ${pending ? "animate-spin" : ""}`} aria-hidden="true" /> {selectedCv.document ? "Lay out again" : "Lay it out"}
+                      <RefreshCw className={`size-4 ${pending ? "animate-spin" : ""}`} aria-hidden="true" /> {selectedCv.document ? t.layOutAgain : t.layOut}
                     </Button>
                   )}
                   {selectedCv.document && (
@@ -442,7 +439,7 @@ export function ProfileLibrary({ candidate, cvs, keptDocuments, selectedCv, sele
               }
             />
             <p className="-mt-2 mb-4 text-sm text-muted-foreground">
-              Laid out by the AI, then checked: every line below is written word for word in your PDF. Under each part, the facts found there: keep, edit or reject them in place.
+              {t.layoutHint}
             </p>
           </div>
           {selectedCv.document ? (
@@ -453,10 +450,10 @@ export function ProfileLibrary({ candidate, cvs, keptDocuments, selectedCv, sele
               renderFacts={(place) => {
                 const placed = cvPlaces.get(place) ?? [];
                 if (!placed.length) return null;
-                const list = <FactReviewList facts={placed} actions={actions} pending={pending} run={run} />;
+                const list = <FactReviewList facts={placed} actions={actions} pending={pending} run={run} t={t} />;
                 return place === "other" ? (
                   <section className="no-print border-t-2 border-primary pt-5">
-                    <h4 className="font-sans text-lg font-bold text-earth uppercase">Other facts from this CV</h4>
+                    <h4 className="font-sans text-lg font-bold text-earth uppercase">{t.otherFacts}</h4>
                     {list}
                   </section>
                 ) : (
@@ -467,9 +464,9 @@ export function ProfileLibrary({ candidate, cvs, keptDocuments, selectedCv, sele
           ) : (
             <div className="no-print border border-dashed border-earth/30 p-8 text-center text-sm text-muted-foreground">
               {selectedCv.hasText
-                ? "This CV is not laid out yet. Use “Lay it out”: about a minute with free models."
-                : "This CV was added before NextRound kept its text. Remove it and add the PDF again to see it here."}
-              <FactReviewList facts={cvFacts} actions={actions} pending={pending} run={run} className="text-left" />
+                ? t.notLaidOut
+                : t.noText}
+              <FactReviewList facts={cvFacts} actions={actions} pending={pending} run={run} t={t} className="text-left" />
             </div>
           )}
         </section>
@@ -478,11 +475,11 @@ export function ProfileLibrary({ candidate, cvs, keptDocuments, selectedCv, sele
       <div className="no-print space-y-12">
       {/* ---------- Fact base, shown as a CV ---------- */}
       <section aria-labelledby="base-title">
-        <SectionHeading eyebrow="Your fact base" title="Everything you validated" id="base-title" aside={<span className="text-sm text-muted-foreground">{validated.length} facts</span>} />
-        <article className="overflow-hidden border border-earth/20 bg-card shadow-soft" aria-label={`Fact base of ${candidate.name}`}>
+        <SectionHeading eyebrow={t.baseEyebrow} title={t.baseTitle} id="base-title" aside={<span className="text-sm text-muted-foreground">{fill(t.factCount, { count: validated.length })}</span>} />
+        <article className="overflow-hidden border border-earth/20 bg-card shadow-soft" aria-label={fill(t.baseOf, { name: candidate.name })}>
           <header className="grid gap-5 bg-primary-soft/55 p-5 sm:grid-cols-[minmax(0,1fr)_112px] sm:items-center sm:p-8 lg:px-12">
             <div className="min-w-0 text-center sm:text-left">
-              <p className="font-display text-xl text-earth dark:text-foreground">Base CV · built only from validated facts</p>
+              <p className="font-display text-xl text-earth dark:text-foreground">{t.baseCv}</p>
               <h3 className="mt-1 text-3xl text-earth sm:text-4xl dark:text-foreground">{candidate.name}</h3>
               {candidate.githubLogin && <p className="mt-1 text-sm text-muted-foreground">github.com/{candidate.githubLogin}</p>}
             </div>
@@ -494,10 +491,10 @@ export function ProfileLibrary({ candidate, cvs, keptDocuments, selectedCv, sele
           <div className="p-5 sm:p-8 lg:p-12">
             {validated.length === 0 && (
               <p className="text-sm text-muted-foreground">
-                Nothing validated yet. Add CVs, import GitHub or answer the 5 questions below, then keep the facts that are true.
+                {t.nothingValidated}
               </p>
             )}
-            {SECTIONS.map(({ type, label, Icon }) => {
+            {SECTIONS.map(({ type, Icon }) => {
               const all = validated.filter((f) => f.type === type);
               if (all.length === 0) return null;
               const items = all.filter((f) => !f.aiAssisted);
@@ -505,7 +502,7 @@ export function ProfileLibrary({ candidate, cvs, keptDocuments, selectedCv, sele
               return (
                 <section key={type} className="py-5">
                   <h4 className="mb-4 flex items-center gap-2 border-b-2 border-primary pb-2 font-sans text-lg font-bold text-earth uppercase dark:text-foreground">
-                    <Icon className="size-4 text-primary" aria-hidden="true" /> {label}
+                    <Icon className="size-4 text-primary" aria-hidden="true" /> {t.sections[type]}
                   </h4>
                   <ul className="space-y-2">
                     {items.map((fact) => (
@@ -519,7 +516,7 @@ export function ProfileLibrary({ candidate, cvs, keptDocuments, selectedCv, sele
                           className="size-7 shrink-0 opacity-60 group-hover:opacity-100"
                           disabled={pending}
                           onClick={() => run(() => actions.reject(fact.id))}
-                          aria-label={`Delete: ${fact.text}`}
+                          aria-label={fill(t.deleteFact, { text: fact.text })}
                         >
                           <Trash2 className="size-3.5" />
                         </Button>
@@ -529,16 +526,16 @@ export function ProfileLibrary({ candidate, cvs, keptDocuments, selectedCv, sele
                   {vibe.length > 0 && (
                     <div className="mt-5 rounded-lg border border-dashed border-earth/30 p-4">
                       <p className="flex items-center gap-2 text-xs font-bold text-muted-foreground uppercase">
-                        <Sparkles className="size-3.5" aria-hidden="true" /> Built with AI · vibe coding
+                        <Sparkles className="size-3.5" aria-hidden="true" /> {t.builtWithAiTitle}
                       </p>
-                      <p className="mt-1 text-xs text-muted-foreground">They show your interest in AI, your creativity and your hackathons. They never count as mastery of their stack.</p>
+                      <p className="mt-1 text-xs text-muted-foreground">{t.builtWithAiHint}</p>
                       <ul className="mt-3 space-y-2">
                         {vibe.map((fact) => (
                           <li key={fact.id} className="flex items-start justify-between gap-3 text-sm leading-relaxed">
                             <span>
                               {fact.text} <span className="ml-1 text-xs text-muted-foreground">· {fact.origin}</span>
                             </span>
-                            <AiAssistedToggle fact={fact} compact disabled={pending} onToggle={(aiAssisted) => run(() => actions.setAiAssisted({ id: fact.id, aiAssisted }))} />
+                            <AiAssistedToggle fact={fact} t={t} compact disabled={pending} onToggle={(aiAssisted) => run(() => actions.setAiAssisted({ id: fact.id, aiAssisted }))} />
                           </li>
                         ))}
                       </ul>
@@ -556,58 +553,58 @@ export function ProfileLibrary({ candidate, cvs, keptDocuments, selectedCv, sele
       <div id="github" className="scroll-mt-24" />
       <ImportSection
         icon={<FolderGit2 className="size-4" aria-hidden="true" />}
-        eyebrow="GitHub projects"
-        title="Bring your projects into your next CV"
+        eyebrow={t.githubEyebrow}
+        title={t.githubTitle}
         body={
           candidate.githubLogin
-            ? `One project per public repository of @${candidate.githubLogin}, linked to the repo. NextRound never invents one: projects appear only after GitHub returns them.`
-            : "Sign in with GitHub to import your public repositories."
+            ? fill(t.githubBody, { login: candidate.githubLogin })
+            : t.githubSignIn
         }
       >
         <Button variant="outline" disabled={pending || !candidate.githubLogin} onClick={() => run(actions.importGithub)}>
-          {pending ? <RefreshCw className="size-4 animate-spin" aria-hidden="true" /> : <FolderGit2 className="size-4" aria-hidden="true" />} Import my repositories
+          {pending ? <RefreshCw className="size-4 animate-spin" aria-hidden="true" /> : <FolderGit2 className="size-4" aria-hidden="true" />} {t.importRepos}
         </Button>
       </ImportSection>
       {githubFacts.length > 0 && (
         <div className="pb-8">
           <p className="text-sm text-muted-foreground">
-            Mark the projects built with AI (vibe coding): they stay in your profile as interest in AI and creativity, never as mastery of their stack.
+            {t.markVibe}
           </p>
-          <FactReviewList facts={githubFacts} actions={actions} pending={pending} run={run} />
+          <FactReviewList facts={githubFacts} actions={actions} pending={pending} run={run} t={t} />
         </div>
       )}
 
       {/* ---------- Codewars ---------- */}
-      <ImportSection icon={<Swords className="size-4" aria-hidden="true" />} eyebrow="Codewars" title="Your kata rank, as proof" body="Optional: your public Codewars profile gives one achievement (rank, katas completed, languages).">
+      <ImportSection icon={<Swords className="size-4" aria-hidden="true" />} eyebrow="Codewars" title={t.codewarsTitle} body={t.codewarsBody}>
         <div className="flex gap-2">
-          <Input placeholder="Codewars username" value={codewars} onChange={(e) => setCodewars(e.target.value)} aria-label="Codewars username" className="sm:w-52" />
+          <Input placeholder={t.codewarsUser} value={codewars} onChange={(e) => setCodewars(e.target.value)} aria-label={t.codewarsUser} className="sm:w-52" />
           <Button variant="outline" disabled={pending || !codewars.trim()} onClick={() => run(() => actions.importCodewars(codewars.trim()))}>
-            Import
+            {t.import}
           </Button>
         </div>
       </ImportSection>
 
       {/* ---------- Onboarding chat ---------- */}
-      <OnboardingChat pending={pending} onFinish={(answers) => run(() => actions.chatFacts(answers))} />
+      <OnboardingChat t={t} pending={pending} onFinish={(answers) => run(() => actions.chatFacts(answers))} />
 
       {/* ---------- Manual ---------- */}
-      <ImportSection icon={<Plus className="size-4" aria-hidden="true" />} eyebrow="Manual" title="Add a fact yourself" body="For anything not in your CVs or on GitHub, e.g. a LeetCode streak.">
+      <ImportSection icon={<Plus className="size-4" aria-hidden="true" />} eyebrow={t.manualEyebrow} title={t.manualTitle} body={t.manualBody}>
         <div className="flex w-full flex-col gap-2 sm:flex-row lg:w-auto">
           <select
             className="h-9 rounded-md border bg-transparent px-2 text-sm"
             value={manual.type}
             onChange={(e) => setManual((m) => ({ ...m, type: e.target.value as FactType }))}
-            aria-label="Fact type"
+            aria-label={t.factType}
           >
             {SECTIONS.map((s) => (
               <option key={s.type} value={s.type}>
-                {s.label}
+                {t.sections[s.type]}
               </option>
             ))}
           </select>
-          <Input placeholder="e.g. Solved 150 LeetCode problems" value={manual.text} onChange={(e) => setManual((m) => ({ ...m, text: e.target.value }))} aria-label="Fact text" className="sm:w-72" />
+          <Input placeholder={t.factPlaceholder} value={manual.text} onChange={(e) => setManual((m) => ({ ...m, text: e.target.value }))} aria-label={t.factText} className="sm:w-72" />
           <Button disabled={pending || manual.text.trim().length < 3} onClick={() => run(() => actions.addManual({ type: manual.type, text: manual.text.trim() }), () => setManual((m) => ({ ...m, text: "" })))}>
-            Add
+            {t.add}
           </Button>
         </div>
       </ImportSection>
@@ -634,7 +631,8 @@ function ImportSection({ icon, eyebrow, title, body, children }: { icon: ReactNo
   );
 }
 
-function OnboardingChat({ pending, onFinish }: { pending: boolean; onFinish: (answers: { question: string; answer: string }[]) => void }) {
+function OnboardingChat({ t, pending, onFinish }: { t: ProfileCopy; pending: boolean; onFinish: (answers: { question: string; answer: string }[]) => void }) {
+  const CHAT_QUESTIONS = t.chatQuestions;
   const [open, setOpen] = useState(false);
   const [answers, setAnswers] = useState<string[]>([]);
   const [draft, setDraft] = useState("");
@@ -646,18 +644,18 @@ function OnboardingChat({ pending, onFinish }: { pending: boolean; onFinish: (an
       <div className="grid gap-5 lg:grid-cols-[minmax(0,1fr)_auto] lg:items-center">
         <div>
           <p className="flex items-center gap-2 text-xs font-bold text-terracotta uppercase">
-            <MessageCircle className="size-4" aria-hidden="true" /> Short chat
+            <MessageCircle className="size-4" aria-hidden="true" /> {t.chatEyebrow}
           </p>
           <h2 id="chat-title" className="mt-2 text-2xl text-earth sm:text-3xl dark:text-foreground">
-            Answer 5 quick questions
+            {t.chatTitle}
           </h2>
           <p className="mt-2 max-w-2xl text-sm leading-relaxed text-muted-foreground">
-            Target roles, stack, proudest projects, languages, availability. Each proposed fact quotes your own words.
+            {t.chatBody}
           </p>
         </div>
         {!open && (
           <Button variant="outline" onClick={() => setOpen(true)}>
-            <MessageCircle className="size-4" aria-hidden="true" /> Start
+            <MessageCircle className="size-4" aria-hidden="true" /> {t.start}
           </Button>
         )}
       </div>
@@ -667,7 +665,7 @@ function OnboardingChat({ pending, onFinish }: { pending: boolean; onFinish: (an
             <div key={q} className="flex flex-col gap-2">
               <p className="w-fit max-w-[85%] rounded-lg rounded-tl-none bg-primary-soft px-3 py-2 text-sm">{q}</p>
               {answers[i] !== undefined && (
-                <p className="ml-auto w-fit max-w-[85%] rounded-lg rounded-tr-none bg-earth px-3 py-2 text-sm text-earth-foreground">{answers[i] || "(skipped)"}</p>
+                <p className="ml-auto w-fit max-w-[85%] rounded-lg rounded-tr-none bg-earth px-3 py-2 text-sm text-earth-foreground">{answers[i] || t.skipped}</p>
               )}
             </div>
           ))}
@@ -676,7 +674,7 @@ function OnboardingChat({ pending, onFinish }: { pending: boolean; onFinish: (an
               <Input
                 autoFocus
                 value={draft}
-                placeholder="Your answer (or leave empty to skip)"
+                placeholder={t.answerPlaceholder}
                 onChange={(e) => setDraft(e.target.value)}
                 onKeyDown={(e) => {
                   if (e.key === "Enter") {
@@ -684,14 +682,14 @@ function OnboardingChat({ pending, onFinish }: { pending: boolean; onFinish: (an
                     setDraft("");
                   }
                 }}
-                aria-label="Your answer"
+                aria-label={t.yourAnswer}
               />
               <Button
                 onClick={() => {
                   setAnswers((a) => [...a, draft.trim()]);
                   setDraft("");
                 }}
-                aria-label="Send"
+                aria-label={t.send}
               >
                 <Send className="size-4" />
               </Button>
@@ -699,10 +697,10 @@ function OnboardingChat({ pending, onFinish }: { pending: boolean; onFinish: (an
           ) : (
             <div className="flex flex-wrap gap-2">
               <Button disabled={pending} onClick={() => onFinish(CHAT_QUESTIONS.map((question, i) => ({ question, answer: answers[i] ?? "" })))}>
-                {pending && <Loader2 className="size-4 animate-spin" aria-hidden="true" />} Extract my facts
+                {pending && <Loader2 className="size-4 animate-spin" aria-hidden="true" />} {t.extract}
               </Button>
               <Button variant="ghost" onClick={() => setAnswers([])}>
-                Start again
+                {t.startAgain}
               </Button>
             </div>
           )}
@@ -715,11 +713,13 @@ function OnboardingChat({ pending, onFinish }: { pending: boolean; onFinish: (an
 /** "Built with AI (vibe coding)": a project the candidate did not write line by line. */
 function AiAssistedToggle({
   fact,
+  t,
   compact = false,
   disabled,
   onToggle,
 }: {
   fact: Pick<ProfileFactView, "text" | "aiAssisted">;
+  t: ProfileCopy;
   compact?: boolean;
   disabled: boolean;
   onToggle: (aiAssisted: boolean) => void;
@@ -731,7 +731,7 @@ function AiAssistedToggle({
       aria-pressed={fact.aiAssisted}
       disabled={disabled}
       onClick={() => onToggle(!fact.aiAssisted)}
-      title={fact.aiAssisted ? "Shown as built with AI: click if you wrote it yourself" : "Built with AI? It will never count as mastery of its stack"}
+      title={fact.aiAssisted ? t.aiShown : t.aiAsk}
       className={cn(
         "inline-flex items-center gap-1.5 rounded-full border text-xs transition-colors disabled:opacity-50",
         compact ? "px-2 py-0.5" : "mt-3 px-2.5 py-1",
@@ -739,7 +739,7 @@ function AiAssistedToggle({
       )}
     >
       <Sparkles className="size-3" aria-hidden="true" />
-      {compact ? (fact.aiAssisted ? `${name}: built with AI` : `${name}: built with AI?`) : fact.aiAssisted ? "Built with AI (vibe coding)" : "Built with AI? (vibe coding)"}
+      {compact ? fill(fact.aiAssisted ? t.aiNamedOn : t.aiNamedAsk, { name }) : fact.aiAssisted ? t.aiOn : t.aiAskLong}
     </button>
   );
 }
