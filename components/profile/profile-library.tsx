@@ -11,7 +11,6 @@ import {
   Languages,
   Loader2,
   MessageCircle,
-  PencilLine,
   Plus,
   Printer,
   RefreshCw,
@@ -20,17 +19,20 @@ import {
   Swords,
   Trash2,
   Upload,
-  UserRound,
   Wrench,
   X,
 } from "lucide-react";
+import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { type ReactNode, useRef, useState, useTransition } from "react";
 import { PageHeading, SectionHeading } from "@/components/page-heading";
+import { TailoredCvDocument, TailoredLetterDocument } from "@/components/documents/tailored-document";
 import { CvDocumentView } from "@/components/profile/cv-document";
+import { FactReviewList } from "@/components/profile/fact-review";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
-import type { CvDocument, FactType } from "@/lib/types";
+import { type FactPlace, placeFacts } from "@/lib/profile/place-facts";
+import type { CvDocument, FactType, TailoredCv, TailoredLetter } from "@/lib/types";
 import { cn } from "@/lib/utils";
 
 export interface ProfileFactView {
@@ -53,6 +55,16 @@ export interface CvItem {
   validated: number;
 }
 
+/** A CV or a cover letter written for an offer and kept in the profile, to reuse it or start from it. */
+export interface KeptDocument {
+  id: string;
+  kind: "cv" | "cover_letter";
+  title: string;
+  language: string | null;
+  createdOn: string;
+  href: string | null;
+}
+
 /** The CV shown as a document: the one chosen in the library, else the latest. */
 export interface SelectedCv {
   id: string;
@@ -66,7 +78,10 @@ type Result = { ok: true; message: string; sourceId?: string } | { ok: false; er
 interface Props {
   candidate: { name: string; imageUrl: string | null; githubLogin: string | null };
   cvs: CvItem[];
+  keptDocuments: KeptDocument[];
   selectedCv: SelectedCv | null;
+  /** A document written for an offer and added to the profile, shown instead of a CV (?doc=). */
+  selectedDocument: { id: string; title: string; href: string | null; content: TailoredCv | TailoredLetter; contacts: { kind: string; value: string }[] } | null;
   facts: ProfileFactView[];
   actions: {
     importGithub: () => Promise<Result>;
@@ -77,9 +92,11 @@ interface Props {
     chatFacts: (answers: { question: string; answer: string }[]) => Promise<Result>;
     validate: (id: string) => Promise<Result>;
     validateAll: () => Promise<Result>;
+    validateMany: (ids: string[]) => Promise<Result>;
     reject: (id: string) => Promise<Result>;
     edit: (input: { id: string; text: string }) => Promise<Result>;
     setAiAssisted: (input: { id: string; aiAssisted: boolean }) => Promise<Result>;
+    keepDocument: (input: { id: string; kept: boolean }) => Promise<{ ok: true } | { ok: false; error: string }>;
     addManual: (input: { type: FactType; text: string }) => Promise<Result>;
   };
 }
@@ -114,18 +131,33 @@ async function pdfToText(file: File): Promise<string> {
   return (Array.isArray(text) ? text.join("\n") : text).trim();
 }
 
-export function ProfileLibrary({ candidate, cvs, selectedCv, facts, actions }: Props) {
+export function ProfileLibrary({ candidate, cvs, keptDocuments, selectedCv, selectedDocument, facts, actions }: Props) {
   const router = useRouter();
   const fileInput = useRef<HTMLInputElement>(null);
   const [pending, startTransition] = useTransition();
   const [message, setMessage] = useState<{ kind: "success" | "error"; text: string } | null>(null);
   const [uploads, setUploads] = useState<{ name: string; status: "reading" | "analysing" | "done" | "error"; note?: string }[]>([]);
-  const [editing, setEditing] = useState<{ id: string; text: string } | null>(null);
   const [codewars, setCodewars] = useState("");
   const [manual, setManual] = useState<{ type: FactType; text: string }>({ type: "skill", text: "" });
 
   const proposed = facts.filter((f) => !f.validated);
   const validated = facts.filter((f) => f.validated);
+  const factTexts = Object.fromEntries(validated.map((f) => [f.id, f.text]));
+  // Where each fact is reviewed: under the line of its CV, in the GitHub section, or in the summary.
+  const cvRefs = new Set(cvs.map((cv) => `cv:${cv.id}`));
+  const githubFacts = facts.filter((f) => f.source === "github");
+  const otherProposed = proposed.filter((f) => f.source !== "github" && !(f.source === "cv_upload" && f.sourceRef && cvRefs.has(f.sourceRef)));
+  const cvFacts = selectedCv ? facts.filter((f) => f.sourceRef === `cv:${selectedCv.id}`) : [];
+  const cvProposed = cvFacts.filter((f) => !f.validated);
+  const cvPlaces = new Map<FactPlace, ProfileFactView[]>();
+  if (selectedCv?.document) {
+    const doc = selectedCv.document;
+    for (const [place, placed] of placeFacts(doc, cvFacts)) {
+      const shownHere = (place === "languages" && doc.languages.length > 0) || (place === "skills" && doc.skills.length > 0) || place.includes(":") || place === "other";
+      const key: FactPlace = shownHere ? place : "other";
+      cvPlaces.set(key, [...(cvPlaces.get(key) ?? []), ...placed]);
+    }
+  }
   const uploading = uploads.some((u) => u.status === "reading" || u.status === "analysing");
 
   const selectCv = (id: string) => router.push(`/profile?cv=${id}`, { scroll: false });
@@ -259,6 +291,45 @@ export function ProfileLibrary({ candidate, cvs, selectedCv, facts, actions }: P
               </article>
             );
           })}
+          {keptDocuments.map((doc) => {
+            const shown = doc.id === selectedDocument?.id;
+            return (
+              <article key={doc.id} className={`border p-5 ${shown ? "border-primary bg-primary-soft/45" : "border-earth/20 bg-card"}`}>
+                <div className="grid grid-cols-[auto_minmax(0,1fr)] gap-3">
+                  <span className="grid size-11 shrink-0 place-items-center bg-terracotta text-white">
+                    <FileText className="size-5" aria-hidden="true" />
+                  </span>
+                  <div className="min-w-0">
+                    <h3 className="truncate font-sans text-base font-bold" title={doc.title}>
+                      {doc.title}
+                    </h3>
+                    <p className="mt-1 text-xs text-muted-foreground">
+                      {doc.kind === "cv" ? "CV" : "Cover letter"} written for an offer{doc.language && ` · ${doc.language.toUpperCase()}`} · {doc.createdOn}
+                    </p>
+                  </div>
+                </div>
+                <div className="mt-5 grid grid-cols-[1fr_auto] gap-2">
+                  <Button size="sm" variant={shown ? "default" : "outline"} onClick={() => router.push(`/profile?doc=${doc.id}`, { scroll: false })} aria-pressed={shown}>
+                    {shown ? "Shown" : "Show"}
+                  </Button>
+                  <Button
+                    size="sm"
+                    variant="ghost"
+                    disabled={pending}
+                    aria-label={`Take ${doc.title} out of the profile`}
+                    onClick={() =>
+                      run(async () => {
+                        const result = await actions.keepDocument({ id: doc.id, kept: false });
+                        return result.ok ? { ok: true, message: "Taken out of your profile." } : result;
+                      })
+                    }
+                  >
+                    <Trash2 className="size-4" aria-hidden="true" /> Remove
+                  </Button>
+                </div>
+              </article>
+            );
+          })}
           <button
             type="button"
             onClick={() => fileInput.current?.click()}
@@ -272,72 +343,78 @@ export function ProfileLibrary({ candidate, cvs, selectedCv, facts, actions }: P
         </div>
       </section>
 
-      {/* ---------- Facts to review ---------- */}
+      {/* ---------- Facts to review: where they are ---------- */}
       {proposed.length > 0 && (
-        <section aria-labelledby="review-title">
-          <SectionHeading
-            eyebrow="Needs your approval"
-            title={`${proposed.length} extracted fact${proposed.length > 1 ? "s" : ""} to review`}
-            id="review-title"
-            aside={
-              <Button size="sm" variant="outline" disabled={pending} onClick={() => run(actions.validateAll)}>
-                <Check className="size-4" aria-hidden="true" /> Keep all
-              </Button>
-            }
-          />
-          <p className="-mt-2 mb-4 text-sm text-muted-foreground">Nothing is reused until you validate it.</p>
-          <div className="grid gap-3 lg:grid-cols-2">
-            {proposed.map((fact) => (
-              <article key={fact.id} className="border border-terracotta/25 bg-card p-4">
-                <div className="grid grid-cols-[auto_minmax(0,1fr)] gap-3">
-                  <UserRound className="mt-0.5 size-5 text-terracotta" aria-hidden="true" />
-                  <div className="min-w-0">
-                    <p className="text-xs font-bold text-muted-foreground uppercase">
-                      {fact.type} · {fact.origin}
-                    </p>
-                    {editing?.id === fact.id ? (
-                      <Input className="mt-1" value={editing.text} onChange={(e) => setEditing({ id: fact.id, text: e.target.value })} aria-label="Edit fact" />
-                    ) : (
-                      <p className="mt-1 text-sm font-semibold">{fact.text}</p>
-                    )}
-                    {fact.quote && <p className="mt-2 text-xs text-muted-foreground italic">“{fact.quote}”</p>}
-                    {fact.sourceRef?.startsWith("http") && (
-                      <a href={fact.sourceRef} target="_blank" rel="noopener noreferrer" className="mt-1 block truncate text-xs text-primary underline">
-                        {fact.sourceRef}
-                      </a>
-                    )}
-                    {fact.type === "project" && (
-                      <AiAssistedToggle fact={fact} disabled={pending} onToggle={(aiAssisted) => run(() => actions.setAiAssisted({ id: fact.id, aiAssisted }))} />
-                    )}
-                  </div>
-                </div>
-                <div className="mt-4 grid grid-cols-[1fr_1fr_auto] gap-2">
-                  {editing?.id === fact.id ? (
-                    <Button size="sm" disabled={pending} onClick={() => run(() => actions.edit(editing), () => setEditing(null))}>
-                      Save
-                    </Button>
-                  ) : (
-                    <Button size="sm" disabled={pending} onClick={() => run(() => actions.validate(fact.id))}>
-                      <Check className="size-4" aria-hidden="true" /> Keep
-                    </Button>
-                  )}
-                  <Button size="sm" variant="outline" disabled={pending} onClick={() => setEditing({ id: fact.id, text: fact.text })}>
-                    <PencilLine className="size-4" aria-hidden="true" /> Edit
-                  </Button>
-                  <Button size="icon" variant="ghost" disabled={pending} onClick={() => run(() => actions.reject(fact.id))} aria-label="Reject fact">
-                    <X className="size-4" />
-                  </Button>
-                </div>
-              </article>
-            ))}
+        <section aria-labelledby="review-title" className="border-l-4 border-terracotta bg-card p-5 shadow-soft">
+          <div className="flex flex-wrap items-start justify-between gap-3">
+            <div>
+              <p className="text-xs font-bold text-terracotta uppercase">Needs your approval</p>
+              <h2 id="review-title" className="mt-1 text-xl">
+                {proposed.length} fact{proposed.length > 1 ? "s" : ""} to review, in place
+              </h2>
+            </div>
+            <Button size="sm" variant="outline" disabled={pending} onClick={() => run(actions.validateAll)}>
+              <Check className="size-4" aria-hidden="true" /> Keep all
+            </Button>
           </div>
+          <p className="mt-2 text-sm text-muted-foreground">
+            Each fact sits under the line of the CV it comes from, or in the GitHub section: keep, edit or reject it there. Nothing is reused until you validate it.
+          </p>
+          <div className="mt-3 flex flex-wrap gap-2 text-sm">
+            {cvs
+              .filter((cv) => cv.facts > cv.validated)
+              .map((cv) => (
+                <button key={cv.id} type="button" onClick={() => selectCv(cv.id)} className="rounded-full border border-earth/20 px-3 py-1 hover:bg-muted">
+                  {cv.fileName.replace(/\.pdf$/i, "")} · <span className="font-bold">{cv.facts - cv.validated}</span>
+                </button>
+              ))}
+            {githubFacts.some((f) => !f.validated) && (
+              <a href="#github" className="rounded-full border border-earth/20 px-3 py-1 hover:bg-muted">
+                GitHub · <span className="font-bold">{githubFacts.filter((f) => !f.validated).length}</span>
+              </a>
+            )}
+          </div>
+          {otherProposed.length > 0 && <FactReviewList facts={otherProposed} actions={actions} pending={pending} run={run} />}
         </section>
       )}
 
       </div>
 
-      {/* ---------- The selected CV, as a document ---------- */}
-      {selectedCv && (
+      {/* ---------- A document written for an offer and added to the profile ---------- */}
+      {selectedDocument && (
+        <section aria-labelledby="preview-title">
+          <div className="no-print">
+            <SectionHeading
+              eyebrow={selectedDocument.content.kind === "tailored_cv" ? "CV written for an offer" : "Cover letter written for an offer"}
+              title={selectedDocument.title}
+              id="preview-title"
+              aside={
+                <div className="flex gap-2">
+                  {selectedDocument.href && (
+                    <Button size="sm" variant="outline" asChild>
+                      <Link href={selectedDocument.href}>Open with its offer</Link>
+                    </Button>
+                  )}
+                  <Button size="sm" variant="outline" onClick={() => window.print()}>
+                    <Printer className="size-4" aria-hidden="true" /> PDF
+                  </Button>
+                </div>
+              }
+            />
+            <p className="-mt-2 mb-4 text-sm text-muted-foreground">Part of your profile: start a new CV or letter from it on another offer (“Start from”).</p>
+          </div>
+          {selectedDocument.content.kind === "tailored_cv" ? (
+            <TailoredCvDocument cv={selectedDocument.content} candidate={{ name: candidate.name, contacts: selectedDocument.contacts }} facts={factTexts} />
+          ) : (
+            <article className="print-page bg-card p-8 shadow-soft">
+              <TailoredLetterDocument letter={selectedDocument.content} facts={factTexts} />
+            </article>
+          )}
+        </section>
+      )}
+
+      {/* ---------- The selected CV, as a document, with its facts to review in place ---------- */}
+      {!selectedDocument && selectedCv && (
         <section aria-labelledby="preview-title">
           <div className="no-print">
             <SectionHeading
@@ -345,7 +422,12 @@ export function ProfileLibrary({ candidate, cvs, selectedCv, facts, actions }: P
               title={selectedCv.fileName.replace(/\.pdf$/i, "")}
               id="preview-title"
               aside={
-                <div className="flex gap-2">
+                <div className="flex flex-wrap gap-2">
+                  {cvProposed.length > 0 && (
+                    <Button size="sm" disabled={pending} onClick={() => run(() => actions.validateMany(cvProposed.map((f) => f.id)))}>
+                      <Check className="size-4" aria-hidden="true" /> Keep all {cvProposed.length} from this CV
+                    </Button>
+                  )}
                   {selectedCv.hasText && (
                     <Button size="sm" variant="outline" disabled={pending} onClick={() => run(() => actions.structureCv(selectedCv.id))}>
                       <RefreshCw className={`size-4 ${pending ? "animate-spin" : ""}`} aria-hidden="true" /> {selectedCv.document ? "Lay out again" : "Lay it out"}
@@ -359,15 +441,35 @@ export function ProfileLibrary({ candidate, cvs, selectedCv, facts, actions }: P
                 </div>
               }
             />
-            <p className="-mt-2 mb-4 text-sm text-muted-foreground">Laid out by the AI, then checked: every line below is written word for word in your PDF.</p>
+            <p className="-mt-2 mb-4 text-sm text-muted-foreground">
+              Laid out by the AI, then checked: every line below is written word for word in your PDF. Under each part, the facts found there: keep, edit or reject them in place.
+            </p>
           </div>
           {selectedCv.document ? (
-            <CvDocumentView document={selectedCv.document} fallbackName={candidate.name} photoUrl={candidate.imageUrl} />
+            <CvDocumentView
+              document={selectedCv.document}
+              fallbackName={candidate.name}
+              photoUrl={candidate.imageUrl}
+              renderFacts={(place) => {
+                const placed = cvPlaces.get(place) ?? [];
+                if (!placed.length) return null;
+                const list = <FactReviewList facts={placed} actions={actions} pending={pending} run={run} />;
+                return place === "other" ? (
+                  <section className="no-print border-t-2 border-primary pt-5">
+                    <h4 className="font-sans text-lg font-bold text-earth uppercase">Other facts from this CV</h4>
+                    {list}
+                  </section>
+                ) : (
+                  list
+                );
+              }}
+            />
           ) : (
             <div className="no-print border border-dashed border-earth/30 p-8 text-center text-sm text-muted-foreground">
               {selectedCv.hasText
                 ? "This CV is not laid out yet. Use “Lay it out”: about a minute with free models."
                 : "This CV was added before NextRound kept its text. Remove it and add the PDF again to see it here."}
+              <FactReviewList facts={cvFacts} actions={actions} pending={pending} run={run} className="text-left" />
             </div>
           )}
         </section>
@@ -424,13 +526,6 @@ export function ProfileLibrary({ candidate, cvs, selectedCv, facts, actions }: P
                       </li>
                     ))}
                   </ul>
-                  {type === "project" && items.length > 0 && (
-                    <div className="mt-2 flex flex-wrap gap-x-3 gap-y-1">
-                      {items.map((fact) => (
-                        <AiAssistedToggle key={fact.id} fact={fact} compact disabled={pending} onToggle={(aiAssisted) => run(() => actions.setAiAssisted({ id: fact.id, aiAssisted }))} />
-                      ))}
-                    </div>
-                  )}
                   {vibe.length > 0 && (
                     <div className="mt-5 rounded-lg border border-dashed border-earth/30 p-4">
                       <p className="flex items-center gap-2 text-xs font-bold text-muted-foreground uppercase">
@@ -458,6 +553,7 @@ export function ProfileLibrary({ candidate, cvs, selectedCv, facts, actions }: P
 
       <div className="divide-y divide-earth/20 border-y border-earth/20">
       {/* ---------- GitHub ---------- */}
+      <div id="github" className="scroll-mt-24" />
       <ImportSection
         icon={<FolderGit2 className="size-4" aria-hidden="true" />}
         eyebrow="GitHub projects"
@@ -472,6 +568,14 @@ export function ProfileLibrary({ candidate, cvs, selectedCv, facts, actions }: P
           {pending ? <RefreshCw className="size-4 animate-spin" aria-hidden="true" /> : <FolderGit2 className="size-4" aria-hidden="true" />} Import my repositories
         </Button>
       </ImportSection>
+      {githubFacts.length > 0 && (
+        <div className="pb-8">
+          <p className="text-sm text-muted-foreground">
+            Mark the projects built with AI (vibe coding): they stay in your profile as interest in AI and creativity, never as mastery of their stack.
+          </p>
+          <FactReviewList facts={githubFacts} actions={actions} pending={pending} run={run} />
+        </div>
+      )}
 
       {/* ---------- Codewars ---------- */}
       <ImportSection icon={<Swords className="size-4" aria-hidden="true" />} eyebrow="Codewars" title="Your kata rank, as proof" body="Optional: your public Codewars profile gives one achievement (rank, katas completed, languages).">

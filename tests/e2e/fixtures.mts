@@ -8,7 +8,7 @@
 process.loadEnvFile(".env");
 
 import { createClerkClient } from "@clerk/backend";
-import type { CvSentence } from "@/lib/documents/generate";
+import type { SourcedSentence, TailoredCv } from "@/lib/types";
 
 export const E2E_EMAIL = "nextround-e2e+clerk_test@example.com";
 
@@ -57,7 +57,8 @@ async function seed() {
   const { addSource, cvRef } = await import("@/lib/data/sources");
   const { createOffer, setOfferStatus } = await import("@/lib/data/offers");
   const { createInterview, saveAnswer, getInterview } = await import("@/lib/data/interviews");
-  const { saveDocumentVersion } = await import("@/lib/data/documents");
+  const { saveDocumentVersion, setDocumentKept } = await import("@/lib/data/documents");
+  const { documentSentences } = await import("@/lib/documents/render");
   const { verifyExtraction } = await import("@/lib/offers/extract");
   const { cvDocumentSchema, verifyCvDocument } = await import("@/lib/profile/cv-document");
 
@@ -142,7 +143,7 @@ async function seed() {
     ],
   });
 
-  const cvSentences: CvSentence[] = [
+  const cvSentences: (SourcedSentence & { section: string })[] = [
     { section: "Projets", text: "weather-app : tableau de bord météo en React et TypeScript qui consomme une API REST.", factIds: [weather.id] },
     { section: "Compétences", text: "Node.js et Express : une API REST pour un projet d'école.", factIds: [node.id] },
     { section: "Langues", text: "Français (langue maternelle), anglais (B2).", factIds: [lang.id] },
@@ -154,13 +155,48 @@ async function seed() {
     { text: "J'ai développé weather-app en React et TypeScript, qui consomme une API REST.", factIds: [weather.id] },
   ]);
 
+  // The same offer, in English, written with the tech-CV structure, and added to the profile.
+  const tailored: TailoredCv = {
+    kind: "tailored_cv",
+    language: "en",
+    headline: "Junior Full Stack Developer",
+    summary: [
+      { text: "Junior developer with a React and TypeScript project and a small Node.js API.", factIds: [weather.id, node.id] },
+      { text: "Five years of production Kubernetes.", factIds: [] }, // deliberately unsupported
+    ],
+    skills: [
+      { category: "Front end", items: [{ name: "React", factIds: [weather.id] }, { name: "TypeScript", factIds: [weather.id] }] },
+      { category: "Back end", items: [{ name: "Node.js", factIds: [node.id] }, { name: "Express", factIds: [node.id] }] },
+    ],
+    projects: [
+      {
+        title: "weather-app",
+        context: "Personal project · solo",
+        link: null,
+        tags: [{ name: "React", factIds: [weather.id] }, { name: "TypeScript", factIds: [weather.id] }],
+        bullets: [{ text: "Weather dashboard that consumes a REST API.", factIds: [weather.id] }],
+        factIds: [weather.id],
+        aiAssisted: false,
+      },
+    ],
+    moreProjects: [],
+    education: [],
+    experience: [],
+    languages: [
+      { name: "French", level: "native", factIds: [lang.id] },
+      { name: "English", level: "B2", factIds: [lang.id] },
+    ],
+  };
+  const tailoredCv = await saveDocumentVersion(userId, offer.id, "cv", documentSentences(tailored), { language: "en", content: tailored, title: "Full Stack Junior · Brussels Tech SRL (EN)" });
+  await setDocumentKept(userId, tailoredCv.id, true);
+
   // Two more offers so that the pipeline tabs have content.
   const second = await createOffer(userId, { sourceUrl: null, sourceSite: "linkedin", rawText: OFFER_TEXT, extraction: { ...extraction, title: "Junior Front-end Developer", company: "Example Studio" } });
   await setOfferStatus(userId, second.id, "applied");
   const third = await createOffer(userId, { sourceUrl: null, sourceSite: "actiris", rawText: OFFER_TEXT, extraction: { ...extraction, title: "Développeur web junior", company: "Exemple ASBL" } });
   await setOfferStatus(userId, third.id, "interview");
 
-  console.log(JSON.stringify({ userId, offerId: offer.id, interviewId }));
+  console.log(JSON.stringify({ userId, offerId: offer.id, interviewId, tailoredCvId: tailoredCv.id }));
 }
 
 async function cleanupData(userId: string) {

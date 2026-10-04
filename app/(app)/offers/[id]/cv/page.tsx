@@ -1,52 +1,74 @@
 import { notFound } from "next/navigation";
 import { CvView } from "@/components/documents/cv-view";
 import { getAccount } from "@/lib/auth";
-import { listDocuments } from "@/lib/data/documents";
+import { type DocumentRow, listDocuments, listKeptDocuments } from "@/lib/data/documents";
 import { listFacts } from "@/lib/data/facts";
 import { getOfferDetail } from "@/lib/data/offers";
-import { factIndex, isCovered, provingFactIds } from "@/lib/offers/coverage";
-import type { SourcedSentence } from "@/lib/types";
-import { generateDocumentsAction } from "./actions";
+import { listSources } from "@/lib/data/sources";
 import { formatDay } from "@/lib/dates";
+import { documentFactIds, isDocumentLanguage } from "@/lib/documents/render";
+import { factIndex, isCovered, provingFactIds } from "@/lib/offers/coverage";
+import type { DocumentLanguage, TailoredCv, TailoredLetter } from "@/lib/types";
+import { generateCvAction, generateLetterAction, keepDocumentAction } from "./actions";
 
 export const maxDuration = 120;
 
+// Contacts shown at the top of a CV: taken from the latest CV the candidate imported (each one was found
+// word for word in it). No phone, address or birth date by default.
+const CONTACT_KINDS = new Set(["email", "github", "linkedin", "website"]);
+
 export default async function OfferCvPage({ params, searchParams }: PageProps<"/offers/[id]/cv">) {
   const { id } = await params;
-  const { v, print } = await searchParams;
+  const { v, l, lang, print } = await searchParams;
   const account = await getAccount();
-  const [detail, facts, docs] = await Promise.all([getOfferDetail(account.userId, id), listFacts(account.userId), listDocuments(account.userId, id)]);
+  const [detail, facts, docs, kept, cvSources] = await Promise.all([
+    getOfferDetail(account.userId, id),
+    listFacts(account.userId),
+    listDocuments(account.userId, id),
+    listKeptDocuments(account.userId),
+    listSources(account.userId, "cv_upload"),
+  ]);
   if (!detail) notFound();
 
-  const validated = facts.filter((f) => f.validated);
-  const cvVersions = docs.filter((d) => d.kind === "cv");
-  const wanted = Number(v);
-  const cv = cvVersions.find((d) => d.version === wanted) ?? cvVersions[0] ?? null;
-  const letter = docs.find((d) => d.kind === "cover_letter" && cv && d.createdAt.getTime() >= cv.createdAt.getTime() - 60_000 && d.createdAt.getTime() <= cv.createdAt.getTime() + 60_000)
-    ?? docs.find((d) => d.kind === "cover_letter") ?? null;
+  // Early versions have no language: they were written in the offer's language.
+  const offerLanguage: DocumentLanguage = detail.offer.language === "fr" ? "fr" : "en";
+  const languageOf = (d: DocumentRow): DocumentLanguage => (isDocumentLanguage(d.language) ? d.language : offerLanguage);
+  const cvs = docs.filter((d) => d.kind === "cv");
+  const letters = docs.filter((d) => d.kind === "cover_letter");
+  const wantedCv = cvs.find((d) => d.version === Number(v));
+  const wantedLetter = letters.find((d) => d.version === Number(l));
+  const language: DocumentLanguage = isDocumentLanguage(lang) ? lang : wantedCv ? languageOf(wantedCv) : wantedLetter ? languageOf(wantedLetter) : offerLanguage;
+  const cv = wantedCv ?? cvs.find((d) => languageOf(d) === language) ?? null;
+  const letter = wantedLetter ?? letters.find((d) => languageOf(d) === language) ?? null;
 
-  // CV feedback, computed by code: requirements covered, gaps, relevant facts not used.
-  const usedFacts = new Set((cv?.sentences ?? []).flatMap((s) => s.factIds));
   const profile = factIndex(facts);
+  const validated = facts.filter((f) => f.validated);
   const covered = detail.requirements.filter((r) => isCovered(r, profile));
   const gaps = detail.requirements.filter((r) => !isCovered(r, profile));
+  const used = new Set(cv ? (cv.content ? documentFactIds(cv.content) : cv.sentences.flatMap((s) => s.factIds)) : []);
   const relevant = new Set(covered.flatMap((r) => provingFactIds(r, profile)));
-  const unusedFacts = validated.filter((f) => relevant.has(f.id) && !usedFacts.has(f.id)).map((f) => f.text);
+  const contactDoc = cvSources.find((s) => s.document?.contacts.length)?.document;
+  const contacts = [...new Map((contactDoc?.contacts ?? []).filter((c) => CONTACT_KINDS.has(c.kind)).map((c) => [c.value, { kind: c.kind, value: c.value }])).values()];
 
   return (
     <CvView
       offerId={detail.offer.id}
       offerLabel={[detail.offer.title, detail.offer.company].filter(Boolean).join(" · ") || "Offer"}
-      candidate={{ name: account.fullName, imageUrl: account.imageUrl, githubLogin: account.githubLogin }}
-      cv={cv ? { version: cv.version, sentences: cv.sentences as (SourcedSentence & { section?: string })[] } : null}
-      letter={letter ? { version: letter.version, sentences: letter.sentences } : null}
-      versions={cvVersions.map((d) => ({ version: d.version, createdOn: formatDay(d.createdAt) })).sort((a, b) => b.version - a.version)}
+      language={language}
+      candidate={{ name: account.fullName, imageUrl: account.imageUrl, contacts }}
+      cv={cv && { id: cv.id, version: cv.version, kept: cv.kept, content: cv.content?.kind === "tailored_cv" ? (cv.content as TailoredCv) : null, sentences: cv.sentences }}
+      letter={letter && { id: letter.id, version: letter.version, kept: letter.kept, content: letter.content?.kind === "cover_letter" ? (letter.content as TailoredLetter) : null, sentences: letter.sentences }}
+      versions={docs.map((d) => ({ kind: d.kind, version: d.version, language: languageOf(d), createdOn: formatDay(d.createdAt) }))}
+      bases={{
+        cv: kept.filter((k) => k.document.content?.kind === "tailored_cv").map((k) => ({ id: k.document.id, title: k.document.title ?? `CV ${k.document.version}` })),
+        letter: kept.filter((k) => k.document.content?.kind === "cover_letter").map((k) => ({ id: k.document.id, title: k.document.title ?? `Letter ${k.document.version}` })),
+      }}
       facts={Object.fromEntries(validated.map((f) => [f.id, f.text]))}
       feedback={{
         requirements: [...covered.map((r) => ({ text: r.text, covered: true })), ...gaps.map((r) => ({ text: r.text, covered: false }))],
-        unusedFacts,
+        unusedFacts: validated.filter((f) => relevant.has(f.id) && !used.has(f.id)).map((f) => f.text),
       }}
-      generate={generateDocumentsAction}
+      actions={{ generateCv: generateCvAction, generateLetter: generateLetterAction, keep: keepDocumentAction }}
       autoPrint={print === "1"}
     />
   );

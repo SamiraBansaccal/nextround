@@ -1,6 +1,7 @@
 import { type ProfileFactView, ProfileLibrary } from "@/components/profile/profile-library";
 import { getAccount } from "@/lib/auth";
 import { listFacts } from "@/lib/data/facts";
+import { listKeptDocuments } from "@/lib/data/documents";
 import { cvRef, listSources } from "@/lib/data/sources";
 import { formatDay } from "@/lib/dates";
 import {
@@ -16,7 +17,9 @@ import {
   structureCvAction,
   validateAllAction,
   validateFactAction,
+  validateManyAction,
 } from "./actions";
+import { keepDocumentAction } from "../offers/[id]/cv/actions";
 
 export const maxDuration = 300; // a CV read by a free model: facts and layout take about a minute, more with a retry
 
@@ -24,15 +27,38 @@ const ORIGIN: Record<ProfileFactView["source"], string> = { github: "GitHub", co
 
 export default async function ProfilePage({ searchParams }: PageProps<"/profile">) {
   const account = await getAccount();
-  const { cv } = await searchParams;
-  const [facts, cvSources] = await Promise.all([listFacts(account.userId), listSources(account.userId, "cv_upload")]);
+  const { cv, doc } = await searchParams;
+  const [facts, cvSources, kept] = await Promise.all([listFacts(account.userId), listSources(account.userId, "cv_upload"), listKeptDocuments(account.userId)]);
   const cvName = new Map(cvSources.map((s) => [cvRef(s.id), s.ref]));
   // The CV shown as a document: the one chosen in the library (?cv=), else the latest one.
   const selected = cvSources.find((s) => s.id === cv) ?? cvSources[0] ?? null;
+  // Or a CV / letter written for an offer and added to the profile (?doc=).
+  const shownDoc = kept.find((k) => k.document.id === doc && k.document.content)?.document ?? null;
+  const contactDoc = cvSources.find((s) => s.document?.contacts.length)?.document;
+  const contacts = [...new Map((contactDoc?.contacts ?? []).filter((c) => ["email", "github", "linkedin", "website"].includes(c.kind)).map((c) => [c.value, { kind: c.kind, value: c.value }])).values()];
 
   return (
     <ProfileLibrary
       candidate={{ name: account.fullName, imageUrl: account.imageUrl, githubLogin: account.githubLogin }}
+      selectedDocument={
+        shownDoc?.content
+          ? {
+              id: shownDoc.id,
+              title: shownDoc.title ?? (shownDoc.kind === "cv" ? "CV" : "Cover letter"),
+              href: shownDoc.offerId ? `/offers/${shownDoc.offerId}/cv?${shownDoc.language ? `lang=${shownDoc.language}&` : ""}${shownDoc.kind === "cv" ? "v" : "l"}=${shownDoc.version}` : null,
+              content: shownDoc.content,
+              contacts,
+            }
+          : null
+      }
+      keptDocuments={kept.map(({ document: d, offerTitle, company }) => ({
+        id: d.id,
+        kind: d.kind,
+        title: d.title ?? ([offerTitle, company].filter(Boolean).join(" · ") || (d.kind === "cv" ? "CV" : "Cover letter")),
+        language: d.language ?? null,
+        createdOn: formatDay(d.createdAt),
+        href: d.offerId ? `/offers/${d.offerId}/cv?${d.language ? `lang=${d.language}&` : ""}${d.kind === "cv" ? "v" : "l"}=${d.version}` : null,
+      }))}
       cvs={cvSources.map((s) => {
         const fromCv = facts.filter((f) => f.sourceRef === cvRef(s.id));
         return {
@@ -64,9 +90,11 @@ export default async function ProfilePage({ searchParams }: PageProps<"/profile"
         chatFacts: chatFactsAction,
         validate: validateFactAction,
         validateAll: validateAllAction,
+        validateMany: validateManyAction,
         reject: rejectFactAction,
         edit: editFactAction,
         setAiAssisted: setAiAssistedAction,
+        keepDocument: keepDocumentAction,
         addManual: addManualFactAction,
       }}
     />

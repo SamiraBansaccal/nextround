@@ -6,7 +6,7 @@ import { expect, type Page, test } from "@playwright/test";
 // Run with `npm run e2e` (scripts/e2e.mjs), never directly: it seeds and cleans the test user.
 
 const E2E_EMAIL = "nextround-e2e+clerk_test@example.com";
-const ids = JSON.parse(process.env.E2E_IDS ?? "{}") as { offerId?: string; interviewId?: string };
+const ids = JSON.parse(process.env.E2E_IDS ?? "{}") as { offerId?: string; interviewId?: string; tailoredCvId?: string };
 
 test.beforeAll(async () => {
   await clerkSetup();
@@ -44,6 +44,8 @@ test("every signed-in screen", async ({ page }, info) => {
     ["03-offers", "/offers"],
     ["04-offer", `/offers/${ids.offerId}`],
     ["05-cv", `/offers/${ids.offerId}/cv`],
+    ["05b-cv-tailored", `/offers/${ids.offerId}/cv?lang=en`],
+    ["02b-profile-document", `/profile?doc=${ids.tailoredCvId}`],
     ["06-interviews", "/interview"],
     ["07-interview-call", `/interview/${ids.interviewId}`],
     ["08-interview-summary", `/interview/${ids.interviewId}/summary`],

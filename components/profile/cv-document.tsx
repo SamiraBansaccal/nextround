@@ -1,5 +1,6 @@
 import { Cake, Flag, FolderGit2, Globe, Info, Link2, Mail, MapPin, Phone } from "lucide-react";
 import type { ReactNode } from "react";
+import type { FactPlace } from "@/lib/profile/place-facts";
 import type { CvContactKind, CvDocument, CvEntry } from "@/lib/types";
 
 // A CV shown as a document, as in the Lovable design (profile page). Display only: every string comes
@@ -26,7 +27,18 @@ const CONTACT_ICON: Record<CvContactKind, ReactNode> = {
   other: <Info />,
 };
 
-export function CvDocumentView({ document, fallbackName, photoUrl }: { document: CvDocument; fallbackName: string; photoUrl: string | null }) {
+/** `renderFacts`: what to show under each part of the CV (the facts proposed from it, to review in place). */
+export function CvDocumentView({
+  document,
+  fallbackName,
+  photoUrl,
+  renderFacts,
+}: {
+  document: CvDocument;
+  fallbackName: string;
+  photoUrl: string | null;
+  renderFacts?: (place: FactPlace) => ReactNode;
+}) {
   const t = HEADINGS[document.language] ?? HEADINGS.en;
   const name = document.name ?? fallbackName;
   const grid = document.languages.some((l) => l.listening || l.reading || l.spoken || l.interaction || l.writing);
@@ -65,8 +77,8 @@ export function CvDocumentView({ document, fallbackName, photoUrl }: { document:
           </section>
         )}
 
-        <CvBlock title={t.experience} entries={document.experiences} />
-        <CvBlock title={t.education} entries={document.education} />
+        <CvBlock title={t.experience} entries={document.experiences} place="experiences" renderFacts={renderFacts} />
+        <CvBlock title={t.education} entries={document.education} place="education" renderFacts={renderFacts} />
 
         {document.languages.length > 0 && (
           <section className="border-t-2 border-primary pt-5 pb-7">
@@ -107,6 +119,7 @@ export function CvDocumentView({ document, fallbackName, photoUrl }: { document:
                 ))}
               </ul>
             )}
+            {renderFacts?.("languages")}
           </section>
         )}
 
@@ -120,14 +133,26 @@ export function CvDocumentView({ document, fallbackName, photoUrl }: { document:
                 </li>
               ))}
             </ul>
+            {renderFacts?.("skills")}
           </section>
         )}
+        {renderFacts?.("other")}
       </div>
     </article>
   );
 }
 
-function CvBlock({ title, entries }: { title: string; entries: CvEntry[] }) {
+function CvBlock({
+  title,
+  entries,
+  place,
+  renderFacts,
+}: {
+  title: string;
+  entries: CvEntry[];
+  place: "experiences" | "education";
+  renderFacts?: (place: FactPlace) => ReactNode;
+}) {
   if (entries.length === 0) return null;
   return (
     <section className="py-7">
@@ -149,6 +174,7 @@ function CvBlock({ title, entries }: { title: string; entries: CvEntry[] }) {
                   ))}
                 </ul>
               )}
+              {renderFacts?.(`${place}:${i}`)}
             </div>
           </article>
         ))}
