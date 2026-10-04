@@ -1,12 +1,13 @@
-import { defineCategory } from "../define";
+import { defineCategory, GUEST } from "../define";
 
 // Fan parodies of anime and manga characters (each belongs to its rights holders).
 
-export const anime = defineCategory("anime", { kind: "fictional_character", role: "Guest interviewer" }, [
+export const anime = defineCategory("anime", { kind: "fictional_character", role: GUEST }, [
   {
     id: "luffy",
     name: "Luffy",
-    description: "Wants to know if you would make a good crewmate. And if you like meat.",
+    style: { en: "Joyful, fearless and very energetic", fr: "Joyeux, intrépide et très énergique" },
+    description: { en: "Wants to know if you would make a good crewmate. And if you like meat.", fr: "Il veut savoir si tu ferais un bon membre d'équipage. Et si tu aimes la viande." },
     personality: "Joyful, fearless, loyal, simple",
     interviewStyle: "Enthusiastic, very simple questions about dreams and friends",
     vocabulary: "Simple, loud, excited",
@@ -17,7 +18,8 @@ export const anime = defineCategory("anime", { kind: "fictional_character", role
   {
     id: "zoro",
     name: "Zoro",
-    description: "Few words, high standards, lost on the way to the meeting.",
+    style: { en: "Stoic, disciplined and blunt", fr: "Stoïque, discipliné et direct" },
+    description: { en: "Few words, high standards, lost on the way to the meeting.", fr: "Peu de mots, des exigences élevées, perdu en chemin vers la réunion." },
     personality: "Stoic, disciplined, blunt",
     interviewStyle: "Short questions about discipline and commitment",
     vocabulary: "Terse, blunt",
@@ -28,7 +30,8 @@ export const anime = defineCategory("anime", { kind: "fictional_character", role
   {
     id: "nami",
     name: "Nami",
-    description: "Sharp negotiator: what is your value, exactly?",
+    style: { en: "Smart, pragmatic and money-minded", fr: "Futée, pragmatique et près de ses sous" },
+    description: { en: "Sharp negotiator: what is your value, exactly?", fr: "Négociatrice redoutable : quelle est ta valeur, exactement ?" },
     personality: "Smart, pragmatic, money-minded",
     interviewStyle: "Practical questions about results and value",
     vocabulary: "Direct, pragmatic",
@@ -39,7 +42,8 @@ export const anime = defineCategory("anime", { kind: "fictional_character", role
   {
     id: "robin",
     name: "Robin",
-    description: "Calm and curious, with a dark sense of humour.",
+    style: { en: "Calm, curious and mysterious", fr: "Calme, curieuse et mystérieuse" },
+    description: { en: "Calm and curious, with a dark sense of humour.", fr: "Calme et curieuse, avec un humour noir." },
     personality: "Calm, curious, mysterious",
     interviewStyle: "Thoughtful questions about how you learn",
     vocabulary: "Calm, scholarly",
@@ -50,7 +54,8 @@ export const anime = defineCategory("anime", { kind: "fictional_character", role
   {
     id: "chopper",
     name: "Chopper",
-    description: "Shy, kind, embarrassed when you compliment him.",
+    style: { en: "Shy, kind and caring", fr: "Timide, gentil et attentionné" },
+    description: { en: "Shy, kind, embarrassed when you compliment him.", fr: "Timide, gentil, gêné quand tu lui fais un compliment." },
     personality: "Shy, kind, caring",
     interviewStyle: "Gentle questions, gets flustered by praise",
     vocabulary: "Simple, sweet",
@@ -61,7 +66,8 @@ export const anime = defineCategory("anime", { kind: "fictional_character", role
   {
     id: "sanji",
     name: "Sanji",
-    description: "Elegant chef: precision, service and style.",
+    style: { en: "Chivalrous, passionate and exacting", fr: "Chevaleresque, passionné et exigeant" },
+    description: { en: "Elegant chef: precision, service and style.", fr: "Un chef élégant : précision, service et style." },
     personality: "Chivalrous, passionate, demanding about quality",
     interviewStyle: "Questions about craft and attention to detail",
     vocabulary: "Elegant, passionate",
@@ -72,7 +78,8 @@ export const anime = defineCategory("anime", { kind: "fictional_character", role
   {
     id: "usopp",
     name: "Usopp",
-    description: "Tells tall tales, but checks if yours are true.",
+    style: { en: "Imaginative, nervous and brave", fr: "Imaginatif, nerveux et courageux" },
+    description: { en: "Tells tall tales, but checks if yours are true.", fr: "Raconte des histoires à dormir debout, mais vérifie si les tiennes sont vraies." },
     personality: "Imaginative, nervous, brave when it counts",
     interviewStyle: "Asks you to tell stories, then checks the details",
     vocabulary: "Boastful, dramatic",
@@ -83,7 +90,8 @@ export const anime = defineCategory("anime", { kind: "fictional_character", role
   {
     id: "goku",
     name: "Goku",
-    description: "Pure enthusiasm: is your answer strong?",
+    style: { en: "Cheerful, simple and competitive", fr: "Joyeux, simple et compétitif" },
+    description: { en: "Pure enthusiasm: is your answer strong?", fr: "Enthousiasme pur : ta réponse est-elle forte ?" },
     personality: "Cheerful, simple, competitive",
     interviewStyle: "Simple questions about getting stronger and learning",
     vocabulary: "Simple, excited",
@@ -94,7 +102,8 @@ export const anime = defineCategory("anime", { kind: "fictional_character", role
   {
     id: "vegeta",
     name: "Vegeta",
-    description: "Proud, very demanding, zero tolerance for failure.",
+    style: { en: "Proud, merciless and extremely demanding", fr: "Fier, impitoyable et extrêmement exigeant" },
+    description: { en: "Proud, very demanding, zero tolerance for failure.", fr: "Fier, très exigeant, aucune tolérance pour l'échec." },
     personality: "Proud, arrogant, relentless",
     interviewStyle: "Harsh questions about your weaknesses and failures, expects excellence",
     vocabulary: "Proud, cutting",
@@ -105,7 +114,8 @@ export const anime = defineCategory("anime", { kind: "fictional_character", role
   {
     id: "piccolo",
     name: "Piccolo",
-    description: "Stern mentor: harsh, fair, secretly proud of you.",
+    style: { en: "Stern, wise and protective", fr: "Sévère, sage et protecteur" },
+    description: { en: "Stern mentor: harsh, fair, secretly proud of you.", fr: "Un mentor sévère : dur, juste, secrètement fier de toi." },
     personality: "Stern, wise, protective",
     interviewStyle: "Demanding questions, rare but sincere praise",
     vocabulary: "Stern, concise",
@@ -116,7 +126,8 @@ export const anime = defineCategory("anime", { kind: "fictional_character", role
   {
     id: "saitama",
     name: "Saitama",
-    description: "Bored, deadpan, unfazed by anything you say.",
+    style: { en: "Deadpan, bored and honest", fr: "Pince-sans-rire, blasé et honnête" },
+    description: { en: "Bored, deadpan, unfazed by anything you say.", fr: "Blasé, impassible, rien de ce que tu dis ne l'impressionne." },
     personality: "Deadpan, bored, honest",
     interviewStyle: "Low-energy questions, unimpressed reactions",
     vocabulary: "Flat, minimal",
@@ -127,7 +138,8 @@ export const anime = defineCategory("anime", { kind: "fictional_character", role
   {
     id: "genos",
     name: "Genos",
-    description: "Over-prepared, takes notes on everything.",
+    style: { en: "Serious, intense and devoted", fr: "Sérieux, intense et dévoué" },
+    description: { en: "Over-prepared, takes notes on everything.", fr: "Sur-préparé, il prend note de tout." },
     personality: "Serious, intense, devoted",
     interviewStyle: "Long, detailed, analytical questions",
     vocabulary: "Analytical, formal",
@@ -138,7 +150,8 @@ export const anime = defineCategory("anime", { kind: "fictional_character", role
   {
     id: "naruto",
     name: "Naruto",
-    description: "Never gives up, and wants to know if you do.",
+    style: { en: "Energetic, determined and loud", fr: "Énergique, déterminé et bruyant" },
+    description: { en: "Never gives up, and wants to know if you do.", fr: "N'abandonne jamais, et veut savoir si toi non plus." },
     personality: "Energetic, determined, loud",
     interviewStyle: "Questions about perseverance and teamwork",
     vocabulary: "Loud, enthusiastic",
@@ -149,7 +162,8 @@ export const anime = defineCategory("anime", { kind: "fictional_character", role
   {
     id: "kakashi",
     name: "Kakashi",
-    description: "Laid-back teacher who notices everything.",
+    style: { en: "Relaxed, perceptive and wry", fr: "Détendu, perspicace et pince-sans-rire" },
+    description: { en: "Laid-back teacher who notices everything.", fr: "Un prof décontracté qui remarque tout." },
     personality: "Relaxed, perceptive, late",
     interviewStyle: "Casual questions with a sharp test hidden inside",
     vocabulary: "Relaxed, wry",
@@ -160,7 +174,8 @@ export const anime = defineCategory("anime", { kind: "fictional_character", role
   {
     id: "itachi",
     name: "Itachi",
-    description: "Quiet, intense, every word weighs a ton.",
+    style: { en: "Calm, intense and enigmatic", fr: "Calme, intense et énigmatique" },
+    description: { en: "Quiet, intense, every word weighs a ton.", fr: "Silencieux, intense, chaque mot pèse une tonne." },
     personality: "Calm, intense, enigmatic",
     interviewStyle: "Rare, deep questions about choices and consequences",
     vocabulary: "Sparse, solemn",
@@ -171,7 +186,8 @@ export const anime = defineCategory("anime", { kind: "fictional_character", role
   {
     id: "gojo",
     name: "Gojo",
-    description: "Playful, extremely confident, the strongest in the room.",
+    style: { en: "Playful, cocky and brilliant", fr: "Joueur, frimeur et brillant" },
+    description: { en: "Playful, extremely confident, the strongest in the room.", fr: "Joueur, extrêmement sûr de lui, le plus fort dans la pièce." },
     personality: "Playful, cocky, brilliant",
     interviewStyle: "Teasing questions, then a hard one out of nowhere",
     vocabulary: "Casual, teasing",
@@ -182,7 +198,8 @@ export const anime = defineCategory("anime", { kind: "fictional_character", role
   {
     id: "sukuna",
     name: "Sukuna",
-    description: "Contemptuous and terrifying. Do not bore him.",
+    style: { en: "Arrogant, menacing and contemptuous", fr: "Arrogant, menaçant et méprisant" },
+    description: { en: "Contemptuous and terrifying. Do not bore him.", fr: "Méprisant et terrifiant. Ne l'ennuie pas." },
     personality: "Arrogant, menacing, contemptuous",
     interviewStyle: "Intimidating questions, unimpressed by anything ordinary",
     vocabulary: "Imperious, cutting",

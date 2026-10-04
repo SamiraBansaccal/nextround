@@ -4,14 +4,19 @@ import { getDb } from "@/lib/db";
 import { answers, interviews, offers, questions } from "@/lib/db/schema";
 import { isUuid } from "@/lib/ids";
 import { DEFAULT_INTERVIEWER_ID } from "@/lib/interviewers";
+import type { InterviewConfig } from "@/lib/interview/session";
 import type { GeneratedQuestion } from "@/lib/interview/generate";
 import type { Feedback } from "@/lib/types";
 
 // Interviews, questions and answers: every query filters on the session user id.
 
-export async function createInterview(userId: string, offerId: string, generated: GeneratedQuestion[], interviewerId: string = DEFAULT_INTERVIEWER_ID): Promise<string> {
+const DEFAULT_CONFIG: InterviewConfig = { interviewerId: DEFAULT_INTERVIEWER_ID, language: "en", focus: "both" };
+
+/** Stores an interview session: its configuration (interviewer, language, questions) and its questions. */
+export async function createInterview(userId: string, offerId: string, generated: GeneratedQuestion[], config: Partial<InterviewConfig> = {}): Promise<string> {
+  const { interviewerId, language, focus } = { ...DEFAULT_CONFIG, ...config };
   const db = getDb();
-  const [interview] = await db.insert(interviews).values({ userId, offerId, mode: "text", interviewerId }).returning({ id: interviews.id });
+  const [interview] = await db.insert(interviews).values({ userId, offerId, mode: "text", interviewerId, language, focus }).returning({ id: interviews.id });
   await db.insert(questions).values(
     generated.map((q, i) => ({
       userId,

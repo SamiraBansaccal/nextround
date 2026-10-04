@@ -137,6 +137,10 @@ export const interviews = pgTable(
     mode: interviewMode("mode").notNull().default("text"),
     // Who asks the questions: an id of the catalog in lib/interviewers/ (code data, so no foreign key).
     interviewerId: text("interviewer_id").notNull().default("marie"),
+    // Session settings chosen before the call (lib/interview/session.ts): the whole interview runs in
+    // `language`, and `focus` says which questions it asks (general, technical or both).
+    language: text("language").notNull().default("en"),
+    focus: text("focus").notNull().default("both"),
     createdAt: createdAt(),
   },
   (t) => [index("interviews_user_idx").on(t.userId)],

@@ -16,7 +16,7 @@ export function personaInstructions(interviewer: Interviewer): string {
   const t = interviewer.traits;
   const length = t.questionLength <= 2 ? "short" : t.questionLength >= 4 ? "long and layered" : "medium-length";
   const lines = [
-    `You are the interviewer "${interviewer.name}"${interviewer.role ? ` (${interviewer.role})` : ""}.`,
+    `You are the interviewer "${interviewer.name}"${interviewer.copy.en.role ? ` (${interviewer.copy.en.role})` : ""}.`,
     `Personality: ${interviewer.personality}. Interview style: ${interviewer.interviewStyle}. Vocabulary: ${interviewer.vocabulary}.`,
     `Severity ${LEVEL_WORDS[t.severity]}, warmth ${LEVEL_WORDS[t.warmth]}, formality ${LEVEL_WORDS[t.formality]}, humour ${LEVEL_WORDS[t.humour]}, pressure ${LEVEL_WORDS[t.pressure]}, energy ${LEVEL_WORDS[t.energy]}, confidence ${LEVEL_WORDS[t.confidence]}, interruptions ${LEVEL_WORDS[t.interruption]}, unpredictability ${LEVEL_WORDS[t.unpredictability]}.`,
     `Questions are ${length}. Follow-ups: ${FOLLOW_UP_WORDS[interviewer.followUpStyle]}.`,

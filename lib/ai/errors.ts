@@ -24,6 +24,18 @@ const MESSAGES: Record<AiErrorCode, string> = {
   forbidden_base_url: "This base URL is not allowed on this instance.",
 };
 
+const MESSAGES_FR: Record<AiErrorCode, string> = {
+  no_key: "Ajoute ta clé d'IA dans Settings pour utiliser les fonctions d'IA.",
+  invalid_key: "Le fournisseur a refusé cette clé d'API.",
+  model_not_found: "Le fournisseur ne connaît pas ce modèle. Vérifie son nom.",
+  rate_limited: "Le fournisseur limite les requêtes. Attends un moment et réessaie, ou essaie un autre modèle.",
+  quota_exceeded: "La limite quotidienne de la clé partagée est atteinte. Ajoute ta propre clé d'IA dans Settings pour continuer.",
+  provider_error: "Le fournisseur d'IA a renvoyé une erreur. Réessaie, ou essaie un autre modèle.",
+  network: "Impossible de joindre le fournisseur d'IA.",
+  invalid_output: "Ce modèle n'a pas renvoyé de réponse valide — essaie un autre modèle.",
+  forbidden_base_url: "Cette base URL n'est pas autorisée sur cette instance.",
+};
+
 export class AiError extends Error {
   constructor(public readonly code: AiErrorCode) {
     super(MESSAGES[code]);
@@ -31,6 +43,8 @@ export class AiError extends Error {
   }
 }
 
-export function aiErrorMessage(error: unknown): string {
+/** A user-safe message; interviews pass their language ("en" elsewhere in the app). */
+export function aiErrorMessage(error: unknown, lang: "en" | "fr" = "en"): string {
+  if (lang === "fr") return error instanceof AiError ? MESSAGES_FR[error.code] : "Une erreur s'est produite. Réessaie.";
   return error instanceof AiError ? error.message : "Something went wrong. Please try again.";
 }

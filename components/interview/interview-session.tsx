@@ -4,18 +4,21 @@ import { Check, ChevronRight, Copy, PhoneOff, RotateCcw, X } from "lucide-react"
 import Link from "next/link";
 import { useEffect, useState, useTransition } from "react";
 import { Button } from "@/components/ui/button";
+import { fill, type InterviewCopy } from "@/lib/interview/copy";
+import type { Lang } from "@/lib/interviewers/types";
 import type { Criterion, Feedback, QuestionGroup, SourcedSentence } from "@/lib/types";
 import { shorten } from "@/lib/text";
 import { cn } from "@/lib/utils";
 import { AnswerComposer } from "./answer-composer";
-import { CallStage } from "./call-stage";
+import { CallControls, CallStage } from "./call-stage";
+import { readMediaChoice, useLocalMedia } from "./media/use-local-media";
 import { QuestionPanel } from "./question-panel";
 import { useVoice } from "./use-voice";
 
 export interface SessionQuestion {
   id: string;
   group: QuestionGroup;
-  label: string; // question type shown on the call ("Motivation", "Technical"…)
+  label: string; // question type, in the interview's language
   text: string;
   source: string;
   suggestedAnswer: SourcedSentence[];
@@ -24,37 +27,34 @@ export interface SessionQuestion {
 
 export interface SessionInterviewer {
   id: string;
-  name: string;
+  name: string; // in the interview's language
   role: string | null;
   image: string | null;
   notice: string | null; // parody notice, when the interviewer is inspired by someone
 }
 
-type Focus = "both" | "hr" | "technical";
-
 interface Props {
   interviewId: string;
   offerId: string | null;
   offerTitle: string;
+  lang: Lang;
+  copy: InterviewCopy; // every text of the call, in the interview's language
   interviewer: SessionInterviewer;
   questions: SessionQuestion[];
   facts: Record<string, string>;
   initialIndex: number;
-  language: string | null;
   voiceLabel: string;
   me: { name: string; imageUrl: string | null };
   submit: (input: { questionId: string; answer: string }) => Promise<{ ok: true; feedback: Feedback } | { ok: false; error: string }>;
 }
 
 const MAX = 3000;
-const inFocus = (focus: Focus, group: QuestionGroup) => focus === "both" || (focus === "hr" ? group === "hr" : group !== "hr");
 
-// A simulated one-to-one video interview with the chosen interviewer: the video on one side, the
-// question in its own readable panel on the other, the answer below. Focus on general HR questions,
-// technical ones (with gaps), or both.
+// A simulated one-to-one video interview with the chosen interviewer, entirely in the interview's
+// language: the video (with real microphone and camera controls) on one side, the question in its own
+// readable panel on the other, the answer below.
 export function InterviewSession(props: Props) {
-  const { interviewId, offerId, offerTitle, interviewer, questions, facts, initialIndex, language, voiceLabel, me, submit } = props;
-  const [focus, setFocus] = useState<Focus>("both");
+  const { interviewId, offerId, offerTitle, lang, copy, interviewer, questions, facts, initialIndex, voiceLabel, me, submit } = props;
   const [current, setCurrent] = useState(questions[initialIndex]?.id ?? questions[0]?.id);
   const [answers, setAnswers] = useState<Record<string, { answer: string; feedback: Feedback | null }>>(() =>
     Object.fromEntries(questions.filter((q) => q.lastAnswer).map((q) => [q.id, q.lastAnswer!])),
@@ -65,11 +65,20 @@ export function InterviewSession(props: Props) {
   const [seconds, setSeconds] = useState(0);
   const [error, setError] = useState<string | null>(null);
   const [pending, startTransition] = useTransition();
-  const voice = useVoice(language);
+  const voice = useVoice(lang, copy);
+  const media = useLocalMedia({ microphone: false, camera: false }, { meter: false });
+  const { restore, start: startMedia } = media;
 
-  const visible = questions.filter((q) => inFocus(focus, q.group));
-  const q = questions.find((x) => x.id === current) ?? visible[0];
-  const position = visible.findIndex((x) => x.id === q?.id);
+  // Microphone and camera as chosen on the "Ready to join?" screen.
+  useEffect(() => {
+    const choice = readMediaChoice();
+    if (!choice) return;
+    restore(choice);
+    if (choice.microphone || choice.camera) void startMedia();
+  }, [restore, startMedia]);
+
+  const q = questions.find((x) => x.id === current) ?? questions[0];
+  const position = questions.findIndex((x) => x.id === q?.id);
   const done = q ? answers[q.id] : undefined;
   const feedback = retrying === null ? (done?.feedback ?? null) : null;
 
@@ -79,7 +88,7 @@ export function InterviewSession(props: Props) {
     return () => window.clearInterval(t);
   }, [feedback, current]);
 
-  if (!q) return <p>No questions in this interview.</p>;
+  if (!q) return <p>—</p>;
 
   function goTo(id: string) {
     setCurrent(id);
@@ -88,12 +97,6 @@ export function InterviewSession(props: Props) {
     setShowSuggested(false);
     setSeconds(0);
     setError(null);
-  }
-
-  function changeFocus(nextFocus: Focus) {
-    setFocus(nextFocus);
-    const first = questions.find((x) => inFocus(nextFocus, x.group));
-    if (q && !inFocus(nextFocus, q.group) && first) goTo(first.id);
   }
 
   function submitAnswer() {
@@ -110,14 +113,20 @@ export function InterviewSession(props: Props) {
     });
   }
 
-  const next = visible[position + 1];
+  /** A switch turned on before the camera / microphone were ever opened opens them. */
+  function switchDevice(toggle: () => void) {
+    toggle();
+    if (media.status === "idle") void media.start();
+  }
+
+  const next = questions[position + 1];
   const timer = `${Math.floor(seconds / 60)}:${String(seconds % 60).padStart(2, "0")}`;
-  const counts = { both: questions.length, hr: questions.filter((x) => x.group === "hr").length, technical: questions.filter((x) => x.group !== "hr").length };
   const summaryHref = `/interview/${interviewId}/summary`;
+  const blocked = media.status === "denied" || media.status === "unavailable";
 
   return (
-    <div className="space-y-6">
-      {/* ---------- Header: offer, interviewer, focus ---------- */}
+    <div className="space-y-6" lang={lang}>
+      {/* ---------- Header: offer, interviewer ---------- */}
       <header className="flex flex-col gap-4 lg:flex-row lg:items-end lg:justify-between">
         <div className="min-w-0">
           <p className="text-sm text-muted-foreground">
@@ -129,44 +138,48 @@ export function InterviewSession(props: Props) {
               offerTitle
             )}
           </p>
-          <h1 className="text-3xl leading-tight sm:text-4xl">Interview with {interviewer.name}</h1>
+          <h1 className="text-3xl leading-tight sm:text-4xl">{fill(copy.callTitle, { name: interviewer.name })}</h1>
           {interviewer.notice && <p className="mt-1 max-w-2xl text-xs text-muted-foreground">{interviewer.notice}</p>}
         </div>
-        <div className="flex flex-wrap items-center gap-2">
-          <div className="flex flex-wrap items-center gap-1 rounded-lg border bg-card p-1" role="group" aria-label="Focus of the questions">
-            {(["hr", "technical", "both"] as const).map((f) => (
-              <Button
-                key={f}
-                size="sm"
-                variant={focus === f ? "default" : "ghost"}
-                className={focus === f ? "bg-earth text-earth-foreground hover:bg-earth/90" : ""}
-                aria-pressed={focus === f}
-                onClick={() => changeFocus(f)}
-              >
-                {f === "hr" ? "General HR" : f === "technical" ? "Technical" : "Both"}
-                <span className="opacity-60">{counts[f]}</span>
-              </Button>
-            ))}
-          </div>
-          <Button asChild variant="outline">
-            <Link href={summaryHref}>
-              <PhoneOff className="size-4" aria-hidden="true" /> Leave the interview
-            </Link>
-          </Button>
-        </div>
+        <Button asChild variant="outline">
+          <Link href={summaryHref}>
+            <PhoneOff className="size-4" aria-hidden="true" /> {copy.leaveInterview}
+          </Link>
+        </Button>
       </header>
 
-      {/* ---------- The call: video + question ---------- */}
+      {/* ---------- The call: video + controls, and the question ---------- */}
       <div className="grid items-start gap-5 lg:grid-cols-[minmax(0,1fr)_380px]">
-        <CallStage interviewer={interviewer} me={me} timer={timer} speaking={voice.speaking} listening={voice.listening} />
+        <div className="space-y-3">
+          <CallStage
+            interviewer={interviewer}
+            me={me}
+            self={{ attach: media.attach, live: media.camera && media.hasVideo, microphone: media.microphone }}
+            timer={timer}
+            speaking={voice.speaking}
+            listening={voice.listening}
+            copy={copy}
+          />
+          <CallControls
+            microphone={media.microphone}
+            camera={media.camera}
+            canUseMicrophone={!blocked || media.hasAudio}
+            canUseCamera={!blocked || media.hasVideo}
+            onMicrophone={() => switchDevice(media.toggleMicrophone)}
+            onCamera={() => switchDevice(media.toggleCamera)}
+            leaveHref={summaryHref}
+            copy={copy}
+          />
+        </div>
         <QuestionPanel
           question={{ id: q.id, text: q.text, label: q.label, source: q.source, answered: !!answers[q.id] }}
           position={position}
-          questions={visible.map((item) => ({ id: item.id, text: item.text, label: item.label, source: item.source, answered: !!answers[item.id] }))}
+          questions={questions.map((item) => ({ id: item.id, text: item.text, label: item.label, source: item.source, answered: !!answers[item.id] }))}
           interviewerName={interviewer.name}
           speaking={voice.speaking}
           voiceLabel={voiceLabel}
           summaryHref={summaryHref}
+          copy={copy}
           onRead={() => voice.speak(q.id, q.text)}
           onSelect={goTo}
         />
@@ -180,12 +193,14 @@ export function InterviewSession(props: Props) {
           timer={timer}
           overTime={seconds >= 120}
           listening={voice.listening}
+          microphone={media.microphone}
           pending={pending}
           previousAnswer={retrying}
-          status={`${interviewer.name} is listening… checking every claim against your profile.`}
+          status={fill(copy.checking, { name: interviewer.name })}
           error={error}
           note={voice.note}
           hasNext={!!next}
+          copy={copy}
           onDraft={setDraft}
           onToggleVoice={() => voice.toggleListening((text) => setDraft((d) => (d ? `${d} ${text}` : text).slice(0, MAX)))}
           onSubmit={submitAnswer}
@@ -203,14 +218,14 @@ export function InterviewSession(props: Props) {
             aria-expanded={showSuggested}
           >
             <span>
-              <span className="block text-xs font-bold text-terracotta uppercase">Hidden on purpose</span>
-              <span className="font-display text-xl">Suggested answer, built only from your validated facts</span>
+              <span className="block text-xs font-bold text-terracotta uppercase">{copy.hiddenOnPurpose}</span>
+              <span className="font-display text-xl">{copy.suggestedTitle}</span>
             </span>
-            <span className="shrink-0 text-sm underline">{showSuggested ? "Hide" : "Show"}</span>
+            <span className="shrink-0 text-sm underline">{showSuggested ? copy.hide : copy.show}</span>
           </button>
           {showSuggested && (
             <div className="mt-4">
-              <Sentences sentences={q.suggestedAnswer} facts={facts} empty="No validated fact supports an answer yet: add facts to your profile." />
+              <Sentences sentences={q.suggestedAnswer} facts={facts} empty={copy.suggestedEmpty} copy={copy} />
             </div>
           )}
         </section>
@@ -220,10 +235,10 @@ export function InterviewSession(props: Props) {
       {feedback && done && (
         <div className="space-y-5">
           <div className="border-l-4 border-terracotta bg-terracotta-soft p-4 text-sm leading-relaxed">
-            <p className="mb-1 text-xs font-bold text-terracotta uppercase">Your answer</p>
+            <p className="mb-1 text-xs font-bold text-terracotta uppercase">{copy.yourAnswer}</p>
             {done.answer}
           </div>
-          <FeedbackPanel feedback={feedback} facts={facts} />
+          <FeedbackPanel feedback={feedback} facts={facts} copy={copy} />
           <div className="flex flex-wrap gap-2">
             <Button
               variant="outline"
@@ -233,15 +248,15 @@ export function InterviewSession(props: Props) {
                 setSeconds(0);
               }}
             >
-              <RotateCcw className="size-4" aria-hidden="true" /> Retry this question
+              <RotateCcw className="size-4" aria-hidden="true" /> {copy.retry}
             </Button>
             {next ? (
               <Button onClick={() => goTo(next.id)}>
-                Next question <ChevronRight className="size-4" aria-hidden="true" />
+                {copy.next} <ChevronRight className="size-4" aria-hidden="true" />
               </Button>
             ) : (
               <Button asChild>
-                <Link href={summaryHref}>See the summary</Link>
+                <Link href={summaryHref}>{copy.seeSummary}</Link>
               </Button>
             )}
           </div>
@@ -251,7 +266,7 @@ export function InterviewSession(props: Props) {
   );
 }
 
-function Sentences({ sentences, facts, empty }: { sentences: SourcedSentence[]; facts: Record<string, string>; empty: string }) {
+function Sentences({ sentences, facts, empty, copy }: { sentences: SourcedSentence[]; facts: Record<string, string>; empty: string; copy: InterviewCopy }) {
   if (sentences.length === 0) return <p className="text-sm text-muted-foreground">{empty}</p>;
   return (
     <div className="flex flex-col gap-2 text-sm leading-relaxed">
@@ -275,7 +290,7 @@ function Sentences({ sentences, facts, empty }: { sentences: SourcedSentence[]; 
             <>
               <span className="unsupported-underline">{s.text}</span>{" "}
               <span className="inline-flex items-center gap-1 rounded-full bg-gap-soft px-2 py-0.5 align-middle text-xs font-medium text-gap">
-                <X className="size-3" aria-hidden="true" /> Unsupported
+                <X className="size-3" aria-hidden="true" /> {copy.unsupported}
               </span>
             </>
           )}
@@ -285,7 +300,7 @@ function Sentences({ sentences, facts, empty }: { sentences: SourcedSentence[]; 
   );
 }
 
-function Row({ label, c }: { label: string; c: Criterion }) {
+function Row({ label, c, copy }: { label: string; c: Criterion; copy: InterviewCopy }) {
   const good = c.rating === "good";
   return (
     <div className="grid gap-1 border-b border-earth/10 py-3 last:border-0 sm:grid-cols-[150px_minmax(0,1fr)] sm:gap-4">
@@ -298,7 +313,7 @@ function Row({ label, c }: { label: string; c: Criterion }) {
           )}
         >
           {good ? <Check className="size-3" aria-hidden="true" /> : <RotateCcw className="size-3" aria-hidden="true" />}
-          {good ? "Good" : "To improve"}
+          {good ? copy.good : copy.toImprove}
         </span>
         {c.comment}
       </span>
@@ -306,24 +321,24 @@ function Row({ label, c }: { label: string; c: Criterion }) {
   );
 }
 
-function FeedbackPanel({ feedback, facts }: { feedback: Feedback; facts: Record<string, string> }) {
+function FeedbackPanel({ feedback, facts, copy }: { feedback: Feedback; facts: Record<string, string>; copy: InterviewCopy }) {
   const [copied, setCopied] = useState(false);
   const improved = feedback.improvedAnswer.map((s) => s.text).join(" ");
   return (
     <section className="space-y-5 border border-earth/20 bg-card p-5 md:p-7">
       <div>
-        <p className="text-xs font-bold text-terracotta uppercase">Coach feedback</p>
-        <h2 className="mt-1 text-2xl">How this answer lands</h2>
+        <p className="text-xs font-bold text-terracotta uppercase">{copy.coachFeedback}</p>
+        <h2 className="mt-1 text-2xl">{copy.howItLands}</h2>
       </div>
       <div>
-        <Row label="STAR structure" c={feedback.star} />
-        <Row label="Relevance" c={feedback.relevance} />
-        <Row label="Evidence" c={feedback.evidence} />
-        {feedback.honesty && <Row label="Honesty" c={feedback.honesty} />}
+        <Row label={copy.star} c={feedback.star} copy={copy} />
+        <Row label={copy.relevance} c={feedback.relevance} copy={copy} />
+        <Row label={copy.evidence} c={feedback.evidence} copy={copy} />
+        {feedback.honesty && <Row label={copy.honesty} c={feedback.honesty} copy={copy} />}
       </div>
       {feedback.evidence.claims.length > 0 && (
         <div>
-          <p className="mb-2 text-sm font-bold">What you claimed (quoted from your answer)</p>
+          <p className="mb-2 text-sm font-bold">{copy.claimsTitle}</p>
           <ul className="space-y-2">
             {feedback.evidence.claims.map((claim, i) => (
               <li key={i} className="text-sm">
@@ -337,7 +352,7 @@ function FeedbackPanel({ feedback, facts }: { feedback: Feedback; facts: Record<
                   </span>
                 ) : (
                   <span className="ml-1 inline-flex items-center gap-1 rounded-full bg-gap-soft px-2 py-0.5 align-middle text-xs font-medium text-gap">
-                    <X className="size-3" aria-hidden="true" /> Not in your profile – add it as a fact if true, otherwise don&apos;t say it
+                    <X className="size-3" aria-hidden="true" /> {copy.notInProfile}
                   </span>
                 )}
               </li>
@@ -347,7 +362,7 @@ function FeedbackPanel({ feedback, facts }: { feedback: Feedback; facts: Record<
       )}
       {feedback.honesty && feedback.honesty.learningPlan.length > 0 && (
         <div>
-          <p className="mb-2 text-sm font-bold">Learning plan</p>
+          <p className="mb-2 text-sm font-bold">{copy.learningPlan}</p>
           <ol className="ml-5 list-decimal space-y-1 text-sm">
             {feedback.honesty.learningPlan.map((step, i) => (
               <li key={i}>{step}</li>
@@ -357,7 +372,7 @@ function FeedbackPanel({ feedback, facts }: { feedback: Feedback; facts: Record<
       )}
       <div className="border-t border-earth/10 pt-5">
         <div className="mb-2 flex items-center justify-between gap-2">
-          <p className="text-sm font-bold">Improved answer, only from your facts</p>
+          <p className="text-sm font-bold">{copy.improvedAnswer}</p>
           {improved && (
             <Button
               size="sm"
@@ -368,11 +383,11 @@ function FeedbackPanel({ feedback, facts }: { feedback: Feedback; facts: Record<
                 window.setTimeout(() => setCopied(false), 2000);
               }}
             >
-              <Copy className="size-4" aria-hidden="true" /> {copied ? "Copied" : "Copy"}
+              <Copy className="size-4" aria-hidden="true" /> {copied ? copy.copied : copy.copy}
             </Button>
           )}
         </div>
-        <Sentences sentences={feedback.improvedAnswer} facts={facts} empty="Not enough validated facts to build an improved answer." />
+        <Sentences sentences={feedback.improvedAnswer} facts={facts} empty={copy.improvedEmpty} copy={copy} />
       </div>
     </section>
   );

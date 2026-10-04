@@ -8,22 +8,34 @@ import { listFacts } from "@/lib/data/facts";
 import { createInterview, getQuestionWithOffer, saveAnswer } from "@/lib/data/interviews";
 import { getOfferDetail } from "@/lib/data/offers";
 import { answerFeedback, MAX_ANSWER } from "@/lib/interview/feedback";
+import { toLang } from "@/lib/interview/copy";
 import { generateQuestions } from "@/lib/interview/generate";
+import { FOCUSES } from "@/lib/interview/session";
 import { findInterviewer } from "@/lib/interviewers";
 import { personaInstructions } from "@/lib/interviewers/persona";
 import type { Feedback } from "@/lib/types";
 
-const startSchema = z.object({ offerId: z.string().uuid(), interviewerId: z.string().trim().min(1).max(80) });
+const startSchema = z.object({
+  offerId: z.string().uuid(),
+  interviewerId: z.string().trim().min(1).max(80),
+  language: z.enum(["en", "fr"]),
+  focus: z.enum(FOCUSES),
+});
 
-/** Creates an interview on an offer, with the chosen interviewer: questions are phrased in their style. */
+/**
+ * Turns the setup screen's configuration into an interview session: questions of the chosen kind, in
+ * the chosen language, phrased in the chosen interviewer's style.
+ */
 export async function startInterviewAction(input: unknown): Promise<{ ok: true; interviewId: string } | { ok: false; error: string }> {
   const account = await getAccount();
   const parsed = startSchema.safeParse(input);
   if (!parsed.success) return { ok: false, error: "Offer not found." };
+  const { language, focus } = parsed.data;
+  const fail = (en: string, fr: string) => ({ ok: false as const, error: language === "fr" ? fr : en });
   const interviewer = findInterviewer(parsed.data.interviewerId);
-  if (!interviewer) return { ok: false, error: "Choose an interviewer first." };
+  if (!interviewer) return fail("Choose an interviewer first.", "Choisis d'abord qui mène l'entretien.");
   const detail = await getOfferDetail(account.userId, parsed.data.offerId);
-  if (!detail) return { ok: false, error: "Offer not found." };
+  if (!detail) return fail("Offer not found.", "Offre introuvable.");
   const facts = (await listFacts(account.userId)).filter((f) => f.validated);
   const valid = new Set(facts.map((f) => f.id));
   try {
@@ -37,14 +49,14 @@ export async function startInterviewAction(input: unknown): Promise<{ ok: true; 
         requirements: detail.requirements.map((r) => ({ text: r.text, quote: r.quote, covered: r.factIds.some((id) => valid.has(id)) })),
       },
       facts,
-      personaInstructions(interviewer),
+      { language, focus, persona: personaInstructions(interviewer) },
     );
-    if (generated.length < 4) return { ok: false, error: "This model could not return valid output — try another model." };
-    const interviewId = await createInterview(account.userId, detail.offer.id, generated, interviewer.id);
+    if (generated.length < 4) return fail("This model could not return valid output — try another model.", "Ce modèle n'a pas renvoyé de réponse valide — essaie un autre modèle.");
+    const interviewId = await createInterview(account.userId, detail.offer.id, generated, { interviewerId: interviewer.id, language, focus });
     revalidatePath("/", "layout");
     return { ok: true, interviewId };
   } catch (error) {
-    return { ok: false, error: aiErrorMessage(error) };
+    return { ok: false, error: aiErrorMessage(error, language) };
   }
 }
 
@@ -56,6 +68,7 @@ export async function submitAnswerAction(input: unknown): Promise<{ ok: true; fe
   if (!parsed.success) return { ok: false, error: `Write an answer of 1 to ${MAX_ANSWER} characters.` };
   const found = await getQuestionWithOffer(account.userId, parsed.data.questionId);
   if (!found) return { ok: false, error: "Question not found." };
+  const lang = toLang(found.interview?.language); // feedback in the interview's language
   const facts = (await listFacts(account.userId)).filter((f) => f.validated);
   try {
     const feedback = await answerFeedback(
@@ -66,7 +79,7 @@ export async function submitAnswerAction(input: unknown): Promise<{ ok: true; fe
         answer: parsed.data.answer,
         offerTitle: found.offer?.title ?? null,
         company: found.offer?.company ?? null,
-        language: found.offer?.language ?? null,
+        language: lang,
       },
       facts,
     );
@@ -74,6 +87,6 @@ export async function submitAnswerAction(input: unknown): Promise<{ ok: true; fe
     revalidatePath("/", "layout");
     return { ok: true, feedback };
   } catch (error) {
-    return { ok: false, error: aiErrorMessage(error) };
+    return { ok: false, error: aiErrorMessage(error, lang) };
   }
 }

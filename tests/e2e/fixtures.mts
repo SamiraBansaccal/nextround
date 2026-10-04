@@ -125,7 +125,7 @@ async function seed() {
     { group: "technical", type: "technical", text: "Comment gérez-vous l'état dans une application React ?", source: "From the offer's stack: React — “React et TypeScript”", suggestedAnswer: [{ text: "Dans weather-app, j'utilise useState pour l'état local.", factIds: [weather.id] }] },
     { group: "technical", type: "technical", text: "Comment avez-vous structuré votre API REST avec Node.js ?", source: "From the offer's stack: Node.js — “Node.js et des API REST”", suggestedAnswer: [{ text: "J'ai construit une petite API REST avec Express pour un projet d'école.", factIds: [node.id] }] },
     { group: "gap", type: "skill_gap", text: "Avez-vous déjà travaillé avec Docker ?", source: "From a gap in your profile: First experience with Docker — “Une première expérience avec Docker est un atout.”", suggestedAnswer: [] },
-  ], "mr-burns"); // a character without a picture yet: the call shows the placeholder and the parody notice
+  ], { interviewerId: "mr-burns", language: "fr", focus: "both" }); // no picture yet (placeholder), a parody notice, a French session
   const interview = await getInterview(userId, interviewId);
   const technical = interview!.questions.find((q) => q.group === "technical")!;
   await saveAnswer(userId, technical.id, "Dans mon projet weather-app en React et TypeScript, j'utilise useState pour l'état local. J'ai aussi utilisé Redux pendant 2 ans en entreprise.", {

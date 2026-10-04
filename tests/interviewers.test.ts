@@ -25,7 +25,11 @@ describe("interviewer catalog", () => {
     for (const i of INTERVIEWERS) {
       expect(Object.keys(i.traits).sort(), i.id).toEqual([...TRAITS].sort());
       for (const value of Object.values(i.traits)) expect(Number.isInteger(value) && value >= 1 && value <= 5, i.id).toBe(true);
-      for (const field of [i.name, i.description, i.personality, i.interviewStyle, i.vocabulary, i.voice.style]) expect(field.trim().length, i.id).toBeGreaterThan(0);
+      for (const field of [i.name, i.personality, i.interviewStyle, i.vocabulary, i.voice.style]) expect(field.trim().length, i.id).toBeGreaterThan(0);
+      for (const lang of ["en", "fr"] as const) {
+        const copy = i.copy[lang];
+        for (const field of [copy.name, copy.style, copy.description]) expect(field.trim().length, `${i.id} ${lang}`).toBeGreaterThan(0);
+      }
     }
   });
 
@@ -73,5 +77,17 @@ describe("placeholders", () => {
       const tone = placeholderTone(i.id, 6);
       expect(tone >= 0 && tone < 6).toBe(true);
     }
+  });
+});
+
+describe("interview style, shown before joining", () => {
+  it("is part of the character, in both languages", () => {
+    expect(getInterviewer("donald-trump").copy.en.style).toBe("High-energy, direct and confrontational");
+    expect(getInterviewer("barack-obama").copy.en.style).toBe("Calm, diplomatic and thoughtful");
+    expect(getInterviewer("margaret-thatcher").copy.en.style).toBe("Formal, demanding and uncompromising");
+    expect(getInterviewer("homer-simpson").copy.en.style).toBe("Chaotic, distracted and humorous");
+    expect(getInterviewer("mr-burns").copy.en.style).toBe("Cold, formal and extremely demanding");
+    expect(getInterviewer("mr-burns").copy.fr.name).toBe("M. Burns");
+    expect(getInterviewer("rick-sanchez").copy.fr.style).toBe("Génial, cynique et chaotique");
   });
 });

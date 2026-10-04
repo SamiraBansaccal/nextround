@@ -1,17 +1,20 @@
 import Link from "next/link";
-import { InterviewerPicker } from "@/components/interview/interviewer-picker";
+import { InterviewSetup } from "@/components/interview/interview-setup";
 import { PageHeading } from "@/components/page-heading";
 import { Button } from "@/components/ui/button";
-import { requireUserId } from "@/lib/auth";
+import { getAccount } from "@/lib/auth";
 import { getOffer, listOffers } from "@/lib/data/offers";
+import { INTERVIEW_COPY, toLang } from "@/lib/interview/copy";
 import { DEFAULT_INTERVIEWER_ID, INTERVIEWERS, listCategories } from "@/lib/interviewers";
 import { startInterviewAction } from "../actions";
 
-export const maxDuration = 300; // the questions are written in the interviewer's style when the interview starts
+export const maxDuration = 300; // the questions are written when the call starts, in the interviewer's style
 
-// Step before an interview: choose who asks the questions. Without an offer, choose the offer first.
+// Before the call ("Ready to join?"): configure the session and check the camera and microphone.
+// Without an offer, choose the offer first.
 export default async function NewInterviewPage({ searchParams }: PageProps<"/interview/new">) {
-  const userId = await requireUserId();
+  const account = await getAccount();
+  const userId = account.userId;
   const { offer: offerId } = await searchParams;
   const offer = typeof offerId === "string" ? await getOffer(userId, offerId) : null;
 
@@ -42,11 +45,14 @@ export default async function NewInterviewPage({ searchParams }: PageProps<"/int
   }
 
   return (
-    <InterviewerPicker
+    <InterviewSetup
       offer={{ id: offer.id, title: [offer.title, offer.company].filter(Boolean).join(" · ") || "Untitled offer" }}
+      me={{ name: account.fullName, imageUrl: account.imageUrl }}
       categories={listCategories()}
       interviewers={INTERVIEWERS}
       defaultInterviewerId={DEFAULT_INTERVIEWER_ID}
+      defaultLanguage={toLang(offer.language)}
+      copies={INTERVIEW_COPY}
       start={startInterviewAction}
     />
   );

@@ -10,7 +10,15 @@ import { createSpeechToTextEngine, type SpeechToTextEngine } from "./voice/speec
 
 const LOCALES: Record<string, string> = { fr: "fr-BE", en: "en-US", nl: "nl-BE", de: "de-DE", es: "es-ES", it: "it-IT" };
 
-export function useVoice(language: string | null) {
+export interface VoiceNotes {
+  voiceUnsupported: string;
+  voiceDenied: string;
+  voiceFailed: string;
+  readFailed: string;
+}
+
+/** `language` is the interview's language: it sets the accent of both the reading and the dictation. */
+export function useVoice(language: string | null, notes: VoiceNotes) {
   const [speaking, setSpeaking] = useState(false);
   const [listening, setListening] = useState(false);
   const [note, setNote] = useState<string | null>(null);
@@ -34,7 +42,7 @@ export function useVoice(language: string | null) {
       playback.current = await speakQuestion(questionId, text, locale, () => setSpeaking(false));
     } catch {
       setSpeaking(false);
-      setNote("The question could not be read aloud.");
+      setNote(notes.readFailed);
     }
   }
 
@@ -45,7 +53,7 @@ export function useVoice(language: string | null) {
     }
     const stt = createSpeechToTextEngine(locale);
     if (!stt) {
-      setNote("Voice answers need Chrome or Edge. You can type your answer instead.");
+      setNote(notes.voiceUnsupported);
       return;
     }
     engine.current = stt;
@@ -56,7 +64,7 @@ export function useVoice(language: string | null) {
       onEnd: () => setListening(false),
       onError: (error) => {
         setListening(false);
-        setNote(error === "denied" ? "The microphone is not allowed. Allow it in the browser, or type your answer." : "The microphone is not available. Type your answer instead.");
+        setNote(error === "denied" ? notes.voiceDenied : notes.voiceFailed);
       },
     });
   }

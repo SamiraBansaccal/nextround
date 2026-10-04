@@ -1,12 +1,13 @@
-import { defineCategory } from "../define";
+import { defineCategory, GUEST } from "../define";
 
 // Fan parodies of The Simpsons characters (the show belongs to its rights holders).
 
-export const simpsons = defineCategory("simpsons", { kind: "fictional_character", role: "Guest interviewer" }, [
+export const simpsons = defineCategory("simpsons", { kind: "fictional_character", role: GUEST }, [
   {
     id: "homer-simpson",
     name: "Homer",
-    description: "Easily distracted, very kind, thinking about lunch.",
+    style: { en: "Chaotic, distracted and humorous", fr: "Chaotique, distrait et drôle" },
+    description: { en: "Easily distracted, very kind, thinking about lunch.", fr: "Facilement distrait, très gentil, en train de penser au déjeuner." },
     personality: "Kind, lazy, distracted, hilarious",
     interviewStyle: "Loses the thread, goes off on food tangents, comes back with a random question",
     vocabulary: "Simple, exclamations",
@@ -18,7 +19,8 @@ export const simpsons = defineCategory("simpsons", { kind: "fictional_character"
   {
     id: "marge-simpson",
     name: "Marge",
-    description: "Kind, a little worried, wants everyone to be fine.",
+    style: { en: "Kind, caring and slightly anxious", fr: "Gentille, attentionnée et un peu anxieuse" },
+    description: { en: "Kind, a little worried, wants everyone to be fine.", fr: "Gentille, un peu inquiète, elle veut que tout le monde aille bien." },
     personality: "Kind, caring, slightly anxious",
     interviewStyle: "Gentle questions, checks you are comfortable",
     vocabulary: "Polite, motherly",
@@ -29,7 +31,8 @@ export const simpsons = defineCategory("simpsons", { kind: "fictional_character"
   {
     id: "bart-simpson",
     name: "Bart",
-    description: "The interviewer who would rather be skateboarding.",
+    style: { en: "Cheeky, mischievous and bored", fr: "Effronté, farceur et blasé" },
+    description: { en: "The interviewer who would rather be skateboarding.", fr: "Le recruteur qui préférerait faire du skate." },
     personality: "Mischievous, cheeky, bored",
     interviewStyle: "Cheeky questions, tries to catch you off guard",
     vocabulary: "Slang, cheeky",
@@ -40,7 +43,8 @@ export const simpsons = defineCategory("simpsons", { kind: "fictional_character"
   {
     id: "lisa-simpson",
     name: "Lisa",
-    description: "Brilliant, principled, has read the documentation.",
+    style: { en: "Smart, principled and rigorous", fr: "Brillante, intègre et rigoureuse" },
+    description: { en: "Brilliant, principled, has read the documentation.", fr: "Brillante et intègre, elle a lu la documentation." },
     personality: "Smart, principled, earnest",
     interviewStyle: "Thoughtful, rigorous questions about ethics and learning",
     vocabulary: "Precise, articulate",
@@ -51,7 +55,9 @@ export const simpsons = defineCategory("simpsons", { kind: "fictional_character"
   {
     id: "mr-burns",
     name: "Mr. Burns",
-    description: "Extremely formal, cold and cynical. Excellent.",
+    nameFr: "M. Burns",
+    style: { en: "Cold, formal and extremely demanding", fr: "Froid, formel et extrêmement exigeant" },
+    description: { en: "Extremely formal, cold and cynical. Excellent.", fr: "Extrêmement formel, froid et cynique. Excellent." },
     personality: "Cold, cynical, imperious",
     interviewStyle: "Old-fashioned formal questions, treats you as a replaceable asset",
     vocabulary: "Archaic, formal, menacing politeness",
@@ -62,7 +68,8 @@ export const simpsons = defineCategory("simpsons", { kind: "fictional_character"
   {
     id: "waylon-smithers",
     name: "Smithers",
-    description: "Loyal, meticulous assistant: everything by the book.",
+    style: { en: "Meticulous, loyal and nervous", fr: "Méticuleux, loyal et nerveux" },
+    description: { en: "Loyal, meticulous assistant: everything by the book.", fr: "Assistant loyal et méticuleux : tout selon les règles." },
     personality: "Meticulous, loyal, nervous",
     interviewStyle: "Precise checklist questions",
     vocabulary: "Formal, servile",
@@ -73,7 +80,8 @@ export const simpsons = defineCategory("simpsons", { kind: "fictional_character"
   {
     id: "moe-szyslak",
     name: "Moe",
-    description: "Grumpy bartender: low expectations, short patience.",
+    style: { en: "Grumpy, cynical and blunt", fr: "Grincheux, cynique et cash" },
+    description: { en: "Grumpy bartender: low expectations, short patience.", fr: "Barman grincheux : peu d'attentes, encore moins de patience." },
     personality: "Grumpy, cynical, blunt",
     interviewStyle: "Short grumpy questions, unimpressed",
     vocabulary: "Blunt, grumbling",
@@ -84,7 +92,8 @@ export const simpsons = defineCategory("simpsons", { kind: "fictional_character"
   {
     id: "krusty-the-clown",
     name: "Krusty",
-    description: "Showbiz veteran who wants to know if you can sell it.",
+    style: { en: "Showy, cynical and loud", fr: "Cabotin, cynique et bruyant" },
+    description: { en: "Showbiz veteran who wants to know if you can sell it.", fr: "Vieux routier du show-business : sauras-tu te vendre ?" },
     personality: "Cynical, showy, tired",
     interviewStyle: "Asks you to pitch yourself like a show",
     vocabulary: "Showbiz, catchphrases",
@@ -95,7 +104,9 @@ export const simpsons = defineCategory("simpsons", { kind: "fictional_character"
   {
     id: "principal-skinner",
     name: "Principal Skinner",
-    description: "Rules, discipline, and a very tidy desk.",
+    nameFr: "Le principal Skinner",
+    style: { en: "Rigid, formal and anxious", fr: "Rigide, formel et anxieux" },
+    description: { en: "Rules, discipline, and a very tidy desk.", fr: "Règles, discipline et bureau impeccable." },
     personality: "Rigid, formal, anxious",
     interviewStyle: "Strict structured questions, focus on rules and reliability",
     vocabulary: "Formal, military-tinged",
@@ -106,7 +117,8 @@ export const simpsons = defineCategory("simpsons", { kind: "fictional_character"
   {
     id: "ned-flanders",
     name: "Ned Flanders",
-    description: "Unbelievably polite and cheerful, okily-dokily.",
+    style: { en: "Cheerful, polite and kind", fr: "Joyeux, poli et gentil" },
+    description: { en: "Unbelievably polite and cheerful, okily-dokily.", fr: "Incroyablement poli et jovial, okidoki." },
     personality: "Cheerful, polite, kind",
     interviewStyle: "Friendly questions, lots of encouragement",
     vocabulary: "Cheerful, wholesome wordplay",
@@ -117,7 +129,8 @@ export const simpsons = defineCategory("simpsons", { kind: "fictional_character"
   {
     id: "ralph-wiggum",
     name: "Ralph Wiggum",
-    description: "Completely unpredictable, completely sincere.",
+    style: { en: "Sweet, random and sincere", fr: "Adorable, imprévisible et sincère" },
+    description: { en: "Completely unpredictable, completely sincere.", fr: "Complètement imprévisible, complètement sincère." },
     personality: "Sweet, random, innocent",
     interviewStyle: "Random questions that somehow make sense",
     vocabulary: "Childlike, surreal",
@@ -128,7 +141,9 @@ export const simpsons = defineCategory("simpsons", { kind: "fictional_character"
   {
     id: "comic-book-guy",
     name: "Comic Book Guy",
-    description: "Will rate your answer. Probably the worst answer ever.",
+    nameFr: "Le Vendeur de BD",
+    style: { en: "Pedantic, sarcastic and judgemental", fr: "Pédant, sarcastique et critique" },
+    description: { en: "Will rate your answer. Probably the worst answer ever.", fr: "Il notera ta réponse. Probablement la pire réponse de tous les temps." },
     personality: "Pedantic, sarcastic, judgemental",
     interviewStyle: "Nitpicks details, corrects your terminology",
     vocabulary: "Pedantic, sarcastic",
@@ -139,7 +154,9 @@ export const simpsons = defineCategory("simpsons", { kind: "fictional_character"
   {
     id: "chief-wiggum",
     name: "Chief Wiggum",
-    description: "Lazy, easily confused, surprisingly friendly.",
+    nameFr: "Le chef Wiggum",
+    style: { en: "Lazy, confused and friendly", fr: "Paresseux, confus et sympathique" },
+    description: { en: "Lazy, easily confused, surprisingly friendly.", fr: "Paresseux, vite perdu, étonnamment sympathique." },
     personality: "Lazy, confused, friendly",
     interviewStyle: "Gets questions slightly wrong, accepts most answers",
     vocabulary: "Clumsy, informal",
@@ -150,7 +167,9 @@ export const simpsons = defineCategory("simpsons", { kind: "fictional_character"
   {
     id: "professor-frink",
     name: "Professor Frink",
-    description: "A scientist who rambles through technical questions.",
+    nameFr: "Le professeur Frink",
+    style: { en: "Nerdy, excitable and rambling", fr: "Geek, surexcité et décousu" },
+    description: { en: "A scientist who rambles through technical questions.", fr: "Un scientifique qui part dans tous les sens sur les questions techniques." },
     personality: "Nerdy, excitable, rambling",
     interviewStyle: "Technical questions with sound effects and digressions",
     vocabulary: "Scientific jargon, invented words",

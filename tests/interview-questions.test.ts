@@ -39,7 +39,7 @@ describe("verifyQuestions", () => {
     expect(technical.type).toBeNull(); // "skill_gap" does not fit a technical question
 
     const docker = questions.find((q) => q.text.includes("Docker"))!;
-    expect(docker.source).toBe("From a gap in your profile: Docker — “Docker is a plus”");
+    expect(docker.source).toBe("From a gap in your profile: “Docker is a plus”");
     expect(docker.type).toBe("skill_gap"); // "Skill gap" normalised
 
     const unknownGap = questions.find((q) => q.text.includes("Kubernetes"))!;
@@ -59,7 +59,34 @@ describe("question types", () => {
 
   it("labels a question by its type, else by its group", () => {
     expect(questionLabel("hr", "motivation")).toBe("Motivation");
-    expect(questionLabel("hr", null)).toBe("General HR");
+    expect(questionLabel("hr", null)).toBe("General");
     expect(questionLabel("gap", "nonsense")).toBe("Skill gap");
+  });
+});
+
+describe("verifyQuestions follows the session", () => {
+  const raw = questionsSchema.parse({
+    questions: [
+      { group: "hr", type: "introduction", text: "Introduce yourself.", ref: null, suggested_answer: [] },
+      { group: "hr", type: "motivation", text: "Why us?", ref: null, suggested_answer: [] },
+      { group: "technical", type: "technical", text: "How does React render?", ref: "S1", suggested_answer: [] },
+      { group: "gap", type: "skill_gap", text: "Have you used Docker?", ref: "R1", suggested_answer: [] },
+    ],
+  });
+
+  it("asks only general questions for a general interview, only technical ones for a technical one", () => {
+    const general = verifyQuestions(raw, OFFER, new Map(), new Set(), { language: "en", focus: "general" });
+    expect(general.map((q) => q.group)).toEqual(["hr", "hr"]);
+    const technical = verifyQuestions(raw, OFFER, new Map(), new Set(), { language: "en", focus: "technical" });
+    expect(technical.map((q) => q.group)).toEqual(["technical", "gap"]);
+  });
+
+  it("writes the sources in the interview's language, quotes untouched", () => {
+    const fr = verifyQuestions(raw, OFFER, new Map(), new Set(), { language: "fr", focus: "both" });
+    expect(fr.find((q) => q.group === "hr")!.source).toBe("Question RH classique");
+    expect(fr.find((q) => q.group === "technical")!.source).toBe("Tirée de la stack de l'offre : React — « We use React »");
+    expect(fr.find((q) => q.group === "gap")!.source).toBe("Tirée d'une lacune de ton profil : « Docker is a plus »");
+    expect(questionLabel("hr", "strengths", "fr")).toBe("Qualités");
+    expect(questionLabel("technical", null, "fr")).toBe("Technique");
   });
 });

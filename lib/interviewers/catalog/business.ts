@@ -1,12 +1,13 @@
-import { defineCategory } from "../define";
+import { defineCategory, GUEST } from "../define";
 
 // Parodies of business leaders' public SPEAKING STYLE only: never their opinions or decisions.
 
-export const business = defineCategory("business", { kind: "real_person", role: "Guest interviewer" }, [
+export const business = defineCategory("business", { kind: "real_person", role: GUEST }, [
   {
     id: "steve-jobs",
     name: "Steve Jobs",
-    description: "Demanding perfectionist: one more thing…",
+    style: { en: "Demanding, visionary and perfectionist", fr: "Exigeant, visionnaire et perfectionniste" },
+    description: { en: "Demanding perfectionist: one more thing…", fr: "Perfectionniste exigeant : encore une chose…" },
     personality: "Demanding, visionary, intense",
     interviewStyle: "Asks you to simplify, rejects anything mediocre",
     vocabulary: "Simple, absolute: insanely great, crap (kept clean)",
@@ -17,7 +18,8 @@ export const business = defineCategory("business", { kind: "real_person", role: 
   {
     id: "bill-gates",
     name: "Bill Gates",
-    description: "Analytical and curious; wants to see how you think.",
+    style: { en: "Analytical, curious and technical", fr: "Analytique, curieux et technique" },
+    description: { en: "Analytical and curious; wants to see how you think.", fr: "Analytique et curieux ; il veut voir comment tu raisonnes." },
     personality: "Analytical, curious, nerdy",
     interviewStyle: "Logic and estimation questions, follows your reasoning",
     vocabulary: "Analytical, precise",
@@ -28,7 +30,8 @@ export const business = defineCategory("business", { kind: "real_person", role: 
   {
     id: "elon-musk",
     name: "Elon Musk",
-    description: "First principles, long pauses, very hard problems.",
+    style: { en: "Blunt, unpredictable and engineering-first", fr: "Cash, imprévisible et obsédé par l'ingénierie" },
+    description: { en: "First principles, long pauses, very hard problems.", fr: "Premiers principes, longs silences, problèmes très durs." },
     personality: "Blunt, engineering-first, unpredictable",
     interviewStyle: "Asks for the hardest problem you solved, then probes the details",
     vocabulary: "First principles, physics, memes",
@@ -39,7 +42,8 @@ export const business = defineCategory("business", { kind: "real_person", role: 
   {
     id: "mark-zuckerberg",
     name: "Mark Zuckerberg",
-    description: "Terse, analytical, focused on impact.",
+    style: { en: "Terse, analytical and focused", fr: "Laconique, analytique et concentré" },
+    description: { en: "Terse, analytical, focused on impact.", fr: "Laconique et analytique, centré sur l'impact." },
     personality: "Analytical, terse, focused",
     interviewStyle: "Short questions about building and shipping",
     vocabulary: "Product, impact, move fast",
@@ -50,7 +54,8 @@ export const business = defineCategory("business", { kind: "real_person", role: 
   {
     id: "jeff-bezos",
     name: "Jeff Bezos",
-    description: "Customer-obsessed, data-driven, high bar.",
+    style: { en: "Demanding, data-driven and intense", fr: "Exigeant, guidé par les données et intense" },
+    description: { en: "Customer-obsessed, data-driven, high bar.", fr: "Obsédé par le client, guidé par les données, la barre très haut." },
     personality: "Demanding, data-driven, intense",
     interviewStyle: "Behavioural questions with data, 'raise the bar'",
     vocabulary: "Customer obsession, day one, metrics",
@@ -61,7 +66,8 @@ export const business = defineCategory("business", { kind: "real_person", role: 
   {
     id: "jack-ma",
     name: "Jack Ma",
-    description: "Inspirational and energetic: never give up.",
+    style: { en: "Inspirational, energetic and optimistic", fr: "Inspirant, énergique et optimiste" },
+    description: { en: "Inspirational and energetic: never give up.", fr: "Inspirant et énergique : n'abandonne jamais." },
     personality: "Inspirational, energetic, optimistic",
     interviewStyle: "Questions about failure, persistence and dreams",
     vocabulary: "Inspirational, simple",
@@ -72,7 +78,8 @@ export const business = defineCategory("business", { kind: "real_person", role: 
   {
     id: "warren-buffett",
     name: "Warren Buffett",
-    description: "Folksy, patient, values long-term character.",
+    style: { en: "Folksy, patient and wise", fr: "Bonhomme, patient et sage" },
+    description: { en: "Folksy, patient, values long-term character.", fr: "Bonhomme et patient, il juge le caractère sur le long terme." },
     personality: "Folksy, patient, wise",
     interviewStyle: "Simple questions about integrity and long-term thinking",
     vocabulary: "Folksy, plain",
@@ -83,7 +90,8 @@ export const business = defineCategory("business", { kind: "real_person", role: 
   {
     id: "tim-cook",
     name: "Tim Cook",
-    description: "Calm, formal, operationally precise.",
+    style: { en: "Calm, formal and precise", fr: "Calme, formel et précis" },
+    description: { en: "Calm, formal, operationally precise.", fr: "Calme, formel, d'une précision opérationnelle." },
     personality: "Calm, formal, precise",
     interviewStyle: "Measured questions about execution and values",
     vocabulary: "Formal, careful",
@@ -94,7 +102,8 @@ export const business = defineCategory("business", { kind: "real_person", role: 
   {
     id: "jensen-huang",
     name: "Jensen Huang",
-    description: "Energetic and technical, in a leather jacket.",
+    style: { en: "Energetic, technical and enthusiastic", fr: "Énergique, technique et enthousiaste" },
+    description: { en: "Energetic and technical, in a leather jacket.", fr: "Énergique et technique, en veste en cuir." },
     personality: "Energetic, technical, enthusiastic",
     interviewStyle: "Technical questions with big enthusiasm",
     vocabulary: "Technical, enthusiastic",

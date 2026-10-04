@@ -1,4 +1,4 @@
-import { ArrowRight, MessagesSquare } from "lucide-react";
+import { ArrowRight, MessagesSquare, PhoneCall } from "lucide-react";
 import Link from "next/link";
 import { InterviewerAvatar } from "@/components/interview/interviewer-avatar";
 import { PageHeading } from "@/components/page-heading";
@@ -15,14 +15,20 @@ export default async function InterviewsPage() {
 
   return (
     <div>
-      <PageHeading eyebrow="One-to-one video calls with the interviewer you choose" title="Interview practice" />
+      <PageHeading eyebrow="One-to-one video calls with the interviewer you choose" title="Interview practice">
+        <Button asChild className="w-full sm:w-auto">
+          <Link href="/interview/new">
+            <PhoneCall className="size-4" aria-hidden="true" /> New interview
+          </Link>
+        </Button>
+      </PageHeading>
       {items.length === 0 ? (
         <div className="flex flex-col items-center gap-3 border border-dashed border-earth/30 p-10 text-center">
           <MessagesSquare className="size-6 text-primary" aria-hidden="true" />
           <p className="font-display text-xl">No practice yet</p>
-          <p className="text-sm text-muted-foreground">Open an offer and start an interview on its stack.</p>
+          <p className="text-sm text-muted-foreground">Choose an offer, an interviewer and a language, then join the call.</p>
           <Button asChild>
-            <Link href="/offers">Browse offers</Link>
+            <Link href="/interview/new">New interview</Link>
           </Button>
         </div>
       ) : (
@@ -39,7 +45,7 @@ export default async function InterviewsPage() {
                 <InterviewerAvatar interviewer={interviewer} />
                 <div className="min-w-0 flex-1">
                   <p className="font-display text-xl">{iv.offerTitle ?? "Untitled offer"}</p>
-                  <p className="text-sm">with {interviewer.name}</p>
+                  <p className="text-sm">with {interviewer.copy.en.name}</p>
                   <p className="text-sm text-muted-foreground">
                     {[iv.company, iv.answered === 0 ? "Ready to practise" : iv.answered === iv.total ? "Completed" : "In progress", formatDay(iv.createdAt)]
                       .filter(Boolean)

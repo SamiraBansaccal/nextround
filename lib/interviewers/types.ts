@@ -1,6 +1,10 @@
 // Interviewers: who asks the questions in a practice interview. Pure data types, shared by the server
-// (prompts, voice) and the UI (picker, call). To add or change an interviewer, edit the catalog files
-// in lib/interviewers/catalog/, not the components.
+// (prompts, voice) and the UI (setup screen, call). To add or change an interviewer, edit the catalog
+// files in lib/interviewers/catalog/, not the components.
+
+/** The languages an interview can run in. A property of the SESSION, never of the interviewer. */
+export type Lang = "en" | "fr";
+export type Localized = Record<Lang, string>;
 
 /** 1 = very low … 5 = very high. Provisional scale: easy to change in one place (lib/interviewers/persona.ts). */
 export type Level = 1 | 2 | 3 | 4 | 5;
@@ -41,14 +45,22 @@ export interface VoiceProfile {
   settings: { stability?: number; similarityBoost?: number; style?: number; speed?: number } | null;
 }
 
+/** What the user reads about an interviewer, in one language. */
+export interface InterviewerCopy {
+  name: string;
+  role: string | null; // shown on the call's name tag, e.g. "Talent Partner"
+  style: string; // the interview style in one line: "Cold, formal and extremely demanding"
+  description: string; // one short line
+}
+
 export interface Interviewer {
   id: string; // stable, used in URLs, the database and asset names (public/interviewers/<id>.webp)
-  name: string;
+  name: string; // canonical name, used in prompts
   categoryId: string;
   kind: InterviewerKind;
-  role: string | null; // shown on the call's name tag, e.g. "Talent Partner"
   image: string | null; // public path of a 16:9 webcam-style picture; null = generated placeholder
-  description: string; // one line, shown in the picker list
+  copy: Record<Lang, InterviewerCopy>;
+  // For the prompt only (English is fine for the model, whatever the interview language):
   personality: string;
   interviewStyle: string;
   vocabulary: string;
@@ -60,7 +72,7 @@ export interface Interviewer {
 
 export interface InterviewerCategory {
   id: string;
-  label: string;
-  description: string;
-  icon: string; // a key mapped to an icon by the UI (components/interview/interviewer-picker.tsx)
+  label: Localized;
+  description: Localized;
+  icon: string; // a key mapped to an icon by the UI
 }
