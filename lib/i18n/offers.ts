@@ -40,6 +40,7 @@ const en = {
   // Badges
   site: { indeed: "Indeed", actiris: "Actiris", forem: "Le Forem", linkedin: "LinkedIn", company: "Company site", other: "Pasted text" } as Record<SourceSite, string>,
   status: { saved: "Saved", applied: "Applied", interview: "Interview", offer: "Offer", rejected: "Rejected" } as Record<OfferStatus, string>,
+  stackLabel: "Technologies asked for",
   covered: "Covered",
   gap: "Gap",
   matchAria: "Match {percent}%",
@@ -141,6 +142,7 @@ const fr: OffersCopy = {
   practiseInterview: "S'entraîner",
   site: { indeed: "Indeed", actiris: "Actiris", forem: "Le Forem", linkedin: "LinkedIn", company: "Site de l'entreprise", other: "Texte collé" },
   status: { saved: "Enregistrée", applied: "Candidature envoyée", interview: "Entretien", offer: "Offre reçue", rejected: "Refusée" },
+  stackLabel: "Technologies demandées",
   covered: "Couvert",
   gap: "Lacune",
   matchAria: "Correspondance {percent} %",
