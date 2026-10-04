@@ -10,7 +10,7 @@ import { isUuid } from "@/lib/ids";
 
 export type Fact = typeof profileFacts.$inferSelect;
 export type NewFact = Omit<typeof profileFacts.$inferInsert, "id" | "userId" | "createdAt">;
-export type FactPatch = Partial<Pick<Fact, "type" | "text" | "validated" | "sourceRef" | "quote">>;
+export type FactPatch = Partial<Pick<Fact, "type" | "text" | "validated" | "sourceRef" | "quote" | "aiAssisted">>;
 
 export async function listFacts(userId: string): Promise<Fact[]> {
   return getDb().select().from(profileFacts).where(eq(profileFacts.userId, userId)).orderBy(desc(profileFacts.createdAt));

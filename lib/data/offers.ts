@@ -78,12 +78,6 @@ export async function markApplied(userId: string, offerId: string): Promise<bool
   return setOfferStatus(userId, offerId, "applied");
 }
 
-/** Covered = at least one CURRENTLY validated fact proves it (facts can be removed later). */
-export function matchScore(reqs: Pick<Requirement, "factIds">[], validFactIds: ReadonlySet<string>) {
-  const covered = reqs.filter((r) => r.factIds.some((id) => validFactIds.has(id))).length;
-  return { covered, total: reqs.length, score: reqs.length ? covered / reqs.length : 0 };
-}
-
 const STATUSES = ["saved", "applied", "interview", "offer", "rejected"] as const;
 export type PipelineStatus = (typeof STATUSES)[number];
 export function isPipelineStatus(value: unknown): value is PipelineStatus {
@@ -102,4 +96,21 @@ export async function setOfferStatus(userId: string, offerId: string, status: Pi
     .where(and(eq(offers.id, offerId), eq(offers.userId, userId)))
     .returning({ id: offers.id });
   return rows.length > 0;
+}
+
+/** Replaces the facts linked to each requirement of one of the user's offers (after a new match). */
+export async function setRequirementFacts(userId: string, offerId: string, links: ReadonlyMap<string, string[]>): Promise<number> {
+  if (!isUuid(offerId)) return 0;
+  const db = getDb();
+  let updated = 0;
+  for (const [requirementId, factIds] of links) {
+    if (!isUuid(requirementId)) continue;
+    const rows = await db
+      .update(requirements)
+      .set({ factIds })
+      .where(and(eq(requirements.id, requirementId), eq(requirements.offerId, offerId), eq(requirements.userId, userId)))
+      .returning({ id: requirements.id });
+    updated += rows.length;
+  }
+  return updated;
 }

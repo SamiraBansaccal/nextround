@@ -5,6 +5,7 @@ import { z } from "zod";
 import { aiErrorMessage } from "@/lib/ai/errors";
 import { getAccount, requireUserId } from "@/lib/auth";
 import { listFacts } from "@/lib/data/facts";
+import { factIndex, isCovered } from "@/lib/offers/coverage";
 import { createInterview, deleteInterview, findSavedFeedback, getInterview, getQuestionWithOffer, listAskedBankIds, saveAnswer, switchInterviewer } from "@/lib/data/interviews";
 import { getOfferDetail } from "@/lib/data/offers";
 import { bankAnswerText, findBankQuestion, findTech } from "@/lib/interview/bank";
@@ -49,7 +50,7 @@ export async function startInterviewAction(input: unknown): Promise<{ ok: true; 
   let offerId: string | null = null;
   let focus = parsed.data.focus;
   let topic: Topic | null = null;
-  let requirements: { text: string; quote: string; factIds: string[] }[] = [];
+  let requirements: { text: string; quote: string; category: string; factIds: string[] }[] = [];
   if (kind === "offer") {
     const detail = parsed.data.offerId ? await getOfferDetail(account.userId, parsed.data.offerId) : null;
     if (!detail) return fail("Offer not found.", "Offre introuvable.");
@@ -71,11 +72,12 @@ export async function startInterviewAction(input: unknown): Promise<{ ok: true; 
 
   const [allFacts, askedBefore] = await Promise.all([listFacts(account.userId), listAskedBankIds(account.userId)]);
   const facts = allFacts.filter((f) => f.validated);
-  const valid = new Set(facts.map((f) => f.id));
-  offer.requirements = requirements.map((r) => ({ text: r.text, quote: r.quote, covered: r.factIds.some((id) => valid.has(id)) }));
+  const profile = factIndex(allFacts); // a vibe-coded project never covers a technical requirement
+  offer.requirements = requirements.map((r) => ({ text: r.text, quote: r.quote, covered: isCovered(r, profile) }));
   try {
     // Written in advance (question banks), so no AI call here: instant and in correct English or French.
-    const generated = buildQuestions(offer, facts.map((f) => f.text), {
+    // The profile's technologies come only from facts that can prove one: not from vibe-coded projects.
+    const generated = buildQuestions(offer, facts.filter((f) => !f.aiAssisted).map((f) => f.text), {
       language,
       focus,
       register: registerOf(interviewer.traits),

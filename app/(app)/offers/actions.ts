@@ -6,10 +6,11 @@ import { aiErrorMessage, AiError } from "@/lib/ai/errors";
 import { consumeInstanceQuota } from "@/lib/ai/usage";
 import { getAccount, requireUserId } from "@/lib/auth";
 import { listFacts } from "@/lib/data/facts";
-import { createOffer, markApplied, setOfferStatus } from "@/lib/data/offers";
+import { createOffer, getOfferDetail, markApplied, setOfferStatus, setRequirementFacts } from "@/lib/data/offers";
 import { serverEnv } from "@/lib/env";
 import { extractOffer } from "@/lib/offers/extract";
 import { fetchPageText, firecrawlPageText, looksBlocked, MAX_PAGE_TEXT, PageFetchError, sourceSiteFor } from "@/lib/offers/fetch-page";
+import { matchRequirements } from "@/lib/offers/match";
 
 export type AddOfferResult = { ok: true; offerId: string; dropped: number } | { ok: false; error: string; needText?: boolean };
 
@@ -85,4 +86,26 @@ export async function setOfferStatusAction(input: unknown): Promise<{ ok: boolea
   const ok = await setOfferStatus(userId, parsed.data.offerId, parsed.data.status);
   revalidatePath("/", "layout");
   return { ok };
+}
+
+/**
+ * Matches an offer's requirements again with the CURRENT validated facts (one AI call): for offers saved
+ * before the facts were validated, or after the profile changed.
+ */
+export async function rematchOfferAction(offerId: unknown): Promise<{ ok: true; message: string } | { ok: false; error: string }> {
+  const account = await getAccount();
+  if (typeof offerId !== "string") return { ok: false, error: "Offer not found." };
+  const detail = await getOfferDetail(account.userId, offerId);
+  if (!detail) return { ok: false, error: "Offer not found." };
+  const facts = await listFacts(account.userId);
+  if (!facts.some((f) => f.validated)) return { ok: false, error: "Validate some facts in your profile first: only validated facts count." };
+  try {
+    const links = await matchRequirements({ userId: account.userId, isOwner: account.isOwner }, detail.requirements, facts);
+    await setRequirementFacts(account.userId, detail.offer.id, links);
+    revalidatePath("/", "layout");
+    const covered = [...links.values()].filter((ids) => ids.length > 0).length;
+    return { ok: true, message: `${covered} of ${links.size} requirements covered by your validated facts.` };
+  } catch (error) {
+    return { ok: false, error: aiErrorMessage(error) };
+  }
 }

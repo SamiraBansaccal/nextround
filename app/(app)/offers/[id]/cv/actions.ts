@@ -6,6 +6,7 @@ import { getAccount } from "@/lib/auth";
 import { saveDocumentVersion } from "@/lib/data/documents";
 import { listFacts } from "@/lib/data/facts";
 import { getOfferDetail } from "@/lib/data/offers";
+import { factIndex, isCovered } from "@/lib/offers/coverage";
 import { generateDocuments } from "@/lib/documents/generate";
 
 /** Generates a new version of the tailored CV and cover letter for an offer (one AI call). */
@@ -16,7 +17,7 @@ export async function generateDocumentsAction(offerId: unknown): Promise<{ ok: t
   if (!detail) return { ok: false, error: "Offer not found." };
   const facts = (await listFacts(account.userId)).filter((f) => f.validated);
   if (facts.length === 0) return { ok: false, error: "Validate some facts in your profile first: the CV is built only from them." };
-  const valid = new Set(facts.map((f) => f.id));
+  const profile = factIndex(facts); // vibe-coded projects never cover a technical requirement
   try {
     const docs = await generateDocuments(
       { userId: account.userId, isOwner: account.isOwner },
@@ -24,7 +25,7 @@ export async function generateDocumentsAction(offerId: unknown): Promise<{ ok: t
         title: detail.offer.title,
         company: detail.offer.company,
         language: detail.offer.language,
-        requirements: detail.requirements.map((r) => ({ text: r.text, covered: r.factIds.some((id) => valid.has(id)) })),
+        requirements: detail.requirements.map((r) => ({ text: r.text, covered: isCovered(r, profile) })),
       },
       facts,
       account.displayName,

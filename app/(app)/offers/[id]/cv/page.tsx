@@ -4,6 +4,7 @@ import { getAccount } from "@/lib/auth";
 import { listDocuments } from "@/lib/data/documents";
 import { listFacts } from "@/lib/data/facts";
 import { getOfferDetail } from "@/lib/data/offers";
+import { factIndex, isCovered, provingFactIds } from "@/lib/offers/coverage";
 import type { SourcedSentence } from "@/lib/types";
 import { generateDocumentsAction } from "./actions";
 import { formatDay } from "@/lib/dates";
@@ -18,7 +19,6 @@ export default async function OfferCvPage({ params, searchParams }: PageProps<"/
   if (!detail) notFound();
 
   const validated = facts.filter((f) => f.validated);
-  const validIds = new Set(validated.map((f) => f.id));
   const cvVersions = docs.filter((d) => d.kind === "cv");
   const wanted = Number(v);
   const cv = cvVersions.find((d) => d.version === wanted) ?? cvVersions[0] ?? null;
@@ -27,9 +27,10 @@ export default async function OfferCvPage({ params, searchParams }: PageProps<"/
 
   // CV feedback, computed by code: requirements covered, gaps, relevant facts not used.
   const usedFacts = new Set((cv?.sentences ?? []).flatMap((s) => s.factIds));
-  const covered = detail.requirements.filter((r) => r.factIds.some((fid) => validIds.has(fid)));
-  const gaps = detail.requirements.filter((r) => !r.factIds.some((fid) => validIds.has(fid)));
-  const relevant = new Set(covered.flatMap((r) => r.factIds.filter((fid) => validIds.has(fid))));
+  const profile = factIndex(facts);
+  const covered = detail.requirements.filter((r) => isCovered(r, profile));
+  const gaps = detail.requirements.filter((r) => !isCovered(r, profile));
+  const relevant = new Set(covered.flatMap((r) => provingFactIds(r, profile)));
   const unusedFacts = validated.filter((f) => relevant.has(f.id) && !usedFacts.has(f.id)).map((f) => f.text);
 
   return (

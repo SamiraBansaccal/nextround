@@ -1,5 +1,5 @@
 import type { Offer, Requirement } from "@/lib/data/offers";
-import { matchScore } from "@/lib/data/offers";
+import { type CoverageFact, matchScore } from "@/lib/offers/coverage";
 import { formatDay } from "@/lib/dates";
 
 // Dashboard pipeline cards (business logic, kept out of the components).
@@ -25,13 +25,13 @@ export interface PipelineCardData {
 
 export function buildPipelineCards(
   offers: Offer[],
-  reqs: Pick<Requirement, "offerId" | "factIds">[],
-  validFactIds: ReadonlySet<string>,
+  reqs: Pick<Requirement, "offerId" | "factIds" | "category">[],
+  facts: ReadonlyMap<string, CoverageFact>, // the profile: validated facts cover, vibe-coded projects not for tech
   interviewCounts: ReadonlyMap<string, number>,
   now: number = Date.now(),
 ): PipelineCardData[] {
   return offers.map((offer) => {
-    const m = matchScore(reqs.filter((r) => r.offerId === offer.id), validFactIds);
+    const m = matchScore(reqs.filter((r) => r.offerId === offer.id), facts);
     const waiting = offer.status === "applied" || offer.status === "interview";
     const followUpAt = offer.appliedAt && waiting ? new Date(offer.appliedAt.getTime() + FOLLOW_UP_DAYS * DAY) : null;
     return {
