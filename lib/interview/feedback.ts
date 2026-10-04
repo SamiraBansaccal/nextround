@@ -57,6 +57,18 @@ export function verifyFeedback(
   };
 }
 
+/**
+ * A feedback saved for the same answer can be shown again only if it still matches the profile: every
+ * claim and every sentence of the improved answer is backed by facts that are still validated. Anything
+ * flagged as unsupported ("Not in your profile") is computed again: a fact validated since may cover it.
+ */
+export function isReusableFeedback(feedback: Feedback, validatedFactIds: ReadonlySet<string>): boolean {
+  return (
+    feedback.evidence.claims.every((c) => c.factId !== undefined && validatedFactIds.has(c.factId)) &&
+    feedback.improvedAnswer.every((s) => s.factIds.length > 0 && s.factIds.every((id) => validatedFactIds.has(id)))
+  );
+}
+
 export async function answerFeedback(
   ctx: AiContext,
   input: {

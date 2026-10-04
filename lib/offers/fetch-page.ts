@@ -100,11 +100,35 @@ export async function fetchPageText(raw: string): Promise<string> {
       continue;
     }
     if (!response.ok) throw new PageFetchError(response.status === 401 || response.status === 403 ? "blocked_or_login" : "unreachable");
-    const buffer = await response.arrayBuffer();
-    if (buffer.byteLength > MAX_BYTES) throw new PageFetchError("unreachable");
-    return htmlToText(new TextDecoder().decode(buffer));
+    return htmlToText(await readAtMost(response, MAX_BYTES));
   }
   throw new PageFetchError("unreachable");
+}
+
+/** The body as text, refused as soon as it passes `max` bytes (a huge page is never held in memory). */
+async function readAtMost(response: Response, max: number): Promise<string> {
+  if (Number(response.headers.get("content-length") ?? 0) > max) throw new PageFetchError("unreachable");
+  if (!response.body) return "";
+  const reader = response.body.getReader();
+  const chunks: Uint8Array[] = [];
+  let size = 0;
+  for (;;) {
+    const { done, value } = await reader.read();
+    if (done) break;
+    size += value.byteLength;
+    if (size > max) {
+      await reader.cancel();
+      throw new PageFetchError("unreachable");
+    }
+    chunks.push(value);
+  }
+  const bytes = new Uint8Array(size);
+  let offset = 0;
+  for (const chunk of chunks) {
+    bytes.set(chunk, offset);
+    offset += chunk.byteLength;
+  }
+  return new TextDecoder().decode(bytes);
 }
 
 const ENTITIES: Record<string, string> = { amp: "&", lt: "<", gt: ">", quot: '"', apos: "'", nbsp: " " };

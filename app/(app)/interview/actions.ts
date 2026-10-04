@@ -9,7 +9,7 @@ import { factIndex, isCovered } from "@/lib/offers/coverage";
 import { createInterview, deleteInterview, findSavedFeedback, getInterview, getQuestionWithOffer, listAskedBankIds, saveAnswer, switchInterviewer } from "@/lib/data/interviews";
 import { getOfferDetail } from "@/lib/data/offers";
 import { bankAnswerText, findBankQuestion, findTech } from "@/lib/interview/bank";
-import { answerFeedback, MAX_ANSWER } from "@/lib/interview/feedback";
+import { answerFeedback, isReusableFeedback, MAX_ANSWER } from "@/lib/interview/feedback";
 import { toLang } from "@/lib/interview/copy";
 import { buildQuestions, type OfferForInterview } from "@/lib/interview/generate";
 import { hrAnswerText } from "@/lib/interview/hr-bank";
@@ -115,9 +115,11 @@ export async function submitAnswerAction(input: unknown): Promise<{ ok: true; fe
   // A bank question's model answer guides the technical part of the feedback ("experience" ones have none).
   const bank = findBankQuestion(found.question.bankId);
   try {
-    // The same answer to the same question already has feedback: reuse it, no new AI call.
+    // The same answer to the same question already has feedback: reuse it (no new AI call), unless the
+    // validated facts it relies on have changed since.
     const saved = await findSavedFeedback(account.userId, found.question.text, parsed.data.answer);
-    const feedback = saved ?? await answerFeedback(
+    const reusable = saved && isReusableFeedback(saved, new Set(facts.map((f) => f.id))) ? saved : null;
+    const feedback = reusable ?? await answerFeedback(
       { userId: account.userId, isOwner: account.isOwner },
       {
         question: found.question.text,

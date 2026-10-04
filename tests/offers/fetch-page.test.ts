@@ -1,5 +1,5 @@
-import { describe, expect, it } from "vitest";
-import { assertPublicHttpUrl, htmlToText, looksBlocked, sourceSiteFor } from "@/lib/offers/fetch-page";
+import { describe, expect, it, vi } from "vitest";
+import { assertPublicHttpUrl, fetchPageText, htmlToText, looksBlocked, sourceSiteFor } from "@/lib/offers/fetch-page";
 
 // SSRF protection and page reading. Literal IP addresses are used so that no DNS is involved.
 
@@ -67,5 +67,24 @@ describe("looksBlocked and sourceSiteFor", () => {
     expect(sourceSiteFor("https://www.linkedin.com/jobs/view/1")).toBe("linkedin");
     expect(sourceSiteFor("https://careers.example.com/1")).toBe("company");
     expect(sourceSiteFor(null)).toBe("other");
+  });
+});
+
+describe("page size limit", () => {
+  it("stops reading a page past 2 MB, without downloading the rest", async () => {
+    let pulled = 0;
+    const endless = new ReadableStream<Uint8Array>({
+      pull(controller) {
+        pulled++;
+        controller.enqueue(new Uint8Array(256 * 1024));
+      },
+    });
+    const spy = vi.spyOn(globalThis, "fetch").mockResolvedValue(new Response(endless, { status: 200 }));
+    try {
+      await expect(fetchPageText("http://93.184.216.34/offer")).rejects.toThrow("unreachable");
+      expect(pulled).toBeLessThan(12); // ~2 MB, not the whole stream
+    } finally {
+      spy.mockRestore();
+    }
   });
 });
