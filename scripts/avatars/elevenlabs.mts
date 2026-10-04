@@ -5,10 +5,10 @@
 //   npm run avatars:el -- set <id>                 the set still (1 image generation)
 //   npm run avatars:el -- voice <id> [preview#]    design the voice (3 previews), save one as a voice
 //   npm run avatars:el -- say <id> <name> <text>   text to speech with the character's voice
-//   npm run avatars:el -- clip <id> <clip-id> [audio-name]   one clip from characters/<id>/clip-plan.json
+//   npm run avatars:el -- clip <id> <clip-id> [audio-name]   one clip from assets/characters/<id>/clip-plan.json
 //   npm run avatars:el -- test <id>                the test set: still, voice, 4 short clips
 // Needs ELEVENLABS_API_KEY (Pro plan or above, with the Image & Video permission). Outputs and ids
-// are stored under characters/<id>/ (elevenlabs.json keeps generation and voice ids).
+// are stored under assets/characters/<id>/ (elevenlabs.json keeps generation and voice ids).
 import { execFileSync } from "node:child_process";
 import { existsSync, mkdirSync, readFileSync, writeFileSync } from "node:fs";
 import { findInterviewer } from "@/lib/interviewers";
@@ -20,7 +20,7 @@ const API = "https://api.elevenlabs.io";
 const DRY = process.env.DRY_RUN === "1"; // print the requests, spend nothing
 
 interface State { setStill?: string; voiceId?: string; generations: Record<string, string> }
-const dir = (id: string) => `characters/${id}`;
+const dir = (id: string) => `assets/characters/${id}`;
 const stateOf = (id: string): State => (existsSync(`${dir(id)}/elevenlabs.json`) ? JSON.parse(readFileSync(`${dir(id)}/elevenlabs.json`, "utf8")) : { generations: {} });
 const saveState = (id: string, s: State) => DRY || writeFileSync(`${dir(id)}/elevenlabs.json`, JSON.stringify(s, null, 1) + "\n");
 

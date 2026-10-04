@@ -1,12 +1,12 @@
 import { ArrowUpRight, BellRing, MessagesSquare, Play } from "lucide-react";
 import Link from "next/link";
 import type { ReactNode } from "react";
-import { SiteBadge, StatusBadge, statusVisual } from "@/components/source/badges";
+import { SiteBadge, StatusBadge, statusVisual } from "@/components/offers/badges";
 import { Button } from "@/components/ui/button";
 import { OFFERS_COPY } from "@/lib/i18n/offers";
 import type { UiLang } from "@/lib/i18n/ui";
 import { fill } from "@/lib/interview/copy";
-import type { PipelineCardData } from "@/lib/pipeline";
+import type { PipelineCardData } from "@/lib/offers/pipeline";
 import { cn } from "@/lib/utils";
 
 // Offer card from the Lovable prototype: tinted by status, match, practice count, follow-up.

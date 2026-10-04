@@ -9,7 +9,7 @@ import type { FlavorField, FlavorPack } from "./types";
 // first, then its category's, then lines that fit its temperament (lib/interviewers/flavor/registers.ts).
 // The question itself is never changed. How often the interviewer speaks follows the traits: a
 // humorous, energetic character interjects often, a cold one rarely. Each piece is used at most once
-// per interview. Pure once `random` is given (tests/flavor.test.ts).
+// per interview. Pure once `random` is given (tests/interview/flavor.test.ts).
 
 export type { FlavorPack } from "./types";
 export { CATEGORY_PACKS, CHARACTER_PACKS } from "./packs";

@@ -1,6 +1,6 @@
 import { notFound } from "next/navigation";
 import { OfferView } from "@/components/offers/offer-view";
-import { requireUserId } from "@/lib/auth";
+import { requireUserId } from "@/lib/server/auth";
 import { listDocuments } from "@/lib/data/documents";
 import { listFacts } from "@/lib/data/facts";
 import { listInterviewIdsForOffer } from "@/lib/data/interviews";
@@ -8,7 +8,7 @@ import { getOfferDetail } from "@/lib/data/offers";
 import { factIndex, matchScore, provingFactIds } from "@/lib/offers/coverage";
 import { highlightSegments } from "@/lib/offers/segments";
 import { markAppliedAction, rematchOfferAction } from "../actions";
-import { formatDay } from "@/lib/dates";
+import { formatDay } from "@/lib/shared/dates";
 import { OFFERS_COPY } from "@/lib/i18n/offers";
 import { getUiLang } from "@/lib/i18n/server";
 import { documentPlainText } from "@/lib/documents/plain-text";

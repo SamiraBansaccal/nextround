@@ -1,7 +1,7 @@
 // When does a requirement of an offer count as covered by the candidate's profile? Only through facts
 // the candidate VALIDATED. And a project built with AI ("vibe coding", marked in the profile) shows
 // interest in AI, creativity, hackathons: it may support a soft requirement, never a technical one, so
-// using TypeScript in a vibe-coded project never reads as "masters TypeScript". Pure (tests/coverage.test.ts).
+// using TypeScript in a vibe-coded project never reads as "masters TypeScript". Pure (tests/offers/coverage.test.ts).
 
 export interface CoverageFact {
   id: string;

@@ -3,7 +3,7 @@ import { z } from "zod";
 import { type AiContext, aiJson } from "@/lib/ai";
 import { lenientArray } from "@/lib/ai/lenient";
 import { canProve, type CoverageFact } from "@/lib/offers/coverage";
-import { factAliases, type FactForPrompt } from "@/lib/prompt-facts";
+import { factAliases, type FactForPrompt } from "@/lib/ai/prompt-facts";
 
 // Matches the requirements of a saved offer (already verified in the offer text) with the candidate's
 // CURRENT validated facts. Links are first made when the offer is added: an offer saved before the

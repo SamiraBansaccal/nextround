@@ -2,9 +2,9 @@ import { auth } from "@clerk/nextjs/server";
 import { Check, KeyRound, Link2, MessagesSquare, Quote, X } from "lucide-react";
 import Image from "next/image";
 import { redirect } from "next/navigation";
-import { Logo } from "@/components/brand/logo";
-import { SignInButtons } from "@/components/sign-in-buttons";
-import { ThemeToggle } from "@/components/theme-toggle";
+import { Logo } from "@/components/layout/logo";
+import { SignInButtons } from "@/components/auth/sign-in-buttons";
+import { ThemeToggle } from "@/components/layout/theme-toggle";
 
 // Landing page (design from the Lovable prototype): the only page visible without signing in.
 const VALUE_PROPS = [

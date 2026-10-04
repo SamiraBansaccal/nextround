@@ -1,15 +1,15 @@
 import { UserRound } from "lucide-react";
 import Image from "next/image";
 import Link from "next/link";
-import { AiStatusCard } from "@/components/ai/ai-status-card";
+import { AiStatusCard } from "@/components/settings/ai-status-card";
 import { GetStarted } from "@/components/dashboard/get-started";
 import { Opportunities } from "@/components/dashboard/opportunities";
 import { AddOfferForm } from "@/components/offers/add-offer-form";
-import { PageHeading } from "@/components/page-heading";
+import { PageHeading } from "@/components/layout/page-heading";
 import { Button } from "@/components/ui/button";
 import { getAiStatus } from "@/lib/ai/config";
-import { getAccount } from "@/lib/auth";
-import { dashboardGreeting } from "@/lib/dashboard";
+import { getAccount } from "@/lib/server/auth";
+import { dashboardGreeting } from "@/lib/dashboard/greeting";
 import { listFacts } from "@/lib/data/facts";
 import { DASHBOARD_COPY } from "@/lib/i18n/dashboard";
 import { OFFERS_COPY } from "@/lib/i18n/offers";
@@ -18,7 +18,7 @@ import { fill } from "@/lib/interview/copy";
 import { countInterviewsByOffer } from "@/lib/data/interviews";
 import { listOffers, listRequirementsForUser } from "@/lib/data/offers";
 import { factIndex } from "@/lib/offers/coverage";
-import { buildPipelineCards } from "@/lib/pipeline";
+import { buildPipelineCards } from "@/lib/offers/pipeline";
 import { addOfferAction, setOfferStatusAction } from "../offers/actions";
 import { importGithubAction } from "../profile/actions";
 

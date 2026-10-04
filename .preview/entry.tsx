@@ -1,5 +1,5 @@
 import { createRoot } from "react-dom/client";
-import { AppShell } from "@/components/app-shell";
+import { AppShell } from "@/components/layout/app-shell";
 import NewInterviewPage from "@/app/(app)/interview/new/page";
 import InterviewsPage from "@/app/(app)/interview/page";
 import { getUiCopy } from "@/lib/i18n/server";

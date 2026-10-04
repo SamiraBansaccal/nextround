@@ -1,11 +1,11 @@
 import { notFound } from "next/navigation";
 import { CvView } from "@/components/documents/cv-view";
-import { getAccount } from "@/lib/auth";
+import { getAccount } from "@/lib/server/auth";
 import { type DocumentRow, listDocuments, listKeptDocuments } from "@/lib/data/documents";
 import { listFacts } from "@/lib/data/facts";
 import { getOfferDetail } from "@/lib/data/offers";
 import { listSources } from "@/lib/data/sources";
-import { formatDay } from "@/lib/dates";
+import { formatDay } from "@/lib/shared/dates";
 import { documentFactIds, isDocumentLanguage } from "@/lib/documents/render";
 import { DOCUMENTS_COPY } from "@/lib/i18n/documents";
 import { getUiLang } from "@/lib/i18n/server";

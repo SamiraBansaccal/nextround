@@ -3,9 +3,9 @@ import { z } from "zod";
 import { type AiContext, aiJson } from "@/lib/ai";
 import { lenientArray } from "@/lib/ai/lenient";
 import { canProve } from "@/lib/offers/coverage";
-import { factAliases, type FactForPrompt } from "@/lib/prompt-facts";
+import { factAliases, type FactForPrompt } from "@/lib/ai/prompt-facts";
 import type { DocumentLanguage, SourcedSentence, TailoredCv, TailoredEntry, TailoredItem } from "@/lib/types";
-import { keepValidFactIds } from "@/lib/verify";
+import { keepValidFactIds } from "@/lib/ai/verify";
 
 // A CV written for ONE offer, with the structure of a tech CV: headline, summary, skills table, projects
 // (tags and a few lines each), education, experience, languages. The profile holds everything the

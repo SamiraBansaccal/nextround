@@ -1,6 +1,6 @@
 import "server-only";
 import type { z } from "zod";
-import { serverEnv } from "@/lib/env";
+import { serverEnv } from "@/lib/server/env";
 import { type ChatMessage, chatCompletion, type ChatOptions, type LlmConfig } from "./client";
 import { resolveLlmConfig } from "./config";
 import { generateJson } from "./json";

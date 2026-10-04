@@ -9,7 +9,7 @@ import type { DashboardCopy } from "@/lib/i18n/dashboard";
 import { OFFERS_COPY } from "@/lib/i18n/offers";
 import type { UiLang } from "@/lib/i18n/ui";
 import { fill } from "@/lib/interview/copy";
-import type { PipelineCardData } from "@/lib/pipeline";
+import type { PipelineCardData } from "@/lib/offers/pipeline";
 import type { OfferStatus } from "@/lib/types";
 import { cn } from "@/lib/utils";
 

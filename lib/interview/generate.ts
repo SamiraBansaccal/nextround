@@ -5,7 +5,7 @@ import { questionType, type QuestionType } from "@/lib/interview/question-types"
 import { inRegister, type Register } from "@/lib/interview/register";
 import { type Focus, PLANS } from "@/lib/interview/session";
 import type { Lang } from "@/lib/interviewers/types";
-import { shorten } from "@/lib/text";
+import { shorten } from "@/lib/shared/text";
 import type { QuestionGroup, SourcedSentence } from "@/lib/types";
 
 // The questions of an interview, built by code from texts written in advance (no AI, so instant, free

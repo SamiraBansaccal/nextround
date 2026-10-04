@@ -1,12 +1,12 @@
-import { AiStatusCard } from "@/components/ai/ai-status-card";
-import { PageHeading } from "@/components/page-heading";
+import { AiStatusCard } from "@/components/settings/ai-status-card";
+import { PageHeading } from "@/components/layout/page-heading";
 import { AiSettingsForm } from "@/components/settings/ai-settings-form";
 import { VoiceSettingsForm } from "@/components/settings/voice-settings-form";
 import { getAiStatus } from "@/lib/ai/config";
 import { DEFAULT_INSTANCE_MODEL, PRESET_IDS, PRESETS } from "@/lib/ai/providers";
-import { getAccount } from "@/lib/auth";
+import { getAccount } from "@/lib/server/auth";
 import { getPublicAiSettings } from "@/lib/data/ai-settings";
-import { serverEnv } from "@/lib/env";
+import { serverEnv } from "@/lib/server/env";
 import { getUiLang } from "@/lib/i18n/server";
 import { SETTINGS_COPY } from "@/lib/i18n/settings";
 import {

@@ -2,7 +2,7 @@ import "server-only";
 import { and, desc, eq } from "drizzle-orm";
 import { getDb } from "@/lib/db";
 import { profileFacts, sources } from "@/lib/db/schema";
-import { isUuid } from "@/lib/ids";
+import { isUuid } from "@/lib/shared/ids";
 import type { CvDocument } from "@/lib/types";
 
 // Profile sources: each uploaded CV (and the GitHub / Codewars / chat imports) is one row.

@@ -7,7 +7,7 @@ import { type BankQuestion, type Tech, type TechKind } from "./types";
 
 // The technical question bank (app data, same for everyone) and how an interview draws from it: the
 // technologies of the offer's verified stack first, then those of the candidate's validated facts.
-// Pure and deterministic once `random` is given (tests/question-bank.test.ts).
+// Pure and deterministic once `random` is given (tests/interview/question-bank.test.ts).
 
 export type { BankQuestion, Tech, TechKind } from "./types";
 export { TECH_KINDS } from "./types";

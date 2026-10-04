@@ -4,14 +4,14 @@ import { AlertTriangle, ArrowLeft, Bookmark, BookmarkCheck, Check, Copy, Downloa
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { useEffect, useState, useTransition } from "react";
-import { CoverageLabel } from "@/components/source/badges";
+import { CoverageLabel } from "@/components/offers/badges";
 import { Button } from "@/components/ui/button";
 import { letterText, tailoredCvText } from "@/lib/documents/render";
 import type { DocumentsCopy } from "@/lib/i18n/documents";
 import type { UiLang } from "@/lib/i18n/ui";
 import { fill } from "@/lib/interview/copy";
 import type { DocumentLanguage, SourcedSentence, TailoredCv, TailoredLetter } from "@/lib/types";
-import { shorten } from "@/lib/text";
+import { shorten } from "@/lib/shared/text";
 import { cn } from "@/lib/utils";
 import { TailoredCvDocument, TailoredLetterDocument } from "./tailored-document";
 

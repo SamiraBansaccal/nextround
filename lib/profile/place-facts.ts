@@ -2,7 +2,7 @@ import type { CvDocument } from "@/lib/types";
 
 // Where each fact proposed from a CV sits in that CV laid out as a document: under the job or the
 // training its quote comes from, in the languages or the skills, or at the end. Lets the candidate review
-// the facts inside the CV they recognise instead of in a long list. Pure (tests/place-facts.test.ts).
+// the facts inside the CV they recognise instead of in a long list. Pure (tests/profile/place-facts.test.ts).
 
 export type FactPlace = `experiences:${number}` | `education:${number}` | "languages" | "skills" | "other";
 

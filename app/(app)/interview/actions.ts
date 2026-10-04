@@ -3,7 +3,7 @@
 import { revalidatePath } from "next/cache";
 import { z } from "zod";
 import { aiErrorMessage } from "@/lib/ai/errors";
-import { getAccount, requireUserId } from "@/lib/auth";
+import { getAccount, requireUserId } from "@/lib/server/auth";
 import { listFacts } from "@/lib/data/facts";
 import { factIndex, isCovered } from "@/lib/offers/coverage";
 import { createInterview, deleteInterview, findSavedFeedback, getInterview, getQuestionWithOffer, listAskedBankIds, saveAnswer, switchInterviewer } from "@/lib/data/interviews";

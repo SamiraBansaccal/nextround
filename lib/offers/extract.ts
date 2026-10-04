@@ -1,9 +1,9 @@
 import "server-only";
 import { z } from "zod";
 import { type AiContext, aiJson } from "@/lib/ai";
-import { factAliases, type FactForPrompt } from "@/lib/prompt-facts";
+import { factAliases, type FactForPrompt } from "@/lib/ai/prompt-facts";
 import { canProve } from "@/lib/offers/coverage";
-import { isContactInText, isQuoteIn, keepValidFactIds } from "@/lib/verify";
+import { isContactInText, isQuoteIn, keepValidFactIds } from "@/lib/ai/verify";
 
 // Offer extraction: the AI proposes title, stack, requirements (matched to the user's facts) and
 // contacts, each with a verbatim quote. verifyExtraction() keeps only what the offer text proves.

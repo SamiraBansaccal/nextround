@@ -3,7 +3,7 @@ import { z } from "zod";
 import { lenientArray } from "@/lib/ai/lenient";
 import { type AiContext, aiJson } from "@/lib/ai";
 import type { CvContact, CvDocument, CvEntry, CvLanguage } from "@/lib/types";
-import { isQuoteIn } from "@/lib/verify";
+import { isQuoteIn } from "@/lib/ai/verify";
 
 // The Profile page shows each CV as a document, as in the Lovable design. The AI only STRUCTURES the
 // CV text into sections and must copy every value word for word. The code then keeps a string only

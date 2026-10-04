@@ -2,7 +2,7 @@ import { clerkMiddleware, createRouteMatcher } from "@clerk/nextjs/server";
 
 // Next.js 16 "proxy" (formerly middleware): runs before every request.
 // Everything requires sign-in except the landing page and the sign-in flow pages.
-// This is a first gate only: server code ALSO checks the session (lib/auth.ts requireUserId).
+// This is a first gate only: server code ALSO checks the session (lib/server/auth.ts requireUserId).
 const isPublicRoute = createRouteMatcher(["/", "/sign-in(.*)", "/sign-up(.*)", "/sso-callback(.*)"]);
 
 export default clerkMiddleware(

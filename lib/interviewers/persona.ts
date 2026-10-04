@@ -1,7 +1,7 @@
 import { FOLLOW_UP_WORDS, LEVEL_WORDS } from "./labels";
 import type { Interviewer } from "./types";
 
-// Turns an interviewer's data into prompt instructions. Pure and tested (tests/interviewers.test.ts).
+// Turns an interviewer's data into prompt instructions. Pure and tested (tests/interview/interviewers.test.ts).
 // Provisional use: questions are PHRASED in this style when an interview is created
 // (lib/interview/generate.ts). Their content rules (HR / stack / gaps, verified sources) do not change.
 

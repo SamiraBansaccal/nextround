@@ -1,15 +1,15 @@
 """Collects reference image candidates for each character from its franchise's Fandom wiki.
 
-For every entry of characters/sources.json: lists the images used on the character's page, keeps the
+For every entry of assets/characters/sources.json: lists the images used on the character's page, keeps the
 large ones, ranks them (official art and transparent renders first) and downloads the best ones into
-characters/<id>/candidates/ with a contact sheet (contact-sheet.jpg) to pick the references from.
+assets/characters/<id>/candidates/ with a contact sheet (contact-sheet.jpg) to pick the references from.
 Usage: python3 scripts/avatars/collect-references.py [--missing] [character-id …]   (all by default; --missing skips done ones)
 """
 import io, json, re, sys, time, urllib.parse, urllib.request
 from pathlib import Path
 from PIL import Image, ImageDraw
 
-ROOT = Path(__file__).resolve().parents[2] / "characters"
+ROOT = Path(__file__).resolve().parents[2] / "assets" / "characters"
 UA = {"User-Agent": "NextRound reference collector (personal project)"}
 SKIP = re.compile(r"logo|icon|signature|title.?card|map|symbol|emblem|flag|sprite|tombstone|gravestone|chart|diagram|stamp|button|badge|\.svg$|\.gif$", re.I)
 GOOD = re.compile(r"render|official|artwork|promo|profile|model|design|full.?body|pose|transparent|infobox|character|cutout|png$", re.I)

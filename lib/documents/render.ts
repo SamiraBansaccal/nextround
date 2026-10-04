@@ -1,7 +1,7 @@
 import type { DocumentLanguage, SourcedSentence, TailoredCv, TailoredDocument, TailoredEntry, TailoredLetter } from "@/lib/types";
 
 // Section titles and plain text of the documents written for an offer, in their own language (not the
-// language of the interface): a French CV has French headings. Pure (tests/tailored-documents.test.ts).
+// language of the interface): a French CV has French headings. Pure (tests/documents/tailored-documents.test.ts).
 
 export const DOC_HEADINGS: Record<DocumentLanguage, Record<"summary" | "skills" | "projects" | "more" | "education" | "experience" | "languages" | "letter" | "builtWithAi", string>> = {
   en: {

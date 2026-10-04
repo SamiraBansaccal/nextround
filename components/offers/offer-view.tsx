@@ -28,7 +28,7 @@ import {
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { useState, useTransition } from "react";
-import { CoverageLabel, MatchRing, QuoteChip, SiteBadge, StatusBadge } from "@/components/source/badges";
+import { CoverageLabel, MatchRing, QuoteChip, SiteBadge, StatusBadge } from "@/components/offers/badges";
 import { Button } from "@/components/ui/button";
 import { Sheet, SheetContent, SheetDescription, SheetHeader, SheetTitle } from "@/components/ui/sheet";
 import type { OffersCopy } from "@/lib/i18n/offers";

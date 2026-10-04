@@ -2,14 +2,14 @@
 
 import { revalidatePath } from "next/cache";
 import { z } from "zod";
-import { getAccount, requireUserId } from "@/lib/auth";
+import { getAccount, requireUserId } from "@/lib/server/auth";
 import { createFact, deleteFact, listFacts, updateFact } from "@/lib/data/facts";
 import { aiErrorMessage } from "@/lib/ai/errors";
 import { PROFILE_COPY } from "@/lib/i18n/profile";
 import { getUiLang } from "@/lib/i18n/server";
 import { fill } from "@/lib/interview/copy";
 import { addSource, cvRef, getCvSource, removeCvSource, setCvDocument } from "@/lib/data/sources";
-import { fetchRelevantRepos, repoToFactText } from "@/lib/github";
+import { fetchRelevantRepos, repoToFactText } from "@/lib/profile/github";
 import { codewarsFact, codewarsProfileSchema, codewarsUsername } from "@/lib/profile/codewars";
 import { isEmptyCvDocument, structureCv } from "@/lib/profile/cv-document";
 import { factKey, proposeFactsFromText } from "@/lib/profile/extract-facts";

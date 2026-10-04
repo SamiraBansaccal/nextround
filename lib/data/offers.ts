@@ -2,7 +2,7 @@ import "server-only";
 import { and, desc, eq } from "drizzle-orm";
 import { getDb } from "@/lib/db";
 import { offerContacts, offers, requirements } from "@/lib/db/schema";
-import { isUuid } from "@/lib/ids";
+import { isUuid } from "@/lib/shared/ids";
 import type { VerifiedExtraction } from "@/lib/offers/extract";
 import type { SourceSite } from "@/lib/types";
 
