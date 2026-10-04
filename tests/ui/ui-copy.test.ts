@@ -1,5 +1,4 @@
 import { describe, expect, it } from "vitest";
-import { DASHBOARD_COPY } from "@/lib/i18n/dashboard";
 import { DOCUMENTS_COPY } from "@/lib/i18n/documents";
 import { OFFERS_COPY } from "@/lib/i18n/offers";
 import { PROFILE_COPY } from "@/lib/i18n/profile";
@@ -22,7 +21,6 @@ describe.each([
   ["offers", OFFERS_COPY],
   ["profile", PROFILE_COPY],
   ["documents", DOCUMENTS_COPY],
-  ["dashboard", DASHBOARD_COPY],
   ["settings", SETTINGS_COPY],
 ] as const)("%s copy", (_, copy) => {
   const en = new Map(flatten(copy.en));

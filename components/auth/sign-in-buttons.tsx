@@ -17,11 +17,11 @@ export function SignInButtons() {
     setFailed(false);
     try {
       // Goes to GitHub/Google, comes back to /sso-callback (which also creates the account
-      // on first sign-in), then lands on the dashboard.
+      // on first sign-in), then lands on the profile.
       await signIn.authenticateWithRedirect({
         strategy,
         redirectUrl: "/sso-callback",
-        redirectUrlComplete: "/dashboard",
+        redirectUrlComplete: "/profile",
       });
     } catch {
       setFailed(true);

@@ -37,9 +37,13 @@ test("every signed-in screen", async ({ page }, info) => {
 
   await page.goto("/");
   await clerk.signIn({ page, emailAddress: E2E_EMAIL });
+  // No dashboard: the profile is the home page, and old /dashboard links land on it.
+  await page.goto("/");
+  await expect(page).toHaveURL(/\/profile$/);
+  await page.goto("/dashboard");
+  await expect(page).toHaveURL(/\/profile$/);
 
   const screens: [string, string][] = [
-    ["01-dashboard", "/dashboard"],
     ["02-profile", "/profile"],
     ["03-offers", "/offers"],
     ["04-offer", `/offers/${ids.offerId}`],
@@ -58,7 +62,6 @@ test("every signed-in screen", async ({ page }, info) => {
   // The same main screens with the site in French (the language cookie set by the EN/FR switch).
   await page.context().addCookies([{ name: "nextround-ui-lang", value: "fr", url: page.url() }]);
   const french: [string, string][] = [
-    ["fr-01-dashboard", "/dashboard"],
     ["fr-02-profile", "/profile"],
     ["fr-03-offers", "/offers"],
     ["fr-04-offer", `/offers/${ids.offerId}`],

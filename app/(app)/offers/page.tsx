@@ -1,11 +1,10 @@
 import { Briefcase } from "lucide-react";
 import Image from "next/image";
 import { AddOfferForm } from "@/components/offers/add-offer-form";
-import { Opportunities } from "@/components/dashboard/opportunities";
+import { Opportunities } from "@/components/offers/opportunities";
 import { PageHeading } from "@/components/layout/page-heading";
 import { requireUserId } from "@/lib/server/auth";
 import { listFacts } from "@/lib/data/facts";
-import { DASHBOARD_COPY } from "@/lib/i18n/dashboard";
 import { OFFERS_COPY } from "@/lib/i18n/offers";
 import { getUiLang } from "@/lib/i18n/server";
 import { countInterviewsByOffer } from "@/lib/data/interviews";
@@ -47,7 +46,7 @@ export default async function OffersPage() {
           <p className="text-sm text-muted-foreground">{t.noOffersHint}</p>
         </div>
       ) : (
-        <Opportunities cards={cards} move={setOfferStatusAction} lang={lang} t={DASHBOARD_COPY[lang]} heading={false} grid="sm:grid-cols-2 xl:grid-cols-3" />
+        <Opportunities cards={cards} move={setOfferStatusAction} lang={lang} />
       )}
     </div>
   );

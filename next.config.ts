@@ -15,6 +15,10 @@ const nextConfig: NextConfig = {
   async headers() {
     return [{ source: "/(.*)", headers: SECURITY_HEADERS }];
   },
+  async redirects() {
+    // The dashboard is gone (ADR 0024): old links and bookmarks land on the profile, the new home page.
+    return [{ source: "/dashboard", destination: "/profile", permanent: false }];
+  },
 };
 
 export default nextConfig;

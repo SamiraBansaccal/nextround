@@ -11,7 +11,6 @@ export function toUiLang(value: unknown): UiLang {
 
 const en = {
   // Shell
-  navDashboard: "Dashboard",
   navOffers: "Offers",
   navInterviews: "Interviews",
   navProfile: "Profile",
@@ -61,7 +60,6 @@ const en = {
 export type UiCopy = typeof en;
 
 const fr: UiCopy = {
-  navDashboard: "Tableau de bord",
   navOffers: "Offres",
   navInterviews: "Entretiens",
   navProfile: "Profil",

@@ -15,7 +15,7 @@ const VALUE_PROPS = [
 
 export default async function LandingPage() {
   const { userId } = await auth();
-  if (userId) redirect("/dashboard");
+  if (userId) redirect("/profile");
 
   return (
     <div className="min-h-screen">

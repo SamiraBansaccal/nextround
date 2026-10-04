@@ -31,11 +31,10 @@ The checks are done by code, not by the AI ([ADR 0003](docs/en/adr/0003-ai-propo
 
 | | Feature |
 |---|---|
-| 👤 | **Profile**: import CVs (PDF, read in the browser), GitHub repositories, Codewars, a 5-question chat; review proposed facts in place, under the CV line they come from; mark projects built with AI (they never count as mastery of their stack) |
-| 💼 | **Offers**: add by link or pasted text; each requirement highlighted green (covered by a validated fact) or red (gap); how to apply, with contacts found in the offer only |
+| 👤 | **Profile** (the home page): import CVs (PDF, read in the browser), GitHub repositories, Codewars, a 5-question chat; review proposed facts in place, under the CV line they come from; mark projects built with AI (they never count as mastery of their stack) |
+| 💼 | **Offers**: add by link or pasted text; each requirement highlighted green (covered by a validated fact) or red (gap); how to apply, with contacts found in the offer only; offers grouped by career track, each card with its stage (Saved → Applied → Interview → Offer / Rejected) and follow-up reminder |
 | 📄 | **Tailored CV and cover letter**, in English or French, every line backed by facts; keep one in your profile and start the next one from it |
 | 🎙️ | **Interview practice**: choose an offer, a technology (42, grouped in tracks) or HR questions; pick one of 110 interviewers; camera and mic check; questions written in advance in real English and French, with model answers; AI feedback on your own answers only |
-| 📊 | **Dashboard**: the application pipeline (Saved → Applied → Interview → Offer / Rejected) with follow-up reminders |
 | 🌍 | **Site in English or French**, independent from each interview's and each document's language |
 
 ## 🧱 Stack
