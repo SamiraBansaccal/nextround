@@ -6,7 +6,7 @@ const stub = (f) => path.join(root, ".preview/stubs", f);
 const map = {
   "@/lib/auth": stub("auth.ts"), "@/lib/data/offers": stub("offers.ts"), "@/lib/data/interviews": stub("interviews.ts"),
   "../actions": stub("actions.ts"), "./actions": stub("actions.ts"), "next/link": stub("next-link.tsx"), "next/image": stub("next-image.tsx"),
-  "next/navigation": stub("next-navigation.ts"), "server-only": stub("empty.ts"), "@clerk/nextjs": stub("clerk.tsx"),
+  "next/navigation": stub("next-navigation.ts"), "server-only": stub("empty.ts"), "@clerk/nextjs": stub("clerk.tsx"), "@/lib/i18n/server": stub("i18n.ts"),
 };
 await build({
   entryPoints: [".preview/entry.tsx"], bundle: true, outfile: ".preview/app.js", format: "esm", jsx: "automatic", target: "es2022",
