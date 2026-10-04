@@ -40,7 +40,7 @@ beforeAll(async () => {
     },
   });
   offerId = offer.id;
-  interviewId = await interviewsData.createInterview(A, offerId, [{ group: "hr", text: "Introduce yourself", source: "Standard HR question", suggestedAnswer: [] }]);
+  interviewId = await interviewsData.createInterview(A, offerId, [{ group: "hr", type: "introduction", text: "Introduce yourself", source: "Standard HR question", suggestedAnswer: [] }], "homer-simpson");
   questionId = (await interviewsData.getInterview(A, interviewId))!.questions[0].id;
   await interviewsData.saveAnswer(A, questionId, "Hello", {
     star: { rating: "good", comment: "ok" },
@@ -74,6 +74,12 @@ describe("offers, requirements and contacts", () => {
 });
 
 describe("interviews, questions and answers", () => {
+  it("keeps the chosen interviewer and the question type", async () => {
+    const own = await interviewsData.getInterview(A, interviewId);
+    expect(own?.interview.interviewerId).toBe("homer-simpson");
+    expect(own?.questions[0].type).toBe("introduction");
+  });
+
   it("B cannot read A's interview, its questions or its answers", async () => {
     expect(await interviewsData.getInterview(B, interviewId)).toBeNull();
     expect(await interviewsData.getQuestionWithOffer(B, questionId)).toBeNull();

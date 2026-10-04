@@ -3,20 +3,22 @@ import { and, asc, desc, eq, inArray } from "drizzle-orm";
 import { getDb } from "@/lib/db";
 import { answers, interviews, offers, questions } from "@/lib/db/schema";
 import { isUuid } from "@/lib/ids";
+import { DEFAULT_INTERVIEWER_ID } from "@/lib/interviewers";
 import type { GeneratedQuestion } from "@/lib/interview/generate";
 import type { Feedback } from "@/lib/types";
 
 // Interviews, questions and answers: every query filters on the session user id.
 
-export async function createInterview(userId: string, offerId: string, generated: GeneratedQuestion[]): Promise<string> {
+export async function createInterview(userId: string, offerId: string, generated: GeneratedQuestion[], interviewerId: string = DEFAULT_INTERVIEWER_ID): Promise<string> {
   const db = getDb();
-  const [interview] = await db.insert(interviews).values({ userId, offerId, mode: "text" }).returning({ id: interviews.id });
+  const [interview] = await db.insert(interviews).values({ userId, offerId, mode: "text", interviewerId }).returning({ id: interviews.id });
   await db.insert(questions).values(
     generated.map((q, i) => ({
       userId,
       interviewId: interview.id,
       position: i,
       group: q.group,
+      type: q.type ?? null,
       text: q.text,
       source: q.source,
       suggestedAnswer: q.suggestedAnswer,
@@ -82,7 +84,7 @@ export async function getQuestionWithOffer(userId: string, questionId: string) {
   const [offer] = interview
     ? await db.select().from(offers).where(and(eq(offers.id, interview.offerId), eq(offers.userId, userId))).limit(1)
     : [];
-  return { question, offer: offer ?? null };
+  return { question, interview: interview ?? null, offer: offer ?? null };
 }
 
 export async function saveAnswer(userId: string, questionId: string, answer: string, feedback: Feedback) {
@@ -101,6 +103,7 @@ export async function countInterviewsByOffer(userId: string): Promise<Map<string
 export interface InterviewListItem {
   id: string;
   offerId: string;
+  interviewerId: string;
   offerTitle: string | null;
   company: string | null;
   createdAt: Date;
@@ -112,7 +115,7 @@ export interface InterviewListItem {
 export async function listInterviewsWithProgress(userId: string): Promise<InterviewListItem[]> {
   const db = getDb();
   const rows = await db
-    .select({ id: interviews.id, offerId: interviews.offerId, createdAt: interviews.createdAt, title: offers.title, company: offers.company })
+    .select({ id: interviews.id, offerId: interviews.offerId, interviewerId: interviews.interviewerId, createdAt: interviews.createdAt, title: offers.title, company: offers.company })
     .from(interviews)
     .innerJoin(offers, and(eq(offers.id, interviews.offerId), eq(offers.userId, userId)))
     .where(eq(interviews.userId, userId))
@@ -137,6 +140,7 @@ export async function listInterviewsWithProgress(userId: string): Promise<Interv
     return {
       id: r.id,
       offerId: r.offerId,
+      interviewerId: r.interviewerId,
       offerTitle: r.title,
       company: r.company,
       createdAt: r.createdAt,

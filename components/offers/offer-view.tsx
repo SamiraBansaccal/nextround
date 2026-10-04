@@ -13,7 +13,6 @@ import {
   FileText,
   Languages,
   Link2,
-  Loader2,
   Mail,
   MapPin,
   Phone,
@@ -68,7 +67,6 @@ export interface OfferViewData {
 interface Props extends OfferViewData {
   actions: {
     markApplied: (offerId: string) => Promise<{ ok: boolean }>;
-    startInterview: (offerId: string) => Promise<{ ok: true; interviewId: string } | { ok: false; error: string }>;
   };
 }
 
@@ -88,18 +86,8 @@ export function OfferView({ offer, segments, requirements, contacts, score, inte
   const [selectedId, setSelectedId] = useState<string | null>(null);
   const [matchOpen, setMatchOpen] = useState(true);
   const [pending, startTransition] = useTransition();
-  const [error, setError] = useState<string | null>(null);
   const byId = new Map(requirements.map((r) => [r.id, r]));
   const selected = selectedId ? byId.get(selectedId) : undefined;
-
-  function startInterview() {
-    setError(null);
-    startTransition(async () => {
-      const result = await actions.startInterview(offer.id);
-      if (result.ok) router.push(`/interview/${result.interviewId}`);
-      else setError(result.error);
-    });
-  }
 
   return (
     <>
@@ -249,18 +237,15 @@ export function OfferView({ offer, segments, requirements, contacts, score, inte
             <Sparkles className="size-6 text-terracotta" aria-hidden="true" />
             <h2 className="mt-5 text-2xl">Ready to practise?</h2>
             <p className="mt-2 text-sm text-earth-foreground/75">
-              A one-to-one call with a simulated recruiter, built from this offer&apos;s stack and your validated profile.
+              A one-to-one video call, built from this offer&apos;s stack and your validated profile. Choose who interviews you.
             </p>
-            <Button size="lg" className="mt-6 w-full bg-terracotta text-earth-foreground hover:bg-terracotta/90" disabled={pending} onClick={startInterview}>
-              {pending ? <Loader2 className="size-4 animate-spin" aria-hidden="true" /> : <Play className="size-4" aria-hidden="true" />}
-              Start interview simulation
+            <Button asChild size="lg" className="mt-6 w-full bg-terracotta text-earth-foreground hover:bg-terracotta/90">
+              <Link href={`/interview/new?offer=${offer.id}`}>
+                <Play className="size-4" aria-hidden="true" /> Start interview simulation
+              </Link>
             </Button>
-            <p aria-live="polite" className="mt-3 min-h-5 text-sm">
-              {pending && <span className="text-earth-foreground/75">Preparing 10 questions on this offer… up to a minute with free models.</span>}
-              {error && <span className="font-semibold">{error}</span>}
-            </p>
             {interviewIds.length > 0 && (
-              <div className="mt-2 border-t border-earth-foreground/15 pt-3 text-sm">
+              <div className="mt-4 border-t border-earth-foreground/15 pt-3 text-sm">
                 <p className="mb-1 text-earth-foreground/60">Previous practice</p>
                 <div className="flex flex-wrap gap-2">
                   {interviewIds.map((id, i) => (

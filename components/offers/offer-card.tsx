@@ -40,7 +40,7 @@ export function OfferCard({ card, footer }: { card: PipelineCardData; footer?: R
       )}
       <div className="mt-5 flex flex-wrap items-center justify-between gap-3">
         <Button asChild variant="outline" size="sm" className="w-full bg-background/70 sm:w-auto">
-          <Link href={`/offers/${card.id}#practise`}>
+          <Link href={`/interview/new?offer=${card.id}`}>
             <Play className="size-3.5" aria-hidden="true" /> Practise interview
           </Link>
         </Button>

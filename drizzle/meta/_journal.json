@@ -15,6 +15,13 @@
       "when": 1791101719401,
       "tag": "0001_cv_document",
       "breakpoints": true
+    },
+    {
+      "idx": 2,
+      "version": "7",
+      "when": 1791105303110,
+      "tag": "0002_interviewers",
+      "breakpoints": true
     }
   ]
 }

@@ -6,6 +6,7 @@ import { Button } from "@/components/ui/button";
 import { getAccount } from "@/lib/auth";
 import { getInterview } from "@/lib/data/interviews";
 import { summarizeInterview } from "@/lib/interview/summary";
+import { getInterviewer } from "@/lib/interviewers";
 
 // End-of-interview summary (layout from the Lovable prototype), computed by code from the verified
 // feedback: no extra AI call, nothing that the feedback did not already say.
@@ -21,7 +22,7 @@ export default async function SummaryPage({ params }: PageProps<"/interview/[id]
   return (
     <div>
       <PageHeading
-        eyebrow={`Interview complete · ${[data.offer?.title, data.offer?.company].filter(Boolean).join(" · ")}`}
+        eyebrow={`Interview with ${getInterviewer(data.interview.interviewerId).name} · ${[data.offer?.title, data.offer?.company].filter(Boolean).join(" · ")}`}
         title={summary.answered ? `Well done, ${account.displayName}. Here's what stood out.` : "No answer yet in this interview."}
       >
         <Button asChild>

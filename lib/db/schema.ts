@@ -135,6 +135,8 @@ export const interviews = pgTable(
       .notNull()
       .references(() => offers.id, { onDelete: "cascade" }),
     mode: interviewMode("mode").notNull().default("text"),
+    // Who asks the questions: an id of the catalog in lib/interviewers/ (code data, so no foreign key).
+    interviewerId: text("interviewer_id").notNull().default("marie"),
     createdAt: createdAt(),
   },
   (t) => [index("interviews_user_idx").on(t.userId)],
@@ -150,6 +152,7 @@ export const questions = pgTable(
       .references(() => interviews.id, { onDelete: "cascade" }),
     position: integer("position").notNull(),
     group: questionGroup("group").notNull(),
+    type: text("type"), // finer label (introduction, motivation…), see lib/interview/question-types.ts
     text: text("text").notNull(),
     source: text("source").notNull(), // why this question was asked (offer quote, gap…)
     suggestedAnswer: jsonb("suggested_answer").$type<SourcedSentence[]>().notNull().default([]),

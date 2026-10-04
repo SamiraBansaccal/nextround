@@ -53,6 +53,26 @@ test("every signed-in screen", async ({ page }, info) => {
     await page.goto(path);
     await check(page, name, info.project.name);
   }
+  // The interview flow: choose an interviewer, see the question in its own panel, type an answer.
+  await page.goto(`/interview/new?offer=${ids.offerId}`);
+  await expect(page.getByRole("heading", { name: "Choose your interviewer" })).toBeVisible();
+  await expect(page.locator("#preview-name")).toHaveText("Marie"); // the default interviewer
+  await page.getByRole("button", { name: /The Simpsons/ }).click();
+  await page.getByRole("button", { name: /Mr\. Burns/ }).click();
+  await expect(page.locator("#preview-name")).toHaveText("Mr. Burns");
+  await expect(page.getByText("Fan parody of a fictional character", { exact: false }).first()).toBeVisible();
+  await expect(page.getByRole("button", { name: "Start the interview" })).toBeEnabled();
+  await check(page, "06b-interviewer-picker", info.project.name);
+
+  await page.goto(`/interview/${ids.interviewId}`);
+  await expect(page.getByRole("heading", { level: 1, name: "Interview with Mr. Burns" })).toBeVisible();
+  const panel = page.locator("aside", { has: page.locator("#question-heading") });
+  await expect(panel.getByRole("heading", { level: 2 })).toHaveText("Pouvez-vous vous présenter brièvement ?");
+  await expect(panel.getByText("Introduction").first()).toBeVisible(); // the type badge (the list below repeats it)
+  await page.getByRole("textbox", { name: "Your answer" }).fill("Je suis développeuse junior.");
+  await expect(page.getByText("/3000")).toContainText("28/3000");
+  await expect(page.getByRole("button", { name: "Submit answer" })).toBeEnabled();
+
   // Dark mode on the two richest screens.
   for (const [name, path] of [["04-offer", `/offers/${ids.offerId}`], ["07-interview-call", `/interview/${ids.interviewId}`]] as const) {
     await page.goto(path);

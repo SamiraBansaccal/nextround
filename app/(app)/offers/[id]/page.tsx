@@ -6,7 +6,6 @@ import { listFacts } from "@/lib/data/facts";
 import { listInterviewIdsForOffer } from "@/lib/data/interviews";
 import { getOfferDetail, matchScore } from "@/lib/data/offers";
 import { highlightSegments } from "@/lib/offers/segments";
-import { startInterviewAction } from "../../interview/actions";
 import { markAppliedAction } from "../actions";
 import { formatDay } from "@/lib/dates";
 import { documentPlainText } from "@/lib/documents/plain-text";
@@ -67,7 +66,7 @@ export default async function OfferPage({ params }: PageProps<"/offers/[id]">) {
       score={matchScore(detail.requirements, validIds)}
       interviewIds={interviewIds}
       documents={{ cv: docSummary(docs.find((d) => d.kind === "cv")), letter: docSummary(docs.find((d) => d.kind === "cover_letter")) }}
-      actions={{ markApplied: markAppliedAction, startInterview: startInterviewAction }}
+      actions={{ markApplied: markAppliedAction }}
     />
   );
 }

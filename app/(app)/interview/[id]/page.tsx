@@ -4,6 +4,9 @@ import { getAiStatus } from "@/lib/ai/config";
 import { getAccount } from "@/lib/auth";
 import { listFacts } from "@/lib/data/facts";
 import { getInterview } from "@/lib/data/interviews";
+import { questionLabel } from "@/lib/interview/question-types";
+import { getInterviewer } from "@/lib/interviewers";
+import { KIND_NOTICE } from "@/lib/interviewers/labels";
 import { submitAnswerAction } from "../actions";
 
 export const maxDuration = 120;
@@ -19,6 +22,7 @@ export default async function InterviewPage({ params, searchParams }: PageProps<
   const latest = new Map<string, (typeof data.answers)[number]>();
   for (const a of data.answers) if (!latest.has(a.questionId)) latest.set(a.questionId, a); // answers are newest first
   const start = Math.min(Math.max(Number(q) || 0, 0), Math.max(data.questions.length - 1, 0));
+  const interviewer = getInterviewer(data.interview.interviewerId);
 
   return (
     <InterviewSession
@@ -26,11 +30,13 @@ export default async function InterviewPage({ params, searchParams }: PageProps<
       offerId={data.offer?.id ?? null}
       me={{ name: account.fullName, imageUrl: account.imageUrl }}
       offerTitle={[data.offer?.title, data.offer?.company].filter(Boolean).join(" · ") || "Interview practice"}
+      interviewer={{ id: interviewer.id, name: interviewer.name, role: interviewer.role, image: interviewer.image, notice: KIND_NOTICE[interviewer.kind] }}
       questions={data.questions.map((question) => {
         const answer = latest.get(question.id);
         return {
           id: question.id,
           group: question.group,
+          label: questionLabel(question.group, question.type),
           text: question.text,
           source: question.source,
           suggestedAnswer: question.suggestedAnswer,

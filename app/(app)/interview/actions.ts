@@ -9,12 +9,20 @@ import { createInterview, getQuestionWithOffer, saveAnswer } from "@/lib/data/in
 import { getOfferDetail } from "@/lib/data/offers";
 import { answerFeedback, MAX_ANSWER } from "@/lib/interview/feedback";
 import { generateQuestions } from "@/lib/interview/generate";
+import { findInterviewer } from "@/lib/interviewers";
+import { personaInstructions } from "@/lib/interviewers/persona";
 import type { Feedback } from "@/lib/types";
 
-export async function startInterviewAction(offerId: unknown): Promise<{ ok: true; interviewId: string } | { ok: false; error: string }> {
+const startSchema = z.object({ offerId: z.string().uuid(), interviewerId: z.string().trim().min(1).max(80) });
+
+/** Creates an interview on an offer, with the chosen interviewer: questions are phrased in their style. */
+export async function startInterviewAction(input: unknown): Promise<{ ok: true; interviewId: string } | { ok: false; error: string }> {
   const account = await getAccount();
-  if (typeof offerId !== "string") return { ok: false, error: "Offer not found." };
-  const detail = await getOfferDetail(account.userId, offerId);
+  const parsed = startSchema.safeParse(input);
+  if (!parsed.success) return { ok: false, error: "Offer not found." };
+  const interviewer = findInterviewer(parsed.data.interviewerId);
+  if (!interviewer) return { ok: false, error: "Choose an interviewer first." };
+  const detail = await getOfferDetail(account.userId, parsed.data.offerId);
   if (!detail) return { ok: false, error: "Offer not found." };
   const facts = (await listFacts(account.userId)).filter((f) => f.validated);
   const valid = new Set(facts.map((f) => f.id));
@@ -29,9 +37,10 @@ export async function startInterviewAction(offerId: unknown): Promise<{ ok: true
         requirements: detail.requirements.map((r) => ({ text: r.text, quote: r.quote, covered: r.factIds.some((id) => valid.has(id)) })),
       },
       facts,
+      personaInstructions(interviewer),
     );
     if (generated.length < 4) return { ok: false, error: "This model could not return valid output — try another model." };
-    const interviewId = await createInterview(account.userId, detail.offer.id, generated);
+    const interviewId = await createInterview(account.userId, detail.offer.id, generated, interviewer.id);
     revalidatePath("/", "layout");
     return { ok: true, interviewId };
   } catch (error) {
