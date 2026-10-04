@@ -191,7 +191,7 @@ export function InterviewSession(props: Props) {
           <CallStage
             interviewer={interviewer}
             me={me}
-            self={{ attach: media.attach, live: media.camera && media.hasVideo, microphone: media.microphone }}
+            self={{ attach: media.attach, live: media.videoLive, microphone: media.microphone }}
             timer={timer}
             speaking={voice.speaking}
             listening={voice.listening}

@@ -77,7 +77,7 @@ export function InterviewSetup({ offer, me, categories, interviewers, defaultInt
     { id: "technical", label: t.focusTechnical, hint: t.focusTechnicalHint, Icon: Code2 },
     { id: "both", label: t.focusBoth, hint: t.focusBothHint, Icon: Layers },
   ];
-  const live = media.camera && media.hasVideo;
+  const live = media.videoLive;
 
   return (
     <div className="space-y-8" lang={language}>
