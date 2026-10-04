@@ -1,0 +1,1 @@
+ALTER TYPE "public"."fact_source" ADD VALUE 'leetcode' BEFORE 'cv_upload';

@@ -11,7 +11,7 @@ import { DOCUMENTS_COPY } from "@/lib/i18n/documents";
 import { getUiLang } from "@/lib/i18n/server";
 import { factIndex, isCovered, provingFactIds } from "@/lib/offers/coverage";
 import type { DocumentLanguage, TailoredCv, TailoredLetter } from "@/lib/types";
-import { generateCvAction, generateLetterAction, keepDocumentAction } from "./actions";
+import { editDocumentLineAction, generateCvAction, generateLetterAction, keepDocumentAction } from "./actions";
 
 export const maxDuration = 120;
 
@@ -74,7 +74,7 @@ export default async function OfferCvPage({ params, searchParams }: PageProps<"/
         requirements: [...covered.map((r) => ({ text: r.text, covered: true })), ...gaps.map((r) => ({ text: r.text, covered: false }))],
         unusedFacts: validated.filter((f) => relevant.has(f.id) && !used.has(f.id)).map((f) => f.text),
       }}
-      actions={{ generateCv: generateCvAction, generateLetter: generateLetterAction, keep: keepDocumentAction }}
+      actions={{ generateCv: generateCvAction, generateLetter: generateLetterAction, keep: keepDocumentAction, editLine: editDocumentLineAction }}
       autoPrint={print === "1"}
     />
   );

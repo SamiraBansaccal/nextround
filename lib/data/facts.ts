@@ -54,3 +54,13 @@ export async function deleteFact(userId: string, id: string): Promise<boolean> {
     .returning({ id: profileFacts.id });
   return rows.length > 0;
 }
+
+/** Facts imported before "everything is validated by default" (ADR 0022): validated in one go. Returns how many. */
+export async function validateLegacyFacts(userId: string): Promise<number> {
+  const rows = await getDb()
+    .update(profileFacts)
+    .set({ validated: true })
+    .where(and(eq(profileFacts.userId, userId), eq(profileFacts.validated, false)))
+    .returning({ id: profileFacts.id });
+  return rows.length;
+}

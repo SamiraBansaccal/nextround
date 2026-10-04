@@ -7,7 +7,8 @@ import { isQuoteIn } from "@/lib/ai/verify";
 
 // Facts proposed from a CV / LinkedIn PDF text, or from the onboarding chat answers.
 // Each proposed fact MUST come with a verbatim quote from the source; unverified quotes are dropped.
-// Proposed facts are NOT validated: the user keeps, edits or rejects each one.
+// The source is the candidate's own CV or answers, so the facts are saved as validated; the candidate
+// can still edit or delete any of them on the profile page.
 
 const TYPES = ["experience", "skill", "project", "education", "language", "achievement"] as const;
 

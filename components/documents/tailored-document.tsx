@@ -1,14 +1,32 @@
 import { AlertTriangle, Check, Sparkles } from "lucide-react";
 import type { ReactNode } from "react";
+import { EditableLine, type EditableLineCopy } from "@/components/shared/editable-line";
+import type { DocEditPath } from "@/lib/documents/edit";
 import { DOC_HEADINGS } from "@/lib/documents/render";
 import type { SourcedSentence, TailoredCv, TailoredEntry, TailoredItem, TailoredLetter } from "@/lib/types";
 import { cn } from "@/lib/utils";
 
 // A CV written for one offer, laid out like a tech CV (header, profile, skills table, projects, education,
 // experience, languages), and its cover letter. On screen, each line shows whether facts prove it; the
-// marks are hidden when printing.
+// marks are hidden when printing. With `edit`, each sentence gets a small pencil to change it by hand,
+// without writing the document again.
 
 type Facts = Record<string, string>;
+
+export interface DocEditing {
+  save: (path: DocEditPath, value: string) => Promise<boolean>;
+  t: EditableLineCopy & { emptyRemoves: string };
+}
+
+/** A piece of text, editable when the page allows it. */
+function Editable({ edit, path, value, removable = true, children }: { edit?: DocEditing; path: DocEditPath; value: string; removable?: boolean; children?: ReactNode }) {
+  if (!edit) return <>{children ?? value}</>;
+  return (
+    <EditableLine value={value} onSave={(next) => edit.save(path, next)} t={edit.t} hint={removable ? edit.t.emptyRemoves : undefined}>
+      {children}
+    </EditableLine>
+  );
+}
 
 function Proof({ factIds, facts }: { factIds: string[]; facts: Facts }) {
   if (factIds.length === 0) {
@@ -25,10 +43,12 @@ function Proof({ factIds, facts }: { factIds: string[]; facts: Facts }) {
   );
 }
 
-function Line({ s, facts }: { s: SourcedSentence & { fromOffer?: boolean }; facts: Facts }) {
+function Line({ s, facts, edit, path }: { s: SourcedSentence & { fromOffer?: boolean }; facts: Facts; edit?: DocEditing; path: DocEditPath }) {
   return (
     <>
-      <span className={cn(s.factIds.length === 0 && !s.fromOffer && "unsupported-underline")}>{s.text}</span>
+      <Editable edit={edit} path={path} value={s.text}>
+        <span className={cn(s.factIds.length === 0 && !s.fromOffer && "unsupported-underline")}>{s.text}</span>
+      </Editable>
       {s.fromOffer ? (
         <span className="no-print ml-1 rounded-full bg-muted px-1.5 py-0.5 align-middle text-[10px] text-muted-foreground">offer</span>
       ) : (
@@ -51,7 +71,21 @@ function Tags({ items }: { items: TailoredItem[] }) {
   );
 }
 
-function Entry({ entry, facts, builtWithAi }: { entry: TailoredEntry; facts: Facts; builtWithAi: string }) {
+function Entry({
+  entry,
+  facts,
+  builtWithAi,
+  edit,
+  section,
+  index,
+}: {
+  entry: TailoredEntry;
+  facts: Facts;
+  builtWithAi: string;
+  edit?: DocEditing;
+  section: "projects" | "education" | "experience";
+  index: number;
+}) {
   return (
     <div className="break-inside-avoid py-2.5">
       <h4 className="font-sans text-base font-bold text-earth italic dark:text-foreground">{entry.title}</h4>
@@ -76,7 +110,7 @@ function Entry({ entry, facts, builtWithAi }: { entry: TailoredEntry; facts: Fac
         <ul className="mt-2 list-disc space-y-1 pl-5 text-sm leading-relaxed">
           {entry.bullets.map((b, i) => (
             <li key={i}>
-              <Line s={b} facts={facts} />
+              <Line s={b} facts={facts} edit={edit} path={{ part: "bullet", section, entry: index, index: i }} />
             </li>
           ))}
         </ul>
@@ -98,17 +132,23 @@ export function TailoredCvDocument({
   cv,
   candidate,
   facts,
+  edit,
 }: {
   cv: TailoredCv;
   candidate: { name: string; contacts: { kind: string; value: string }[] };
   facts: Facts;
+  edit?: DocEditing;
 }) {
   const t = DOC_HEADINGS[cv.language];
   return (
     <article className="print-page overflow-hidden border border-earth/20 bg-card shadow-soft" lang={cv.language} aria-label={`${candidate.name} — CV`}>
       <header className="bg-primary-soft/60 px-6 py-6 text-center sm:px-10">
         <h2 className="text-3xl text-earth sm:text-4xl dark:text-foreground">{candidate.name}</h2>
-        {cv.headline && <p className="mt-1 font-sans text-lg font-bold text-earth dark:text-foreground">{cv.headline}</p>}
+        {cv.headline && (
+          <p className="mt-1 font-sans text-lg font-bold text-earth dark:text-foreground">
+            <Editable edit={edit} path={{ part: "headline" }} value={cv.headline} />
+          </p>
+        )}
         {candidate.contacts.length > 0 && <p className="mt-2 text-sm text-muted-foreground">{candidate.contacts.map((c) => c.value).join(" · ")}</p>}
       </header>
       <div className="space-y-2 px-6 py-5 sm:px-10">
@@ -117,7 +157,7 @@ export function TailoredCvDocument({
             <p className="border-l-4 border-primary/40 pl-4 text-sm leading-relaxed">
               {cv.summary.map((s, i) => (
                 <span key={i}>
-                  <Line s={s} facts={facts} />{" "}
+                  <Line s={s} facts={facts} edit={edit} path={{ part: "summary", index: i }} />{" "}
                 </span>
               ))}
             </p>
@@ -143,8 +183,8 @@ export function TailoredCvDocument({
         )}
         {(cv.projects.length > 0 || cv.moreProjects.length > 0) && (
           <Section title={t.projects}>
-            {cv.projects.map((p) => (
-              <Entry key={p.title} entry={p} facts={facts} builtWithAi={t.builtWithAi} />
+            {cv.projects.map((p, i) => (
+              <Entry key={p.title} entry={p} facts={facts} builtWithAi={t.builtWithAi} edit={edit} section="projects" index={i} />
             ))}
             {cv.moreProjects.length > 0 && (
               <p className="pt-2 text-sm">
@@ -155,15 +195,15 @@ export function TailoredCvDocument({
         )}
         {cv.education.length > 0 && (
           <Section title={t.education}>
-            {cv.education.map((e) => (
-              <Entry key={e.title} entry={e} facts={facts} builtWithAi={t.builtWithAi} />
+            {cv.education.map((e, i) => (
+              <Entry key={e.title} entry={e} facts={facts} builtWithAi={t.builtWithAi} edit={edit} section="education" index={i} />
             ))}
           </Section>
         )}
         {cv.experience.length > 0 && (
           <Section title={t.experience}>
-            {cv.experience.map((e) => (
-              <Entry key={e.title} entry={e} facts={facts} builtWithAi={t.builtWithAi} />
+            {cv.experience.map((e, i) => (
+              <Entry key={e.title} entry={e} facts={facts} builtWithAi={t.builtWithAi} edit={edit} section="experience" index={i} />
             ))}
           </Section>
         )}
@@ -184,20 +224,24 @@ export function TailoredCvDocument({
   );
 }
 
-export function TailoredLetterDocument({ letter, facts }: { letter: TailoredLetter; facts: Facts }) {
+export function TailoredLetterDocument({ letter, facts, edit }: { letter: TailoredLetter; facts: Facts; edit?: DocEditing }) {
   return (
     <div className="space-y-4 text-sm leading-relaxed" lang={letter.language}>
-      <p>{letter.greeting}</p>
+      <p>
+        <Editable edit={edit} path={{ part: "greeting" }} value={letter.greeting} removable={false} />
+      </p>
       {letter.paragraphs.map((paragraph, i) => (
         <p key={i}>
           {paragraph.map((s, j) => (
             <span key={j}>
-              <Line s={s} facts={facts} />{" "}
+              <Line s={s} facts={facts} edit={edit} path={{ part: "sentence", paragraph: i, index: j }} />{" "}
             </span>
           ))}
         </p>
       ))}
-      <p className="whitespace-pre-line">{letter.closing}</p>
+      <p className="whitespace-pre-line">
+        <Editable edit={edit} path={{ part: "closing" }} value={letter.closing} removable={false} />
+      </p>
     </div>
   );
 }

@@ -44,8 +44,8 @@ for (const file of files) {
   for (const fact of factsResult.value.facts) {
     if (known.has(factKey(fact.text))) continue;
     known.add(factKey(fact.text));
-    await createFact(ctx.userId, { ...fact, source: "cv_upload", sourceRef: cvRef(source.id), validated: false });
+    await createFact(ctx.userId, { ...fact, source: "cv_upload", sourceRef: cvRef(source.id), validated: true });
     added++;
   }
-  console.log(`${name}: ${added} new facts to review, ${factsResult.value.dropped} dropped (quote not found), ${document ? "laid out" : "not laid out yet (retry from its card)"}.`);
+  console.log(`${name}: ${added} new facts, ${factsResult.value.dropped} dropped (quote not found), ${document ? "laid out" : "not laid out yet (retry from its card)"}.`);
 }

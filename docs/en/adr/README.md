@@ -35,6 +35,7 @@ without knowing why it was made.
 | 🌍 [0019](0019-three-languages.md) | Three independent languages: the site, each interview, each document | ✅ accepted |
 | 🔊 [0020](0020-paid-voice-is-opt-in.md) | Paid voice is opt-in, and a sentence is never paid twice | ✅ accepted |
 | 🗂️ [0021](0021-one-folder-per-domain.md) | One folder per domain, no loose files | ✅ accepted |
+| 👤 [0022](0022-profile-is-the-base.md) | The profile is the base: everything validated, merged, editable | ✅ accepted |
 
 > 📌 **Read the statuses.** An ADR is never deleted: when a decision changes, the old record stays
 > and says where the next step is. That is how one understands *why* a decision changed, and not

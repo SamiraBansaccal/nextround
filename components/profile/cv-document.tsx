@@ -1,10 +1,27 @@
 import { Cake, Flag, FolderGit2, Globe, Info, Link2, Mail, MapPin, Phone } from "lucide-react";
 import type { ReactNode } from "react";
-import type { FactPlace } from "@/lib/profile/place-facts";
+import { EditableLine, type EditableLineCopy } from "@/components/shared/editable-line";
+import type { CvEditPath } from "@/lib/profile/cv-edit";
 import type { CvContactKind, CvDocument, CvEntry } from "@/lib/types";
 
-// A CV shown as a document, as in the Lovable design (profile page). Display only: every string comes
-// from the verified document (lib/profile/cv-document.ts). Section titles follow the CV's language.
+// A CV shown as a document, as in the Lovable design (profile page). Every string comes from the
+// document laid out from the PDF (lib/profile/cv-document.ts). With `edit`, each line gets a small
+// pencil to fix it (a date, a typo, a capital letter). Section titles follow the CV's language.
+
+export interface CvEditing {
+  save: (path: CvEditPath, value: string) => Promise<boolean>;
+  t: EditableLineCopy & { emptyRemoves: string };
+}
+
+/** A line of the CV, editable when the page allows it. */
+function Line({ edit, path, value, removable = false, children }: { edit?: CvEditing; path: CvEditPath; value: string; removable?: boolean; children?: ReactNode }) {
+  if (!edit) return <>{children ?? value}</>;
+  return (
+    <EditableLine value={value} onSave={(next) => edit.save(path, next)} t={edit.t} hint={removable ? edit.t.emptyRemoves : undefined}>
+      {children}
+    </EditableLine>
+  );
+}
 
 const HEADINGS: Record<string, { cv: string; contact: string; experience: string; education: string; languages: string; skills: string; grid: string[] }> = {
   fr: { cv: "Curriculum Vitae", contact: "Coordonnées", experience: "Expériences", education: "Formations", languages: "Compétences linguistiques", skills: "Compétences", grid: ["Langue", "Compréhension orale", "Compréhension écrite", "Expression orale", "Interaction", "Écrit"] },
@@ -27,18 +44,7 @@ const CONTACT_ICON: Record<CvContactKind, ReactNode> = {
   other: <Info />,
 };
 
-/** `renderFacts`: what to show under each part of the CV (the facts proposed from it, to review in place). */
-export function CvDocumentView({
-  document,
-  fallbackName,
-  photoUrl,
-  renderFacts,
-}: {
-  document: CvDocument;
-  fallbackName: string;
-  photoUrl: string | null;
-  renderFacts?: (place: FactPlace) => ReactNode;
-}) {
+export function CvDocumentView({ document, fallbackName, photoUrl, edit }: { document: CvDocument; fallbackName: string; photoUrl: string | null; edit?: CvEditing }) {
   const t = HEADINGS[document.language] ?? HEADINGS.en;
   const name = document.name ?? fallbackName;
   const grid = document.languages.some((l) => l.listening || l.reading || l.spoken || l.interaction || l.writing);
@@ -49,7 +55,11 @@ export function CvDocumentView({
         <div className="min-w-0 text-center sm:text-left">
           <p className="font-display text-xl text-earth">{t.cv}</p>
           <h3 className="mt-1 text-3xl text-earth sm:text-4xl">{name}</h3>
-          {document.headline && <p className="mt-2 text-sm text-muted-foreground">{document.headline}</p>}
+          {document.headline && (
+            <p className="mt-2 text-sm text-muted-foreground">
+              <Line edit={edit} path={{ part: "headline" }} value={document.headline} removable />
+            </p>
+          )}
         </div>
         {photoUrl && (
           // eslint-disable-next-line @next/next/no-img-element -- the avatar comes from Clerk's CDN
@@ -77,8 +87,8 @@ export function CvDocumentView({
           </section>
         )}
 
-        <CvBlock title={t.experience} entries={document.experiences} place="experiences" renderFacts={renderFacts} />
-        <CvBlock title={t.education} entries={document.education} place="education" renderFacts={renderFacts} />
+        <CvBlock title={t.experience} entries={document.experiences} section="experiences" edit={edit} />
+        <CvBlock title={t.education} entries={document.education} section="education" edit={edit} />
 
         {document.languages.length > 0 && (
           <section className="border-t-2 border-primary pt-5 pb-7">
@@ -96,9 +106,11 @@ export function CvDocumentView({
                     </tr>
                   </thead>
                   <tbody>
-                    {document.languages.map((l) => (
-                      <tr key={l.name} className="border-b border-primary/15">
-                        <th className="p-2 text-left text-primary">{l.name}</th>
+                    {document.languages.map((l, i) => (
+                      <tr key={i} className="border-b border-primary/15">
+                        <th className="p-2 text-left text-primary">
+                          <Line edit={edit} path={{ part: "language", index: i, field: "name" }} value={l.name} />
+                        </th>
                         {[l.listening, l.reading, l.spoken, l.interaction, l.writing].map((v, i) => (
                           <td key={i} className="p-2">
                             {v ?? (i === 0 ? l.level : null) ?? "—"}
@@ -111,15 +123,21 @@ export function CvDocumentView({
               </div>
             ) : (
               <ul className="grid gap-1.5 text-sm sm:grid-cols-2">
-                {document.languages.map((l) => (
-                  <li key={l.name}>
-                    <span className="font-bold text-primary">{l.name}</span>
-                    {l.level && <span> — {l.level}</span>}
+                {document.languages.map((l, i) => (
+                  <li key={i}>
+                    <span className="font-bold text-primary">
+                      <Line edit={edit} path={{ part: "language", index: i, field: "name" }} value={l.name} />
+                    </span>
+                    {l.level && (
+                      <span>
+                        {" — "}
+                        <Line edit={edit} path={{ part: "language", index: i, field: "level" }} value={l.level} removable />
+                      </span>
+                    )}
                   </li>
                 ))}
               </ul>
             )}
-            {renderFacts?.("languages")}
           </section>
         )}
 
@@ -127,32 +145,20 @@ export function CvDocumentView({
           <section className="border-t-2 border-primary pt-5">
             <h4 className="mb-4 font-sans text-lg font-bold text-earth uppercase">{t.skills}</h4>
             <ul className="flex flex-wrap gap-2 text-sm">
-              {document.skills.map((s) => (
-                <li key={s} className="border border-primary/25 bg-primary-soft/40 px-2.5 py-1">
-                  {s}
+              {document.skills.map((s, i) => (
+                <li key={i} className="border border-primary/25 bg-primary-soft/40 px-2.5 py-1">
+                  <Line edit={edit} path={{ part: "skill", index: i }} value={s} removable />
                 </li>
               ))}
             </ul>
-            {renderFacts?.("skills")}
           </section>
         )}
-        {renderFacts?.("other")}
       </div>
     </article>
   );
 }
 
-function CvBlock({
-  title,
-  entries,
-  place,
-  renderFacts,
-}: {
-  title: string;
-  entries: CvEntry[];
-  place: "experiences" | "education";
-  renderFacts?: (place: FactPlace) => ReactNode;
-}) {
+function CvBlock({ title, entries, section, edit }: { title: string; entries: CvEntry[]; section: "experiences" | "education"; edit?: CvEditing }) {
   if (entries.length === 0) return null;
   return (
     <section className="py-7">
@@ -161,20 +167,35 @@ function CvBlock({
         {entries.map((entry, i) => (
           <article key={i} className="grid gap-2 sm:grid-cols-[170px_minmax(0,1fr)] sm:gap-6">
             <div className="text-sm text-primary">
-              {entry.location && <p className="font-bold">{entry.location}</p>}
-              {entry.period && <p className="italic">{entry.period}</p>}
+              {entry.location && (
+                <p className="font-bold">
+                  <Line edit={edit} path={{ part: "entry", section, index: i, field: "location" }} value={entry.location} removable />
+                </p>
+              )}
+              {entry.period && (
+                <p className="italic">
+                  <Line edit={edit} path={{ part: "entry", section, index: i, field: "period" }} value={entry.period} removable />
+                </p>
+              )}
             </div>
             <div className="min-w-0">
-              <h5 className="font-sans text-sm font-bold text-earth sm:text-base">{entry.title}</h5>
-              {entry.organisation && <p className="text-sm text-primary">{entry.organisation}</p>}
+              <h5 className="font-sans text-sm font-bold text-earth sm:text-base">
+                <Line edit={edit} path={{ part: "entry", section, index: i, field: "title" }} value={entry.title} />
+              </h5>
+              {entry.organisation && (
+                <p className="text-sm text-primary">
+                  <Line edit={edit} path={{ part: "entry", section, index: i, field: "organisation" }} value={entry.organisation} removable />
+                </p>
+              )}
               {entry.details.length > 0 && (
                 <ul className="mt-2 space-y-1 text-sm leading-relaxed">
                   {entry.details.map((detail, j) => (
-                    <li key={j}>{detail}</li>
+                    <li key={j}>
+                      <Line edit={edit} path={{ part: "detail", section, index: i, detail: j }} value={detail} removable />
+                    </li>
                   ))}
                 </ul>
               )}
-              {renderFacts?.(`${place}:${i}`)}
             </div>
           </article>
         ))}

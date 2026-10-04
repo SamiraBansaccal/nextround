@@ -18,7 +18,7 @@ Règle : chaque session a sa *branch*, s'inscrit ici, ouvre une PR, et met la li
 
 | *Branch* | Session | Sujet | PR |
 |---|---|---|---|
-| `claude/intelligent-einstein-58bqoh` | cloud | 🎭 Répliques des personnages, banques de questions enrichies, Stripe dans le cloud | PR à venir |
+| `claude/intelligent-einstein-58bqoh` | cloud | 👤 Profil = une base unique (CV fusionnés sans doublons, tout validé, crayon sur chaque ligne, LeetCode), CV et lettre modifiables phrase par phrase, cartes d'offres alignées. Migration `0007` | PR à venir |
 
 <details>
 <summary>📦 Branches déjà fusionnées</summary>
@@ -31,11 +31,22 @@ Règle : chaque session a sa *branch*, s'inscrit ici, ouvre une PR, et met la li
 | `claude/intelligent-einstein-58bqoh` | cloud | Réorganisation des dossiers, doc revue en profondeur, nouveaux ADR | [#9](https://github.com/SamiraBansaccal/nextround/pull/9) |
 | `claude/intelligent-einstein-58bqoh` | cloud | Audit sécurité et code, corrections | [#10](https://github.com/SamiraBansaccal/nextround/pull/10) |
 | `claude/remove-interviewers` | local | Retrait des 38 intervieweurs masqués par la propriétaire | [#7](https://github.com/SamiraBansaccal/nextround/pull/7) |
+| `claude/intelligent-einstein-58bqoh` | cloud | 🎭 Répliques des personnages, banques de questions enrichies, Stripe dans le cloud | [#12](https://github.com/SamiraBansaccal/nextround/pull/12) |
 | `claude/intelligent-einstein-58bqoh` | cloud | Traduction EN/FR de tout le site | [#6](https://github.com/SamiraBansaccal/nextround/pull/6), [#8](https://github.com/SamiraBansaccal/nextround/pull/8) |
 
 </details>
 
 ## ✅ Fait récemment
+
+### 👤 Profil (cloud)
+
+- Le profil est **la base** : tous les CV (anciens, récents, tech ou non) y sont fusionnés. Un même fait écrit un peu différemment dans deux CV n'apparaît qu'une fois, dans sa formulation la plus complète, avec « aussi dans N autres sources » (`lib/profile/dedupe-facts.ts`, à l'affichage : rien n'est supprimé).
+- **Tout est validé d'office** (CV, GitHub, Codewars, LeetCode, chat, ajout à la main) : plus de section « à valider ». Chaque ligne du CV et de la base a un petit crayon pour corriger un mot, une majuscule ou une date (`components/shared/editable-line.tsx`, `lib/profile/cv-edit.ts`).
+- Projets : interrupteur « fait avec l'IA » à côté de chaque projet.
+- Codewars et **LeetCode** (API GraphQL publique, gratuite) dans un bloc compact. Migration `0007_leetcode_source` (valeur `leetcode` de l'enum `fact_source`).
+- Page plus compacte (bibliothèque en lignes, imports sur deux colonnes).
+- CV et lettre par offre : chaque phrase se modifie au crayon **sans réécrire le document** (même version, les faits cités restent) ; pareil pour un document ajouté au profil (`lib/documents/edit.ts`).
+- Cartes d'offres : bouton « S'entraîner » et ligne match/entraînements alignés en bas.
 
 ### 🎭 Contenu (cloud)
 
@@ -66,7 +77,7 @@ Règle : chaque session a sa *branch*, s'inscrit ici, ouvre une PR, et met la li
 - CV par offre au format CV tech, EN ou FR, chaque élément vérifié ; lettre EN/FR ; un document peut être **ajouté au profil** et servir de point de départ.
 - Les faits proposés se valident **sur place**, sous la ligne du CV d'où ils viennent.
 - 110 intervieweurs dans 10 catégories après le retrait des 38 masqués.
-- Données de la propriétaire : 2 CV, 19 projets GitHub, 11 offres importés ; **rien n'est encore validé**. À demander : « cookie » (introuvable sur GitHub) et l'app du hackathon (2e place).
+- Données de la propriétaire : 2 CV, 19 projets GitHub, 11 offres importés ; leurs faits sont validés d'office depuis la refonte du profil. À demander : « cookie » (introuvable sur GitHub) et l'app du hackathon (2e place).
 
 ### 🎙️ Entretiens (cloud, PR #2)
 
@@ -92,6 +103,9 @@ Règle : chaque session a sa *branch*, s'inscrit ici, ouvre une PR, et met la li
 
 ## 🔜 Ensuite
 
+- 📅 Harmoniser les dates des CV (« 2024 » / « mars 2024 » / « 03/2024 ») : aujourd'hui on les corrige au crayon ; proposer un format unique.
+- 🔁 Doublons : ils sont repliés à l'affichage ; un bouton « fusionner » pourrait les supprimer pour de bon.
+- 💬 Le chat de 5 questions du profil : à retravailler plus tard (demande du 2026-10-04).
 - 🧪 Lancer les e2e et regarder quelques écrans en français (cookie `nextround-ui-lang=fr`) ; vérifier que les *security headers* ne gênent pas Clerk.
 - 🔍 Points ouverts de l'audit : DNS rebinding, *owner* par id GitHub, CSP complète, `shadcn` en *devDependencies*, purge des compteurs.
 - 🚀 Relier Vercel à GitHub pour *deploy* sans le Mac.

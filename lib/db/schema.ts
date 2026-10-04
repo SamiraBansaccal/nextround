@@ -20,7 +20,7 @@ import {
 import type { CvDocument, Feedback, Quoted, SourcedSentence, TailoredDocument } from "@/lib/types";
 
 export const factType = pgEnum("fact_type", ["experience", "skill", "project", "education", "language", "achievement"]);
-export const factSource = pgEnum("fact_source", ["github", "codewars", "cv_upload", "chat", "manual"]);
+export const factSource = pgEnum("fact_source", ["github", "codewars", "leetcode", "cv_upload", "chat", "manual"]);
 export const sourceSite = pgEnum("source_site", ["indeed", "actiris", "forem", "linkedin", "company", "other"]);
 export const offerStatus = pgEnum("offer_status", ["saved", "applied", "interview", "offer", "rejected"]);
 export const requirementKind = pgEnum("requirement_kind", ["must", "nice"]);
