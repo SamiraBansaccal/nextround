@@ -4,9 +4,10 @@ import { requireUserId } from "@/lib/auth";
 import { listDocuments } from "@/lib/data/documents";
 import { listFacts } from "@/lib/data/facts";
 import { listInterviewIdsForOffer } from "@/lib/data/interviews";
-import { getOfferDetail, matchScore } from "@/lib/data/offers";
+import { getOfferDetail } from "@/lib/data/offers";
+import { factIndex, matchScore, provingFactIds } from "@/lib/offers/coverage";
 import { highlightSegments } from "@/lib/offers/segments";
-import { markAppliedAction } from "../actions";
+import { markAppliedAction, rematchOfferAction } from "../actions";
 import { formatDay } from "@/lib/dates";
 import { documentPlainText } from "@/lib/documents/plain-text";
 
@@ -30,10 +31,10 @@ export default async function OfferPage({ params }: PageProps<"/offers/[id]">) {
   ]);
   if (!detail) notFound();
 
-  const validFacts = new Map(facts.filter((f) => f.validated).map((f) => [f.id, f]));
-  const validIds = new Set(validFacts.keys());
+  const profile = factIndex(facts);
+  const byId = new Map(facts.map((f) => [f.id, f]));
   const requirements = detail.requirements.map((r) => {
-    const proving = r.factIds.filter((fid) => validIds.has(fid)).map((fid) => validFacts.get(fid)!);
+    const proving = provingFactIds(r, profile).map((fid) => byId.get(fid)!);
     return {
       id: r.id,
       kind: r.kind,
@@ -63,10 +64,10 @@ export default async function OfferPage({ params }: PageProps<"/offers/[id]">) {
       segments={highlightSegments(detail.offer.rawText, requirements)}
       requirements={requirements}
       contacts={detail.contacts.map((c) => ({ kind: c.kind, value: c.value, quote: c.quote }))}
-      score={matchScore(detail.requirements, validIds)}
+      score={matchScore(detail.requirements, profile)}
       interviewIds={interviewIds}
       documents={{ cv: docSummary(docs.find((d) => d.kind === "cv")), letter: docSummary(docs.find((d) => d.kind === "cover_letter")) }}
-      actions={{ markApplied: markAppliedAction }}
+      actions={{ markApplied: markAppliedAction, rematch: rematchOfferAction }}
     />
   );
 }

@@ -13,6 +13,7 @@ import { dashboardGreeting } from "@/lib/dashboard";
 import { listFacts } from "@/lib/data/facts";
 import { countInterviewsByOffer } from "@/lib/data/interviews";
 import { listOffers, listRequirementsForUser } from "@/lib/data/offers";
+import { factIndex } from "@/lib/offers/coverage";
 import { buildPipelineCards } from "@/lib/pipeline";
 import { addOfferAction, setOfferStatusAction } from "../offers/actions";
 import { importGithubAction } from "../profile/actions";
@@ -29,7 +30,7 @@ export default async function DashboardPage() {
     countInterviewsByOffer(account.userId),
   ]);
   const validated = facts.filter((f) => f.validated);
-  const cards = buildPipelineCards(offers, reqs, new Set(validated.map((f) => f.id)), interviewCounts);
+  const cards = buildPipelineCards(offers, reqs, factIndex(facts), interviewCounts);
   const inProgress = cards.filter((c) => c.status !== "offer" && c.status !== "rejected").length;
   const greeting = dashboardGreeting(account.displayName);
 

@@ -12,8 +12,8 @@ describe("pipeline follow-up reminder", () => {
         { ...base, id: "b", title: "Dev", company: "B", sourceSite: "indeed", status: "applied", appliedAt: new Date("2026-10-08T09:00:00Z") },
         { ...base, id: "c", title: "Dev", company: "C", sourceSite: "linkedin", status: "rejected", appliedAt: new Date("2026-09-01T09:00:00Z") },
       ],
-      [{ offerId: "a", factIds: ["f1"] }, { offerId: "a", factIds: [] }],
-      new Set(["f1"]),
+      [{ offerId: "a", category: "tech", factIds: ["f1"] }, { offerId: "a", category: "tech", factIds: [] }],
+      new Map([["f1", { id: "f1", validated: true, aiAssisted: false }]]),
       new Map([["a", 2]]),
       NOW,
     );

@@ -19,6 +19,7 @@ import {
   Play,
   Plus,
   Printer,
+  RefreshCw,
   Send,
   Sparkles,
   User,
@@ -67,6 +68,8 @@ export interface OfferViewData {
 interface Props extends OfferViewData {
   actions: {
     markApplied: (offerId: string) => Promise<{ ok: boolean }>;
+    /** Links the requirements again to the CURRENT validated facts. */
+    rematch: (offerId: string) => Promise<{ ok: true; message: string } | { ok: false; error: string }>;
   };
 }
 
@@ -85,6 +88,7 @@ export function OfferView({ offer, segments, requirements, contacts, score, inte
   const router = useRouter();
   const [selectedId, setSelectedId] = useState<string | null>(null);
   const [matchOpen, setMatchOpen] = useState(true);
+  const [matchNote, setMatchNote] = useState<{ ok: boolean; text: string } | null>(null);
   const [pending, startTransition] = useTransition();
   const byId = new Map(requirements.map((r) => [r.id, r]));
   const selected = selectedId ? byId.get(selectedId) : undefined;
@@ -206,6 +210,27 @@ export function OfferView({ offer, segments, requirements, contacts, score, inte
               </div>
               <MatchRing covered={score.covered} total={score.total} />
             </div>
+            <Button
+              variant="outline"
+              size="sm"
+              className="mt-4 w-full"
+              disabled={pending}
+              onClick={() =>
+                startTransition(async () => {
+                  setMatchNote(null);
+                  const result = await actions.rematch(offer.id);
+                  setMatchNote(result.ok ? { ok: true, text: result.message } : { ok: false, text: result.error });
+                  if (result.ok) router.refresh();
+                })
+              }
+            >
+              <RefreshCw className={cn("size-4", pending && "animate-spin")} aria-hidden="true" /> Update with my validated facts
+            </Button>
+            {matchNote && (
+              <p role="status" className={cn("mt-2 text-xs", matchNote.ok ? "text-muted-foreground" : "text-gap")}>
+                {matchNote.text}
+              </p>
+            )}
             <Button
               variant="ghost"
               className="mt-4 w-full justify-between text-earth dark:text-foreground"

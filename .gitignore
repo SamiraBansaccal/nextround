@@ -27,6 +27,13 @@ npm-debug.log*
 /test-results/
 /playwright-report/
 
+
+# Personal, machine-only files (your own CVs, offers, import scripts): never committed
+/.local/
+
+# Avatar reference candidates (large, re-downloadable with scripts/avatars/collect-references.py)
+/characters/*/candidates/*.png
+
 .projects/cache
 .projects/vault
 .projects/state.test.json
@@ -34,9 +41,3 @@ npm-debug.log*
 .env
 .env.*
 !.env.example
-
-# Personal, machine-only files (your own CVs, offers, import scripts): never committed
-/.local/
-
-# Avatar reference candidates (large, re-downloadable with scripts/avatars/collect-references.py)
-/characters/*/candidates/*.png

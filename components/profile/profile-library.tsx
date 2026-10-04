@@ -16,6 +16,7 @@ import {
   Printer,
   RefreshCw,
   Send,
+  Sparkles,
   Swords,
   Trash2,
   Upload,
@@ -30,6 +31,7 @@ import { CvDocumentView } from "@/components/profile/cv-document";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import type { CvDocument, FactType } from "@/lib/types";
+import { cn } from "@/lib/utils";
 
 export interface ProfileFactView {
   id: string;
@@ -39,6 +41,7 @@ export interface ProfileFactView {
   sourceRef: string | null;
   quote: string | null;
   validated: boolean;
+  aiAssisted: boolean; // a project built with AI ("vibe coding"): never proof of its technologies
   origin: string; // e.g. "CV · cv-frontend-2025.pdf", "GitHub"
 }
 
@@ -76,6 +79,7 @@ interface Props {
     validateAll: () => Promise<Result>;
     reject: (id: string) => Promise<Result>;
     edit: (input: { id: string; text: string }) => Promise<Result>;
+    setAiAssisted: (input: { id: string; aiAssisted: boolean }) => Promise<Result>;
     addManual: (input: { type: FactType; text: string }) => Promise<Result>;
   };
 }
@@ -302,6 +306,9 @@ export function ProfileLibrary({ candidate, cvs, selectedCv, facts, actions }: P
                         {fact.sourceRef}
                       </a>
                     )}
+                    {fact.type === "project" && (
+                      <AiAssistedToggle fact={fact} disabled={pending} onToggle={(aiAssisted) => run(() => actions.setAiAssisted({ id: fact.id, aiAssisted }))} />
+                    )}
                   </div>
                 </div>
                 <div className="mt-4 grid grid-cols-[1fr_1fr_auto] gap-2">
@@ -389,8 +396,10 @@ export function ProfileLibrary({ candidate, cvs, selectedCv, facts, actions }: P
               </p>
             )}
             {SECTIONS.map(({ type, label, Icon }) => {
-              const items = validated.filter((f) => f.type === type);
-              if (items.length === 0) return null;
+              const all = validated.filter((f) => f.type === type);
+              if (all.length === 0) return null;
+              const items = all.filter((f) => !f.aiAssisted);
+              const vibe = all.filter((f) => f.aiAssisted);
               return (
                 <section key={type} className="py-5">
                   <h4 className="mb-4 flex items-center gap-2 border-b-2 border-primary pb-2 font-sans text-lg font-bold text-earth uppercase dark:text-foreground">
@@ -415,6 +424,31 @@ export function ProfileLibrary({ candidate, cvs, selectedCv, facts, actions }: P
                       </li>
                     ))}
                   </ul>
+                  {type === "project" && items.length > 0 && (
+                    <div className="mt-2 flex flex-wrap gap-x-3 gap-y-1">
+                      {items.map((fact) => (
+                        <AiAssistedToggle key={fact.id} fact={fact} compact disabled={pending} onToggle={(aiAssisted) => run(() => actions.setAiAssisted({ id: fact.id, aiAssisted }))} />
+                      ))}
+                    </div>
+                  )}
+                  {vibe.length > 0 && (
+                    <div className="mt-5 rounded-lg border border-dashed border-earth/30 p-4">
+                      <p className="flex items-center gap-2 text-xs font-bold text-muted-foreground uppercase">
+                        <Sparkles className="size-3.5" aria-hidden="true" /> Built with AI · vibe coding
+                      </p>
+                      <p className="mt-1 text-xs text-muted-foreground">They show your interest in AI, your creativity and your hackathons. They never count as mastery of their stack.</p>
+                      <ul className="mt-3 space-y-2">
+                        {vibe.map((fact) => (
+                          <li key={fact.id} className="flex items-start justify-between gap-3 text-sm leading-relaxed">
+                            <span>
+                              {fact.text} <span className="ml-1 text-xs text-muted-foreground">· {fact.origin}</span>
+                            </span>
+                            <AiAssistedToggle fact={fact} compact disabled={pending} onToggle={(aiAssisted) => run(() => actions.setAiAssisted({ id: fact.id, aiAssisted }))} />
+                          </li>
+                        ))}
+                      </ul>
+                    </div>
+                  )}
                 </section>
               );
             })}
@@ -571,5 +605,37 @@ function OnboardingChat({ pending, onFinish }: { pending: boolean; onFinish: (an
         </div>
       )}
     </section>
+  );
+}
+
+/** "Built with AI (vibe coding)": a project the candidate did not write line by line. */
+function AiAssistedToggle({
+  fact,
+  compact = false,
+  disabled,
+  onToggle,
+}: {
+  fact: Pick<ProfileFactView, "text" | "aiAssisted">;
+  compact?: boolean;
+  disabled: boolean;
+  onToggle: (aiAssisted: boolean) => void;
+}) {
+  const name = fact.text.split(" — ")[0];
+  return (
+    <button
+      type="button"
+      aria-pressed={fact.aiAssisted}
+      disabled={disabled}
+      onClick={() => onToggle(!fact.aiAssisted)}
+      title={fact.aiAssisted ? "Shown as built with AI: click if you wrote it yourself" : "Built with AI? It will never count as mastery of its stack"}
+      className={cn(
+        "inline-flex items-center gap-1.5 rounded-full border text-xs transition-colors disabled:opacity-50",
+        compact ? "px-2 py-0.5" : "mt-3 px-2.5 py-1",
+        fact.aiAssisted ? "border-terracotta/40 bg-terracotta-soft text-terracotta" : "border-earth/20 text-muted-foreground hover:border-terracotta/40 hover:text-foreground",
+      )}
+    >
+      <Sparkles className="size-3" aria-hidden="true" />
+      {compact ? (fact.aiAssisted ? `${name}: built with AI` : `${name}: built with AI?`) : fact.aiAssisted ? "Built with AI (vibe coding)" : "Built with AI? (vibe coding)"}
+    </button>
   );
 }

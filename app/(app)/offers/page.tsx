@@ -7,6 +7,7 @@ import { requireUserId } from "@/lib/auth";
 import { listFacts } from "@/lib/data/facts";
 import { countInterviewsByOffer } from "@/lib/data/interviews";
 import { listOffers, listRequirementsForUser } from "@/lib/data/offers";
+import { factIndex } from "@/lib/offers/coverage";
 import { buildPipelineCards } from "@/lib/pipeline";
 import { addOfferAction } from "./actions";
 
@@ -20,7 +21,7 @@ export default async function OffersPage() {
     listFacts(userId),
     countInterviewsByOffer(userId),
   ]);
-  const cards = buildPipelineCards(offers, reqs, new Set(facts.filter((f) => f.validated).map((f) => f.id)), interviewCounts);
+  const cards = buildPipelineCards(offers, reqs, factIndex(facts), interviewCounts);
 
   return (
     <div className="space-y-10">

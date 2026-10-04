@@ -68,7 +68,7 @@ test("every signed-in screen", async ({ page }, info) => {
   // The interviewer, chosen in the side panel; the style is visible before joining.
   await page.getByRole("button", { name: "Change" }).click();
   await page.getByRole("button", { name: /The Simpsons/ }).click();
-  await page.getByRole("button", { name: /Mr\. Burns/ }).click();
+  await page.getByRole("button", { name: /^Mr\. Burns/ } /* not its "Hide Mr. Burns" button */).click();
   await expect(page.locator("#setup-interviewer")).toHaveText("Mr. Burns");
   await expect(page.getByText("Cold, formal and extremely demanding").first()).toBeVisible();
   // Real microphone switch.

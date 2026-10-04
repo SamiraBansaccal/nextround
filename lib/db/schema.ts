@@ -47,6 +47,9 @@ export const profileFacts = pgTable(
     sourceRef: text("source_ref"), // e.g. the GitHub repo URL
     quote: text("quote"), // verbatim evidence from the CV text or the chat answers
     validated: boolean("validated").notNull().default(false),
+    // A project built with AI ("vibe coding"), marked by the user: it shows interest in AI, creativity,
+    // hackathons, but never proves mastery of its technologies (lib/offers/coverage.ts).
+    aiAssisted: boolean("ai_assisted").notNull().default(false),
     createdAt: createdAt(),
   },
   (t) => [index("profile_facts_user_idx").on(t.userId)],

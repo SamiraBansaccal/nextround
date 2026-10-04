@@ -12,6 +12,7 @@ import {
   importGithubAction,
   rejectFactAction,
   removeCvAction,
+  setAiAssistedAction,
   structureCvAction,
   validateAllAction,
   validateFactAction,
@@ -51,6 +52,7 @@ export default async function ProfilePage({ searchParams }: PageProps<"/profile"
         sourceRef: f.sourceRef,
         quote: f.quote,
         validated: f.validated,
+        aiAssisted: f.aiAssisted,
         origin: f.source === "cv_upload" ? `CV · ${cvName.get(f.sourceRef ?? "") ?? "removed CV"}` : ORIGIN[f.source],
       }))}
       actions={{
@@ -64,6 +66,7 @@ export default async function ProfilePage({ searchParams }: PageProps<"/profile"
         validateAll: validateAllAction,
         reject: rejectFactAction,
         edit: editFactAction,
+        setAiAssisted: setAiAssistedAction,
         addManual: addManualFactAction,
       }}
     />

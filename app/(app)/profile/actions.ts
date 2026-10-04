@@ -210,3 +210,24 @@ export async function validateAllAction(): Promise<ActionResult> {
   revalidatePath("/", "layout");
   return { ok: true, message: `${pending.length} facts validated.` };
 }
+
+const aiAssistedSchema = z.object({ id: z.string().uuid(), aiAssisted: z.boolean() });
+
+/**
+ * Marks a project as built with AI ("vibe coding") or written by hand. A vibe-coded project stays in the
+ * profile (interest in AI, creativity, hackathons) but never proves mastery of its technologies.
+ */
+export async function setAiAssistedAction(input: unknown): Promise<ActionResult> {
+  const userId = await requireUserId();
+  const parsed = aiAssistedSchema.safeParse(input);
+  if (!parsed.success) return { ok: false, error: "Fact not found." };
+  const fact = await updateFact(userId, parsed.data.id, { aiAssisted: parsed.data.aiAssisted });
+  if (!fact) return { ok: false, error: "Fact not found." };
+  revalidatePath("/", "layout");
+  return {
+    ok: true,
+    message: parsed.data.aiAssisted
+      ? "Marked as built with AI: it shows your interest in AI and your creativity, never mastery of its stack."
+      : "Marked as written by you.",
+  };
+}
