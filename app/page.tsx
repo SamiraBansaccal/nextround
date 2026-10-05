@@ -3,8 +3,10 @@ import { Check, KeyRound, Link2, MessagesSquare, Quote, X } from "lucide-react";
 import Image from "next/image";
 import { redirect } from "next/navigation";
 import { Logo } from "@/components/layout/logo";
+import { RequestAccess } from "@/components/auth/request-access";
 import { SignInButtons } from "@/components/auth/sign-in-buttons";
 import { ThemeToggle } from "@/components/layout/theme-toggle";
+import { requestAccessAction } from "./actions";
 
 // Landing page (design from the Lovable prototype): the only page visible without signing in.
 const VALUE_PROPS = [
@@ -28,7 +30,10 @@ export default async function LandingPage() {
           <h1 className="text-4xl leading-[1.08] sm:text-5xl md:text-6xl">
             Your coach to reach the next interview round — <em className="text-primary">without inventing anything.</em>
           </h1>
-          <SignInButtons />
+          <div className="flex flex-col gap-4">
+            <SignInButtons />
+            <RequestAccess request={requestAccessAction} />
+          </div>
         </div>
         <div className="overflow-hidden rounded-md border bg-card shadow-soft">
           <Image

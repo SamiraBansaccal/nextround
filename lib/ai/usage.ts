@@ -4,11 +4,14 @@ import { getDb } from "@/lib/db";
 import { usageCounters } from "@/lib/db/schema";
 import { AiError } from "./errors";
 
-// Rate limit + daily cap, ONLY for calls made with the instance keys (owner path).
+// Rate limit + daily cap, ONLY for calls made with the instance keys (owner path), and for the public
+// access-request form (per visitor, and for the emails it sends to the owner).
 // Users who bring their own key are limited by their own provider, not by us.
 // Counters live in Postgres (usage_counters), so limits hold across serverless instances.
 
-export type UsageKind = "llm" | "tts" | "scrape";
+/** The services behind the instance keys. */
+export type ServiceKind = "llm" | "tts" | "scrape";
+export type UsageKind = ServiceKind | "access_request" | "access_mail";
 
 export interface UsageLimits {
   perMinute: number;
@@ -20,6 +23,8 @@ export const DEFAULT_LIMITS: Record<UsageKind, UsageLimits> = {
   llm: { perMinute: 8, perDay: 40 },
   tts: { perMinute: 10, perDay: 60 },
   scrape: { perMinute: 5, perDay: 30 },
+  access_request: { perMinute: 2, perDay: 3 }, // per visitor (hashed IP address)
+  access_mail: { perMinute: 5, perDay: 20 }, // emails to the owner, the whole instance together
 };
 
 async function increment(userId: string, day: string, kind: string): Promise<number> {
@@ -57,13 +62,13 @@ export async function consumeInstanceQuota(
 }
 
 /** How many instance-key calls of each kind this user made today (UTC day), for the Settings page. */
-export async function getTodayUsage(userId: string, now: Date = new Date()): Promise<Record<UsageKind, number>> {
-  const kinds: UsageKind[] = ["llm", "tts", "scrape"];
+export async function getTodayUsage(userId: string, now: Date = new Date()): Promise<Record<ServiceKind, number>> {
+  const kinds: ServiceKind[] = ["llm", "tts", "scrape"];
   const rows = await getDb()
     .select({ kind: usageCounters.kind, count: usageCounters.count })
     .from(usageCounters)
     .where(and(eq(usageCounters.userId, userId), eq(usageCounters.day, now.toISOString().slice(0, 10)), inArray(usageCounters.kind, kinds)));
-  const used: Record<UsageKind, number> = { llm: 0, tts: 0, scrape: 0 };
-  for (const row of rows) used[row.kind as UsageKind] = row.count;
+  const used: Record<ServiceKind, number> = { llm: 0, tts: 0, scrape: 0 };
+  for (const row of rows) used[row.kind as ServiceKind] = row.count;
   return used;
 }

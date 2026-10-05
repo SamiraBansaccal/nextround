@@ -39,6 +39,7 @@ without knowing why it was made.
 | 🔐 [0023](0023-instance-keys-for-the-owner-only.md) | The instance's keys serve the owner only; sign-up closed during development | ✅ accepted |
 | 🧭 [0024](0024-no-dashboard.md) | No dashboard: the profile is the home page | ✅ accepted |
 | 🔁 [0025](0025-merge-for-good-dates-and-own-words.md) | Duplicates merged for good, one way to write CV dates, the candidate's own sentences join the base | ✅ accepted |
+| 📨 [0026](0026-access-requests.md) | Access requests: Clerk's waitlist, an email to the owner, an answer in Settings | ✅ accepted |
 
 > 📌 **Read the statuses.** An ADR is never deleted: when a decision changes, the old record stays
 > and says where the next step is. That is how one understands *why* a decision changed, and not

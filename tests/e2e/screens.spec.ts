@@ -36,6 +36,10 @@ test("landing page (signed out)", async ({ page }, info) => {
   expect(scriptSrc).toContain("'strict-dynamic'");
   expect(scriptSrc).toMatch(/'nonce-[^']+'/);
   await check(page, "00-landing", info.project.name);
+  // Not invited yet: the request form opens on the landing page (not sent here: it would email the owner).
+  await page.getByRole("button", { name: "No invitation yet? Request access" }).click();
+  await expect(page.getByLabel("Email")).toBeVisible();
+  await check(page, "00b-request-access", info.project.name);
   if (info.project.name === "desktop") {
     // Under that policy, the GitHub sign-in still starts: Clerk sends the browser to GitHub.
     await page.getByRole("button", { name: "Continue with GitHub" }).click();

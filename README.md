@@ -61,7 +61,7 @@ NextRound is a website. It does not run on your computer: it runs **in the cloud
 
 ### 1. Get invited
 
-Sign-up is **invite-only**: send the owner the **email address of the GitHub account** (or Google account) you will sign in with. She adds it to the guest list; until then, Clerk refuses the sign-up with "Access not allowed".
+Sign-up is **invite-only**. On the home page, click **No invitation yet? Request access** and give the **email address of the GitHub account** (or Google account) you will sign in with. The owner is told by email and answers in her Settings; when she allows you, Clerk emails you an invitation. Until then, Clerk refuses the sign-up with "Access not allowed".
 
 ### 2. Sign in
 
@@ -143,6 +143,15 @@ NextRound uses six services. Normally that means six sign-ups, six dashboards an
 4. `stripe projects env --pull` writes them into the `.env` file on your computer. **You never copy a key by hand.**
 5. Stripe Projects does not send them to Vercel: NextRound's script `scripts/infra/push-env-to-vercel.mjs` does it, and Vercel stores them encrypted.
 
+#### ❓ Stripe Projects, in plain words
+
+- **Does Stripe create the Vercel (Neon, Clerk…) accounts by itself?** Yes. These providers built a common protocol with Stripe to "create an account and a resource, then hand over the keys". When you run `stripe projects add vercel/project`, the Stripe CLI asks Stripe, which asks Vercel to create an account in your name (or to link the Vercel account you already have), then a project in it, on the plan you named. Vercel trusts it because Stripe already knows who you are (hence the verified account), and you accept Vercel's terms along the way.
+- **So is it a vault?** Partly. It does three jobs: it **creates or links** the accounts and resources; it **keeps their keys**, encrypted, in Stripe's secret store, and writes them to your `.env` when you ask (`stripe projects env --pull`); and for paid plans, it **pays** the provider with the card you gave Stripe once. The accounts are really yours: `stripe projects open vercel` opens your Vercel dashboard, and you could keep using them without Stripe.
+- **Does it subscribe for me?** Only to what you ask for, on the plan you name (`vercel/hobby`, `neon/free`…). A paid plan asks you to confirm, and `stripe projects spend` shows what you spend.
+- **Do I need to know my whole stack before starting?** No. `stripe projects init` creates an empty project; you add a service when you need it, even months later (`stripe projects add <provider>/<service>`), and remove one with `stripe projects remove`. To see what exists: `stripe projects catalog`, or `stripe projects search email`. You can also start from a ready-made template (`stripe projects build`).
+- **Example, adding a service later:** to email the owner about access requests, NextRound uses Resend. Adding it is `stripe projects add resend/free` (the free plan: 3,000 emails a month), then `stripe projects add resend/email` (its API key). The key lands in `.env`; Stripe Projects does not handle production, so NextRound's script `scripts/infra/push-env-to-vercel.mjs` sends it to Vercel.
+- **One Stripe project = one app.** A second app means a second `stripe projects init`, in another folder; your provider accounts are reused (one Vercel account holds several projects).
+
 Good to know, before you start:
 
 - ✅ Stripe Projects needs a **Stripe account in live mode**, which means **identity verification**, as for any payment account. You do not sell anything, and the free plans cost nothing; `stripe projects spend` shows what you spend (it should say no charges).
@@ -189,7 +198,7 @@ Good to know, before you start:
    npm run clerk:signup -- allow friend@example.com
    npm run clerk:signup -- status            # who is allowed
    ```
-   (This guest list is free on Clerk's development setup, which the install uses; on a production Clerk setup it is a paid feature.)
+   (This guest list is free on Clerk's development setup, which the install uses; on a production Clerk setup it is a paid feature.) People can also ask from your home page: their requests appear in **Settings → Access requests**, where you allow or decline them, and you get an email for each one if Resend is set up (see the example above).
 8. **Check your costs** whenever you want: `stripe projects spend`.
 
 ### 🔄 Update your copy later
