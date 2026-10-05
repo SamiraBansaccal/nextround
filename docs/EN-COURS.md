@@ -18,13 +18,14 @@ Règle : chaque session a sa *branch*, s'inscrit ici, ouvre une PR, et met la li
 
 | *Branch* | Session | Sujet | PR |
 |---|---|---|---|
-| `claude/local-profile-followups` | local | 🔁 Profil, suite : doublons fusionnés pour de bon (références recâblées), dates des CV écrites d'une seule façon sans rien inventer, phrases corrigées à la main d'un document du profil ajoutées à la base. Fichiers : `lib/profile/{merge-facts,cv-dates,dedupe-facts}.ts`, `lib/documents/{edit,hand-written}.ts`, `lib/data/facts.ts`, `components/profile/profile-library.tsx`, `app/(app)/profile/**`, `app/(app)/offers/[id]/cv/actions.ts` | [#19](https://github.com/SamiraBansaccal/nextround/pull/19) |
+| `claude/local-audit-followups` | local | 🔍 Points ouverts de l'audit : DNS rebinding (agent undici qui vérifie l'adresse à la connexion), `shadcn` en *devDependencies*, purge des compteurs par minute. Fichiers : `lib/offers/fetch-page.ts`, `lib/ai/usage.ts`, `package.json`, `docs/fr/audits/` | PR à venir |
 
 <details>
 <summary>📦 Branches déjà fusionnées</summary>
 
 | *Branch* | Session | Sujet | PR |
 |---|---|---|---|
+| `claude/local-profile-followups` | local | 🔁 Profil, suite : doublons fusionnés pour de bon (références recâblées), dates des CV écrites d'une seule façon sans rien inventer, phrases corrigées à la main d'un document du profil ajoutées à la base. Fichiers : `lib/profile/{merge-facts,cv-dates,dedupe-facts}.ts`, `lib/documents/{edit,hand-written}.ts`, `lib/data/facts.ts`, `components/profile/profile-library.tsx`, `app/(app)/profile/**`, `app/(app)/offers/[id]/cv/actions.ts` | [#19](https://github.com/SamiraBansaccal/nextround/pull/19) |
 | `claude/local-no-dashboard` | local | 🧭 Plus de tableau de bord : menu Profil → Offres → Entretiens → Réglages, le profil devient la page d'accueil, `/dashboard` renvoie vers `/profile`. Fichiers : `app/(app)/dashboard/` (supprimé), `components/{dashboard,layout,offers}/**`, `lib/i18n/{offers,ui}.ts`, `next.config.ts`, `tests/e2e/screens.spec.ts` | [#18](https://github.com/SamiraBansaccal/nextround/pull/18) |
 | `claude/local-owner-only` | local | 🔐 Toutes les clés de l'instance pour la propriétaire seule (Firecrawl compris ; clé Firecrawl perso dans les Réglages), propriétaire reconnue par son id GitHub numérique, inscription Clerk fermée. Migration `0008`. Fichiers : `lib/ai/config.ts`, `lib/server/{auth,env}.ts`, `lib/data/ai-settings.ts`, `components/settings/**`, `app/(app)/settings/**`, `app/(app)/offers/actions.ts`, `scripts/{infra,owner}/**`, `tests/e2e/fixtures.mts` | [#17](https://github.com/SamiraBansaccal/nextround/pull/17) |
 | `claude/local-settings` | local | ⚙️ Page Réglages (pleine largeur, encart « ce qui est branché », IA et voix côte à côte), bouton EN/FR aux couleurs de la DA, écrans e2e en français | [#16](https://github.com/SamiraBansaccal/nextround/pull/16) |
@@ -42,6 +43,13 @@ Règle : chaque session a sa *branch*, s'inscrit ici, ouvre une PR, et met la li
 </details>
 
 ## ✅ Fait récemment
+
+### 🔍 Audit, suite (local, 2026-10-05)
+
+- 🛡️ **DNS rebinding** : la lecture des pages d'offres passe par un agent undici dont la résolution DNS refuse toute adresse privée **au moment où la connexion s'ouvre** (`publicLookup`), plus seulement avant. Vérifié : `localtest.me` (qui pointe vers 127.0.0.1) refusé, une vraie page lue.
+- 📦 `shadcn` en *devDependencies* : `npm audit --omit=dev` ne trouve plus rien.
+- 🧹 Le premier appel du jour efface les compteurs par minute des jours d'avant (les totaux par jour restent).
+- Reste ouvert : une CSP complète (*nonces*), à tester avec la connexion Clerk dans un vrai navigateur. Rapport : [audit](fr/audits/2026-10-04-audit.md).
 
 ### 🔁 Profil, suite (local, 2026-10-05)
 
@@ -153,7 +161,7 @@ Décision : [ADR 0023](fr/adr/0023-cles-de-l-instance-pour-la-proprietaire.md).
 - ❓ À demander à la propriétaire : le nom de « cookie » (introuvable sur GitHub) et l'app du hackathon (2e place), pour les ajouter à ses projets faits avec l'IA.
 - 💼 Les 15 offres Actiris restantes (voir « En cours »).
 - 💬 Le chat de 5 questions du profil : à retravailler (demande du 2026-10-04).
-- 🔍 Points ouverts de l'audit : DNS rebinding, CSP complète, `shadcn` en *devDependencies*, purge des compteurs (*owner* par id GitHub : fait, ADR 0023).
+- 🔍 Dernier point ouvert de l'audit : une CSP complète avec *nonces*, à tester avec la connexion Clerk (GitHub, Google) dans un vrai navigateur.
 - 🚀 Relier Vercel à GitHub pour *deploy* sans le Mac (et sans *token* Stripe Projects qui expire).
 - 🖼️ Logos Actiris/Forem plus nets (aujourd'hui des favicons de 16 à 32 px dans `public/sites/`).
 - 🔐 Avant une instance Clerk de **production** : l'*allowlist* y est payante ; prévoir une barrière dans l'app, ou le plan payant (ADR 0023). Idée de la propriétaire, pas décidée : faire payer les autres utilisateurs via Stripe au lieu de leur demander leurs clés.

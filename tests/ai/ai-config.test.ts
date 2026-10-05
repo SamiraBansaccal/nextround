@@ -127,6 +127,19 @@ describe("instance key limits", () => {
     await expect(consumeInstanceQuota("user_rate", "llm", { perMinute: 3, perDay: 100 }, now)).rejects.toThrow("rate limiting");
   });
 
+  it("clears the per-minute rows of the days before on the first call of a day, keeping the daily totals", async () => {
+    const { usageCounters } = await import("@/lib/db/schema");
+    const limits = { perMinute: 100, perDay: 100 };
+    await consumeInstanceQuota("user_purge", "llm", limits, new Date("2026-10-03T10:00:00Z"));
+    await consumeInstanceQuota("user_purge", "llm", limits, new Date("2026-10-03T10:01:00Z"));
+    await consumeInstanceQuota("user_other", "llm", limits, new Date("2026-10-03T10:00:00Z"));
+    await consumeInstanceQuota("user_purge", "llm", limits, new Date("2026-10-04T09:00:00Z"));
+    const rows = await testDb.select({ userId: usageCounters.userId, day: usageCounters.day, kind: usageCounters.kind }).from(usageCounters);
+    const mine = rows.filter((r) => r.userId === "user_purge").map((r) => `${r.day} ${r.kind}`).sort();
+    expect(mine).toEqual(["2026-10-03 llm", "2026-10-04 llm", "2026-10-04 llm:minute:09:00"]);
+    expect(rows.some((r) => r.userId === "user_other" && r.kind.includes(":minute:"))).toBe(true); // another user's rows: untouched
+  });
+
   it("enforces the daily cap, counted per user and per day", async () => {
     const limits = { perMinute: 100, perDay: 2 };
     await consumeInstanceQuota("user_cap", "llm", limits, new Date("2026-10-03T10:00:00Z"));

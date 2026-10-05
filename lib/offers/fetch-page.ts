@@ -1,10 +1,13 @@
 import "server-only";
+import { lookup as lookupCallback, type LookupAddress } from "node:dns";
 import { lookup } from "node:dns/promises";
-import { isIP } from "node:net";
+import { isIP, type LookupFunction } from "node:net";
+import { Agent } from "undici";
 
 // Server-side page fetching for offers, safe against SSRF:
 // http(s) only, no credentials, and the host must resolve to PUBLIC addresses only
-// (re-checked on every redirect). Private, loopback, link-local and metadata addresses are refused.
+// (re-checked on every redirect). Private, loopback, link-local and metadata addresses are refused,
+// and checked again on the address the connection actually opens to (DNS rebinding, see `publicOnly`).
 
 export class PageFetchError extends Error {
   constructor(public readonly reason: "invalid_url" | "blocked_address" | "unreachable" | "blocked_or_login") {
@@ -79,18 +82,38 @@ export async function assertPublicHttpUrl(raw: string): Promise<URL> {
   return url;
 }
 
+/**
+ * The DNS lookup used when a connection opens: it refuses a host with any private address. Without it, the
+ * host is resolved twice (once by `assertPublicHttpUrl`, once to connect), and a DNS server that answers a
+ * public address first and a private one next (DNS rebinding) would get the request to an internal address.
+ */
+export const publicLookup: LookupFunction = (hostname, options, callback) => {
+  lookupCallback(hostname, { ...options, all: true }, (error, found: LookupAddress[]) => {
+    if (error) return callback(error, "", 0);
+    if (found.length === 0 || found.some((a) => isPrivateIP(a.address))) return callback(new PageFetchError("blocked_address"), "", 0);
+    if (options.all) return (callback as unknown as (e: null, all: LookupAddress[]) => void)(null, found);
+    callback(null, found[0].address, found[0].family);
+  });
+};
+
+/** Connections for page reading open only to an address `publicLookup` has just checked. */
+const publicOnly = new Agent({ connect: { lookup: publicLookup } });
+
 /** Fetches an HTML page (max 3 redirects, each one re-validated) and returns its readable text. */
 export async function fetchPageText(raw: string): Promise<string> {
   let url = await assertPublicHttpUrl(raw);
   for (let hop = 0; hop < 4; hop++) {
     let response: Response;
     try {
-      response = await fetch(url, {
+      // `dispatcher` is undici's (Node's fetch) option, unknown to the DOM types: hence the separate object.
+      const init: RequestInit & { dispatcher: Agent } = {
+        dispatcher: publicOnly,
         redirect: "manual",
         headers: { "User-Agent": "Mozilla/5.0 (compatible; NextRound/1.0)", Accept: "text/html,application/xhtml+xml" },
         signal: AbortSignal.timeout(15_000),
         cache: "no-store",
-      });
+      };
+      response = await fetch(url, init);
     } catch {
       throw new PageFetchError("unreachable");
     }

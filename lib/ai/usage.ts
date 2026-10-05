@@ -1,5 +1,5 @@
 import "server-only";
-import { and, eq, inArray, sql } from "drizzle-orm";
+import { and, eq, inArray, like, lt, sql } from "drizzle-orm";
 import { getDb } from "@/lib/db";
 import { usageCounters } from "@/lib/db/schema";
 import { AiError } from "./errors";
@@ -46,6 +46,13 @@ export async function consumeInstanceQuota(
   const perMinute = await increment(userId, day, `${kind}:minute:${minute}`);
   if (perMinute > limits.perMinute) throw new AiError("rate_limited");
   const perDay = await increment(userId, day, kind);
+  // The first call of the day clears this user's per-minute rows of the days before: one row per minute
+  // used, useful only during that minute. The daily totals stay.
+  if (perDay === 1) {
+    await getDb()
+      .delete(usageCounters)
+      .where(and(eq(usageCounters.userId, userId), lt(usageCounters.day, day), like(usageCounters.kind, "%:minute:%")));
+  }
   if (perDay > limits.perDay) throw new AiError("quota_exceeded");
 }
 
