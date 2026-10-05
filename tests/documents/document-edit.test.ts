@@ -42,6 +42,7 @@ describe("applyDocEdit", () => {
     expect(next?.projects[0].bullets[0]).toEqual({
       text: "Built a Spring app.",
       factIds: ["f2"],
+      edited: true, // the candidate's own words now (lib/documents/hand-written.ts)
     });
     expect(cv.projects[0].bullets[0].text).toBe("Built an app."); // the original is untouched
     expect(applyDocEdit(cv, { part: "summary", index: 0 }, "Java and Python developer.")?.summary[0].factIds).toEqual(["f1"]);

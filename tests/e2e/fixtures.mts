@@ -104,6 +104,8 @@ async function seed() {
   const node = await createFact(userId, { type: "skill", text: "Node.js and Express: built a small REST API for a school project", source: "manual", validated: true });
   const lang = await createFact(userId, { type: "language", text: "French (native), English (B2)", source: "cv_upload", sourceRef: cvRef(cv.id), quote: "Français (langue maternelle), anglais (B2)", validated: true });
   await createFact(userId, { type: "education", text: "42 Belgium, software development curriculum (2023 - 2025)", source: "cv_upload", sourceRef: cvRef(cv.id), quote: "42 Belgium, cursus de développement logiciel (2023 - 2025)", validated: true });
+  // The same training written a little differently by hand: folded under the line above, with "Merge".
+  await createFact(userId, { type: "education", text: "42 Belgium software development curriculum, 2023 - 2025", source: "manual", validated: true });
   await createFact(userId, { type: "experience", text: "Front-end intern at WebAgency SPRL, Brussels (February 2025 - June 2025)", source: "cv_upload", sourceRef: cvRef(cv.id), quote: "Stagiaire développeuse front-end chez WebAgency SPRL, Bruxelles (février 2025 - juin 2025)", validated: false });
 
   const aliases = new Map([["F1", weather.id], ["F2", node.id], ["F3", lang.id]]);

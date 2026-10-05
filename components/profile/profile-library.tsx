@@ -10,6 +10,7 @@ import {
   GraduationCap,
   Languages,
   Loader2,
+  Merge,
   MessageCircle,
   Plus,
   Printer,
@@ -51,6 +52,8 @@ export interface ProfileFactView {
   origin: string; // e.g. "CV · cv-2025.pdf", "GitHub"
   /** Ids of the same fact found in other CVs or sources (hidden: this wording is the shown one). */
   mergedIds: string[];
+  /** Their wordings, shown before merging them for good. */
+  mergedTexts: string[];
 }
 
 export interface CvItem {
@@ -118,6 +121,8 @@ interface Props {
     editCvLine: (input: { sourceId: string; path: CvEditPath; value: string }) => Promise<Result>;
     chatFacts: (answers: { question: string; answer: string }[]) => Promise<Result>;
     reject: (ids: string[]) => Promise<Result>;
+    merge: (input: { keepId: string; mergeIds: string[] }) => Promise<Result>;
+    mergeAll: () => Promise<Result>;
     edit: (input: { id: string; text: string; mergedIds: string[] }) => Promise<Result>;
     setAiAssisted: (input: { id: string; aiAssisted: boolean }) => Promise<Result>;
     keepDocument: (input: { id: string; kept: boolean }) => Promise<{ ok: true } | { ok: false; error: string }>;
@@ -184,6 +189,8 @@ export function ProfileLibrary({ t, candidate, cvs, keptDocuments, categories, g
       if (result.ok) after?.();
     });
   }
+
+  const duplicateCount = facts.reduce((n, f) => n + f.mergedIds.length, 0);
 
   /** For inline edits: shows an error, says whether to close the field, refreshes the page on success. */
   async function saveLine(action: () => Promise<Result>): Promise<boolean> {
@@ -497,7 +504,28 @@ export function ProfileLibrary({ t, candidate, cvs, keptDocuments, categories, g
       <div className="no-print space-y-8">
         {/* ---------- The merged profile ---------- */}
         <section aria-labelledby="base-title">
-          <SectionHeading eyebrow={t.baseEyebrow} title={t.baseTitle} id="base-title" aside={<span className="text-sm text-muted-foreground">{fill(t.factCount, { count: facts.length })}</span>} />
+          <SectionHeading
+            eyebrow={t.baseEyebrow}
+            title={t.baseTitle}
+            id="base-title"
+            aside={
+              <span className="flex flex-wrap items-center justify-end gap-3">
+                {duplicateCount > 0 && (
+                  <Button
+                    variant="outline"
+                    size="sm"
+                    disabled={pending}
+                    onClick={() => {
+                      if (window.confirm(fill(t.mergeAllConfirm, { count: duplicateCount }))) run(actions.mergeAll);
+                    }}
+                  >
+                    <Merge aria-hidden="true" /> {fill(t.mergeAll, { count: duplicateCount })}
+                  </Button>
+                )}
+                <span className="text-sm text-muted-foreground">{fill(t.factCount, { count: facts.length })}</span>
+              </span>
+            }
+          />
           <p className="-mt-2 mb-4 max-w-3xl text-sm text-muted-foreground">{t.baseHint}</p>
           <article className="overflow-hidden border border-earth/20 bg-card shadow-soft" aria-label={fill(t.baseOf, { name: candidate.name })}>
             <header className="flex items-center gap-4 bg-primary-soft/55 px-5 py-4 sm:px-8">
@@ -533,6 +561,10 @@ export function ProfileLibrary({ t, candidate, cvs, keptDocuments, categories, g
                       )
                     }
                     onDelete={() => run(() => actions.reject([fact.id, ...fact.mergedIds]))}
+                    onMerge={() => {
+                      const others = fact.mergedTexts.map((text) => `• ${text}`).join("\n");
+                      if (window.confirm(fill(t.mergeConfirm, { kept: fact.text, others }))) run(() => actions.merge({ keepId: fact.id, mergeIds: fact.mergedIds }));
+                    }}
                     onToggleAi={
                       type === "project"
                         ? (aiAssisted) =>
@@ -652,6 +684,7 @@ function FactRow({
   disabled,
   onSave,
   onDelete,
+  onMerge,
   onToggleAi,
   lineCopy,
 }: {
@@ -660,6 +693,7 @@ function FactRow({
   disabled: boolean;
   onSave: (text: string) => Promise<boolean>;
   onDelete: () => void;
+  onMerge: () => void;
   onToggleAi?: (aiAssisted: boolean) => void;
   lineCopy: { editLine: string; save: string; cancel: string };
 }) {
@@ -670,7 +704,18 @@ function FactRow({
         <EditableLine value={fact.text} onSave={onSave} t={lineCopy} />{" "}
         <span className="text-xs text-muted-foreground">
           · {fact.origin}
-          {also > 0 && ` · ${also === 1 ? t.alsoInOne : fill(t.alsoInMany, { count: also })}`}
+          {also > 0 && ` · ${also === 1 ? t.alsoInOne : fill(t.alsoInMany, { count: also })} · `}
+          {also > 0 && (
+            <button
+              type="button"
+              disabled={disabled}
+              onClick={onMerge}
+              aria-label={fill(t.mergeLabel, { text: fact.text })}
+              className="inline-flex items-center gap-0.5 underline underline-offset-2 hover:text-foreground disabled:opacity-50"
+            >
+              <Merge className="size-3" aria-hidden="true" /> {t.merge}
+            </button>
+          )}
         </span>
       </span>
       <span className="flex shrink-0 items-center gap-1">

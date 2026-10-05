@@ -3,7 +3,7 @@
 import { revalidatePath } from "next/cache";
 import { z } from "zod";
 import { getAccount, requireUserId } from "@/lib/server/auth";
-import { createFact, deleteFact, listFacts, updateFact } from "@/lib/data/facts";
+import { createFact, deleteFact, listFacts, mergeFacts, updateFact } from "@/lib/data/facts";
 import { aiErrorMessage } from "@/lib/ai/errors";
 import { PROFILE_COPY } from "@/lib/i18n/profile";
 import { getUiLang } from "@/lib/i18n/server";
@@ -15,6 +15,7 @@ import { applyCvEdit, cvEditPathSchema } from "@/lib/profile/cv-edit";
 import { LEETCODE_QUERY, leetcodeFact, leetcodeResponseSchema, leetcodeUsername } from "@/lib/profile/leetcode";
 import { isEmptyCvDocument, structureCv } from "@/lib/profile/cv-document";
 import { factKey, proposeFactsFromText } from "@/lib/profile/extract-facts";
+import { groupValidatedFacts } from "@/lib/profile/dedupe-facts";
 
 /** Messages in the site's language (the facts themselves keep the language they were written in). */
 async function uiCopy() {
@@ -73,8 +74,8 @@ export async function rejectFactAction(ids: unknown): Promise<ActionResult> {
 const editSchema = z.object({ id: z.string().uuid(), text: z.string().trim().min(3).max(500), mergedIds: z.array(z.string().uuid()).max(20).default([]) });
 
 /**
- * Rewrites a fact. When it was merged from several CVs, the other wordings are deleted: the candidate's
- * edit is now the one wording of that fact.
+ * Rewrites a fact. When it was merged from several CVs, the other wordings are merged into it for good
+ * (what cited them now cites this one): the candidate's edit is now the one wording of that fact.
  */
 export async function editFactAction(input: unknown): Promise<ActionResult> {
   const { t } = await uiCopy();
@@ -82,9 +83,43 @@ export async function editFactAction(input: unknown): Promise<ActionResult> {
   const parsed = editSchema.safeParse(input);
   if (!parsed.success) return { ok: false, error: t.textLength };
   if (!(await updateFact(userId, parsed.data.id, { text: parsed.data.text, validated: true }))) return { ok: false, error: t.factNotFound };
-  for (const id of parsed.data.mergedIds) if (id !== parsed.data.id) await deleteFact(userId, id);
+  await mergeFacts(userId, parsed.data.id, parsed.data.mergedIds);
   revalidatePath("/", "layout");
   return { ok: true, message: t.saved };
+}
+
+const mergeSchema = z.object({ keepId: z.string().uuid(), mergeIds: z.array(z.string().uuid()).min(1).max(20) });
+
+const mergedMessage = (t: (typeof PROFILE_COPY)["en"], count: number) => (count === 1 ? t.mergedOne : fill(t.mergedMany, { count }));
+
+/**
+ * Merges the other wordings of one fact into the wording shown, for good. Only wordings the profile
+ * still folds under that fact are merged (the groups are computed again here, as on the page).
+ */
+export async function mergeFactsAction(input: unknown): Promise<ActionResult> {
+  const { t } = await uiCopy();
+  const userId = await requireUserId();
+  const parsed = mergeSchema.safeParse(input);
+  if (!parsed.success) return { ok: false, error: t.factNotFound };
+  const group = groupValidatedFacts(await listFacts(userId)).find((g) => g.fact.id === parsed.data.keepId);
+  const asked = new Set(parsed.data.mergeIds);
+  const ids = group?.duplicates.map((d) => d.id).filter((id) => asked.has(id)) ?? [];
+  if (ids.length === 0) return { ok: false, error: t.nothingToMerge };
+  const merged = await mergeFacts(userId, parsed.data.keepId, ids);
+  revalidatePath("/", "layout");
+  return { ok: true, message: mergedMessage(t, merged) };
+}
+
+/** Merges every folded duplicate of the profile into the wording shown for its fact. */
+export async function mergeAllDuplicatesAction(): Promise<ActionResult> {
+  const { t } = await uiCopy();
+  const userId = await requireUserId();
+  const groups = groupValidatedFacts(await listFacts(userId)).filter((g) => g.duplicates.length > 0);
+  if (groups.length === 0) return { ok: false, error: t.nothingToMerge };
+  let merged = 0;
+  for (const g of groups) merged += await mergeFacts(userId, g.fact.id, g.duplicates.map((d) => d.id));
+  revalidatePath("/", "layout");
+  return { ok: true, message: mergedMessage(t, merged) };
 }
 
 const manualSchema = z.object({

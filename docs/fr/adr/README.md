@@ -41,6 +41,7 @@ défaire sans savoir pourquoi il a été pris.
 | 👤 [0022](0022-le-profil-est-la-base.md) | Le profil est la base : tout validé, fusionné, modifiable | ✅ acceptée |
 | 🔐 [0023](0023-cles-de-l-instance-pour-la-proprietaire.md) | Les clés de l'instance ne servent qu'à la propriétaire ; inscription fermée pendant le dev | ✅ acceptée |
 | 🧭 [0024](0024-pas-de-tableau-de-bord.md) | Pas de tableau de bord : le profil est la page d'accueil | ✅ acceptée |
+| 🔁 [0025](0025-fusion-dates-et-phrases-de-la-candidate.md) | Doublons fusionnés pour de bon, une seule façon d'écrire les dates des CV, les phrases de la candidate rejoignent la base | ✅ acceptée |
 
 > 📌 **Lisez les statuts.** Un ADR n'est jamais effacé : quand une décision change, l'ancien reste
 > et indique où se trouve la suite. C'est ce qui permet de comprendre *pourquoi* une décision a
