@@ -10,8 +10,20 @@ export interface AccessMail {
   text: string;
 }
 
+/**
+ * The site's public address, from the configuration only (APP_URL, else Vercel's production domain): a link
+ * built from the request's Host header could be forged by the visitor. Null when neither is set.
+ */
+export function appUrl(): string | null {
+  const env = serverEnv();
+  if (env.APP_URL) return env.APP_URL.replace(/\/+$/, "");
+  return env.VERCEL_PROJECT_PRODUCTION_URL ? `https://${env.VERCEL_PROJECT_PRODUCTION_URL}` : null;
+}
+
 /** The email to the owner, in English then French. Pure (tests/access/access-requests.test.ts). */
-export function accessRequestMail(request: { email: string; name: string; message: string }, appUrl: string): AccessMail {
+export function accessRequestMail(request: { email: string; name: string; message: string }, appUrl: string | null): AccessMail {
+  const settings = appUrl ? ` on ${appUrl}/settings` : "";
+  const reglages = appUrl ? ` sur ${appUrl}/settings` : "";
   const who = request.name ? `${request.name} (${request.email})` : request.email;
   const lines = [
     `${who} asks for access to NextRound.`,
@@ -20,11 +32,11 @@ export function accessRequestMail(request: { email: string; name: string; messag
     ...(request.name ? [`Name: ${request.name}`] : []),
     ...(request.message ? [`Message: ${request.message}`] : []),
     "",
-    `To answer: Settings, "Access requests", on ${appUrl}/settings`,
+    `To answer: Settings, "Access requests"${settings}`,
     `(or in a terminal: npm run clerk:signup -- allow ${request.email})`,
     "",
     "—",
-    `${who} demande l'accès à NextRound. Pour répondre : Réglages, « Demandes d'accès », sur ${appUrl}/settings.`,
+    `${who} demande l'accès à NextRound. Pour répondre : Réglages, « Demandes d'accès »${reglages}.`,
   ];
   return { subject: `NextRound: access request from ${request.email}`, text: lines.join("\n") };
 }

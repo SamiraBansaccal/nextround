@@ -59,6 +59,7 @@ Décision : [ADR 0026](fr/adr/0026-demandes-d-acces.md).
 - Vérifié : sur la version en ligne, l'inscription demande bien une invitation (`npm run clerk:signup -- probe` → `403 not_allowed_access` ; liste : l'adresse de la propriétaire seulement).
 - **« No invitation yet? Request access »** sur l'accueil et la page d'inscription : adresse, nom et message facultatifs. La demande va dans la **liste d'attente de Clerk** (pas de nouvelle table), et un **e-mail part vers la propriétaire**, retrouvée à l'exécution par `OWNER_GITHUB_ID` (rien d'écrit en dur). Limites : 3 demandes par jour et par visiteur, 20 e-mails par jour, un champ piège pour les robots.
 - **Réglages → Demandes d'accès** (propriétaire seulement) : Autoriser (liste d'autorisation + invitation envoyée par Clerk), Refuser, et la liste des adresses invitées avec Retirer.
+- 🔒 Le lien de l'e-mail vient de la configuration (`APP_URL`, sinon le domaine de production donné par Vercel), jamais des en-têtes de la requête, qu'un visiteur pourrait falsifier derrière un autre hébergeur (relevé par la revue de sécurité automatique, corrigé le jour même).
 - ⏳ **L'e-mail attend Resend** (`stripe projects add resend/free` puis `resend/email`, offre gratuite de 3 000 e-mails par mois) : à lancer avec l'accord de la propriétaire. Sans Resend, les demandes arrivent quand même dans ses Réglages.
 - README : « Stripe Projects en clair » (qui crée les comptes, le coffre à secrets, s'abonner, ajouter un service après coup), et le lien « Request access » dans l'option A.
 

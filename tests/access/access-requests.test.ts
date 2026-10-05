@@ -32,6 +32,12 @@ describe("the email to the owner", () => {
     expect(mail.text).toContain("demande l'accès à NextRound");
   });
 
+  it("gives no link when the site's address is not configured (never one taken from the request)", () => {
+    const mail = accessRequestMail({ email: "alex@example.com", name: "", message: "" }, null);
+    expect(mail.text).toContain('To answer: Settings, "Access requests"\n');
+    expect(mail.text).not.toContain("http");
+  });
+
   it("leaves out the lines the person did not fill in", () => {
     const mail = accessRequestMail({ email: "alex@example.com", name: "", message: "" }, "https://nextround.example");
     expect(mail.text.startsWith("alex@example.com asks for access")).toBe(true);
