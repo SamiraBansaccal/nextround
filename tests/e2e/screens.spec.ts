@@ -30,8 +30,17 @@ async function check(page: Page, name: string, projectName: string, theme: "ligh
 }
 
 test("landing page (signed out)", async ({ page }, info) => {
-  await page.goto("/");
+  const response = await page.goto("/");
+  // A strict Content-Security-Policy with a fresh nonce on every page (proxy.ts).
+  const scriptSrc = (response?.headers()["content-security-policy"] ?? "").split(";").find((d) => d.trim().startsWith("script-src")) ?? "";
+  expect(scriptSrc).toContain("'strict-dynamic'");
+  expect(scriptSrc).toMatch(/'nonce-[^']+'/);
   await check(page, "00-landing", info.project.name);
+  if (info.project.name === "desktop") {
+    // Under that policy, the GitHub sign-in still starts: Clerk sends the browser to GitHub.
+    await page.getByRole("button", { name: "Continue with GitHub" }).click();
+    await page.waitForURL(/github\.com/, { timeout: 30_000 });
+  }
 });
 
 test("every signed-in screen", async ({ page }, info) => {
@@ -85,6 +94,10 @@ test("every signed-in screen", async ({ page }, info) => {
     await merge.click();
     await expect(page.getByText("1 wording merged.")).toBeVisible();
     await expect(merge).toHaveCount(0);
+    // A CV PDF is still read in the browser under the CSP (unpdf). The test user has no AI key, so the
+    // import stops at the AI step, with the "add your key" message, once the PDF has been read.
+    await page.getByLabel("Add CVs (PDF)").setInputFiles("tests/e2e/cv-sample.pdf");
+    await expect(page.getByText("Add your AI key in Settings to use AI features.")).toBeVisible();
   }
   // New interview, step 1: what to practise; step 2: a track and its technologies.
   await page.goto("/interview/new");

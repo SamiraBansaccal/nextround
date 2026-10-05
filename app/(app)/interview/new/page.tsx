@@ -20,7 +20,9 @@ import { startInterviewAction } from "../actions";
 //   3. the interviewer, the interview's language (and, for an offer, which questions);
 //   4. the camera and microphone check, then the call.
 // Steps 1–2 are links (?kind=, ?offer=, ?track=, ?topic=); steps 3–4 are the setup screen. A link from an
-// offer (?offer=<id>) opens step 3 directly.
+// offer (?offer=<id>) opens step 3 directly. These links are not prefetched: in production, prefetching this
+// same page with other search params left requests open that never ended (seen with E2E_PROD=1); a click
+// renders the next step in well under a second anyway.
 
 const lang = "en"; // the interview's default language; the setup screen lets the candidate change it
 // Steps 1–2 are in the site's language (ui); steps 3–4 in the interview's language.
@@ -66,14 +68,14 @@ export default async function NewInterviewPage({ searchParams }: PageProps<"/int
             <p className="font-display text-xl">{t.noOffer}</p>
             <p className="mt-1 text-muted-foreground">{t.noOfferHint}</p>
             <Button asChild variant="action" size="xl" className="mt-5">
-              <Link href="/offers">{t.addOffer}</Link>
+              <Link prefetch={false} href="/offers">{t.addOffer}</Link>
             </Button>
           </div>
         ) : (
           <ul className="divide-y divide-border overflow-hidden rounded-3xl bg-card shadow-soft">
             {offers.map((o) => (
               <li key={o.id}>
-                <Link href={`/interview/new?offer=${o.id}`} className="flex items-center justify-between gap-4 px-6 py-5 transition-colors hover:bg-ink-soft">
+                <Link prefetch={false} href={`/interview/new?offer=${o.id}`} className="flex items-center justify-between gap-4 px-6 py-5 transition-colors hover:bg-ink-soft">
                   <span className="min-w-0">
                     <span className="block font-display text-xl">{o.title ?? t.untitledOffer}</span>
                     {o.company && <span className="text-sm text-muted-foreground">{o.company}</span>}
@@ -94,7 +96,7 @@ export default async function NewInterviewPage({ searchParams }: PageProps<"/int
     if (track) {
       return (
         <Step title={track.label[ui]} intro={track.description[ui]} back="/interview/new?kind=technology" backLabel={t.back}>
-          <Link
+          <Link prefetch={false}
             href={`/interview/new?kind=technology&topic=track:${track.id}`}
             className="mb-6 flex items-center gap-4 rounded-3xl bg-earth p-6 text-earth-foreground transition hover:brightness-110"
           >
@@ -109,7 +111,7 @@ export default async function NewInterviewPage({ searchParams }: PageProps<"/int
           <ul className="grid grid-cols-2 gap-3 sm:grid-cols-3 lg:grid-cols-4">
             {techsOfTrack(track).map((tech) => (
               <li key={tech.id}>
-                <Link
+                <Link prefetch={false}
                   href={`/interview/new?kind=technology&topic=tech:${tech.id}`}
                   className="flex h-full flex-col items-center gap-3 rounded-2xl border-2 border-transparent bg-card p-5 text-center transition-colors hover:border-ink/40"
                 >
@@ -127,7 +129,7 @@ export default async function NewInterviewPage({ searchParams }: PageProps<"/int
         <ul className="grid gap-4 sm:grid-cols-2">
           {TRACKS.map((track) => (
             <li key={track.id}>
-              <Link href={`/interview/new?kind=technology&track=${track.id}`} className="block h-full rounded-3xl bg-card p-6 shadow-soft transition hover:-translate-y-0.5">
+              <Link prefetch={false} href={`/interview/new?kind=technology&track=${track.id}`} className="block h-full rounded-3xl bg-card p-6 shadow-soft transition hover:-translate-y-0.5">
                 <span className="flex -space-x-2">
                   {track.techs.slice(0, 5).map((id) => (
                     <TechLogo key={id} logo={techLogo(id)} className="size-11 ring-2 ring-card" />
@@ -151,14 +153,14 @@ export default async function NewInterviewPage({ searchParams }: PageProps<"/int
         <p className="mt-3 text-muted-foreground">{t.whatToPractiseIntro}</p>
       </header>
       <div className="grid gap-5 lg:grid-cols-3">
-        <Link href="/interview/new?kind=offer" className="group flex min-h-64 flex-col justify-between rounded-[2rem] bg-earth p-7 text-earth-foreground transition hover:brightness-110">
+        <Link prefetch={false} href="/interview/new?kind=offer" className="group flex min-h-64 flex-col justify-between rounded-[2rem] bg-earth p-7 text-earth-foreground transition hover:brightness-110">
           <Briefcase className="size-9 text-action" aria-hidden="true" />
           <span>
             <span className="block font-display text-3xl">{t.kindOffer}</span>
             <span className="mt-2 block text-earth-foreground/80">{t.kindOfferHint}</span>
           </span>
         </Link>
-        <Link href="/interview/new?kind=technology" className="flex min-h-64 flex-col justify-between rounded-[2rem] bg-action p-7 text-action-foreground transition hover:brightness-105">
+        <Link prefetch={false} href="/interview/new?kind=technology" className="flex min-h-64 flex-col justify-between rounded-[2rem] bg-action p-7 text-action-foreground transition hover:brightness-105">
           <span className="flex -space-x-2">
             {["docker", "react", "cpp", "python", "kubernetes"].map((id) => (
               <TechLogo key={id} logo={techLogo(id)} className="size-11 ring-2 ring-action" />
@@ -169,7 +171,7 @@ export default async function NewInterviewPage({ searchParams }: PageProps<"/int
             <span className="mt-2 block opacity-80">{t.kindTechnologyHint}</span>
           </span>
         </Link>
-        <Link href="/interview/new?kind=hr" className="flex min-h-64 flex-col justify-between rounded-[2rem] border-2 border-ink bg-ink-soft p-7 text-ink transition hover:bg-ink hover:text-white">
+        <Link prefetch={false} href="/interview/new?kind=hr" className="flex min-h-64 flex-col justify-between rounded-[2rem] border-2 border-ink bg-ink-soft p-7 text-ink transition hover:bg-ink hover:text-white">
           <MessagesSquare className="size-9" aria-hidden="true" />
           <span>
             <span className="block font-display text-3xl">{t.kindHr}</span>
@@ -185,7 +187,7 @@ function Step({ title, intro, back, backLabel, children }: { title: string; intr
   return (
     <div className="space-y-8">
       <header className="max-w-3xl">
-        <Link href={back} className="inline-flex items-center gap-1 text-sm font-semibold text-ink hover:underline">
+        <Link prefetch={false} href={back} className="inline-flex items-center gap-1 text-sm font-semibold text-ink hover:underline">
           <ArrowLeft className="size-4" aria-hidden="true" /> {backLabel}
         </Link>
         <h1 className="mt-3 text-4xl leading-tight sm:text-5xl">{title}</h1>

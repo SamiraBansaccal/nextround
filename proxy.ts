@@ -9,7 +9,25 @@ export default clerkMiddleware(
   async (auth, request) => {
     if (!isPublicRoute(request)) await auth.protect();
   },
-  { signInUrl: "/sign-in", signUpUrl: "/sign-up" },
+  {
+    signInUrl: "/sign-in",
+    signUpUrl: "/sign-up",
+    // Content-Security-Policy, built by Clerk with its own domains and a new nonce on every request: only
+    // scripts that carry the nonce, or that such a script loads, may run ('strict-dynamic'). Next.js reads
+    // the nonce from the request and puts it on its scripts; the root layout hands it to Clerk and the theme.
+    // Added to Clerk's defaults: audio and downloads from blob: URLs (questions read aloud, CV as text),
+    // small data: images, and nothing may frame the site.
+    contentSecurityPolicy: {
+      strict: true,
+      directives: {
+        "img-src": ["self", "data:", "blob:", "https://img.clerk.com"],
+        "media-src": ["self", "blob:"],
+        "object-src": ["none"],
+        "base-uri": ["self"],
+        "frame-ancestors": ["none"],
+      },
+    },
+  },
 );
 
 export const config = {
