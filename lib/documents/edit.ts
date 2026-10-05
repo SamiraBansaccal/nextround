@@ -3,7 +3,8 @@ import type { SourcedSentence, TailoredDocument } from "@/lib/types";
 
 // Editing one sentence of a CV or a cover letter written for an offer, without writing it again: the
 // candidate changes a word, a phrase or a whole sentence. The sentence keeps the facts it cited (the
-// proof marks stay), and the edit is kept as written: the candidate is the author. Pure
+// proof marks stay), and the edit is kept as written and marked `edited`: the candidate is the author,
+// and once the document is in the profile the sentence joins the base (lib/documents/hand-written.ts). Pure
 // (tests/documents/document-edit.test.ts); the server action validates the path with `docEditPathSchema`.
 
 const index = z.number().int().min(0).max(200);
@@ -28,7 +29,7 @@ export const MAX_DOC_LINE = 1000;
 /** Replaces sentence `i` of a list, or removes it when the new text is empty. False if it does not exist. */
 function editSentence(list: SourcedSentence[], i: number, value: string): boolean {
   if (!list[i]) return false;
-  if (value) list[i] = { ...list[i], text: value };
+  if (value) list[i] = { ...list[i], text: value, edited: true };
   else list.splice(i, 1);
   return true;
 }

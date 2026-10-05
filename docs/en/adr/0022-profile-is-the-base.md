@@ -3,7 +3,7 @@
 > 🇫🇷 French version: [fr/adr/0022](../../fr/adr/0022-le-profil-est-la-base.md)
 
 - **Date:** 2026-10-04
-- **Status:** ✅ accepted
+- **Status:** ✅ accepted, amended by [ADR 0025](0025-merge-for-good-dates-and-own-words.md) (duplicates merged for good, CV dates, the candidate's own sentences)
 
 ## 🎯 Context
 

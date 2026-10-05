@@ -4,7 +4,8 @@ import { listFacts, validateLegacyFacts } from "@/lib/data/facts";
 import { listKeptDocuments } from "@/lib/data/documents";
 import { cvRef, listSources } from "@/lib/data/sources";
 import { formatDay } from "@/lib/shared/dates";
-import { groupNearDuplicates } from "@/lib/profile/dedupe-facts";
+import { harmonizeCvDates } from "@/lib/profile/cv-dates";
+import { groupValidatedFacts } from "@/lib/profile/dedupe-facts";
 import { TRACKS } from "@/lib/interview/tracks";
 import { offerTrack } from "@/lib/offers/track";
 import { PROFILE_COPY } from "@/lib/i18n/profile";
@@ -22,6 +23,8 @@ import {
   structureCvAction,
   editCvLineAction,
   importLeetcodeAction,
+  mergeAllDuplicatesAction,
+  mergeFactsAction,
 } from "./actions";
 import { editDocumentLineAction, keepDocumentAction } from "../offers/[id]/cv/actions";
 
@@ -44,7 +47,7 @@ export default async function ProfilePage({ searchParams }: PageProps<"/profile"
   // Everything comes from the candidate's own CVs and accounts: one merged base, duplicates folded in.
   const validated = facts.filter((f) => f.validated).sort((a, b) => b.createdAt.getTime() - a.createdAt.getTime());
   const originOf = (f: (typeof facts)[number]) => (f.source === "cv_upload" ? `CV · ${cvName.get(f.sourceRef ?? "") ?? t.removedCv}` : t.origin[f.source]);
-  const groups = groupNearDuplicates(validated);
+  const groups = groupValidatedFacts(facts);
   // Each CV in a category: the career track of the offer it was written for, or of its own skills and
   // headline (a CV written for one kind of job); "general" when it names no known technology.
   const GENERAL = "general";
@@ -112,7 +115,8 @@ export default async function ProfilePage({ searchParams }: PageProps<"/profile"
         selected && {
           id: selected.id,
           fileName: selected.ref,
-          document: selected.document,
+          // Dates written one way, never one the CV does not give (lib/profile/cv-dates.ts).
+          document: selected.document && harmonizeCvDates(selected.document),
           hasText: Boolean(selected.text),
         }
       }
@@ -123,10 +127,13 @@ export default async function ProfilePage({ searchParams }: PageProps<"/profile"
         aiAssisted: [fact, ...duplicates].some((f) => f.aiAssisted),
         origin: [...new Set([fact, ...duplicates].map(originOf))].join(" + "),
         mergedIds: duplicates.map((d) => d.id),
+        mergedTexts: duplicates.map((d) => d.text),
       }))}
       factTexts={Object.fromEntries(validated.map((f) => [f.id, f.text]))}
       actions={{
         importGithub: importGithubAction,
+        merge: mergeFactsAction,
+        mergeAll: mergeAllDuplicatesAction,
         importCodewars: importCodewarsAction,
         importLeetcode: importLeetcodeAction,
         editCvLine: editCvLineAction,

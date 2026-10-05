@@ -8,6 +8,11 @@ import { expect, type Page, test } from "@playwright/test";
 const E2E_EMAIL = "nextround-e2e+clerk_test@example.com";
 const ids = JSON.parse(process.env.E2E_IDS ?? "{}") as { offerId?: string; interviewId?: string; tailoredCvId?: string };
 
+// Known and harmless, development only: Clerk's development-keys notices, and next-themes, whose anti-flash
+// <script> sits inside a component, which React 19 reports when the layout renders again in the browser
+// (the script already ran with the server render). Seen now and then on the mobile run.
+const KNOWN_CONSOLE_ERRORS = ["Clerk", "Encountered a script tag while rendering React component"];
+
 test.beforeAll(async () => {
   await clerkSetup();
 });
@@ -32,7 +37,7 @@ test("landing page (signed out)", async ({ page }, info) => {
 test("every signed-in screen", async ({ page }, info) => {
   const errors: string[] = [];
   page.on("console", (msg) => {
-    if (msg.type() === "error" && !msg.text().includes("Clerk")) errors.push(msg.text());
+    if (msg.type() === "error" && !KNOWN_CONSOLE_ERRORS.some((known) => msg.text().includes(known))) errors.push(msg.text());
   });
 
   await page.goto("/");
@@ -72,6 +77,15 @@ test("every signed-in screen", async ({ page }, info) => {
     await check(page, name, info.project.name);
   }
   await page.context().clearCookies({ name: "nextround-ui-lang" });
+  // Merging a folded duplicate for good (once: both projects share the seeded data).
+  if (info.project.name === "desktop") {
+    await page.goto("/profile");
+    const merge = page.getByRole("button", { name: /^Merge the other wordings of “42 Belgium/ });
+    page.once("dialog", (dialog) => dialog.accept());
+    await merge.click();
+    await expect(page.getByText("1 wording merged.")).toBeVisible();
+    await expect(merge).toHaveCount(0);
+  }
   // New interview, step 1: what to practise; step 2: a track and its technologies.
   await page.goto("/interview/new");
   await expect(page.getByRole("heading", { level: 1, name: "What do you want to practise?" })).toBeVisible();

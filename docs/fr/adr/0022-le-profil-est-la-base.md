@@ -3,7 +3,7 @@
 > 🇬🇧 English version: [en/adr/0022](../../en/adr/0022-profile-is-the-base.md)
 
 - **Date :** 2026-10-04
-- **Statut :** ✅ acceptée
+- **Statut :** ✅ acceptée, amendée par l'[ADR 0025](0025-fusion-dates-et-phrases-de-la-candidate.md) (doublons fusionnés pour de bon, dates des CV, phrases de la candidate)
 
 ## 🎯 Contexte
 

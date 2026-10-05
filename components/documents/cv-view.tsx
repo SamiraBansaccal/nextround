@@ -120,7 +120,7 @@ export function CvView({ ui, t, offerId, offerLabel, language, candidate, cv, le
   });
 
   const keepButton = (doc: ShownDocument<unknown>) => (
-    <Button size="sm" variant={doc.kept ? "secondary" : "outline"} disabled={pending} onClick={() => run("cv", () => actions.keep({ id: doc.id, kept: !doc.kept }))}>
+    <Button size="sm" variant={doc.kept ? "secondary" : "outline"} disabled={pending} title={t.addToProfileHint} onClick={() => run("cv", () => actions.keep({ id: doc.id, kept: !doc.kept }))}>
       {doc.kept ? <BookmarkCheck className="size-4" aria-hidden="true" /> : <Bookmark className="size-4" aria-hidden="true" />}
       {doc.kept ? t.inProfile : t.addToProfile}
     </Button>

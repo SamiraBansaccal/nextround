@@ -35,6 +35,11 @@ export interface FactGroup<F> {
   duplicates: F[];
 }
 
+/** The profile's merged base: validated facts, newest first, near-duplicates grouped (as the profile shows them). */
+export function groupValidatedFacts<F extends { type: string; text: string; validated: boolean; createdAt: Date }>(facts: readonly F[]): FactGroup<F>[] {
+  return groupNearDuplicates(facts.filter((f) => f.validated).sort((a, b) => b.createdAt.getTime() - a.createdAt.getTime()));
+}
+
 /** Groups near-duplicate facts of the same type; the input order (newest first) breaks ties. */
 export function groupNearDuplicates<F extends { type: string; text: string }>(facts: readonly F[]): FactGroup<F>[] {
   const groups: { members: F[] }[] = [];

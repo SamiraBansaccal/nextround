@@ -18,6 +18,8 @@ export interface Quoted {
 export interface SourcedSentence {
   text: string;
   factIds: string[];
+  /** Written or corrected by the candidate with the pencil (lib/documents/edit.ts): their own words. */
+  edited?: boolean;
 }
 
 export type QuestionGroup = "hr" | "technical" | "gap";

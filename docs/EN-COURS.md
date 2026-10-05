@@ -18,13 +18,14 @@ Règle : chaque session a sa *branch*, s'inscrit ici, ouvre une PR, et met la li
 
 | *Branch* | Session | Sujet | PR |
 |---|---|---|---|
-| `claude/local-no-dashboard` | local | 🧭 Plus de tableau de bord : menu Profil → Offres → Entretiens → Réglages, le profil devient la page d'accueil, `/dashboard` renvoie vers `/profile`. Fichiers : `app/(app)/dashboard/` (supprimé), `components/{dashboard,layout,offers}/**`, `lib/i18n/{offers,ui}.ts`, `next.config.ts`, `tests/e2e/screens.spec.ts` | [#18](https://github.com/SamiraBansaccal/nextround/pull/18) |
+| `claude/local-profile-followups` | local | 🔁 Profil, suite : doublons fusionnés pour de bon (références recâblées), dates des CV écrites d'une seule façon sans rien inventer, phrases corrigées à la main d'un document du profil ajoutées à la base. Fichiers : `lib/profile/{merge-facts,cv-dates,dedupe-facts}.ts`, `lib/documents/{edit,hand-written}.ts`, `lib/data/facts.ts`, `components/profile/profile-library.tsx`, `app/(app)/profile/**`, `app/(app)/offers/[id]/cv/actions.ts` | PR à venir |
 
 <details>
 <summary>📦 Branches déjà fusionnées</summary>
 
 | *Branch* | Session | Sujet | PR |
 |---|---|---|---|
+| `claude/local-no-dashboard` | local | 🧭 Plus de tableau de bord : menu Profil → Offres → Entretiens → Réglages, le profil devient la page d'accueil, `/dashboard` renvoie vers `/profile`. Fichiers : `app/(app)/dashboard/` (supprimé), `components/{dashboard,layout,offers}/**`, `lib/i18n/{offers,ui}.ts`, `next.config.ts`, `tests/e2e/screens.spec.ts` | [#18](https://github.com/SamiraBansaccal/nextround/pull/18) |
 | `claude/local-owner-only` | local | 🔐 Toutes les clés de l'instance pour la propriétaire seule (Firecrawl compris ; clé Firecrawl perso dans les Réglages), propriétaire reconnue par son id GitHub numérique, inscription Clerk fermée. Migration `0008`. Fichiers : `lib/ai/config.ts`, `lib/server/{auth,env}.ts`, `lib/data/ai-settings.ts`, `components/settings/**`, `app/(app)/settings/**`, `app/(app)/offers/actions.ts`, `scripts/{infra,owner}/**`, `tests/e2e/fixtures.mts` | [#17](https://github.com/SamiraBansaccal/nextround/pull/17) |
 | `claude/local-settings` | local | ⚙️ Page Réglages (pleine largeur, encart « ce qui est branché », IA et voix côte à côte), bouton EN/FR aux couleurs de la DA, écrans e2e en français | [#16](https://github.com/SamiraBansaccal/nextround/pull/16) |
 | `claude/intelligent-einstein-58bqoh` | cloud | Entretiens sans offre, parcours de création, caméra, langue du site, couleurs, réglages IA | [#2](https://github.com/SamiraBansaccal/nextround/pull/2) |
@@ -41,6 +42,16 @@ Règle : chaque session a sa *branch*, s'inscrit ici, ouvre une PR, et met la li
 </details>
 
 ## ✅ Fait récemment
+
+### 🔁 Profil, suite (local, 2026-10-05)
+
+Décision : [ADR 0025](fr/adr/0025-fusion-dates-et-phrases-de-la-candidate.md).
+
+- **Doublons fusionnés pour de bon** : lien « Fusionner » sur chaque fait replié, bouton « Fusionner les doublons (N) » sur la base. Tout ce qui citait une formulation fusionnée (exigences d'offres, phrases de CV et lettres, réponses types, retours) pointe vers la formulation gardée avant la suppression.
+- 🐛 **Bug corrigé** : corriger au crayon un fait replié supprimait ses autres formulations sans recâbler leurs références (une offre pouvait perdre sa couverture, une phrase de CV sa preuve). Le crayon fusionne maintenant de la même façon.
+- 📅 **Dates des CV** écrites d'une seule façon à l'affichage (« février 2025 – juin 2025 », « 2023 – aujourd’hui »), **sans jamais rien inventer** : une année reste une année, « January – June 2025 » garde son année commune, ce qui ne se lit pas avec certitude reste tel quel. Le CV stocké ne change pas.
+- ✍️ Les phrases qu'on **corrige à la main** dans un CV ou une lettre du profil rejoignent la base (puce avec le titre de son entrée ; résumé et lettre sous « Réalisations »). Les phrases de l'IA et celles sur l'entreprise, non.
+- Vérifié : 210 tests unitaires (fusion testée sur un Postgres en mémoire), e2e 4/4 dont un clic réel sur « Fusionner ».
 
 ### 🧭 Plus de tableau de bord (local, 2026-10-05)
 
@@ -139,25 +150,12 @@ Décision : [ADR 0023](fr/adr/0023-cles-de-l-instance-pour-la-proprietaire.md).
 
 ## 🔜 Ensuite
 
-### 📋 To-do laissée par la session cloud (2026-10-04, pour la session locale)
-
-1. 🗄️ `git pull` puis `npm run db:migrate` (migration `0007_leetcode_source`), ou directement `node scripts/infra/deploy.mjs` qui migre puis déploie.
-2. 👀 Regarder `/dashboard`, `/offers` et `/profile` en vrai (FR) : nouvelles cartes, onglets par parcours, onglets de CV, bloc GitHub. Les logos Actiris/Forem sont des favicons 16–32 px : à remplacer par des logos plus nets si besoin.
-3. ⚙️ **Page Réglages** (demandée par la propriétaire, pas commencée) :
-   - prendre toute la largeur (aujourd'hui elle n'occupe qu'une partie) ;
-   - en haut, un **encart pleine largeur dans une couleur qui ressort** (brun ou orange, dans la DA) : « ce qui est branché » (fournisseur IA, modèle, voix), avec une explication simple de ce qu'est OpenRouter et de la limite de la clé de l'instance ;
-   - en dessous, **deux encarts côte à côte** : à gauche le fournisseur IA, à droite la voix ; expliquer où l'IA et la voix servent dans le site ;
-   - ElevenLabs reste coupé (voix du navigateur) tant qu'on ne fabrique pas les voix des intervieweurs ;
-   - fichiers : `app/(app)/settings/page.tsx`, `components/settings/*`, `lib/i18n/settings.ts`.
-4. 🎨 **Bouton EN/FR** : son bleu sort de la DA ; le passer en brun ou terracotta (`components/layout/*`).
-5. 🔐 **Question de la propriétaire** : quelqu'un qui trouve l'adresse Vercel et s'inscrit consomme-t-il ses requêtes IA ? Vérifier dans le code (limites de la clé de l'instance dans `lib/ai/config.ts`, inscription Clerk ouverte ou non) et lui répondre ; si oui, proposer de fermer l'inscription (liste d'autorisation Clerk) ou de réserver la clé de l'instance à la propriétaire.
-6. 📄 Profil, suite : ajouter à la base les phrases d'un CV ou d'une lettre validés ; harmoniser les dates des CV ; bouton « fusionner pour de bon » pour les doublons.
-
-- 📅 Harmoniser les dates des CV (« 2024 » / « mars 2024 » / « 03/2024 ») : aujourd'hui on les corrige au crayon ; proposer un format unique.
-- 🔁 Doublons : ils sont repliés à l'affichage ; un bouton « fusionner » pourrait les supprimer pour de bon.
-- 💬 Le chat de 5 questions du profil : à retravailler plus tard (demande du 2026-10-04).
-- 🧪 Lancer les e2e et regarder quelques écrans en français (cookie `nextround-ui-lang=fr`) ; vérifier que les *security headers* ne gênent pas Clerk.
-- 🔍 Points ouverts de l'audit : DNS rebinding, *owner* par id GitHub, CSP complète, `shadcn` en *devDependencies*, purge des compteurs.
-- 🚀 Relier Vercel à GitHub pour *deploy* sans le Mac.
+- ❓ À demander à la propriétaire : le nom de « cookie » (introuvable sur GitHub) et l'app du hackathon (2e place), pour les ajouter à ses projets faits avec l'IA.
+- 💼 Les 15 offres Actiris restantes (voir « En cours »).
+- 💬 Le chat de 5 questions du profil : à retravailler (demande du 2026-10-04).
+- 🔍 Points ouverts de l'audit : DNS rebinding, CSP complète, `shadcn` en *devDependencies*, purge des compteurs (*owner* par id GitHub : fait, ADR 0023).
+- 🚀 Relier Vercel à GitHub pour *deploy* sans le Mac (et sans *token* Stripe Projects qui expire).
+- 🖼️ Logos Actiris/Forem plus nets (aujourd'hui des favicons de 16 à 32 px dans `public/sites/`).
+- 🔐 Avant une instance Clerk de **production** : l'*allowlist* y est payante ; prévoir une barrière dans l'app, ou le plan payant (ADR 0023). Idée de la propriétaire, pas décidée : faire payer les autres utilisateurs via Stripe au lieu de leur demander leurs clés.
 - 🔊 Cache audio durable (Vercel Blob ou S3) quand ElevenLabs sera activé pour de bon.
-- 🎬 Avatars : animation pendant l'entretien (boucles vidéo, ElevenLabs Avatars, *lip sync* en temps réel).
+- 🎬 Avatars : en pause.
