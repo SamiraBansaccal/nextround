@@ -18,13 +18,14 @@ Règle : chaque session a sa *branch*, s'inscrit ici, ouvre une PR, et met la li
 
 | *Branch* | Session | Sujet | PR |
 |---|---|---|---|
-| `claude/local-handover` | local | 📝 EN-COURS à jour (offres importées, état du *deploy*), logo du Forem net. Fichiers : `docs/EN-COURS.md`, `public/sites/forem.png` | [#21](https://github.com/SamiraBansaccal/nextround/pull/21) |
+| `claude/local-private-repos` | local | 📝 EN-COURS : « cookie » et l'app du hackathon sont privés, pour plus tard | PR à venir |
 
 <details>
 <summary>📦 Branches déjà fusionnées</summary>
 
 | *Branch* | Session | Sujet | PR |
 |---|---|---|---|
+| `claude/local-handover` | local | 📝 EN-COURS à jour (offres importées, état du *deploy*), logo du Forem net. Fichiers : `docs/EN-COURS.md`, `public/sites/forem.png` | [#21](https://github.com/SamiraBansaccal/nextround/pull/21) |
 | `claude/local-audit-followups` | local | 🔍 Points ouverts de l'audit : DNS rebinding (agent undici qui vérifie l'adresse à la connexion), `shadcn` en *devDependencies*, purge des compteurs par minute. Fichiers : `lib/offers/fetch-page.ts`, `lib/ai/usage.ts`, `package.json`, `docs/fr/audits/` | [#20](https://github.com/SamiraBansaccal/nextround/pull/20) |
 | `claude/local-profile-followups` | local | 🔁 Profil, suite : doublons fusionnés pour de bon (références recâblées), dates des CV écrites d'une seule façon sans rien inventer, phrases corrigées à la main d'un document du profil ajoutées à la base. Fichiers : `lib/profile/{merge-facts,cv-dates,dedupe-facts}.ts`, `lib/documents/{edit,hand-written}.ts`, `lib/data/facts.ts`, `components/profile/profile-library.tsx`, `app/(app)/profile/**`, `app/(app)/offers/[id]/cv/actions.ts` | [#19](https://github.com/SamiraBansaccal/nextround/pull/19) |
 | `claude/local-no-dashboard` | local | 🧭 Plus de tableau de bord : menu Profil → Offres → Entretiens → Réglages, le profil devient la page d'accueil, `/dashboard` renvoie vers `/profile`. Fichiers : `app/(app)/dashboard/` (supprimé), `components/{dashboard,layout,offers}/**`, `lib/i18n/{offers,ui}.ts`, `next.config.ts`, `tests/e2e/screens.spec.ts` | [#18](https://github.com/SamiraBansaccal/nextround/pull/18) |
@@ -159,7 +160,7 @@ Décision : [ADR 0023](fr/adr/0023-cles-de-l-instance-pour-la-proprietaire.md).
 
 ## 🔜 Ensuite
 
-- ❓ À demander à la propriétaire : le nom de « cookie » (introuvable sur GitHub) et l'app du hackathon (2e place), pour les ajouter à ses projets faits avec l'IA.
+- 🔒 « cookie » et l'app du hackathon (2e place) sont des dépôts **privés** : on les ajoutera plus tard aux projets faits avec l'IA, quand la propriétaire le dira (réponse du 2026-10-05). Ne plus lui demander leurs noms.
 - 💼 Les 15 offres Actiris restantes (voir « En cours »).
 - 💬 Le chat de 5 questions du profil : à retravailler (demande du 2026-10-04).
 - 🔍 Dernier point ouvert de l'audit : une CSP complète avec *nonces*, à tester avec la connexion Clerk (GitHub, Google) dans un vrai navigateur.
