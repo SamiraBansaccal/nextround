@@ -2,7 +2,11 @@ import "server-only";
 import { z } from "zod";
 
 // Server-side environment, validated once. Names come from Stripe Projects
-// (`stripe projects env --pull`) and from scripts/setup-env.mjs.
+// (`stripe projects env --pull`) and from scripts/infra/setup-env.mjs; `.env.example` lists them all.
+
+/** An optional value: an empty line in `.env` ("NAME=") counts as not set, not as an empty string. */
+const optional = <T extends z.ZodTypeAny>(schema: T) => z.preprocess((v) => (v === "" ? undefined : v), schema.optional());
+
 const serverEnvSchema = z.object({
   DB_CONNECTION_STRING: z.string().min(1),
   CLERK_SECRET_KEY: z.string().min(1),
@@ -10,19 +14,19 @@ const serverEnvSchema = z.object({
   APP_ENCRYPTION_KEY: z.string().min(1),
   // The owner's NUMERIC GitHub id (api.github.com/users/<login> -> id): stable, unlike a username that can
   // be changed and then taken by someone else. Missing = nobody is the owner (fail closed).
-  OWNER_GITHUB_ID: z.string().regex(/^\d+$/).optional(),
+  OWNER_GITHUB_ID: optional(z.string().regex(/^\d+$/)),
   // Instance AI and services (optional: features degrade gracefully without them).
-  OPENROUTER_API_API_KEY: z.string().optional(),
-  FIRECRAWL_API_API_KEY: z.string().optional(),
-  ELEVENLABS_API_KEY: z.string().optional(),
+  OPENROUTER_API_API_KEY: optional(z.string()),
+  FIRECRAWL_API_API_KEY: optional(z.string()),
+  ELEVENLABS_API_KEY: optional(z.string()),
   // The instance's ElevenLabs key spends paid credits: used for the owner only when this is "true".
   INSTANCE_VOICE_ENABLED: z.enum(["true", "false"]).default("false"),
   // The owner's Anthropic API key (Console, not a Claude.ai subscription): preferred over OpenRouter when set.
-  ANTHROPIC_API_KEY: z.string().optional(),
-  INSTANCE_ANTHROPIC_MODEL: z.string().optional(),
+  ANTHROPIC_API_KEY: optional(z.string()),
+  INSTANCE_ANTHROPIC_MODEL: optional(z.string()),
   // Instance model on OpenRouter (defaults in lib/ai/providers.ts); fallbacks are comma-separated.
-  INSTANCE_LLM_MODEL: z.string().optional(),
-  INSTANCE_LLM_FALLBACK_MODELS: z.string().optional(),
+  INSTANCE_LLM_MODEL: optional(z.string()),
+  INSTANCE_LLM_FALLBACK_MODELS: optional(z.string()),
   // Self-hosting only: allow any OpenAI-compatible base URL (e.g. Ollama on localhost).
   ALLOW_CUSTOM_LLM_BASE_URL: z.enum(["true", "false"]).default("false"),
 });
