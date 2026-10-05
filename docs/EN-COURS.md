@@ -18,13 +18,14 @@ Règle : chaque session a sa *branch*, s'inscrit ici, ouvre une PR, et met la li
 
 | *Branch* | Session | Sujet | PR |
 |---|---|---|---|
-| `claude/local-csp` | local | 🛡️ CSP stricte (nonce par requête, construite par Clerk), e2e sur le *build* de production (`E2E_PROD=1`), liens de « Nouvel entretien » sans *prefetch*. Fichiers : `proxy.ts`, `app/layout.tsx`, `next.config.ts`, `app/(app)/interview/new/page.tsx`, `playwright.config.ts`, `tests/e2e/**` | [#24](https://github.com/SamiraBansaccal/nextround/pull/24) |
+| `claude/local-csp-live` | local | 📝 EN-COURS : CSP en ligne et vérifiée | [#25](https://github.com/SamiraBansaccal/nextround/pull/25) |
 
 <details>
 <summary>📦 Branches déjà fusionnées</summary>
 
 | *Branch* | Session | Sujet | PR |
 |---|---|---|---|
+| `claude/local-csp` | local | 🛡️ CSP stricte (nonce par requête, construite par Clerk), e2e sur le *build* de production (`E2E_PROD=1`), liens de « Nouvel entretien » sans *prefetch*. Fichiers : `proxy.ts`, `app/layout.tsx`, `next.config.ts`, `app/(app)/interview/new/page.tsx`, `playwright.config.ts`, `tests/e2e/**` | [#24](https://github.com/SamiraBansaccal/nextround/pull/24) |
 | `claude/local-deployed` | local | 📝 EN-COURS : *deploy* fait et vérifié | [#23](https://github.com/SamiraBansaccal/nextround/pull/23) |
 | `claude/local-private-repos` | local | 📝 EN-COURS : « cookie » et l'app du hackathon sont privés, pour plus tard | [#22](https://github.com/SamiraBansaccal/nextround/pull/22) |
 | `claude/local-handover` | local | 📝 EN-COURS à jour (offres importées, état du *deploy*), logo du Forem net. Fichiers : `docs/EN-COURS.md`, `public/sites/forem.png` | [#21](https://github.com/SamiraBansaccal/nextround/pull/21) |
@@ -52,6 +53,7 @@ Règle : chaque session a sa *branch*, s'inscrit ici, ouvre une PR, et met la li
 
 - **Content-Security-Policy stricte** sur chaque page : un *nonce* neuf par requête et `'strict-dynamic'`, construite par Clerk dans le *proxy* (`proxy.ts`, avec ses propres domaines), plus `media-src blob:` (questions lues à voix haute), `object-src 'none'`, `base-uri 'self'`, `frame-ancestors 'none'`. `<ClerkProvider dynamic>` et le thème reçoivent le *nonce* ; Next.js le met sur ses scripts. C'était le dernier point ouvert de l'audit.
 - **e2e sur le *build* de production** : `npm run build && E2E_PROD=1 npm run e2e` (en dev, la CSP autorise `'unsafe-eval'` et Next.js ne précharge rien). Les e2e vérifient aussi l'en-tête CSP, la lecture d'un CV PDF dans le navigateur (`tests/e2e/cv-sample.pdf`, fictif) et le départ de la connexion GitHub. 4/4 en dev et en production.
+- 🚀 En ligne (même jour) et vérifié sur le vrai site dans un navigateur : `/` et `/sign-in` ont la CSP stricte avec *nonce* (sans `'unsafe-eval'`), aucune erreur ni violation dans la console, « Continue with GitHub » mène bien à GitHub.
 - 🐛 Trouvé grâce à ce mode : en production, les liens de « Nouvel entretien » préchargeaient la même page avec d'autres paramètres, et ces préchargements restaient ouverts sans fin (invisible pour l'utilisatrice, mais des requêtes pendantes). Ces liens ne sont plus préchargés ; un clic affiche l'étape suivante en moins d'une demi-seconde.
 
 ### 🚀 En ligne (local, 2026-10-05)

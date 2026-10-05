@@ -27,13 +27,6 @@ npm-debug.log*
 /test-results/
 /playwright-report/
 
-.projects/cache
-.projects/vault
-.projects/state.test.json
-.projects/state.local.test.json
-.env
-.env.*
-!.env.example
 
 # Personal, machine-only files (your own CVs, offers, import scripts): never committed
 /.local/
@@ -48,3 +41,11 @@ npm-debug.log*
 
 # Python bytecode
 __pycache__/
+
+.projects/cache
+.projects/vault
+.projects/state.test.json
+.projects/state.local.test.json
+.env
+.env.*
+!.env.example
