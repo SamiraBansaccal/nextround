@@ -18,7 +18,7 @@ Règle : chaque session a sa *branch*, s'inscrit ici, ouvre une PR, et met la li
 
 | *Branch* | Session | Sujet | PR |
 |---|---|---|---|
-| `claude/local-deployed` | local | 📝 EN-COURS : *deploy* fait et vérifié | PR à venir |
+| `claude/local-deployed` | local | 📝 EN-COURS : *deploy* fait et vérifié | [#23](https://github.com/SamiraBansaccal/nextround/pull/23) |
 
 <details>
 <summary>📦 Branches déjà fusionnées</summary>
