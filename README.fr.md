@@ -185,7 +185,7 @@ Bon à savoir avant de commencer :
    ```
    Il passe par sept étapes, et te demande d'approuver des choses dans le navigateur en chemin :
    1. crée ton projet Stripe ;
-   2. ajoute les offres gratuites : Vercel, Neon, Clerk, OpenRouter, Firecrawl, ElevenLabs ;
+   2. ajoute les offres gratuites : Vercel, Neon, Clerk, OpenRouter, Firecrawl, ElevenLabs, Resend (e-mails des demandes d'accès) ;
    3. écrit les identifiants dans `.env` ;
    4. crée les valeurs propres à l'app : les clés Clerk, une clé de chiffrement, et **toi comme propriétaire** (ton identifiant GitHub numérique) ;
    5. crée les tables de la base ;
@@ -225,6 +225,7 @@ Si tu as modifié le code toi-même, la synchronisation peut te demander de rés
 | 🤖 OpenRouter | Modèles gratuits : 20 requêtes par minute et 50 par jour par compte (1 000 par jour après un achat unique de 10 $ de crédits) |
 | 🎧 ElevenLabs | 10 000 crédits par mois, usage non commercial |
 | 🕷️ Firecrawl | 1 000 pages par mois |
+| ✉️ Resend | 3 000 e-mails par mois ; sans domaine à toi, il n'envoie qu'à l'adresse de ton compte (ça suffit pour te prévenir des demandes d'accès) |
 
 Chiffres vérifiés sur les pages de tarifs des fournisseurs le 2026-10-05 : ils peuvent changer.
 

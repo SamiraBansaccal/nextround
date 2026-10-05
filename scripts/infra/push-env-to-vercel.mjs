@@ -8,8 +8,7 @@
 // Uses VERCEL_TOKEN / VERCEL_ORG_ID / VERCEL_PROJECT_ID from .env (provided by Stripe Projects).
 // Only the variables listed below are sent (never the Vercel token itself). Values are never printed.
 
-import { readFileSync } from "node:fs";
-import { parseEnv } from "node:util";
+import { envWithFreshVercelToken } from "./vercel-env.mjs";
 
 const KEYS = [
   "NEXT_PUBLIC_CLERK_PUBLISHABLE_KEY",
@@ -24,12 +23,9 @@ const KEYS = [
   "ACCESS_MAIL_FROM",
 ];
 
-const env = parseEnv(readFileSync(".env", "utf8"));
+// The token issued by Stripe Projects expires: it is renewed first when needed (vercel-env.mjs).
+const env = await envWithFreshVercelToken();
 const { VERCEL_TOKEN, VERCEL_ORG_ID, VERCEL_PROJECT_ID } = env;
-if (!VERCEL_TOKEN || !VERCEL_PROJECT_ID) {
-  console.error("VERCEL_TOKEN / VERCEL_PROJECT_ID missing from .env. Run `stripe projects env --pull` first.");
-  process.exit(1);
-}
 
 const team = VERCEL_ORG_ID ? `&teamId=${encodeURIComponent(VERCEL_ORG_ID)}` : "";
 const url = `https://api.vercel.com/v10/projects/${encodeURIComponent(VERCEL_PROJECT_ID)}/env?upsert=true${team}`;

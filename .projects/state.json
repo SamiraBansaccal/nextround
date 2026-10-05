@@ -16,6 +16,9 @@
     "openrouter": {
       "name": "OpenRouter"
     },
+    "resend": {
+      "name": "Resend"
+    },
     "vercel": {
       "name": "Vercel"
     }
@@ -81,6 +84,18 @@
       "providerName": "OpenRouter",
       "serviceId": "free"
     },
+    "resend-email": {
+      "livemode": true,
+      "name": "resend-email",
+      "providerName": "Resend",
+      "serviceId": "email"
+    },
+    "resend-plan": {
+      "livemode": true,
+      "name": "resend-plan",
+      "providerName": "Resend",
+      "serviceId": "free"
+    },
     "vercel-plan": {
       "livemode": true,
       "name": "vercel-plan",
@@ -121,6 +136,12 @@
         },
         {
           "resourceName": "openrouter-plan"
+        },
+        {
+          "resourceName": "resend-email"
+        },
+        {
+          "resourceName": "resend-plan"
         },
         {
           "resourceName": "vercel-plan"
