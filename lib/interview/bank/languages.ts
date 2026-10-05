@@ -83,7 +83,7 @@ export const csharp = defineTech(
     label: same("C# / .NET"),
     family: "language",
     tool: true,
-    aliases: ["c#", "csharp", "c sharp", ".net", "dotnet", ".net core", "asp.net", "asp.net core", "blazor", "entity framework", "ef core"],
+    aliases: ["c#", "csharp", "c sharp", ".net", "dotnet", ".net core", "asp.net", "asp.net core", "blazor", "entity framework", "ef core", "winforms", "windows forms", "wpf"],
   },
   [
     [

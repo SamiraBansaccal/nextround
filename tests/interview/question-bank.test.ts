@@ -91,6 +91,22 @@ describe("techsIn", () => {
     expect(ids("JavaScript")).toEqual(["javascript"]);
     expect(ids("Kubernetes (K8s)")).toEqual(["kubernetes"]);
     expect(ids("MariaDB")).toEqual(["sql"]);
+    // Names seen in real offers: a whole value for common words ("Express", "Cursor", "Windows"), aliases otherwise.
+    expect(ids("Express")).toEqual(["node"]);
+    expect(ids("Oracle")).toEqual(["sql"]);
+    expect(ids("Hudson")).toEqual(["cicd"]);
+    expect(ids("PowerShell")).toEqual(["windows"]);
+    expect(ids("Windows 10/11")).toEqual(["windows"]);
+    expect(ids("Active Directory et GPO")).toEqual(["windows"]);
+    expect(ids("CQRS")).toEqual(["architecture"]);
+    expect(ids("Hexagonal")).toEqual(["architecture"]);
+    expect(ids("Microservices")).toEqual(["architecture"]);
+    expect(ids("Copilot")).toEqual(["llm"]);
+    expect(ids("GitHub Copilot")).toContain("llm"); // and Git, through "github"
+    expect(ids("Cursor")).toEqual(["llm"]);
+    expect(ids("RAG with Pinecone")).toEqual(["llm"]);
+    expect(ids("SQL cursors and stored procedures")).toEqual(["sql"]); // "cursor" alone is the AI editor only as a whole value
+    expect(ids("maintenance windows on Sunday")).toEqual([]); // the word, not the system
     expect(ids("Docker Compose")).toEqual(["docker"]);
     expect(ids("CI/CD")).toEqual(["cicd"]);
     expect(ids("Spring")).toEqual(["spring"]);
