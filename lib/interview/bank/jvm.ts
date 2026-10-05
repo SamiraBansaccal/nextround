@@ -8,7 +8,7 @@ export const java = defineTech(
     label: same("Java"),
     family: "language",
     tool: true,
-    aliases: ["java", "jdk", "jvm", "java se", "java ee", "jakarta ee", "j2ee", "java 8", "java 11", "java 17", "java 21", "maven", "gradle", "junit"],
+    aliases: ["java", "jdk", "jvm", "java se", "java ee", "jakarta ee", "j2ee", "java 8", "java 11", "java 17", "java 21", "maven", "gradle", "junit", "vaadin"],
   },
   [
     [

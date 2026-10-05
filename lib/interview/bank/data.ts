@@ -8,6 +8,7 @@ export const sql = defineTech(
     label: same("SQL"),
     family: "data",
     tool: true,
+    exact: ["oracle"],
     aliases: [
       "sql", "mysql", "mariadb", "postgresql", "postgres", "sql server", "mssql", "sqlite", "t-sql", "pl/sql", "plsql", "oracle database", "oracle db",
       "relational database", "relational databases", "base de donnees relationnelle", "bases de donnees relationnelles", "rdbms", "sgbd", "sgbdr",

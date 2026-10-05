@@ -206,7 +206,7 @@ export const node = defineTech(
     label: same("Node.js"),
     family: "web",
     tool: true,
-    exact: ["node"],
+    exact: ["node", "express"],
     aliases: ["node.js", "nodejs", "node js", "express.js", "expressjs", "express js", "nestjs", "nest.js", "npm", "fastify"],
   },
   [

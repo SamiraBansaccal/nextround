@@ -129,7 +129,7 @@ export const cpp = defineTech(
     label: same("C++"),
     family: "language",
     tool: true,
-    aliases: ["c++", "cpp", "c++11", "c++14", "c++17", "c++20", "c++23", "modern c++", "cplusplus"],
+    aliases: ["c++", "cpp", "c++11", "c++14", "c++17", "c++20", "c++23", "modern c++", "cplusplus", "mfc"],
   },
   [
     [

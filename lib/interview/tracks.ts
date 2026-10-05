@@ -17,7 +17,7 @@ export const TRACKS: readonly Track[] = [
     id: "devops",
     label: { en: "DevOps & cloud", fr: "DevOps & cloud" },
     description: { en: "Containers, pipelines, Linux and infrastructure.", fr: "Conteneurs, pipelines, Linux et infrastructure." },
-    techs: ["docker", "kubernetes", "cicd", "git", "linux", "bash", "terraform", "ansible", "cloud", "networking", "nginx", "monitoring"],
+    techs: ["docker", "kubernetes", "cicd", "git", "linux", "bash", "terraform", "ansible", "cloud", "networking", "nginx", "monitoring", "windows"],
   },
   {
     id: "web",
@@ -59,7 +59,7 @@ export const TRACKS: readonly Track[] = [
     id: "foundations",
     label: { en: "Foundations", fr: "Fondamentaux" },
     description: { en: "Algorithms, OOP, security, testing, agile.", fr: "Algorithmes, POO, sécurité, tests, agilité." },
-    techs: ["algorithms", "oop", "security", "testing", "agile"],
+    techs: ["algorithms", "oop", "security", "testing", "agile", "architecture", "llm"],
   },
 ];
 

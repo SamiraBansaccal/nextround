@@ -55,6 +55,9 @@ const LOGOS: Record<string, TechLogo> = {
   security: { kind: "icon", icon: "shield" },
   testing: { kind: "icon", icon: "flask" },
   agile: { kind: "icon", icon: "kanban" },
+  architecture: { kind: "icon", icon: "layers" },
+  llm: { kind: "icon", icon: "sparkles" },
+  windows: { kind: "icon", icon: "monitor" },
 };
 
 export function techLogo(id: string): TechLogo {

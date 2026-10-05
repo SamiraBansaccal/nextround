@@ -1,11 +1,14 @@
-import { Binary, Boxes, Cloud, Code2, Cpu, FlaskConical, Kanban, Network, Plug, ShieldCheck } from "lucide-react";
+import { Binary, Boxes, Cloud, Code2, Cpu, FlaskConical, Kanban, Layers, Monitor, Network, Plug, ShieldCheck, Sparkles } from "lucide-react";
 import type { TechLogo as Logo } from "@/lib/interview/tech-logos";
 import { cn } from "@/lib/utils";
 
 // A technology's logo in a round badge: the brand mark (Simple Icons) in its colour, or a generic icon
 // for notions without a logo. Display only.
 
-const ICONS = { cloud: Cloud, network: Network, plug: Plug, cpu: Cpu, binary: Binary, boxes: Boxes, shield: ShieldCheck, flask: FlaskConical, kanban: Kanban, code: Code2 };
+const ICONS = {
+  cloud: Cloud, network: Network, plug: Plug, cpu: Cpu, binary: Binary, boxes: Boxes, shield: ShieldCheck, flask: FlaskConical, kanban: Kanban, code: Code2,
+  layers: Layers, sparkles: Sparkles, monitor: Monitor,
+};
 
 export function TechLogo({ logo, className }: { logo: Logo; className?: string }) {
   if (logo.kind === "brand") {

@@ -18,13 +18,14 @@ Règle : chaque session a sa *branch*, s'inscrit ici, ouvre une PR, et met la li
 
 | *Branch* | Session | Sujet | PR |
 |---|---|---|---|
-| `claude/local-csp-live` | local | 📝 EN-COURS : CSP en ligne et vérifiée | [#25](https://github.com/SamiraBansaccal/nextround/pull/25) |
+| `claude/local-bank-gaps` | local | 🎙️ Banque technique : architecture logicielle, IA et LLM, Windows Server et AD ; alias pour les noms vus dans les offres. Fichiers : `lib/interview/bank/**`, `lib/interview/{tracks,tech-logos}.ts`, `components/interview/tech-logo.tsx`, `tests/interview/question-bank.test.ts` | PR à venir |
 
 <details>
 <summary>📦 Branches déjà fusionnées</summary>
 
 | *Branch* | Session | Sujet | PR |
 |---|---|---|---|
+| `claude/local-csp-live` | local | 📝 EN-COURS : CSP en ligne et vérifiée | [#25](https://github.com/SamiraBansaccal/nextround/pull/25) |
 | `claude/local-csp` | local | 🛡️ CSP stricte (nonce par requête, construite par Clerk), e2e sur le *build* de production (`E2E_PROD=1`), liens de « Nouvel entretien » sans *prefetch*. Fichiers : `proxy.ts`, `app/layout.tsx`, `next.config.ts`, `app/(app)/interview/new/page.tsx`, `playwright.config.ts`, `tests/e2e/**` | [#24](https://github.com/SamiraBansaccal/nextround/pull/24) |
 | `claude/local-deployed` | local | 📝 EN-COURS : *deploy* fait et vérifié | [#23](https://github.com/SamiraBansaccal/nextround/pull/23) |
 | `claude/local-private-repos` | local | 📝 EN-COURS : « cookie » et l'app du hackathon sont privés, pour plus tard | [#22](https://github.com/SamiraBansaccal/nextround/pull/22) |
@@ -48,6 +49,15 @@ Règle : chaque session a sa *branch*, s'inscrit ici, ouvre une PR, et met la li
 </details>
 
 ## ✅ Fait récemment
+
+### 🎙️ Banque technique, trous comblés (local, 2026-10-05)
+
+- Mesuré sur les 21 offres de la propriétaire : quelles technologies de leur *stack* n'avaient aucune question. Ajouté 3 technologies (**45** en tout, **497** questions, chacune avec sa réponse modèle EN/FR et le vous/tu de l'intervieweur) :
+  - **Architecture logicielle** (parcours Fondamentaux) : monolithe ou microservices, architecture hexagonale, CQRS, event sourcing, cohérence à terme, timeouts entre services, données partagées, versions d'API, et une question d'expérience ;
+  - **IA et LLM** (Fondamentaux) : ce qu'un LLM sait faire ou non, assistant de code sans livrer ce qu'on ne comprend pas, RAG, embeddings et bases vectorielles, hallucinations, clés et données, modèle hébergé ou local, tokens, et « un projet fait avec l'IA : qu'as-tu vérifié toi-même ? » (utile pour les projets vibe-codés) ;
+  - **Windows Server et AD** (DevOps et cloud) : Active Directory, GPO, session qui ne s'ouvre pas, PowerShell, dossier partagé inaccessible, mises à jour en vagues, Hyper-V et points de contrôle.
+- Alias pour les noms vus dans ses offres : Express → Node.js, Oracle → SQL, Hudson → CI/CD, OpenSearch/Graphite/Mimir → supervision, Fortigate → réseaux, Zero Trust/Vault/ISO 27001 → sécurité, MFC → C++, WinForms/WPF → C#, Vaadin → Java. Les mots courants (« Cursor », « Windows », « Express ») ne comptent que comme valeur entière : « SQL cursors » reste du SQL.
+- Restent sans questions, une offre chacune : Ruby, SOAP, Nomad, Machine Learning (et des outils qui ne sont pas des sujets d'entretien : Confluence, IntelliJ, ISO 9001, ticketing).
 
 ### 🛡️ CSP complète (local, 2026-10-05)
 

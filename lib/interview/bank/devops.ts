@@ -178,6 +178,7 @@ export const cicd = defineTech(
     aliases: [
       "ci/cd", "ci / cd", "ci-cd", "cicd", "continuous integration", "continuous delivery", "continuous deployment", "integration continue",
       "livraison continue", "deploiement continu", "github actions", "gitlab ci", "gitlab-ci", "jenkins", "azure devops", "circleci", "argo cd", "argocd",
+      "hudson",
     ],
   },
   [
@@ -621,6 +622,7 @@ export const networking = defineTech(
     aliases: [
       "networking", "network", "networks", "reseau", "reseaux", "tcp/ip", "tcp", "udp", "dns", "dhcp", "osi", "routing", "routage", "subnetting",
       "lan", "vlan", "vpn", "firewall", "pare-feu", "cisco", "ccna",
+      "fortigate", "fortinet",
     ],
   },
   [
@@ -746,6 +748,7 @@ export const monitoring = defineTech(
     aliases: [
       "monitoring", "observability", "observabilite", "supervision", "alerting", "prometheus", "grafana", "datadog", "zabbix", "nagios",
       "elk", "kibana", "logstash", "loki", "opentelemetry", "new relic",
+      "opensearch", "graphite", "mimir",
     ],
   },
   [
@@ -783,6 +786,71 @@ export const monitoring = defineTech(
       "Des utilisateurs signalent des erreurs, mais tous les tableaux de bord sont au vert. Comment {enquêtez-vous|enquêtes-tu} ?",
       "The dashboards are probably not measuring what users experience. I start from a concrete case, time, account and page, and look for it in the logs and traces, and I test the path myself from outside, like a user, through DNS, CDN and load balancer. Often the error is on a path nobody monitors, in a single region or for some users only, or on the client side. Then I add the missing check.",
       "Les tableaux de bord ne mesurent probablement pas ce que vivent les utilisateurs. Je pars d'un cas concret, heure, compte et page, je le cherche dans les logs et les traces, et je teste le parcours moi-même depuis l'extérieur, comme un utilisateur, en passant par le DNS, le CDN et le répartiteur de charge. Souvent l'erreur touche un chemin que personne ne surveille, une seule région ou une partie des utilisateurs, ou le côté client. Ensuite j'ajoute la vérification qui manquait.",
+    ],
+  ],
+);
+
+export const windows = defineTech(
+  {
+    id: "windows",
+    label: { en: "Windows Server & AD", fr: "Windows Server et AD" },
+    family: "devops",
+    tool: true,
+    exact: ["windows", "ad", "nps", "windows 10/11"],
+    aliases: [
+      "windows server", "active directory", "powershell", "group policy", "group policies", "strategie de groupe", "gpo", "hyper-v", "hyperv",
+      "windows 10", "windows 11", "intune", "sccm", "wsus", "entra id", "azure ad", "azure active directory", "veeam", "microsoft 365", "office 365",
+    ],
+  },
+  [
+    [
+      "active-directory", "concept",
+      "What is Active Directory, and what does a domain controller do?",
+      "Qu'est-ce qu'Active Directory, et à quoi sert un contrôleur de domaine ?",
+      "Active Directory is Microsoft's directory: it holds the users, groups, computers and policies of an organisation, so that people log in everywhere with one account and administrators manage rights centrally. A domain controller is a server that runs it: it checks logins, mostly with Kerberos, answers directory queries and replicates the data to the other domain controllers, which is why there are always at least two.",
+      "Active Directory est l'annuaire de Microsoft : il contient les utilisateurs, les groupes, les ordinateurs et les stratégies d'une organisation, pour que chacun se connecte partout avec un seul compte et que les administrateurs gèrent les droits de façon centralisée. Un contrôleur de domaine est un serveur qui le fait tourner : il vérifie les connexions, surtout avec Kerberos, répond aux requêtes sur l'annuaire et réplique les données vers les autres contrôleurs de domaine, c'est pourquoi il y en a toujours au moins deux.",
+    ],
+    [
+      "gpo", "practice",
+      "What is a Group Policy, and what would you use one for?",
+      "Qu'est-ce qu'une stratégie de groupe (GPO), et à quoi {l'utiliseriez-vous|l'utiliserais-tu} ?",
+      "A Group Policy Object is a set of settings that Active Directory applies to the users or computers of an organisational unit: for example a password policy, locking the screen after ten minutes, mapping a network drive, installing a printer or a piece of software, or blocking USB drives. You link it to the right OU, test it on a few machines first, and check what was applied with gpresult.",
+      "Une GPO est un ensemble de paramètres qu'Active Directory applique aux utilisateurs ou aux ordinateurs d'une unité d'organisation : par exemple une politique de mots de passe, le verrouillage de l'écran après dix minutes, un lecteur réseau, une imprimante ou un logiciel à installer, ou le blocage des clés USB. On la lie à la bonne OU, on la teste d'abord sur quelques machines, et on vérifie ce qui a été appliqué avec gpresult.",
+    ],
+    [
+      "login-fails", "troubleshoot",
+      "A user cannot open their Windows session on the domain. What do you check?",
+      "Un utilisateur n'arrive pas à ouvrir sa session Windows sur le domaine. Que {vérifiez-vous|vérifies-tu} ?",
+      "First the simple causes: caps lock or the keyboard layout, an expired password or a locked account, which I can see and fix in Active Directory. If other people can log in on that computer, the problem is the account; if nobody can, I look at the machine: the network, a DNS that does not point to the domain controllers, a clock out of sync, which breaks Kerberos, or a broken trust with the domain. The event logs of the computer and of the domain controller confirm it.",
+      "D'abord les causes simples : la touche majuscule ou la disposition du clavier, un mot de passe expiré ou un compte verrouillé, que je vois et corrige dans Active Directory. Si d'autres personnes se connectent bien sur ce poste, le problème vient du compte ; si personne n'y arrive, je regarde la machine : le réseau, un DNS qui ne pointe pas vers les contrôleurs de domaine, une horloge décalée, qui casse Kerberos, ou une relation d'approbation rompue avec le domaine. Les journaux d'événements du poste et du contrôleur de domaine le confirment.",
+    ],
+    [
+      "powershell", "practice",
+      "Why use PowerShell rather than the graphical tools? Give an example of a task you would script.",
+      "Pourquoi utiliser PowerShell plutôt que les outils graphiques ? {Donnez|Donne} un exemple de tâche que {vous scripteriez|tu scripterais}.",
+      "A script does the same thing every time, on one machine or five hundred, leaves a trace of what was done, and can be reviewed and reused. PowerShell works with objects, not text, so filtering and exporting is easy. For example: creating the accounts of new employees from a CSV file with New-ADUser, putting them in the right groups and sending the list to their managers, or listing the accounts that have not logged in for ninety days.",
+      "Un script fait la même chose à chaque fois, sur une machine ou sur cinq cents, garde une trace de ce qui a été fait, et peut être relu et réutilisé. PowerShell manipule des objets et non du texte, donc filtrer et exporter est simple. Par exemple : créer les comptes des nouveaux employés à partir d'un fichier CSV avec New-ADUser, les mettre dans les bons groupes et envoyer la liste à leurs responsables, ou lister les comptes qui ne se sont pas connectés depuis quatre-vingt-dix jours.",
+    ],
+    [
+      "share-access", "troubleshoot",
+      "One team can no longer open a shared folder. How do you investigate?",
+      "Une équipe n'arrive plus à ouvrir un dossier partagé. Comment {enquêtez-vous|enquêtes-tu} ?",
+      "I check whether it is the whole team or one person, and what changed recently. Then the path: the server answers, and the share can be reached by its name, which tests DNS. On Windows two layers of rights apply, the share permissions and the NTFS permissions of the folder, and the most restrictive wins, so I check both, and the groups of the team members; someone just added to a group must log in again to get the new rights.",
+      "Je vérifie si c'est toute l'équipe ou une seule personne, et ce qui a changé récemment. Puis le chemin : le serveur répond, et le partage est joignable par son nom, ce qui teste le DNS. Sous Windows, deux niveaux de droits s'appliquent, les autorisations du partage et les autorisations NTFS du dossier, et le plus restrictif l'emporte : je vérifie donc les deux, et les groupes des membres de l'équipe ; une personne qu'on vient d'ajouter à un groupe doit se reconnecter pour obtenir ses nouveaux droits.",
+    ],
+    [
+      "updates", "best_practice",
+      "How do you roll out Windows updates on many computers without breaking anything?",
+      "Comment {déployez-vous|déploies-tu} les mises à jour Windows sur beaucoup de postes sans rien casser ?",
+      "With a central tool, WSUS or Intune for example, and in waves: first a small test group, with IT and a few volunteers, then everyone else after a few days without problems. Installations happen in a maintenance window, outside working hours for the servers, with a backup or a snapshot before, a check afterwards that the important applications still work, and a report of the machines that failed. Security updates are not postponed for long.",
+      "Avec un outil central, WSUS ou Intune par exemple, et par vagues : d'abord un petit groupe de test, avec l'informatique et quelques volontaires, puis tous les autres après quelques jours sans problème. Les installations se font dans une fenêtre de maintenance, en dehors des heures de travail pour les serveurs, avec une sauvegarde ou un snapshot avant, une vérification après que les applications importantes fonctionnent encore, et un rapport des machines en échec. Les mises à jour de sécurité ne sont pas repoussées longtemps.",
+    ],
+    [
+      "hyper-v-checkpoints", "concept",
+      "What is Hyper-V, and what is a checkpoint, or snapshot, for and not for?",
+      "Qu'est-ce que Hyper-V, et à quoi sert un point de contrôle (snapshot), et à quoi il ne sert pas ?",
+      "Hyper-V is Microsoft's hypervisor: it runs several virtual machines on one physical server, each with its own operating system. A checkpoint saves the state of a virtual machine at one moment, useful just before a risky change, like an update, to go back quickly if it goes wrong. It is not a backup: it sits on the same storage, slows the disk down if kept for long, and is lost with the server; real backups, for example with Veeam, go somewhere else.",
+      "Hyper-V est l'hyperviseur de Microsoft : il fait tourner plusieurs machines virtuelles sur un serveur physique, chacune avec son propre système d'exploitation. Un point de contrôle enregistre l'état d'une machine virtuelle à un instant donné, utile juste avant une modification risquée, comme une mise à jour, pour revenir en arrière rapidement si ça tourne mal. Ce n'est pas une sauvegarde : il est sur le même stockage, ralentit le disque si on le garde longtemps, et disparaît avec le serveur ; les vraies sauvegardes, par exemple avec Veeam, vont ailleurs.",
     ],
   ],
 );
