@@ -18,7 +18,7 @@ Règle : chaque session a sa *branch*, s'inscrit ici, ouvre une PR, et met la li
 
 | *Branch* | Session | Sujet | PR |
 |---|---|---|---|
-| `claude/local-handover` | local | 📝 EN-COURS à jour (offres importées, état du *deploy*), logo du Forem net. Fichiers : `docs/EN-COURS.md`, `public/sites/forem.png` | PR à venir |
+| `claude/local-handover` | local | 📝 EN-COURS à jour (offres importées, état du *deploy*), logo du Forem net. Fichiers : `docs/EN-COURS.md`, `public/sites/forem.png` | [#21](https://github.com/SamiraBansaccal/nextround/pull/21) |
 
 <details>
 <summary>📦 Branches déjà fusionnées</summary>
