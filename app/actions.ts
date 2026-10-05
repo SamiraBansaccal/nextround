@@ -2,7 +2,7 @@
 
 import { createHash } from "node:crypto";
 import { headers } from "next/headers";
-import { accessRequestMail, sendMail } from "@/lib/access/notify";
+import { accessRequestMail, appUrl, sendMail } from "@/lib/access/notify";
 import { accessRequestSchema } from "@/lib/access/request-form";
 import { type AccessRequestOutcome, recordAccessRequest } from "@/lib/access/requests";
 import { consumeInstanceQuota } from "@/lib/ai/usage";
@@ -40,12 +40,10 @@ export async function requestAccessAction(input: unknown): Promise<RequestAccess
   }
   if (outcome === "received") {
     const owner = await ownerContact().catch(() => null);
-    const host = h.get("x-forwarded-host") ?? h.get("host");
-    if (owner && host) {
-      const appUrl = `${h.get("x-forwarded-proto") ?? "https"}://${host}`;
+    if (owner) {
       // Over the daily cap, no email: the request still waits in the owner's Settings.
       await consumeInstanceQuota("instance", "access_mail").then(
-        () => sendMail(owner.email, accessRequestMail(parsed.data, appUrl)),
+        () => sendMail(owner.email, accessRequestMail(parsed.data, appUrl())),
         () => false,
       );
     }
