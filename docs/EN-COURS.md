@@ -18,7 +18,7 @@ Règle : chaque session a sa *branch*, s'inscrit ici, ouvre une PR, et met la li
 
 | *Branch* | Session | Sujet | PR |
 |---|---|---|---|
-| `claude/local-readme-friends` | local | 🙋 README pour débutants en FR et EN (app en ligne sur invitation ou copie à soi), `.env.example`, invitations `npm run clerk:signup -- allow / disallow`, lignes vides du `.env` = non définies. Fichiers : `README.md`, `README.fr.md`, `.env.example`, `scripts/infra/clerk-signup.mts`, `lib/server/env.ts`, `docs/README.md` | PR à venir |
+| `claude/local-readme-friends` | local | 🙋 README pour débutants en FR et EN (app en ligne sur invitation ou copie à soi), `.env.example`, invitations `npm run clerk:signup -- allow / disallow`, lignes vides du `.env` = non définies. Fichiers : `README.md`, `README.fr.md`, `.env.example`, `scripts/infra/clerk-signup.mts`, `lib/server/env.ts`, `docs/README.md` | [#27](https://github.com/SamiraBansaccal/nextround/pull/27) |
 
 <details>
 <summary>📦 Branches déjà fusionnées</summary>
