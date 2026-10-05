@@ -18,7 +18,7 @@ Règle : chaque session a sa *branch*, s'inscrit ici, ouvre une PR, et met la li
 
 | *Branch* | Session | Sujet | PR |
 |---|---|---|---|
-| `claude/local-access-requests` | local | 📨 Demandes d'accès : formulaire public, liste d'attente Clerk, e-mail à la propriétaire (Resend, à brancher), réponse dans les Réglages ; README « Stripe Projects en clair ». Fichiers : `lib/access/**`, `lib/server/owner.ts`, `app/actions.ts`, `app/page.tsx`, `app/sign-up/**`, `components/{auth,settings}/**`, `app/(app)/settings/**`, `lib/ai/usage.ts`, `README*.md` | PR à venir |
+| `claude/local-access-requests` | local | 📨 Demandes d'accès : formulaire public, liste d'attente Clerk, e-mail à la propriétaire (Resend, à brancher), réponse dans les Réglages ; README « Stripe Projects en clair ». Fichiers : `lib/access/**`, `lib/server/owner.ts`, `app/actions.ts`, `app/page.tsx`, `app/sign-up/**`, `components/{auth,settings}/**`, `app/(app)/settings/**`, `lib/ai/usage.ts`, `README*.md` | [#29](https://github.com/SamiraBansaccal/nextround/pull/29) |
 
 <details>
 <summary>📦 Branches déjà fusionnées</summary>
