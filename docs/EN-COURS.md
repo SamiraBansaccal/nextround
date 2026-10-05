@@ -18,7 +18,7 @@ Règle : chaque session a sa *branch*, s'inscrit ici, ouvre une PR, et met la li
 
 | *Branch* | Session | Sujet | PR |
 |---|---|---|---|
-| `claude/local-csp` | local | 🛡️ CSP stricte (nonce par requête, construite par Clerk), e2e sur le *build* de production (`E2E_PROD=1`), liens de « Nouvel entretien » sans *prefetch*. Fichiers : `proxy.ts`, `app/layout.tsx`, `next.config.ts`, `app/(app)/interview/new/page.tsx`, `playwright.config.ts`, `tests/e2e/**` | PR à venir |
+| `claude/local-csp` | local | 🛡️ CSP stricte (nonce par requête, construite par Clerk), e2e sur le *build* de production (`E2E_PROD=1`), liens de « Nouvel entretien » sans *prefetch*. Fichiers : `proxy.ts`, `app/layout.tsx`, `next.config.ts`, `app/(app)/interview/new/page.tsx`, `playwright.config.ts`, `tests/e2e/**` | [#24](https://github.com/SamiraBansaccal/nextround/pull/24) |
 
 <details>
 <summary>📦 Branches déjà fusionnées</summary>
