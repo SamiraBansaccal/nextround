@@ -2,12 +2,14 @@ import { defineConfig, devices } from "@playwright/test";
 
 // Visual check of every screen (scripts/test/e2e.mjs seeds a test user, runs this, then cleans up).
 // Playwright starts the dev server itself and stops it at the end: no orphan browser or server.
+// E2E_PROD=1 runs the same screens on the production build instead (`npm run build` first): the
+// Content-Security-Policy is stricter there (no 'unsafe-eval'), as on the live site.
 const PORT = 3100;
 
 export default defineConfig({
   testDir: "./tests/e2e",
   testMatch: /.*\.spec\.ts/,
-  timeout: 90_000,
+  timeout: process.env.E2E_PROD ? 300_000 : 90_000, // production prefetches every visible link: slower to settle
   workers: 1, // one browser at a time: kind to an 8 GB laptop
   reporter: [["list"]],
   outputDir: "test-results",
@@ -31,7 +33,7 @@ export default defineConfig({
     { name: "mobile", use: { ...devices["Pixel 7"] } },
   ],
   webServer: {
-    command: `npx next dev --port ${PORT}`,
+    command: process.env.E2E_PROD ? `npx next start --port ${PORT}` : `npx next dev --port ${PORT}`,
     url: `http://localhost:${PORT}`,
     reuseExistingServer: false,
     timeout: 180_000,

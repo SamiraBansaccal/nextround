@@ -63,6 +63,7 @@ npm install
 npm run dev          # http://localhost:3000 (needs a .env, see below)
 npm test             # unit tests, no secrets needed
 npm run e2e          # every screen in a real browser (needs the Clerk and Neon keys)
+npm run build && E2E_PROD=1 npm run e2e   # the same screens on the production build (stricter CSP)
 npm run db:migrate   # apply new migrations before deploying
 ```
 

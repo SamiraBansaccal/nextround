@@ -117,7 +117,7 @@ tests/
 ```
 
 - `npm test` lance Vitest (rapide, sans secret).
-- `npm run e2e` lance Playwright via `scripts/test/e2e.mjs` (a besoin des secrets Clerk et Neon).
+- `npm run e2e` lance Playwright via `scripts/test/e2e.mjs` (a besoin des secrets Clerk et Neon). `npm run build && E2E_PROD=1 npm run e2e` fait la même chose sur le *build* de production, où la CSP est plus stricte (pas de `'unsafe-eval'`) et où Next.js précharge les liens.
 
 ## ⚙️ `scripts/` : les outils en ligne de commande
 

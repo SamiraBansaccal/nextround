@@ -18,13 +18,14 @@ Règle : chaque session a sa *branch*, s'inscrit ici, ouvre une PR, et met la li
 
 | *Branch* | Session | Sujet | PR |
 |---|---|---|---|
-| `claude/local-deployed` | local | 📝 EN-COURS : *deploy* fait et vérifié | [#23](https://github.com/SamiraBansaccal/nextround/pull/23) |
+| `claude/local-csp` | local | 🛡️ CSP stricte (nonce par requête, construite par Clerk), e2e sur le *build* de production (`E2E_PROD=1`), liens de « Nouvel entretien » sans *prefetch*. Fichiers : `proxy.ts`, `app/layout.tsx`, `next.config.ts`, `app/(app)/interview/new/page.tsx`, `playwright.config.ts`, `tests/e2e/**` | [#24](https://github.com/SamiraBansaccal/nextround/pull/24) |
 
 <details>
 <summary>📦 Branches déjà fusionnées</summary>
 
 | *Branch* | Session | Sujet | PR |
 |---|---|---|---|
+| `claude/local-deployed` | local | 📝 EN-COURS : *deploy* fait et vérifié | [#23](https://github.com/SamiraBansaccal/nextround/pull/23) |
 | `claude/local-private-repos` | local | 📝 EN-COURS : « cookie » et l'app du hackathon sont privés, pour plus tard | [#22](https://github.com/SamiraBansaccal/nextround/pull/22) |
 | `claude/local-handover` | local | 📝 EN-COURS à jour (offres importées, état du *deploy*), logo du Forem net. Fichiers : `docs/EN-COURS.md`, `public/sites/forem.png` | [#21](https://github.com/SamiraBansaccal/nextround/pull/21) |
 | `claude/local-audit-followups` | local | 🔍 Points ouverts de l'audit : DNS rebinding (agent undici qui vérifie l'adresse à la connexion), `shadcn` en *devDependencies*, purge des compteurs par minute. Fichiers : `lib/offers/fetch-page.ts`, `lib/ai/usage.ts`, `package.json`, `docs/fr/audits/` | [#20](https://github.com/SamiraBansaccal/nextround/pull/20) |
@@ -46,6 +47,12 @@ Règle : chaque session a sa *branch*, s'inscrit ici, ouvre une PR, et met la li
 </details>
 
 ## ✅ Fait récemment
+
+### 🛡️ CSP complète (local, 2026-10-05)
+
+- **Content-Security-Policy stricte** sur chaque page : un *nonce* neuf par requête et `'strict-dynamic'`, construite par Clerk dans le *proxy* (`proxy.ts`, avec ses propres domaines), plus `media-src blob:` (questions lues à voix haute), `object-src 'none'`, `base-uri 'self'`, `frame-ancestors 'none'`. `<ClerkProvider dynamic>` et le thème reçoivent le *nonce* ; Next.js le met sur ses scripts. C'était le dernier point ouvert de l'audit.
+- **e2e sur le *build* de production** : `npm run build && E2E_PROD=1 npm run e2e` (en dev, la CSP autorise `'unsafe-eval'` et Next.js ne précharge rien). Les e2e vérifient aussi l'en-tête CSP, la lecture d'un CV PDF dans le navigateur (`tests/e2e/cv-sample.pdf`, fictif) et le départ de la connexion GitHub. 4/4 en dev et en production.
+- 🐛 Trouvé grâce à ce mode : en production, les liens de « Nouvel entretien » préchargeaient la même page avec d'autres paramètres, et ces préchargements restaient ouverts sans fin (invisible pour l'utilisatrice, mais des requêtes pendantes). Ces liens ne sont plus préchargés ; un clic affiche l'étape suivante en moins d'une demi-seconde.
 
 ### 🚀 En ligne (local, 2026-10-05)
 
@@ -168,8 +175,8 @@ Décision : [ADR 0023](fr/adr/0023-cles-de-l-instance-pour-la-proprietaire.md).
 - 🔒 « cookie » et l'app du hackathon (2e place) sont des dépôts **privés** : on les ajoutera plus tard aux projets faits avec l'IA, quand la propriétaire le dira (réponse du 2026-10-05). Ne plus lui demander leurs noms.
 - 💼 Les 15 offres Actiris restantes (voir « En cours »).
 - 💬 Le chat de 5 questions du profil : à retravailler (demande du 2026-10-04).
-- 🔍 Dernier point ouvert de l'audit : une CSP complète avec *nonces*, à tester avec la connexion Clerk (GitHub, Google) dans un vrai navigateur.
-- 🚀 Relier Vercel à GitHub pour *deploy* sans le Mac (et sans *token* Stripe Projects qui expire).
+- 🔍 Audit du 2026-10-04 : tous les points sont fermés. Le refaire de temps en temps (`npm audit --omit=dev`, `/security-review`).
+- 🚀 Relier Vercel à GitHub pour *deploy* sans le Mac : le compte Vercel (créé par Stripe Projects) ne voit **aucun** compte GitHub (`/v1/integrations/git-namespaces` vide). Il faut que la propriétaire connecte GitHub une fois dans Vercel (un clic, OAuth) ; ensuite, relier le projet par l'API et ne lancer les migrations qu'au *build* de **production** (`VERCEL_ENV=production`), jamais sur une *preview* (une seule base, ADR 0014).
 - 🖼️ Logo Actiris : toujours le favicon de 16 px (le site n'a pas d'icône plus grande ; le logo complet est horizontal). Le Forem a maintenant son icône officielle en 64 px.
 - 🔐 Avant une instance Clerk de **production** : l'*allowlist* y est payante ; prévoir une barrière dans l'app, ou le plan payant (ADR 0023). Idée de la propriétaire, pas décidée : faire payer les autres utilisateurs via Stripe au lieu de leur demander leurs clés.
 - 🔊 Cache audio durable (Vercel Blob ou S3) quand ElevenLabs sera activé pour de bon.

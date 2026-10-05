@@ -79,7 +79,7 @@ Only `types.ts` and `utils.ts` (shadcn's `cn()`, a path shadcn expects) stay at 
 
 ## 🧪 `tests/`
 
-`helpers/` (in-memory Postgres, server-only stub), then one folder per domain: `ai/`, `data/` (🧱 isolation between users), `interview/`, `offers/`, `profile/`, `documents/`, `ui/` (EN/FR copy parity), `voice/`, and `e2e/` (Playwright). `npm test` needs no secrets; `npm run e2e` needs the Clerk and Neon ones.
+`helpers/` (in-memory Postgres, server-only stub), then one folder per domain: `ai/`, `data/` (🧱 isolation between users), `interview/`, `offers/`, `profile/`, `documents/`, `ui/` (EN/FR copy parity), `voice/`, and `e2e/` (Playwright). `npm test` needs no secrets; `npm run e2e` needs the Clerk and Neon ones. `npm run build && E2E_PROD=1 npm run e2e` runs the same screens on the production build, where the CSP is stricter (no `'unsafe-eval'`) and Next.js prefetches links.
 
 ## ⚙️ `scripts/`
 

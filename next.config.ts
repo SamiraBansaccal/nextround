@@ -1,10 +1,9 @@
 import type { NextConfig } from "next";
 
-// Security headers on every response. No full Content-Security-Policy yet: Clerk loads scripts and
-// frames from its own domains, and a strict policy needs testing in a real browser first.
+// Security headers on every response. The Content-Security-Policy itself (nonces, Clerk's domains,
+// frame-ancestors 'none') is set by the proxy on every page (proxy.ts).
 const SECURITY_HEADERS = [
-  { key: "Content-Security-Policy", value: "frame-ancestors 'none'" }, // no clickjacking: never shown in a frame
-  { key: "X-Frame-Options", value: "DENY" }, // the same, for older browsers
+  { key: "X-Frame-Options", value: "DENY" }, // no clickjacking: never shown in a frame (CSP frame-ancestors too)
   { key: "X-Content-Type-Options", value: "nosniff" },
   { key: "Referrer-Policy", value: "strict-origin-when-cross-origin" },
   // Camera and microphone for the interview call, on this site only; nothing else.
