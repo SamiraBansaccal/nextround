@@ -1,5 +1,6 @@
 import { describe, expect, it, vi } from "vitest";
-import { assertPublicHttpUrl, fetchPageText, htmlToText, looksBlocked, sourceSiteFor } from "@/lib/offers/fetch-page";
+import type { LookupAddress } from "node:dns";
+import { assertPublicHttpUrl, fetchPageText, htmlToText, looksBlocked, publicLookup, sourceSiteFor } from "@/lib/offers/fetch-page";
 
 // SSRF protection and page reading. Literal IP addresses are used so that no DNS is involved.
 
@@ -40,6 +41,20 @@ describe("assertPublicHttpUrl (SSRF protection)", () => {
 
   it("accepts a public address", async () => {
     await expect(assertPublicHttpUrl("http://93.184.216.34/jobs/1")).resolves.toBeInstanceOf(URL);
+  });
+});
+
+describe("publicLookup (DNS rebinding)", () => {
+  // The lookup run when the connection opens: a name that resolves to a private address is refused there
+  // too, whatever the first check saw. "localhost" resolves locally (no network needed).
+  const resolve = (all: boolean) =>
+    new Promise<{ error: Error | null; found: string | LookupAddress[] }>((done) =>
+      publicLookup("localhost", { all }, ((error: Error | null, found: string | LookupAddress[]) => done({ error, found })) as never),
+    );
+
+  it("refuses a host that resolves to a private address, with or without `all`", async () => {
+    expect((await resolve(false)).error).toMatchObject({ reason: "blocked_address" });
+    expect((await resolve(true)).error).toMatchObject({ reason: "blocked_address" });
   });
 });
 
