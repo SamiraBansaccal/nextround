@@ -18,7 +18,7 @@ Règle : chaque session a sa *branch*, s'inscrit ici, ouvre une PR, et met la li
 
 | *Branch* | Session | Sujet | PR |
 |---|---|---|---|
-| `claude/local-resend` | local | ✉️ Resend dans la *stack* (fiches Stripe Projects, `bootstrap`), renouvellement du *token* Vercel partagé, README | PR à venir |
+| `claude/local-resend` | local | ✉️ Resend dans la *stack* (fiches Stripe Projects, `bootstrap`), renouvellement du *token* Vercel partagé, README | [#31](https://github.com/SamiraBansaccal/nextround/pull/31) |
 
 <details>
 <summary>📦 Branches déjà fusionnées</summary>
