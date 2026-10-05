@@ -18,13 +18,14 @@ Règle : chaque session a sa *branch*, s'inscrit ici, ouvre une PR, et met la li
 
 | *Branch* | Session | Sujet | PR |
 |---|---|---|---|
-| `claude/local-audit-followups` | local | 🔍 Points ouverts de l'audit : DNS rebinding (agent undici qui vérifie l'adresse à la connexion), `shadcn` en *devDependencies*, purge des compteurs par minute. Fichiers : `lib/offers/fetch-page.ts`, `lib/ai/usage.ts`, `package.json`, `docs/fr/audits/` | [#20](https://github.com/SamiraBansaccal/nextround/pull/20) |
+| `claude/local-handover` | local | 📝 EN-COURS à jour (offres importées, état du *deploy*), logo du Forem net. Fichiers : `docs/EN-COURS.md`, `public/sites/forem.png` | PR à venir |
 
 <details>
 <summary>📦 Branches déjà fusionnées</summary>
 
 | *Branch* | Session | Sujet | PR |
 |---|---|---|---|
+| `claude/local-audit-followups` | local | 🔍 Points ouverts de l'audit : DNS rebinding (agent undici qui vérifie l'adresse à la connexion), `shadcn` en *devDependencies*, purge des compteurs par minute. Fichiers : `lib/offers/fetch-page.ts`, `lib/ai/usage.ts`, `package.json`, `docs/fr/audits/` | [#20](https://github.com/SamiraBansaccal/nextround/pull/20) |
 | `claude/local-profile-followups` | local | 🔁 Profil, suite : doublons fusionnés pour de bon (références recâblées), dates des CV écrites d'une seule façon sans rien inventer, phrases corrigées à la main d'un document du profil ajoutées à la base. Fichiers : `lib/profile/{merge-facts,cv-dates,dedupe-facts}.ts`, `lib/documents/{edit,hand-written}.ts`, `lib/data/facts.ts`, `components/profile/profile-library.tsx`, `app/(app)/profile/**`, `app/(app)/offers/[id]/cv/actions.ts` | [#19](https://github.com/SamiraBansaccal/nextround/pull/19) |
 | `claude/local-no-dashboard` | local | 🧭 Plus de tableau de bord : menu Profil → Offres → Entretiens → Réglages, le profil devient la page d'accueil, `/dashboard` renvoie vers `/profile`. Fichiers : `app/(app)/dashboard/` (supprimé), `components/{dashboard,layout,offers}/**`, `lib/i18n/{offers,ui}.ts`, `next.config.ts`, `tests/e2e/screens.spec.ts` | [#18](https://github.com/SamiraBansaccal/nextround/pull/18) |
 | `claude/local-owner-only` | local | 🔐 Toutes les clés de l'instance pour la propriétaire seule (Firecrawl compris ; clé Firecrawl perso dans les Réglages), propriétaire reconnue par son id GitHub numérique, inscription Clerk fermée. Migration `0008`. Fichiers : `lib/ai/config.ts`, `lib/server/{auth,env}.ts`, `lib/data/ai-settings.ts`, `components/settings/**`, `app/(app)/settings/**`, `app/(app)/offers/actions.ts`, `scripts/{infra,owner}/**`, `tests/e2e/fixtures.mts` | [#17](https://github.com/SamiraBansaccal/nextround/pull/17) |
@@ -144,7 +145,7 @@ Décision : [ADR 0023](fr/adr/0023-cles-de-l-instance-pour-la-proprietaire.md).
 
 - 🚀 **Deploy en attente** : le *token* Vercel donné par Stripe Projects a expiré (HTTP 403), et son renouvellement écrit dans le coffre de Stripe : à lancer par la propriétaire (`stripe projects rotate nextround` puis `stripe projects env --pull`). Ensuite : `node scripts/infra/push-env-to-vercel.mjs` (envoie `OWNER_GITHUB_ID` à Vercel, **avant** le *deploy*, sinon la propriétaire perd les clés de l'instance) puis `node scripts/infra/deploy.mjs`.
 - 🔑 **Secrets absents du cloud** : sans eux, ni l'app ni les e2e ne tournent dans une session cloud. Liste : [guide local et cloud](fr/guides/local-et-cloud.md#-les-secrets-dans-le-cloud).
-- 💼 25 offres Actiris (Bruxelles, IT, accessibles à un junior) choisies le 2026-10-04 : à importer avec `npm run owner:import-offers -- .local/offers/*.txt` une fois les secrets en place. Si `.local/offers/` n'existe plus : `npm run offers:actiris -- search`, puis `npm run offers:actiris -- fetch <ref:type> …` (refs : 5953957 5965434 5949141 5952000 5952031 5951701:Select 5947174:Select 5947193 5949293:DirectOnline 5945294 5936584 5947954 5907687 5962926 5959174:DirectOnline 5966908 5964627 5966116 5969827 5934580 5887917 5843176 5905968:Select 5869183 5869129).
+- 💼 25 offres Actiris (Bruxelles, IT, accessibles à un junior) choisies le 2026-10-04 : **20 importées** sur le compte de la propriétaire (10 de plus le 2026-10-05, pour 19 appels d'IA : le modèle gratuit relance parfois). **Restent 5**, textes prêts dans `.local/offers/` : `npm run owner:import-offers -- .local/offers/{5945294,5962926,5966908,5869183,5869129}.txt` (environ 9 appels ; à lancer un jour où le quota de 40 n'est pas entamé). Si `.local/offers/` n'existe plus : `npm run offers:actiris -- fetch 5945294 5962926 5966908 5869183 5869129`.
 - 🚫 Indeed bloque les robots (Cloudflare, 403) et l'interdit : on ne le contourne pas. Offres Indeed : lien ou texte collé dans l'app.
 - 📄 Importer des CV : les joindre au chat, Claude lance `owner:import-cv`.
 
@@ -163,7 +164,7 @@ Décision : [ADR 0023](fr/adr/0023-cles-de-l-instance-pour-la-proprietaire.md).
 - 💬 Le chat de 5 questions du profil : à retravailler (demande du 2026-10-04).
 - 🔍 Dernier point ouvert de l'audit : une CSP complète avec *nonces*, à tester avec la connexion Clerk (GitHub, Google) dans un vrai navigateur.
 - 🚀 Relier Vercel à GitHub pour *deploy* sans le Mac (et sans *token* Stripe Projects qui expire).
-- 🖼️ Logos Actiris/Forem plus nets (aujourd'hui des favicons de 16 à 32 px dans `public/sites/`).
+- 🖼️ Logo Actiris : toujours le favicon de 16 px (le site n'a pas d'icône plus grande ; le logo complet est horizontal). Le Forem a maintenant son icône officielle en 64 px.
 - 🔐 Avant une instance Clerk de **production** : l'*allowlist* y est payante ; prévoir une barrière dans l'app, ou le plan payant (ADR 0023). Idée de la propriétaire, pas décidée : faire payer les autres utilisateurs via Stripe au lieu de leur demander leurs clés.
 - 🔊 Cache audio durable (Vercel Blob ou S3) quand ElevenLabs sera activé pour de bon.
 - 🎬 Avatars : en pause.
