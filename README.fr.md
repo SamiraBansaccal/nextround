@@ -206,10 +206,6 @@ Ta copie ne change jamais toute seule. Pour récupérer les nouveautés de la pr
 
 Si tu as modifié le code toi-même, la synchronisation peut te demander de résoudre des conflits d'abord.
 
-### 💻 L'essayer sur ton ordinateur
-
-`npm run dev` lance l'app sur http://localhost:3000. Elle n'est **toujours pas « en local »** : elle utilise **la même** base Neon et la même application Clerk que ta copie en ligne, par Internet. Ce que tu fais sur localhost apparaît en ligne ([ADR 0014](docs/fr/adr/0014-une-seule-base.md)).
-
 ### 📏 Les offres gratuites, en chiffres
 
 | Service | Offre gratuite |
@@ -246,6 +242,34 @@ Possible, mais à la main : crée toi-même les comptes (Vercel, Neon, Clerk, Op
 - 🧮 **Ce qui consomme un appel :** un par retour sur une réponse, un par offre lue, un par CV lu, un par CV ou lettre rédigé. Les questions d'entretien n'en consomment aucun.
 
 ## 🛠️ Pour les devs
+
+### 💻 Faire tourner le code sur ton ordinateur (pour le modifier)
+
+> Seulement si tu veux **modifier le code** de NextRound. Pour simplement utiliser ta copie, tu n'en as jamais besoin : elle tourne sur Vercel.
+
+**Pourquoi le faire tourner chez toi ?** Pour changer le code et voir le résultat en une seconde, sans rien mettre en ligne. C'est la façon normale de développer : tu modifies un fichier, tu l'enregistres, et la page se recharge toute seule.
+
+**Ce qui tourne où.** Seul le code passe sur ton ordinateur. La base de données et la connexion restent dans le cloud : il n'y a pas de base de données sur ton ordinateur. Ton fichier `.env`, écrit par l'installation, dit à l'app où les trouver, et il donne les mêmes adresses que celles de ta copie en ligne ([ADR 0014](docs/fr/adr/0014-une-seule-base.md)) :
+
+```
+En ligne      ton navigateur → Vercel fait tourner le code          → Neon (données) + Clerk (connexion) + OpenRouter (IA)
+npm run dev   ton navigateur → ton ordinateur fait tourner le code  → les mêmes Neon + Clerk + OpenRouter
+```
+
+**Ce que ça veut dire pour toi :**
+
+- 🗄️ Ce sont tes **vraies données** : un fait que tu ajoutes sur http://localhost:3000 est aussi dans ton app en ligne, et ce que tu y supprimes est supprimé en ligne aussi.
+- 🤖 Les appels d'IA que tu fais en testant comptent sur ton vrai quota d'IA.
+- 🔐 Tu te connectes avec le même compte qu'en ligne.
+- 🚀 Tes modifications du code restent sur ton ordinateur tant que tu ne les déploies pas (`node scripts/infra/deploy.mjs`).
+
+**Comment :**
+
+```bash
+npm run dev     # puis ouvre http://localhost:3000 ; Ctrl+C dans le terminal pour arrêter
+```
+
+Il faut le fichier `.env` écrit par l'installation : sans lui, les pages affichent une erreur qui nomme les variables manquantes.
 
 ### 🧱 Stack
 

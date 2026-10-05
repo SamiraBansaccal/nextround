@@ -206,10 +206,6 @@ Your copy never changes by itself. To get the owner's new features:
 
 If you changed the code yourself, the sync may ask you to resolve conflicts first.
 
-### 💻 Try it on your computer
-
-`npm run dev` starts the app at http://localhost:3000. It is still **not "local"**: it uses the **same** Neon database and the same Clerk application as your online copy, over the internet. What you do on localhost shows up online ([ADR 0014](docs/en/adr/0014-one-database.md)).
-
 ### 📏 The free plans, in numbers
 
 | Service | Free plan |
@@ -246,6 +242,34 @@ Possible, but by hand: create the accounts yourself (Vercel, Neon, Clerk, OpenRo
 - 🧮 **What uses a call:** one per answer feedback, one per offer read, one per CV read, one per CV or letter written. Interview questions use none.
 
 ## 🛠️ For developers
+
+### 💻 Run the code on your computer (to change it)
+
+> Only if you want to **modify NextRound's code**. To simply use your copy, you never need this: it runs on Vercel.
+
+**Why run it on your computer?** To change the code and see the result in a second, without putting anything online. It is the usual way to develop: you edit a file, save it, and the page reloads by itself.
+
+**What runs where.** Only the code moves to your computer. The database and the sign-in stay in the cloud: there is no database on your computer. Your `.env` file, written by the install, tells the app where to find them, and it gives the same addresses as your online copy uses ([ADR 0014](docs/en/adr/0014-one-database.md)):
+
+```
+Online        your browser → Vercel runs the code         → Neon (data) + Clerk (sign-in) + OpenRouter (AI)
+npm run dev   your browser → your computer runs the code  → the same Neon + Clerk + OpenRouter
+```
+
+**What it means for you:**
+
+- 🗄️ It is your **real data**: a fact you add on http://localhost:3000 is also in your online app, and what you delete there is deleted online too.
+- 🤖 The AI calls you make while testing count on your real AI quota.
+- 🔐 You sign in with the same account as online.
+- 🚀 Your code changes stay on your computer until you deploy them (`node scripts/infra/deploy.mjs`).
+
+**How:**
+
+```bash
+npm run dev     # then open http://localhost:3000; Ctrl+C in the terminal to stop
+```
+
+It needs the `.env` file written by the install: without it, the pages show an error that names the missing variables.
 
 ### 🧱 Stack
 
