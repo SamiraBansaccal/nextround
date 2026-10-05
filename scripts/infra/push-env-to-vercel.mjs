@@ -20,6 +20,8 @@ const KEYS = [
   "OPENROUTER_API_API_KEY",
   "FIRECRAWL_API_API_KEY",
   "ELEVENLABS_API_KEY",
+  "RESEND_API_KEY",
+  "ACCESS_MAIL_FROM",
 ];
 
 const env = parseEnv(readFileSync(".env", "utf8"));

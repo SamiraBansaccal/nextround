@@ -1,4 +1,5 @@
 import { FileSearch, Volume2 } from "lucide-react";
+import { AccessRequests } from "@/components/settings/access-requests";
 import { ConnectionBanner } from "@/components/settings/connection-banner";
 import { PageHeading } from "@/components/layout/page-heading";
 import { WithCode } from "@/components/shared/with-code";
@@ -13,9 +14,16 @@ import { serverEnv } from "@/lib/server/env";
 import { getUiLang } from "@/lib/i18n/server";
 import { SETTINGS_COPY } from "@/lib/i18n/settings";
 import { fill } from "@/lib/interview/copy";
+import { mailConfigured } from "@/lib/access/notify";
+import { listAllowedAddresses, listPendingRequests } from "@/lib/access/requests";
+import { formatDay } from "@/lib/shared/dates";
+import { ownerContact } from "@/lib/server/owner";
 import {
+  allowAccessAction,
+  declineAccessAction,
   loadModelsAction,
   removeAiKeyAction,
+  removeGuestAction,
   removeFirecrawlKeyAction,
   removeVoiceKeyAction,
   saveAiSettingsAction,
@@ -33,6 +41,10 @@ export default async function SettingsPage() {
   const [settings, status, usage] = await Promise.all([getPublicAiSettings(account.userId), getAiStatus(account.userId, account.isOwner), getTodayUsage(account.userId)]);
   const env = serverEnv();
   const keyCopy = { save: t.save, remove: t.remove };
+  // The owner answers access requests here (lib/access/requests.ts); nobody else sees them.
+  const access = account.isOwner
+    ? await Promise.all([listPendingRequests(), listAllowedAddresses(), ownerContact()]).catch(() => null)
+    : null;
 
   return (
     <div>
@@ -97,6 +109,15 @@ export default async function SettingsPage() {
           />
         </div>
         </div>
+        {access && (
+          <AccessRequests
+            requests={access[0].map((r) => ({ id: r.id, email: r.email, askedOn: formatDay(new Date(r.createdAt)) }))}
+            guests={access[1].map((g) => ({ id: g.id, email: g.email, you: g.email.toLowerCase() === access[2]?.email.toLowerCase() }))}
+            mailOn={mailConfigured()}
+            actions={{ allow: allowAccessAction, decline: declineAccessAction, remove: removeGuestAction }}
+            t={t}
+          />
+        )}
       </div>
     </div>
   );

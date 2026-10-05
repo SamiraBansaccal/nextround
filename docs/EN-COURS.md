@@ -18,13 +18,14 @@ Règle : chaque session a sa *branch*, s'inscrit ici, ouvre une PR, et met la li
 
 | *Branch* | Session | Sujet | PR |
 |---|---|---|---|
-| `claude/local-readme-friends` | local | 🙋 README pour débutants en FR et EN (app en ligne sur invitation ou copie à soi), `.env.example`, invitations `npm run clerk:signup -- allow / disallow`, lignes vides du `.env` = non définies. Fichiers : `README.md`, `README.fr.md`, `.env.example`, `scripts/infra/clerk-signup.mts`, `lib/server/env.ts`, `docs/README.md` | [#27](https://github.com/SamiraBansaccal/nextround/pull/27) |
+| `claude/local-access-requests` | local | 📨 Demandes d'accès : formulaire public, liste d'attente Clerk, e-mail à la propriétaire (Resend, à brancher), réponse dans les Réglages ; README « Stripe Projects en clair ». Fichiers : `lib/access/**`, `lib/server/owner.ts`, `app/actions.ts`, `app/page.tsx`, `app/sign-up/**`, `components/{auth,settings}/**`, `app/(app)/settings/**`, `lib/ai/usage.ts`, `README*.md` | PR à venir |
 
 <details>
 <summary>📦 Branches déjà fusionnées</summary>
 
 | *Branch* | Session | Sujet | PR |
 |---|---|---|---|
+| `claude/local-readme-friends` | local | 🙋 README pour débutants en FR et EN (app en ligne sur invitation ou copie à soi), `.env.example`, invitations `npm run clerk:signup -- allow / disallow`, lignes vides du `.env` = non définies. Fichiers : `README.md`, `README.fr.md`, `.env.example`, `scripts/infra/clerk-signup.mts`, `lib/server/env.ts`, `docs/README.md` | [#27](https://github.com/SamiraBansaccal/nextround/pull/27) |
 | `claude/local-bank-gaps` | local | 🎙️ Banque technique : architecture logicielle, IA et LLM, Windows Server et AD ; alias pour les noms vus dans les offres. Fichiers : `lib/interview/bank/**`, `lib/interview/{tracks,tech-logos}.ts`, `components/interview/tech-logo.tsx`, `tests/interview/question-bank.test.ts` | [#26](https://github.com/SamiraBansaccal/nextround/pull/26) |
 | `claude/local-csp-live` | local | 📝 EN-COURS : CSP en ligne et vérifiée | [#25](https://github.com/SamiraBansaccal/nextround/pull/25) |
 | `claude/local-csp` | local | 🛡️ CSP stricte (nonce par requête, construite par Clerk), e2e sur le *build* de production (`E2E_PROD=1`), liens de « Nouvel entretien » sans *prefetch*. Fichiers : `proxy.ts`, `app/layout.tsx`, `next.config.ts`, `app/(app)/interview/new/page.tsx`, `playwright.config.ts`, `tests/e2e/**` | [#24](https://github.com/SamiraBansaccal/nextround/pull/24) |
@@ -50,6 +51,16 @@ Règle : chaque session a sa *branch*, s'inscrit ici, ouvre une PR, et met la li
 </details>
 
 ## ✅ Fait récemment
+
+### 📨 Demandes d'accès (local, 2026-10-05)
+
+Décision : [ADR 0026](fr/adr/0026-demandes-d-acces.md).
+
+- Vérifié : sur la version en ligne, l'inscription demande bien une invitation (`npm run clerk:signup -- probe` → `403 not_allowed_access` ; liste : l'adresse de la propriétaire seulement).
+- **« No invitation yet? Request access »** sur l'accueil et la page d'inscription : adresse, nom et message facultatifs. La demande va dans la **liste d'attente de Clerk** (pas de nouvelle table), et un **e-mail part vers la propriétaire**, retrouvée à l'exécution par `OWNER_GITHUB_ID` (rien d'écrit en dur). Limites : 3 demandes par jour et par visiteur, 20 e-mails par jour, un champ piège pour les robots.
+- **Réglages → Demandes d'accès** (propriétaire seulement) : Autoriser (liste d'autorisation + invitation envoyée par Clerk), Refuser, et la liste des adresses invitées avec Retirer.
+- ⏳ **L'e-mail attend Resend** (`stripe projects add resend/free` puis `resend/email`, offre gratuite de 3 000 e-mails par mois) : à lancer avec l'accord de la propriétaire. Sans Resend, les demandes arrivent quand même dans ses Réglages.
+- README : « Stripe Projects en clair » (qui crée les comptes, le coffre à secrets, s'abonner, ajouter un service après coup), et le lien « Request access » dans l'option A.
 
 ### 🙋 Partager l'app avec des amis (local, 2026-10-05)
 

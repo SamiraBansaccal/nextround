@@ -27,6 +27,10 @@ const serverEnvSchema = z.object({
   // Instance model on OpenRouter (defaults in lib/ai/providers.ts); fallbacks are comma-separated.
   INSTANCE_LLM_MODEL: optional(z.string()),
   INSTANCE_LLM_FALLBACK_MODELS: optional(z.string()),
+  // Resend, to email the owner about access requests (free plan). Without it, requests still reach Settings.
+  RESEND_API_KEY: optional(z.string()),
+  // The sender of that email; without a domain verified at Resend, only its test sender works.
+  ACCESS_MAIL_FROM: optional(z.string()),
   // Self-hosting only: allow any OpenAI-compatible base URL (e.g. Ollama on localhost).
   ALLOW_CUSTOM_LLM_BASE_URL: z.enum(["true", "false"]).default("false"),
 });

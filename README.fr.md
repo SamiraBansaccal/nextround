@@ -61,7 +61,7 @@ NextRound est un site web. Il ne tourne pas sur ton ordinateur : il tourne **dan
 
 ### 1. Te faire inviter
 
-L'inscription se fait **sur invitation** : envoie à la propriétaire l'**adresse e-mail de ton compte GitHub** (ou Google) avec lequel tu vas te connecter. Elle l'ajoute à la liste des invités ; avant ça, Clerk refuse l'inscription avec « Access not allowed ».
+L'inscription se fait **sur invitation**. Sur la page d'accueil, clique sur **No invitation yet? Request access** et donne l'**adresse e-mail de ton compte GitHub** (ou Google) avec lequel tu vas te connecter. La propriétaire est prévenue par e-mail et répond dans ses Réglages ; quand elle t'autorise, Clerk t'envoie une invitation par e-mail. Avant ça, Clerk refuse l'inscription avec « Access not allowed ».
 
 ### 2. Te connecter
 
@@ -143,6 +143,15 @@ NextRound utilise six services. D'habitude, ça veut dire six inscriptions, six 
 4. `stripe projects env --pull` les écrit dans le fichier `.env` de ton ordinateur. **Tu ne copies jamais une clé à la main.**
 5. Stripe Projects ne les envoie pas à Vercel : c'est le script de NextRound `scripts/infra/push-env-to-vercel.mjs` qui le fait, et Vercel les stocke chiffrées.
 
+#### ❓ Stripe Projects, en clair
+
+- **C'est Stripe qui crée les comptes Vercel (Neon, Clerk…) tout seul ?** Oui. Ces fournisseurs ont construit avec Stripe un protocole commun pour « créer un compte et une ressource, puis remettre les clés ». Quand tu lances `stripe projects add vercel/project`, la Stripe CLI demande à Stripe, qui demande à Vercel de créer un compte à ton nom (ou de relier le compte Vercel que tu as déjà), puis un projet dedans, avec l'offre que tu as choisie. Vercel lui fait confiance parce que Stripe sait déjà qui tu es (d'où le compte vérifié), et tu acceptes les conditions de Vercel en chemin.
+- **C'est donc une sorte de coffre-fort ?** En partie. Il fait trois choses : il **crée ou relie** les comptes et les ressources ; il **garde leurs clés**, chiffrées, dans le coffre à secrets de Stripe, et les écrit dans ton `.env` quand tu le demandes (`stripe projects env --pull`) ; et pour les offres payantes, il **paie** le fournisseur avec la carte donnée une fois à Stripe. Les comptes sont vraiment à toi : `stripe projects open vercel` ouvre ton tableau de bord Vercel, et tu pourrais continuer à t'en servir sans Stripe.
+- **Il s'abonne à ma place ?** Seulement à ce que tu demandes, avec l'offre que tu nommes (`vercel/hobby`, `neon/free`…). Une offre payante demande ta confirmation, et `stripe projects spend` montre ce que tu dépenses.
+- **Je dois connaître toute ma stack avant de commencer ?** Non. `stripe projects init` crée un projet vide ; tu ajoutes un service quand tu en as besoin, même des mois plus tard (`stripe projects add <fournisseur>/<service>`), et tu en retires un avec `stripe projects remove`. Pour voir ce qui existe : `stripe projects catalog`, ou `stripe projects search email`. Tu peux aussi partir d'un modèle tout prêt (`stripe projects build`).
+- **Exemple, ajouter un service après coup :** pour prévenir la propriétaire des demandes d'accès par e-mail, NextRound utilise Resend. L'ajouter, c'est `stripe projects add resend/free` (l'offre gratuite : 3 000 e-mails par mois), puis `stripe projects add resend/email` (sa clé d'API). La clé arrive dans `.env` ; Stripe Projects ne s'occupe pas de la production, donc c'est le script de NextRound `scripts/infra/push-env-to-vercel.mjs` qui l'envoie à Vercel.
+- **Un projet Stripe = une app.** Une deuxième app, c'est un deuxième `stripe projects init`, dans un autre dossier ; tes comptes chez les fournisseurs sont réutilisés (un compte Vercel contient plusieurs projets).
+
 Bon à savoir avant de commencer :
 
 - ✅ Stripe Projects demande un **compte Stripe en mode live**, donc une **vérification d'identité**, comme pour tout compte de paiement. Tu ne vends rien, et les offres gratuites ne coûtent rien ; `stripe projects spend` montre ce que tu dépenses (normalement : aucune facturation).
@@ -189,7 +198,7 @@ Bon à savoir avant de commencer :
    npm run clerk:signup -- allow ami@example.com
    npm run clerk:signup -- status            # qui est autorisé
    ```
-   (Cette liste d'invités est gratuite avec la formule de développement de Clerk, celle qu'utilise l'installation ; avec une formule de production, elle est payante.)
+   (Cette liste d'invités est gratuite avec la formule de développement de Clerk, celle qu'utilise l'installation ; avec une formule de production, elle est payante.) Les gens peuvent aussi demander depuis ta page d'accueil : leurs demandes apparaissent dans **Réglages → Demandes d'accès**, où tu les autorises ou les refuses, et tu reçois un e-mail pour chacune si Resend est en place (voir l'exemple plus haut).
 8. **Vérifie tes coûts** quand tu veux : `stripe projects spend`.
 
 ### 🔄 Mettre à jour ta copie plus tard
