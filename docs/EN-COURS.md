@@ -18,7 +18,7 @@ Règle : chaque session a sa *branch*, s'inscrit ici, ouvre une PR, et met la li
 
 | *Branch* | Session | Sujet | PR |
 |---|---|---|---|
-| `claude/local-csp-live` | local | 📝 EN-COURS : CSP en ligne et vérifiée | PR à venir |
+| `claude/local-csp-live` | local | 📝 EN-COURS : CSP en ligne et vérifiée | [#25](https://github.com/SamiraBansaccal/nextround/pull/25) |
 
 <details>
 <summary>📦 Branches déjà fusionnées</summary>
