@@ -18,13 +18,14 @@ Règle : chaque session a sa *branch*, s'inscrit ici, ouvre une PR, et met la li
 
 | *Branch* | Session | Sujet | PR |
 |---|---|---|---|
-| `claude/local-private-repos` | local | 📝 EN-COURS : « cookie » et l'app du hackathon sont privés, pour plus tard | [#22](https://github.com/SamiraBansaccal/nextround/pull/22) |
+| `claude/local-deployed` | local | 📝 EN-COURS : *deploy* fait et vérifié | [#23](https://github.com/SamiraBansaccal/nextround/pull/23) |
 
 <details>
 <summary>📦 Branches déjà fusionnées</summary>
 
 | *Branch* | Session | Sujet | PR |
 |---|---|---|---|
+| `claude/local-private-repos` | local | 📝 EN-COURS : « cookie » et l'app du hackathon sont privés, pour plus tard | [#22](https://github.com/SamiraBansaccal/nextround/pull/22) |
 | `claude/local-handover` | local | 📝 EN-COURS à jour (offres importées, état du *deploy*), logo du Forem net. Fichiers : `docs/EN-COURS.md`, `public/sites/forem.png` | [#21](https://github.com/SamiraBansaccal/nextround/pull/21) |
 | `claude/local-audit-followups` | local | 🔍 Points ouverts de l'audit : DNS rebinding (agent undici qui vérifie l'adresse à la connexion), `shadcn` en *devDependencies*, purge des compteurs par minute. Fichiers : `lib/offers/fetch-page.ts`, `lib/ai/usage.ts`, `package.json`, `docs/fr/audits/` | [#20](https://github.com/SamiraBansaccal/nextround/pull/20) |
 | `claude/local-profile-followups` | local | 🔁 Profil, suite : doublons fusionnés pour de bon (références recâblées), dates des CV écrites d'une seule façon sans rien inventer, phrases corrigées à la main d'un document du profil ajoutées à la base. Fichiers : `lib/profile/{merge-facts,cv-dates,dedupe-facts}.ts`, `lib/documents/{edit,hand-written}.ts`, `lib/data/facts.ts`, `components/profile/profile-library.tsx`, `app/(app)/profile/**`, `app/(app)/offers/[id]/cv/actions.ts` | [#19](https://github.com/SamiraBansaccal/nextround/pull/19) |
@@ -45,6 +46,11 @@ Règle : chaque session a sa *branch*, s'inscrit ici, ouvre une PR, et met la li
 </details>
 
 ## ✅ Fait récemment
+
+### 🚀 En ligne (local, 2026-10-05)
+
+- *Token* Vercel renouvelé (`stripe projects rotate nextround`, à la demande de la propriétaire), `OWNER_GITHUB_ID` envoyé à Vercel, puis `main` (PR #17 à #22) déployé avec `node scripts/infra/deploy.mjs`.
+- Vérifié en production : `/` et `/sign-in` en 200, `/dashboard` renvoie vers `/profile`, les pages protégées passent par la connexion Clerk (un `curl` sans en-têtes de navigateur reçoit un 404 de Clerk : normal), *security headers* présents, inscription refusée à un inconnu (`npm run clerk:signup -- probe`).
 
 ### 🔍 Audit, suite (local, 2026-10-05)
 
@@ -144,7 +150,6 @@ Décision : [ADR 0023](fr/adr/0023-cles-de-l-instance-pour-la-proprietaire.md).
 
 ## 🚧 En cours
 
-- 🚀 **Deploy en attente** : le *token* Vercel donné par Stripe Projects a expiré (HTTP 403), et son renouvellement écrit dans le coffre de Stripe : à lancer par la propriétaire (`stripe projects rotate nextround` puis `stripe projects env --pull`). Ensuite : `node scripts/infra/push-env-to-vercel.mjs` (envoie `OWNER_GITHUB_ID` à Vercel, **avant** le *deploy*, sinon la propriétaire perd les clés de l'instance) puis `node scripts/infra/deploy.mjs`.
 - 🔑 **Secrets absents du cloud** : sans eux, ni l'app ni les e2e ne tournent dans une session cloud. Liste : [guide local et cloud](fr/guides/local-et-cloud.md#-les-secrets-dans-le-cloud).
 - 💼 25 offres Actiris (Bruxelles, IT, accessibles à un junior) choisies le 2026-10-04 : **20 importées** sur le compte de la propriétaire (10 de plus le 2026-10-05, pour 19 appels d'IA : le modèle gratuit relance parfois). **Restent 5**, textes prêts dans `.local/offers/` : `npm run owner:import-offers -- .local/offers/{5945294,5962926,5966908,5869183,5869129}.txt` (environ 9 appels ; à lancer un jour où le quota de 40 n'est pas entamé). Si `.local/offers/` n'existe plus : `npm run offers:actiris -- fetch 5945294 5962926 5966908 5869183 5869129`.
 - 🚫 Indeed bloque les robots (Cloudflare, 403) et l'interdit : on ne le contourne pas. Offres Indeed : lien ou texte collé dans l'app.
