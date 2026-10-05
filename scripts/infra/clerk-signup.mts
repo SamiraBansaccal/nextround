@@ -1,10 +1,13 @@
 // Opens or closes sign-up on the Clerk instance, and shows the current state.
 //
-// Usage: npm run clerk:signup -- status | close | open | probe
-//   status  is sign-up open? which addresses are allowed?
-//   close   turns the allowlist on, with the owner's verified email addresses only (her account is found
-//           through OWNER_GITHUB_ID). Existing accounts keep signing in; any new account is refused.
-//   open    turns the allowlist off: anyone can sign up again.
+// Usage: npm run clerk:signup -- status | close | open | probe | allow <email> | disallow <email>
+//   status    is sign-up open? which addresses are allowed?
+//   close     turns the allowlist on, with the owner's verified email addresses only (her account is found
+//             through OWNER_GITHUB_ID). Existing accounts keep signing in; any new account is refused.
+//   open      turns the allowlist off: anyone can sign up again.
+//   allow     invites one person: their email address joins the allowlist, so they can create an account
+//             (with the GitHub or Google account that uses that address). Sign-up stays closed to others.
+//   disallow  takes an address off the allowlist (an account already created stays: delete it in Clerk).
 //   probe   tries to sign up a throwaway "+clerk_test" address through the Frontend API, as a stranger
 //           would, and says whether Clerk refused it (nothing is created when it is refused). A testing
 //           token gets past the bot protection (captcha) only, so what answers is the allowlist.
@@ -67,6 +70,33 @@ async function close() {
   console.log("Sign-up closed: only the allowlist above may create an account.");
 }
 
+const EMAIL = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+
+/** The email address given after the command, or exits with the usage. */
+function emailArgument(): string {
+  const email = (process.argv[3] ?? "").trim().toLowerCase();
+  if (!EMAIL.test(email)) {
+    console.error("Give an email address: npm run clerk:signup -- allow friend@example.com");
+    process.exit(1);
+  }
+  return email;
+}
+
+async function allow() {
+  const email = emailArgument();
+  if ((await allowlisted()).some((e) => e.identifier.toLowerCase() === email)) return console.log(`${mask(email)} is already invited.`);
+  await clerk.allowlistIdentifiers.createAllowlistIdentifier({ identifier: email, notify: false });
+  console.log(`Invited: ${mask(email)}. They can now sign up with the GitHub or Google account that uses this address.`);
+}
+
+async function disallow() {
+  const email = emailArgument();
+  const entry = (await allowlisted()).find((e) => e.identifier.toLowerCase() === email);
+  if (!entry) return console.log(`${mask(email)} was not on the allowlist.`);
+  await clerk.allowlistIdentifiers.deleteAllowlistIdentifier(entry.id);
+  console.log(`Removed from the allowlist: ${mask(email)}. An account they already created still exists.`);
+}
+
 async function open() {
   await clerk.instance.updateRestrictions({ allowlist: false });
   console.log("Sign-up open: anyone can create an account.");
@@ -93,10 +123,10 @@ async function probe() {
   else console.log(`ALLOWED (HTTP ${response.status}): a stranger could start a sign-up. Run \`close\`.`);
 }
 
-const commands: Record<string, () => Promise<void>> = { status, close, open, probe };
+const commands: Record<string, () => Promise<void>> = { status, close, open, probe, allow, disallow };
 const command = commands[process.argv[2] ?? ""];
 if (!command) {
-  console.error("Usage: npm run clerk:signup -- status | close | open | probe");
+  console.error("Usage: npm run clerk:signup -- status | close | open | probe | allow <email> | disallow <email>");
   process.exit(1);
 }
 await command();

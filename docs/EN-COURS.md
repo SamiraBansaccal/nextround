@@ -18,13 +18,14 @@ Règle : chaque session a sa *branch*, s'inscrit ici, ouvre une PR, et met la li
 
 | *Branch* | Session | Sujet | PR |
 |---|---|---|---|
-| `claude/local-bank-gaps` | local | 🎙️ Banque technique : architecture logicielle, IA et LLM, Windows Server et AD ; alias pour les noms vus dans les offres. Fichiers : `lib/interview/bank/**`, `lib/interview/{tracks,tech-logos}.ts`, `components/interview/tech-logo.tsx`, `tests/interview/question-bank.test.ts` | [#26](https://github.com/SamiraBansaccal/nextround/pull/26) |
+| `claude/local-readme-friends` | local | 🙋 README pour débutants en FR et EN (app en ligne sur invitation ou copie à soi), `.env.example`, invitations `npm run clerk:signup -- allow / disallow`, lignes vides du `.env` = non définies. Fichiers : `README.md`, `README.fr.md`, `.env.example`, `scripts/infra/clerk-signup.mts`, `lib/server/env.ts`, `docs/README.md` | PR à venir |
 
 <details>
 <summary>📦 Branches déjà fusionnées</summary>
 
 | *Branch* | Session | Sujet | PR |
 |---|---|---|---|
+| `claude/local-bank-gaps` | local | 🎙️ Banque technique : architecture logicielle, IA et LLM, Windows Server et AD ; alias pour les noms vus dans les offres. Fichiers : `lib/interview/bank/**`, `lib/interview/{tracks,tech-logos}.ts`, `components/interview/tech-logo.tsx`, `tests/interview/question-bank.test.ts` | [#26](https://github.com/SamiraBansaccal/nextround/pull/26) |
 | `claude/local-csp-live` | local | 📝 EN-COURS : CSP en ligne et vérifiée | [#25](https://github.com/SamiraBansaccal/nextround/pull/25) |
 | `claude/local-csp` | local | 🛡️ CSP stricte (nonce par requête, construite par Clerk), e2e sur le *build* de production (`E2E_PROD=1`), liens de « Nouvel entretien » sans *prefetch*. Fichiers : `proxy.ts`, `app/layout.tsx`, `next.config.ts`, `app/(app)/interview/new/page.tsx`, `playwright.config.ts`, `tests/e2e/**` | [#24](https://github.com/SamiraBansaccal/nextround/pull/24) |
 | `claude/local-deployed` | local | 📝 EN-COURS : *deploy* fait et vérifié | [#23](https://github.com/SamiraBansaccal/nextround/pull/23) |
@@ -49,6 +50,13 @@ Règle : chaque session a sa *branch*, s'inscrit ici, ouvre une PR, et met la li
 </details>
 
 ## ✅ Fait récemment
+
+### 🙋 Partager l'app avec des amis (local, 2026-10-05)
+
+- **README pour débutants**, en anglais ([README.md](../README.md)) et en français ([README.fr.md](../README.fr.md)) : les deux façons d'utiliser NextRound (l'app de la propriétaire, sur invitation, ou sa propre copie) avec leurs pour et contre (mises à jour, données, limites, stabilité), chaque service expliqué (Vercel, Neon, Clerk, Stripe Projects, OpenRouter, ElevenLabs, Firecrawl, *serverless*), les clés d'API, les limites de l'IA, les chiffres des offres gratuites vérifiés le 2026-10-05.
+- **Clés** : tout le code et tout l'historique git passés au crible (OpenRouter, Anthropic, OpenAI, Stripe, Clerk, ElevenLabs, Firecrawl, GitHub, *tokens*, mots de passe de base) : rien que des exemples factices, aucun `.env` jamais commité. Les clés de l'instance ne servent qu'au compte de la propriétaire (ADR 0023) : les amis apportent leurs propres clés, donc leurs propres limites.
+- **Inviter un ami** : `npm run clerk:signup -- allow <email>` (l'e-mail de son compte GitHub ou Google) ; `disallow` le retire. L'inscription reste fermée aux autres.
+- **`.env.example`** : toutes les variables, sans valeur, avec d'où vient chacune ; une ligne vide (`NOM=`) compte maintenant comme non définie (`lib/server/env.ts`).
 
 ### 🎙️ Banque technique, trous comblés (local, 2026-10-05)
 

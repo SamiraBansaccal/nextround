@@ -14,6 +14,7 @@
 
 | Tu veux… | Lis |
 |---|---|
+| 🙋 Utiliser l'app (en ligne, sur invitation) ou installer ta propre copie, sans rien connaître au départ | [README.fr.md](../README.fr.md) (🇬🇧 [README.md](../README.md)) |
 | 🔄 Reprendre le travail là où une autre session s'est arrêtée | [EN-COURS.md](EN-COURS.md) — **toujours en premier** |
 | 🏗️ Comprendre où se trouve quoi dans le repo | [fr/guides/architecture.md](fr/guides/architecture.md) |
 | ☁️ Passer d'une session Claude locale au cloud (et inversement) | [fr/guides/local-et-cloud.md](fr/guides/local-et-cloud.md) |
