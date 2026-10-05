@@ -7,7 +7,7 @@
 //
 // Steps (each one is skipped when already done, so the script can be re-run safely):
 //   1. stripe projects init           (your Stripe account; browser sign-in the first time)
-//   2. stripe projects add …          (free tiers: Vercel, Neon, Clerk, OpenRouter, Firecrawl, ElevenLabs)
+//   2. stripe projects add …          (free tiers: Vercel, Neon, Clerk, OpenRouter, Firecrawl, ElevenLabs, Resend)
 //   3. stripe projects env --pull     (credentials -> .env, never committed)
 //   4. scripts/infra/setup-env.mjs          (Clerk keys, encryption key, OWNER_GITHUB_ID)
 //   5. drizzle-kit migrate            (creates the tables in your Neon database)
@@ -47,6 +47,8 @@ const STACK = [
   { provider: "OpenRouter", plan: "openrouter/free", service: "openrouter/api", serviceId: "api", extra: [] },
   { provider: "Firecrawl", plan: "firecrawl/free", service: "firecrawl/api", serviceId: "api", extra: [] },
   { provider: "ElevenLabs", plan: null, service: "elevenlabs/tts", serviceId: "tts", extra: [] },
+  // Emails the owner about access requests (ADR 0026); produces RESEND_API_KEY.
+  { provider: "Resend", plan: "resend/free", service: "resend/email", serviceId: "email", extra: [] },
 ];
 
 function step(title) {

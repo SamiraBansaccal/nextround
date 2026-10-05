@@ -185,7 +185,7 @@ Good to know, before you start:
    ```
    It goes through seven steps, and asks you to approve things in the browser along the way:
    1. creates your Stripe project;
-   2. adds the free plans: Vercel, Neon, Clerk, OpenRouter, Firecrawl, ElevenLabs;
+   2. adds the free plans: Vercel, Neon, Clerk, OpenRouter, Firecrawl, ElevenLabs, Resend (emails about access requests);
    3. writes the credentials to `.env`;
    4. creates the app's own values: the Clerk keys, an encryption key, and **you as the owner** (your numeric GitHub id);
    5. creates the database tables;
@@ -225,6 +225,7 @@ If you changed the code yourself, the sync may ask you to resolve conflicts firs
 | 🤖 OpenRouter | Free models: 20 requests a minute and 50 a day per account (1,000 a day after buying $10 of credits once) |
 | 🎧 ElevenLabs | 10,000 credits a month, non-commercial |
 | 🕷️ Firecrawl | 1,000 pages a month |
+| ✉️ Resend | 3,000 emails a month; without a domain of your own, it only sends to your account's address (enough to tell you about access requests) |
 
 Figures checked on the providers' pricing pages on 2026-10-05: they can change.
 

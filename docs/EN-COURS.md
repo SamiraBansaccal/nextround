@@ -18,13 +18,14 @@ Règle : chaque session a sa *branch*, s'inscrit ici, ouvre une PR, et met la li
 
 | *Branch* | Session | Sujet | PR |
 |---|---|---|---|
-| `claude/local-access-requests` | local | 📨 Demandes d'accès : formulaire public, liste d'attente Clerk, e-mail à la propriétaire (Resend, à brancher), réponse dans les Réglages ; README « Stripe Projects en clair ». Fichiers : `lib/access/**`, `lib/server/owner.ts`, `app/actions.ts`, `app/page.tsx`, `app/sign-up/**`, `components/{auth,settings}/**`, `app/(app)/settings/**`, `lib/ai/usage.ts`, `README*.md` | [#29](https://github.com/SamiraBansaccal/nextround/pull/29) |
+| `claude/local-resend` | local | ✉️ Resend dans la *stack* (fiches Stripe Projects, `bootstrap`), renouvellement du *token* Vercel partagé, README | [#31](https://github.com/SamiraBansaccal/nextround/pull/31) |
 
 <details>
 <summary>📦 Branches déjà fusionnées</summary>
 
 | *Branch* | Session | Sujet | PR |
 |---|---|---|---|
+| `claude/local-access-requests` | local | 📨 Demandes d'accès : formulaire public, liste d'attente Clerk, e-mail à la propriétaire (Resend, à brancher), réponse dans les Réglages ; README « Stripe Projects en clair ». Fichiers : `lib/access/**`, `lib/server/owner.ts`, `app/actions.ts`, `app/page.tsx`, `app/sign-up/**`, `components/{auth,settings}/**`, `app/(app)/settings/**`, `lib/ai/usage.ts`, `README*.md` | [#29](https://github.com/SamiraBansaccal/nextround/pull/29) |
 | `claude/local-readme-friends` | local | 🙋 README pour débutants en FR et EN (app en ligne sur invitation ou copie à soi), `.env.example`, invitations `npm run clerk:signup -- allow / disallow`, lignes vides du `.env` = non définies. Fichiers : `README.md`, `README.fr.md`, `.env.example`, `scripts/infra/clerk-signup.mts`, `lib/server/env.ts`, `docs/README.md` | [#27](https://github.com/SamiraBansaccal/nextround/pull/27) |
 | `claude/local-bank-gaps` | local | 🎙️ Banque technique : architecture logicielle, IA et LLM, Windows Server et AD ; alias pour les noms vus dans les offres. Fichiers : `lib/interview/bank/**`, `lib/interview/{tracks,tech-logos}.ts`, `components/interview/tech-logo.tsx`, `tests/interview/question-bank.test.ts` | [#26](https://github.com/SamiraBansaccal/nextround/pull/26) |
 | `claude/local-csp-live` | local | 📝 EN-COURS : CSP en ligne et vérifiée | [#25](https://github.com/SamiraBansaccal/nextround/pull/25) |
@@ -60,7 +61,8 @@ Décision : [ADR 0026](fr/adr/0026-demandes-d-acces.md).
 - **« No invitation yet? Request access »** sur l'accueil et la page d'inscription : adresse, nom et message facultatifs. La demande va dans la **liste d'attente de Clerk** (pas de nouvelle table), et un **e-mail part vers la propriétaire**, retrouvée à l'exécution par `OWNER_GITHUB_ID` (rien d'écrit en dur). Limites : 3 demandes par jour et par visiteur, 20 e-mails par jour, un champ piège pour les robots.
 - **Réglages → Demandes d'accès** (propriétaire seulement) : Autoriser (liste d'autorisation + invitation envoyée par Clerk), Refuser, et la liste des adresses invitées avec Retirer.
 - 🔒 Le lien de l'e-mail vient de la configuration (`APP_URL`, sinon le domaine de production donné par Vercel), jamais des en-têtes de la requête, qu'un visiteur pourrait falsifier derrière un autre hébergeur (relevé par la revue de sécurité automatique, corrigé le jour même).
-- ⏳ **L'e-mail attend Resend** (`stripe projects add resend/free` puis `resend/email`, offre gratuite de 3 000 e-mails par mois) : à lancer avec l'accord de la propriétaire. Sans Resend, les demandes arrivent quand même dans ses Réglages.
+- ✉️ **Resend branché** (2026-10-06, avec l'accord de la propriétaire, conditions acceptées en son nom à sa demande) : offre gratuite (3 000 e-mails par mois), `RESEND_API_KEY` dans `.env` et sur Vercel. Test réel : une demande depuis le site → e-mail « delivered » à l'adresse de la propriétaire. `stripe projects spend` : aucune facturation. Resend fait aussi partie de `npm run bootstrap`.
+- 🔁 `push-env-to-vercel.mjs` renouvelle maintenant le *token* Vercel expiré, comme `deploy.mjs` (code partagé : `scripts/infra/vercel-env.mjs`).
 - README : « Stripe Projects en clair » (qui crée les comptes, le coffre à secrets, s'abonner, ajouter un service après coup), et le lien « Request access » dans l'option A.
 
 ### 🙋 Partager l'app avec des amis (local, 2026-10-05)
