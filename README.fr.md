@@ -156,6 +156,7 @@ Bon à savoir avant de commencer :
 
 - ✅ Stripe Projects demande un **compte Stripe en mode live**, donc une **vérification d'identité**, comme pour tout compte de paiement. Tu ne vends rien, et les offres gratuites ne coûtent rien ; `stripe projects spend` montre ce que tu dépenses (normalement : aucune facturation).
 - ✅ Accepter les conditions de chaque fournisseur lui transmet le nom, l'e-mail, le pays et le téléphone de ton compte Stripe. Le script te le demande à chaque fois.
+- 📬 Chaque fournisseur reçoit donc **l'adresse e-mail de ton compte Stripe**, et beaucoup y envoient leurs newsletters. Désabonne-toi avec le lien en bas de chacune (les e-mails utiles, comme les alertes de sécurité, de quota ou de facturation, continuent d'arriver, et ils valent la peine d'être lus). Mieux, avant de commencer : crée ton compte Stripe avec un **alias « + »**, comme `toi+projets@gmail.com`. Gmail le livre dans ta boîte habituelle, et un seul filtre sur cette adresse peut ensuite trier d'un coup les e-mails de tous les fournisseurs.
 - ⚠️ L'installation en une commande ci-dessous a été vérifiée en **simulation** (elle liste chaque étape sans rien faire) ; une installation complète sur des comptes tout neufs n'a pas encore été faite. Si une étape échoue, corrige puis relance la commande : les étapes déjà faites sont sautées.
 
 ### 🧰 Ce qu'il te faut
