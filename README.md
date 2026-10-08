@@ -156,7 +156,6 @@ Good to know, before you start:
 
 - ✅ Stripe Projects needs a **Stripe account in live mode**, which means **identity verification**, as for any payment account. You do not sell anything, and the free plans cost nothing; `stripe projects spend` shows what you spend (it should say no charges).
 - ✅ Accepting each provider's terms shares your Stripe account's name, email, country and phone with that provider. The script asks you each time.
-- 📬 So every provider gets **your Stripe account's email address**, and many of them send newsletters to it. Unsubscribe with the link at the bottom of each one (transactional emails such as security, quota or billing alerts keep coming, and they are worth reading). Better, before you start: create your Stripe account with a **"+" alias**, such as `you+projects@gmail.com`. Gmail delivers it to your usual inbox, and one filter on that address can then sort every provider's email at once.
 - ⚠️ The one-command install below was checked in **dry run** (it lists every step without doing anything); a full run on brand-new accounts has not been done yet. If a step fails, fix it and run the command again: finished steps are skipped.
 
 ### 🧰 What you need
