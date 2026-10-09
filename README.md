@@ -48,9 +48,9 @@ NextRound is a website. It does not run on your computer: it runs **in the cloud
 
 | | 🅰️ The owner's app | 🅱️ Your own copy |
 |---|---|---|
-| ⏱️ Setup | 5 minutes: get invited, sign in, paste an AI key | 1 to 2 hours the first time: accounts, tools, one command |
+| ⏱️ Setup | 5 minutes: get invited, sign in, paste an AI key | 1 to 2 hours the first time: a few accounts to create and keys to copy |
 | 💶 Cost | Free (free AI models are enough) | Free on the free plans; nothing is charged unless you upgrade a service yourself |
-| 👤 Accounts you need | GitHub (or Google) and an AI provider (OpenRouter) | The same, plus a **verified Stripe account**; Stripe Projects then creates or links the Vercel, Neon, Clerk and OpenRouter accounts for you (ElevenLabs and Firecrawl optional) |
+| 👤 Accounts you need | GitHub (or Google) and an AI provider (OpenRouter) | The same, plus **Vercel**, **Neon** and **Clerk** accounts (ElevenLabs, Firecrawl and Resend optional) |
 | 🔄 Updates | **Automatic**: new features appear as soon as the owner deploys them | **None by default**: your copy only changes when you pull the owner's changes and redeploy (see [updating](#-update-your-copy-later)) |
 | 🗄️ Your data | In the **owner's** database: the owner administers it and could technically read it, and may **delete or reset it** at any time (it is a personal project, with no guarantee) | In **your** database: you are the only administrator |
 | 🚦 Limits | Your AI key's own limits; the free hosting and database quotas are **shared** by everyone on the app | Every free quota is yours |
@@ -133,39 +133,19 @@ Once deployed, your copy is made of a few services that talk to each other over 
 | **Migration** | A file that creates or changes the database tables. It must run before the code that needs it goes online. |
 | **Free tier** | The free plan of a service, with limits (storage, requests per day…). |
 
-### 🧾 What Stripe Projects does
+### 🧭 Why no more Stripe Projects
 
-NextRound uses six services. Normally that means six sign-ups, six dashboards and six API keys copied by hand. **Stripe Projects** (a plugin of the Stripe command-line tool) does it for you:
-
-1. You sign in to **your** Stripe account in the terminal.
-2. `stripe projects add vercel/project` (and the same for Neon, Clerk, OpenRouter…) creates the account at that provider for you, or links the one you already have, and creates the resource (a Vercel project, a Neon database, a Clerk application) on its **free plan**.
-3. The provider hands the credentials to Stripe, which keeps them encrypted in its **secret store**.
-4. `stripe projects env --pull` writes them into the `.env` file on your computer. **You never copy a key by hand.**
-5. Stripe Projects does not send them to Vercel: NextRound's script `scripts/infra/push-env-to-vercel.mjs` does it, and Vercel stores them encrypted.
-
-#### ❓ Stripe Projects, in plain words
-
-- **Does Stripe create the Vercel (Neon, Clerk…) accounts by itself?** Yes. These providers built a common protocol with Stripe to "create an account and a resource, then hand over the keys". When you run `stripe projects add vercel/project`, the Stripe CLI asks Stripe, which asks Vercel to create an account in your name (or to link the Vercel account you already have), then a project in it, on the plan you named. Vercel trusts it because Stripe already knows who you are (hence the verified account), and you accept Vercel's terms along the way.
-- **So is it a vault?** Partly. It does three jobs: it **creates or links** the accounts and resources; it **keeps their keys**, encrypted, in Stripe's secret store, and writes them to your `.env` when you ask (`stripe projects env --pull`); and for paid plans, it **pays** the provider with the card you gave Stripe once. The accounts are really yours: `stripe projects open vercel` opens your Vercel dashboard, and you could keep using them without Stripe.
-- **Does it subscribe for me?** Only to what you ask for, on the plan you name (`vercel/hobby`, `neon/free`…). A paid plan asks you to confirm, and `stripe projects spend` shows what you spend.
-- **Do I need to know my whole stack before starting?** No. `stripe projects init` creates an empty project; you add a service when you need it, even months later (`stripe projects add <provider>/<service>`), and remove one with `stripe projects remove`. To see what exists: `stripe projects catalog`, or `stripe projects search email`. You can also start from a ready-made template (`stripe projects build`).
-- **Example, adding a service later:** to email the owner about access requests, NextRound uses Resend. Adding it is `stripe projects add resend/free` (the free plan: 3,000 emails a month), then `stripe projects add resend/email` (its API key). The key lands in `.env`; Stripe Projects does not handle production, so NextRound's script `scripts/infra/push-env-to-vercel.mjs` sends it to Vercel.
-- **One Stripe project = one app.** A second app means a second `stripe projects init`, in another folder; your provider accounts are reused (one Vercel account holds several projects).
-
-Good to know, before you start:
-
-- ✅ Stripe Projects needs a **Stripe account in live mode**, which means **identity verification**, as for any payment account. You do not sell anything, and the free plans cost nothing; `stripe projects spend` shows what you spend (it should say no charges).
-- ✅ Accepting each provider's terms shares your Stripe account's name, email, country and phone with that provider. The script asks you each time.
-- ⚠️ The one-command install below was checked in **dry run** (it lists every step without doing anything); a full run on brand-new accounts has not been done yet. If a step fails, fix it and run the command again: finished steps are skipped.
+NextRound was born during a Stripe hackathon, where we discovered **Stripe Projects**: from a single Stripe account, it created the accounts at every provider (Vercel, Neon, Clerk…) and kept their keys. We dropped it in October 2026. It already required handing your identity to Stripe; after an update of its plugin, a new account could no longer switch to live mode without activating payments, which means giving a bank account, for a project that sells nothing. A day lost going back and forth between the terminal and the browser, and terms that can change overnight: no basis for a reliable install. Your copy is now set up directly with each service.
 
 ### 🧰 What you need
 
 - 🐙 A **GitHub** account.
-- 💳 A **Stripe** account in live mode (https://dashboard.stripe.com/register).
+- ▲ Free accounts at **Vercel** (hosting), **Neon** (database), **Clerk** (sign-in) and **OpenRouter** (AI). ElevenLabs, Firecrawl and Resend are optional.
 - 🟢 **Node.js** 20 or newer (https://nodejs.org, the "LTS" version) and **Git** (https://git-scm.com).
-- 🧾 The **Stripe CLI** and its Projects plugin. On macOS: `brew install stripe/stripe-cli/stripe`, then `stripe plugin install projects`. Other systems: https://docs.stripe.com/stripe-cli/install.
 
 ### 🚀 Step by step
+
+⚠️ This path has not been run again end to end on brand-new accounts yet.
 
 1. **Fork** the repository on GitHub (the **Fork** button, top right of https://github.com/SamiraBansaccal/nextround): you get your own copy, which can receive the owner's updates later.
 2. **Clone your fork** and install the dependencies:
@@ -174,32 +154,21 @@ Good to know, before you start:
    cd nextround
    npm install
    ```
-3. **Sign in to Stripe** in the terminal: `stripe login` (a browser page asks you to confirm).
-4. **Preview** what will happen, without doing anything:
-   ```bash
-   npm run bootstrap -- --owner <your-github-login> --dry-run
-   ```
-5. **Run it for real**:
-   ```bash
-   npm run bootstrap -- --owner <your-github-login>
-   ```
-   It goes through seven steps, and asks you to approve things in the browser along the way:
-   1. creates your Stripe project;
-   2. adds the free plans: Vercel, Neon, Clerk, OpenRouter, Firecrawl, ElevenLabs, Resend (emails about access requests);
-   3. writes the credentials to `.env`;
-   4. creates the app's own values: the Clerk keys, an encryption key, and **you as the owner** (your numeric GitHub id);
-   5. creates the database tables;
-   6. turns on the GitHub sign-in in your Clerk application;
-   7. sends the variables to Vercel and deploys. At the end you get your address: `https://<name>.vercel.app`.
-6. **Open your app** and sign in with the GitHub account you gave as `--owner`: you are the owner, so the instance keys (the OpenRouter key created for you) work for your account without anything to paste.
-7. **Decide who can sign up.** By default anyone can create an account (they will need their own AI key). To make your app invite-only:
+3. **Create your services**, each on its free plan:
+   - **Neon**: a project, then copy its connection string (`postgresql://…`);
+   - **Clerk**: an application, turn on the **GitHub** sign-in in its *SSO connections*, then copy its two keys;
+   - **OpenRouter**: an API key (see [option A, step 3](#3-connect-your-ai-needed-for-feedback-offers-and-cvs)).
+4. **Fill in your `.env`**: copy [`.env.example`](.env.example) to `.env` and fill each line; the file explains where each value comes from. For the encryption key: `openssl rand -base64 32`. For your numeric GitHub id: the `id` field of `https://api.github.com/users/<your-github-login>`.
+5. **Create the database tables**: `npm run db:migrate`.
+6. **Go online**: `npx vercel` creates your Vercel project. Add the same variables in the project's **Settings → Environment Variables**, then run `npx vercel --prod`. At the end you get your address: `https://<name>.vercel.app`.
+7. **Open your app** and sign in with your GitHub account: you are the owner, so the OpenRouter key in your `.env` works for your account without anything to paste.
+8. **Decide who can sign up.** By default anyone can create an account (they will need their own AI key). To make your app invite-only:
    ```bash
    npm run clerk:signup -- close             # only you
    npm run clerk:signup -- allow friend@example.com
    npm run clerk:signup -- status            # who is allowed
    ```
-   (This guest list is free on Clerk's development setup, which the install uses; on a production Clerk setup it is a paid feature.) People can also ask from your home page: their requests appear in **Settings → Access requests**, where you allow or decline them, and you get an email for each one if Resend is set up (see the example above).
-8. **Check your costs** whenever you want: `stripe projects spend`.
+   (This guest list is free on Clerk's development setup; on a production Clerk setup it is a paid feature.) People can also ask from your home page: their requests appear in **Settings → Access requests**, where you allow or decline them, and you get an email for each one if a Resend key is set.
 
 ### 🔄 Update your copy later
 
@@ -210,7 +179,8 @@ Your copy never changes by itself. To get the owner's new features:
    ```bash
    git pull
    npm install
-   node scripts/infra/deploy.mjs   # applies the new database migrations first, then deploys
+   npm run db:migrate   # applies the new database migrations first
+   npx vercel --prod    # then deploys
    ```
 
 If you changed the code yourself, the sync may ask you to resolve conflicts first.
@@ -229,18 +199,14 @@ If you changed the code yourself, the sync may ask you to resolve conflicts firs
 
 Figures checked on the providers' pricing pages on 2026-10-05: they can change.
 
-### 🧑‍🔧 Without Stripe Projects (advanced)
-
-Possible, but by hand: create the accounts yourself (Vercel, Neon, Clerk, OpenRouter), copy [`.env.example`](.env.example) to `.env` and fill each value from the provider's website (the file explains every line), run `npm run db:migrate`, then deploy with `npx vercel` and add the same variables in the Vercel project's **Settings → Environment Variables**. This path has not been tested end to end.
-
 ## 🔑 API keys, simply
 
 - 🎫 An **API key** is a password for programs. Whoever holds it **acts as the account that owns it**: their requests are counted and billed to that account. So a key is never shared, never written in the code, never sent to the browser.
 - 🗂️ **Where NextRound keeps them:**
-  - the keys of the owner's services: in Stripe's secret store, on the owner's computer in `.env` (ignored by git), and online in Vercel's environment variables (encrypted);
+  - the keys of the owner's services: on the owner's computer in `.env` (ignored by git), and online in Vercel's environment variables (encrypted);
   - the keys users save in **Settings**: encrypted in the database (AES-256-GCM), never sent back to the browser;
   - in the code: **none**. Every file and the whole git history were scanned on 2026-10-05 (OpenRouter, Anthropic, OpenAI, Stripe, Clerk, ElevenLabs, Firecrawl and GitHub keys, tokens, database passwords): only placeholders in examples, and no `.env` file was ever committed.
-- 🧯 **If a key leaks:** delete it on the provider's website and create a new one (with Stripe Projects: `stripe projects rotate <resource>`).
+- 🧯 **If a key leaks:** delete it on the provider's website, create a new one and replace it in your `.env` and on Vercel.
 
 ## 🤖 AI limits, explained
 
@@ -259,7 +225,7 @@ Possible, but by hand: create the accounts yourself (Vercel, Neon, Clerk, OpenRo
 
 **Why run it on your computer?** To change the code and see the result in a second, without putting anything online. It is the usual way to develop: you edit a file, save it, and the page reloads by itself.
 
-**What runs where.** Only the code moves to your computer. The database and the sign-in stay in the cloud: there is no database on your computer. Your `.env` file, written by the install, tells the app where to find them, and it gives the same addresses as your online copy uses ([ADR 0014](docs/en/adr/0014-one-database.md)):
+**What runs where.** Only the code moves to your computer. The database and the sign-in stay in the cloud: there is no database on your computer. Your `.env` file, filled in during the install, tells the app where to find them, and it gives the same addresses as your online copy uses ([ADR 0014](docs/en/adr/0014-one-database.md)):
 
 ```
 Online        your browser → Vercel runs the code         → Neon (data) + Clerk (sign-in) + OpenRouter (AI)
@@ -271,7 +237,7 @@ npm run dev   your browser → your computer runs the code  → the same Neon + 
 - 🗄️ It is your **real data**: a fact you add on http://localhost:3000 is also in your online app, and what you delete there is deleted online too.
 - 🤖 The AI calls you make while testing count on your real AI quota.
 - 🔐 You sign in with the same account as online.
-- 🚀 Your code changes stay on your computer until you deploy them (`node scripts/infra/deploy.mjs`).
+- 🚀 Your code changes stay on your computer until you deploy them (see [update your copy](#-update-your-copy-later)).
 
 **How:**
 
@@ -279,11 +245,11 @@ npm run dev   your browser → your computer runs the code  → the same Neon + 
 npm run dev     # then open http://localhost:3000; Ctrl+C in the terminal to stop
 ```
 
-It needs the `.env` file written by the install: without it, the pages show an error that names the missing variables.
+It needs the `.env` file you filled in during the install: without it, the pages show an error that names the missing variables.
 
 ### 🧱 Stack
 
-Next.js 16 (App Router) · TypeScript · Tailwind CSS 4 + shadcn/ui · Drizzle ORM on Neon Postgres · Clerk (GitHub and Google sign-in) · zod · Vitest + PGlite · Playwright. Services provisioned with [Stripe Projects](https://docs.stripe.com/projects) ([ADR 0001](docs/en/adr/0001-stripe-projects-provisioning.md)).
+Next.js 16 (App Router) · TypeScript · Tailwind CSS 4 + shadcn/ui · Drizzle ORM on Neon Postgres · Clerk (GitHub and Google sign-in) · zod · Vitest + PGlite · Playwright.
 
 ### 🗂️ Repository layout
 
