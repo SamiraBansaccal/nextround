@@ -2,7 +2,7 @@
 
 Mis à jour à la fin de chaque session Claude (locale ou cloud). **À lire en premier.**
 
-_Dernière mise à jour : 2026-10-05, session locale (Mac)._
+_Dernière mise à jour : 2026-10-09, session locale (Mac)._
 
 ## 🧭 Sommaire
 
@@ -18,13 +18,16 @@ Règle : chaque session a sa *branch*, s'inscrit ici, ouvre une PR, et met la li
 
 | *Branch* | Session | Sujet | PR |
 |---|---|---|---|
-| `claude/local-resend` | local | ✉️ Resend dans la *stack* (fiches Stripe Projects, `bootstrap`), renouvellement du *token* Vercel partagé, README | [#31](https://github.com/SamiraBansaccal/nextround/pull/31) |
+| `claude/local-readme-sans-stripe` | local | 🧭 README sans Stripe Projects : un paragraphe sur le changement de cap, installation à la main (Neon, Clerk, OpenRouter, Vercel). Fichiers : `README.md`, `README.fr.md`, `.env.example`, `docs/EN-COURS.md` | [#34](https://github.com/SamiraBansaccal/nextround/pull/34) |
 
 <details>
 <summary>📦 Branches déjà fusionnées</summary>
 
 | *Branch* | Session | Sujet | PR |
 |---|---|---|---|
+| `claude/local-revert-mail-tip` | local | ↩️ Retrait de l'astuce e-mails des README : le README général reste tel quel | [#33](https://github.com/SamiraBansaccal/nextround/pull/33) |
+| `claude/local-readme-mail-tip` | local | 📝 Astuce e-mails des fournisseurs dans les README (retirée par #33) | [#32](https://github.com/SamiraBansaccal/nextround/pull/32) |
+| `claude/local-resend` | local | ✉️ Resend dans la *stack* (fiches Stripe Projects, `bootstrap`), renouvellement du *token* Vercel partagé, README | [#31](https://github.com/SamiraBansaccal/nextround/pull/31) |
 | `claude/local-access-requests` | local | 📨 Demandes d'accès : formulaire public, liste d'attente Clerk, e-mail à la propriétaire (Resend, à brancher), réponse dans les Réglages ; README « Stripe Projects en clair ». Fichiers : `lib/access/**`, `lib/server/owner.ts`, `app/actions.ts`, `app/page.tsx`, `app/sign-up/**`, `components/{auth,settings}/**`, `app/(app)/settings/**`, `lib/ai/usage.ts`, `README*.md` | [#29](https://github.com/SamiraBansaccal/nextround/pull/29) |
 | `claude/local-readme-friends` | local | 🙋 README pour débutants en FR et EN (app en ligne sur invitation ou copie à soi), `.env.example`, invitations `npm run clerk:signup -- allow / disallow`, lignes vides du `.env` = non définies. Fichiers : `README.md`, `README.fr.md`, `.env.example`, `scripts/infra/clerk-signup.mts`, `lib/server/env.ts`, `docs/README.md` | [#27](https://github.com/SamiraBansaccal/nextround/pull/27) |
 | `claude/local-bank-gaps` | local | 🎙️ Banque technique : architecture logicielle, IA et LLM, Windows Server et AD ; alias pour les noms vus dans les offres. Fichiers : `lib/interview/bank/**`, `lib/interview/{tracks,tech-logos}.ts`, `components/interview/tech-logo.tsx`, `tests/interview/question-bank.test.ts` | [#26](https://github.com/SamiraBansaccal/nextround/pull/26) |
@@ -52,6 +55,13 @@ Règle : chaque session a sa *branch*, s'inscrit ici, ouvre une PR, et met la li
 </details>
 
 ## ✅ Fait récemment
+
+### 🧭 Fin de Stripe Projects (local, 2026-10-08 et 09)
+
+- **Pourquoi** : après une mise à jour du *plugin* Projects (0.46 → 0.48), un compte Stripe neuf ne pouvait plus passer en mode live sans activer les paiements, donc sans compte bancaire, pour une app qui ne vend rien. Seule l'ancienne version du *plugin* passait encore. Résumé dans le README ([option B](../README.fr.md#-pourquoi-plus-de-stripe-projects)) ; retour envoyé à Stripe.
+- **Données de la propriétaire sauvegardées** hors du repo (base et réglages Clerk), restauration vérifiée sur un Postgres en mémoire.
+- **Cap** : Vercel et sa Marketplace (Neon et Clerk créés depuis Vercel), avec une adresse dédiée au développement. Le nouveau compte Vercel existe ; l'app actuelle reste en ligne jusqu'à la bascule.
+- **README FR et EN** : parties Stripe retirées, installation à la main (Neon, Clerk, OpenRouter, `.env`, Vercel) ; en-tête de `.env.example` aligné.
 
 ### 📨 Demandes d'accès (local, 2026-10-05)
 
@@ -191,6 +201,7 @@ Décision : [ADR 0023](fr/adr/0023-cles-de-l-instance-pour-la-proprietaire.md).
 
 ## 🚧 En cours
 
+- 🧭 **Bascule vers Vercel, sans Stripe** : prochaine étape, une PR qui accepte `DATABASE_URL` (Neon installé depuis Vercel) et crée les tables au *build* de production. Puis : projet Vercel relié au repo, Neon et Clerk depuis la Marketplace, données réimportées. Ensuite : retirer les scripts Stripe (`bootstrap`, `setup-env`, renouvellement du *token*), `.projects/` et la section Stripe d'`AGENTS.md`, puis fermer les anciens comptes.
 - 🔑 **Secrets absents du cloud** : sans eux, ni l'app ni les e2e ne tournent dans une session cloud. Liste : [guide local et cloud](fr/guides/local-et-cloud.md#-les-secrets-dans-le-cloud).
 - 💼 25 offres Actiris (Bruxelles, IT, accessibles à un junior) choisies le 2026-10-04 : **20 importées** sur le compte de la propriétaire (10 de plus le 2026-10-05, pour 19 appels d'IA : le modèle gratuit relance parfois). **Restent 5**, textes prêts dans `.local/offers/` : `npm run owner:import-offers -- .local/offers/{5945294,5962926,5966908,5869183,5869129}.txt` (environ 9 appels ; à lancer un jour où le quota de 40 n'est pas entamé). Si `.local/offers/` n'existe plus : `npm run offers:actiris -- fetch 5945294 5962926 5966908 5869183 5869129`.
 - 🚫 Indeed bloque les robots (Cloudflare, 403) et l'interdit : on ne le contourne pas. Offres Indeed : lien ou texte collé dans l'app.
