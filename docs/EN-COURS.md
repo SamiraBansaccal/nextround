@@ -18,7 +18,7 @@ Règle : chaque session a sa *branch*, s'inscrit ici, ouvre une PR, et met la li
 
 | *Branch* | Session | Sujet | PR |
 |---|---|---|---|
-| `claude/local-vercel-switch` | local | ▲ Bascule sur le nouveau compte Vercel : fonctions à Francfort (`fra1`, à côté de la base Neon `eu-central-1`), *skills* Neon et Clerk ajoutés par la Marketplace, état de la bascule et import des données préparé (répétition réussie). Fichiers : `vercel.json`, `skills-lock.json`, `.agents/skills/{clerk-*,neon*}`, `.claude/skills/{clerk-*,neon*}`, `docs/EN-COURS.md` | à venir |
+| `claude/local-vercel-switch` | local | ▲ Bascule sur le nouveau compte Vercel : fonctions à Francfort (`fra1`, à côté de la base Neon `eu-central-1`), *skills* Neon et Clerk ajoutés par la Marketplace, état de la bascule et import des données préparé (répétition réussie). Fichiers : `vercel.json`, `skills-lock.json`, `.agents/skills/{clerk-*,neon*}`, `.claude/skills/{clerk-*,neon*}`, `docs/EN-COURS.md` | [#36](https://github.com/SamiraBansaccal/nextround/pull/36) |
 
 <details>
 <summary>📦 Branches déjà fusionnées</summary>
