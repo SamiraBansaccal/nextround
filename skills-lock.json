@@ -1,6 +1,12 @@
 {
   "version": 1,
   "skills": {
+    "agents": {
+      "source": "elevenlabs/skills",
+      "sourceType": "github",
+      "skillPath": "agents/SKILL.md",
+      "computedHash": "62ce5580f82bb8f2df303444709f4f141c75a676089bd727ff0d457b6e255edc"
+    },
     "clerk-backend-api": {
       "source": "clerk/skills",
       "sourceType": "github",
@@ -37,11 +43,41 @@
       "skillPath": "skills/clerk-webhooks/SKILL.md",
       "computedHash": "7a9fd8c5c956ad8672eef0592e83df89ce1fc78080a0af9cb853abfe2e549b16"
     },
+    "create-agent-tui": {
+      "source": "OpenRouterTeam/skills",
+      "sourceType": "github",
+      "skillPath": "skills/create-agent-tui/SKILL.md",
+      "computedHash": "422ecebe81f06b3ff4c4e5ee5f4459da544e9f1cbdc1b0b69eb42c9150cc0ad2"
+    },
+    "create-headless-agent": {
+      "source": "OpenRouterTeam/skills",
+      "sourceType": "github",
+      "skillPath": "skills/create-headless-agent/SKILL.md",
+      "computedHash": "e6cb59cee25daa83a9410365c31d300bce1bd0b46b365e7c48f29f94b4fec48d"
+    },
+    "dubbing": {
+      "source": "elevenlabs/skills",
+      "sourceType": "github",
+      "skillPath": "dubbing/SKILL.md",
+      "computedHash": "a1e90267056a299fe57d624657bde6ae34d98f0faa80fc2b4ded08ea12a9f483"
+    },
     "frontend-design": {
       "source": "anthropics/skills",
       "sourceType": "github",
       "skillPath": "skills/frontend-design/SKILL.md",
       "computedHash": "89496d5dd00f4810205f351759594fc2742bf8eea85a2f2b2d1de59f4bd91576"
+    },
+    "install-ori-harness": {
+      "source": "OpenRouterTeam/skills",
+      "sourceType": "github",
+      "skillPath": "skills/install-ori-harness/SKILL.md",
+      "computedHash": "159ab1321d19364f6bd676fe8d3a9832a68a6e24074445594ebccd2bdc4e58a2"
+    },
+    "music": {
+      "source": "elevenlabs/skills",
+      "sourceType": "github",
+      "skillPath": "music/SKILL.md",
+      "computedHash": "7ceca67d5dcc5b777b876f1fe44a4a02134f9f78b71f7356a8b7791ba251b8e1"
     },
     "neon": {
       "source": "neondatabase/agent-skills",
@@ -55,11 +91,119 @@
       "skillPath": "skills/neon-postgres/SKILL.md",
       "computedHash": "b9763d379a3c5039e5555540a1333b1c529e2365d4f0b8fe2998ba41509814c5"
     },
+    "open-responses": {
+      "source": "OpenRouterTeam/skills",
+      "sourceType": "github",
+      "skillPath": "open-responses/SKILL.md",
+      "computedHash": "fde6c62120193b011c40cca23e3c719dd367c18fc1d1a715b7e699f7e44ca9fe"
+    },
+    "openrouter-agent-migration": {
+      "source": "OpenRouterTeam/skills",
+      "sourceType": "github",
+      "skillPath": "skills/openrouter-agent-migration/SKILL.md",
+      "computedHash": "0b08942afa921711215a35ed7b560f0c9dfedac948d7020c47b5154f753ac172"
+    },
+    "openrouter-analytics": {
+      "source": "OpenRouterTeam/skills",
+      "sourceType": "github",
+      "skillPath": "skills/openrouter-analytics/SKILL.md",
+      "computedHash": "4606ff33ac385c640d4b8ac851d280db570839b386753cfc9ec80cb04fe4d36e"
+    },
+    "openrouter-analytics-query": {
+      "source": "OpenRouterTeam/skills",
+      "sourceType": "github",
+      "skillPath": "skills/openrouter-analytics-query/SKILL.md",
+      "computedHash": "023efed0539fb3876a928e7620af38d753682f88fec17b455f81c9375f2ffccf"
+    },
+    "openrouter-analytics-schema": {
+      "source": "OpenRouterTeam/skills",
+      "sourceType": "github",
+      "skillPath": "skills/openrouter-analytics-schema/SKILL.md",
+      "computedHash": "f58b5d0ad07d3b94a78b5fda27d4746d1fbb3e7d955e5c7dbbe731f4b52e89f2"
+    },
+    "openrouter-benchmarks": {
+      "source": "OpenRouterTeam/skills",
+      "sourceType": "github",
+      "skillPath": "skills/openrouter-benchmarks/SKILL.md",
+      "computedHash": "6f5869f21807048abd149789347c3e540024c9c483592df2461aa5b7eda77e93"
+    },
+    "openrouter-generations": {
+      "source": "OpenRouterTeam/skills",
+      "sourceType": "github",
+      "skillPath": "skills/openrouter-generations/SKILL.md",
+      "computedHash": "53e96cc8dd6b93dcecef378b5d6e3823ca1896006dcd0e134a8ab44b79cd30df"
+    },
+    "openrouter-images": {
+      "source": "OpenRouterTeam/skills",
+      "sourceType": "github",
+      "skillPath": "skills/openrouter-images/SKILL.md",
+      "computedHash": "6c78fd1f6e787ba5a977d9ca8609ec545a5a7065ac071957e78d0a3ba834a773"
+    },
+    "openrouter-models": {
+      "source": "OpenRouterTeam/skills",
+      "sourceType": "github",
+      "skillPath": "skills/openrouter-models/SKILL.md",
+      "computedHash": "d1ef33877a30b9b22c0f1a2cedd54f795c9459ae70d8bb66978feba526549fc4"
+    },
+    "openrouter-oauth": {
+      "source": "OpenRouterTeam/skills",
+      "sourceType": "github",
+      "skillPath": "skills/openrouter-oauth/SKILL.md",
+      "computedHash": "7dc098e3c66b13c1f0f89df40c8991a0c93cf7ec8139963628ee1c55d3e72ff3"
+    },
+    "openrouter-stt": {
+      "source": "OpenRouterTeam/skills",
+      "sourceType": "github",
+      "skillPath": "skills/openrouter-stt/SKILL.md",
+      "computedHash": "33017d6f04b0a8ed32e604c3e3162d7770550ade4aaea9f7fe53e030c0fd1907"
+    },
+    "openrouter-tts": {
+      "source": "OpenRouterTeam/skills",
+      "sourceType": "github",
+      "skillPath": "skills/openrouter-tts/SKILL.md",
+      "computedHash": "b23a0d6997e2d2743858ce8f41cd81f8931f3e3984661b23d3a2c9125b9e5dcf"
+    },
+    "openrouter-typescript-sdk": {
+      "source": "OpenRouterTeam/skills",
+      "sourceType": "github",
+      "skillPath": "skills/openrouter-typescript-sdk/SKILL.md",
+      "computedHash": "444920e33326e4af1e7a0062c8843ea8c111ba3cfa3d1b2e028aed34ebaac347"
+    },
+    "openrouter-video": {
+      "source": "OpenRouterTeam/skills",
+      "sourceType": "github",
+      "skillPath": "skills/openrouter-video/SKILL.md",
+      "computedHash": "ca1a65aeb1cb30b4d3a96a698a3eff1ad8c1819396469631a1ef5767bd6f0f54"
+    },
+    "setup-api-key": {
+      "source": "elevenlabs/skills",
+      "sourceType": "github",
+      "skillPath": "setup-api-key/SKILL.md",
+      "computedHash": "f8daa32a413354452b90480ffe5acd056dc04608108463bd5d014a8af56dd077"
+    },
     "shadcn": {
       "source": "shadcn-ui/ui",
       "sourceType": "github",
       "skillPath": "skills/shadcn/SKILL.md",
       "computedHash": "f615de216e085a84e31593ad0fa9062232adc40cd87b7c7ab2b8e49abf6500be"
+    },
+    "sound-effects": {
+      "source": "elevenlabs/skills",
+      "sourceType": "github",
+      "skillPath": "sound-effects/SKILL.md",
+      "computedHash": "4de004ec3405d836c33207320a477951ce3de2f3dcb68f5365734302b91ad72c"
+    },
+    "spawn-ori-eval": {
+      "source": "OpenRouterTeam/skills",
+      "sourceType": "github",
+      "skillPath": "skills/spawn-ori-eval/SKILL.md",
+      "computedHash": "ed90d45540bbc558b687bf0896552a6220594a4849b2a062ccbd6666c001fbb0"
+    },
+    "speech-engine": {
+      "source": "elevenlabs/skills",
+      "sourceType": "github",
+      "skillPath": "speech-engine/SKILL.md",
+      "computedHash": "409fb9839da70eb3341330cd5486a837979eec28be3dbe83290ddff44de910b0"
     },
     "speech-to-text": {
       "source": "elevenlabs/skills",
@@ -92,7 +236,13 @@
       "source": "elevenlabs/skills",
       "sourceType": "github",
       "skillPath": "text-to-speech/SKILL.md",
-      "computedHash": "d07e420ac4a0d695b27c7a8cbe9af8ab3a8c60f3a9fc1a0fa2ce1748fbf883ae"
+      "computedHash": "bb182b4e3a864bdc7f04c0401dfd45b2b5c6f144281d5e6ddb7da0c00b7de3ad"
+    },
+    "update-skills-from-changelog": {
+      "source": "elevenlabs/skills",
+      "sourceType": "github",
+      "skillPath": ".agents/skills/update-skills-from-changelog/SKILL.md",
+      "computedHash": "d08cc5333ba774b2a07333fa8913db6d99f652a691f052783511f13fd12503c5"
     },
     "vercel-composition-patterns": {
       "source": "vercel-labs/agent-skills",
@@ -105,6 +255,18 @@
       "sourceType": "github",
       "skillPath": "skills/react-best-practices/SKILL.md",
       "computedHash": "3219a1944e404ffc14d1d9d6aef6dd2e3855b81387ee0a044ccbfe14d34c2357"
+    },
+    "voice-changer": {
+      "source": "elevenlabs/skills",
+      "sourceType": "github",
+      "skillPath": "voice-changer/SKILL.md",
+      "computedHash": "6e1542754e66fe21c8bffe419c0424c80d0c770217d5466e22813f9f302b75c9"
+    },
+    "voice-isolator": {
+      "source": "elevenlabs/skills",
+      "sourceType": "github",
+      "skillPath": "voice-isolator/SKILL.md",
+      "computedHash": "d4f7873a0b68ec3deb33d2073bf966551135c83964a37c9cf062a4fb7bc648ea"
     },
     "web-design-guidelines": {
       "source": "vercel-labs/agent-skills",
