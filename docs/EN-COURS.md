@@ -18,13 +18,14 @@ Règle : chaque session a sa *branch*, s'inscrit ici, ouvre une PR, et met la li
 
 | *Branch* | Session | Sujet | PR |
 |---|---|---|---|
-| `claude/local-readme-sans-stripe` | local | 🧭 README sans Stripe Projects : un paragraphe sur le changement de cap, installation à la main (Neon, Clerk, OpenRouter, Vercel). Fichiers : `README.md`, `README.fr.md`, `.env.example`, `docs/EN-COURS.md` | [#34](https://github.com/SamiraBansaccal/nextround/pull/34) |
+| `claude/local-vercel-ready` | local | ▲ App prête pour Vercel : `DATABASE_URL` (Neon de la Marketplace) en plus de `DB_CONNECTION_STRING`, migrations au *build* de production (`vercel.json`, connexion directe), pas de *preview* (une seule base), scripts qui lisent `.env.local`. Fichiers : `lib/server/env.ts`, `lib/db/index.ts`, `drizzle.config.ts`, `vercel.json`, `scripts/infra/{migrate-on-build.mjs,clerk-signup.mts}`, `scripts/owner/{owner,whoami}.mts`, `.env.example`, `tests/server/` | [#35](https://github.com/SamiraBansaccal/nextround/pull/35) |
 
 <details>
 <summary>📦 Branches déjà fusionnées</summary>
 
 | *Branch* | Session | Sujet | PR |
 |---|---|---|---|
+| `claude/local-readme-sans-stripe` | local | 🧭 README sans Stripe Projects : un paragraphe sur le changement de cap, installation à la main (Neon, Clerk, OpenRouter, Vercel). Fichiers : `README.md`, `README.fr.md`, `.env.example`, `docs/EN-COURS.md` | [#34](https://github.com/SamiraBansaccal/nextround/pull/34) |
 | `claude/local-revert-mail-tip` | local | ↩️ Retrait de l'astuce e-mails des README : le README général reste tel quel | [#33](https://github.com/SamiraBansaccal/nextround/pull/33) |
 | `claude/local-readme-mail-tip` | local | 📝 Astuce e-mails des fournisseurs dans les README (retirée par #33) | [#32](https://github.com/SamiraBansaccal/nextround/pull/32) |
 | `claude/local-resend` | local | ✉️ Resend dans la *stack* (fiches Stripe Projects, `bootstrap`), renouvellement du *token* Vercel partagé, README | [#31](https://github.com/SamiraBansaccal/nextround/pull/31) |
@@ -201,7 +202,7 @@ Décision : [ADR 0023](fr/adr/0023-cles-de-l-instance-pour-la-proprietaire.md).
 
 ## 🚧 En cours
 
-- 🧭 **Bascule vers Vercel, sans Stripe** : prochaine étape, une PR qui accepte `DATABASE_URL` (Neon installé depuis Vercel) et crée les tables au *build* de production. Puis : projet Vercel relié au repo, Neon et Clerk depuis la Marketplace, données réimportées. Ensuite : retirer les scripts Stripe (`bootstrap`, `setup-env`, renouvellement du *token*), `.projects/` et la section Stripe d'`AGENTS.md`, puis fermer les anciens comptes.
+- 🧭 **Bascule vers Vercel, sans Stripe** : l'app accepte `DATABASE_URL` (Neon installé depuis Vercel) et crée les tables au *build* de production, sans *preview* tant qu'il n'y a qu'une base. Audit de ce qui part sur le nouveau compte en cours : nouvelle base en Europe (l'ancienne est aux États-Unis), fonctions à Francfort, seulement les variables utiles. Puis : projet Vercel relié au repo, Neon et Clerk depuis la Marketplace, données réimportées. Ensuite : retirer les scripts Stripe (`bootstrap`, `setup-env`, renouvellement du *token*), `.projects/` et la section Stripe d'`AGENTS.md`, puis fermer les anciens comptes.
 - 🔑 **Secrets absents du cloud** : sans eux, ni l'app ni les e2e ne tournent dans une session cloud. Liste : [guide local et cloud](fr/guides/local-et-cloud.md#-les-secrets-dans-le-cloud).
 - 💼 25 offres Actiris (Bruxelles, IT, accessibles à un junior) choisies le 2026-10-04 : **20 importées** sur le compte de la propriétaire (10 de plus le 2026-10-05, pour 19 appels d'IA : le modèle gratuit relance parfois). **Restent 5**, textes prêts dans `.local/offers/` : `npm run owner:import-offers -- .local/offers/{5945294,5962926,5966908,5869183,5869129}.txt` (environ 9 appels ; à lancer un jour où le quota de 40 n'est pas entamé). Si `.local/offers/` n'existe plus : `npm run offers:actiris -- fetch 5945294 5962926 5966908 5869183 5869129`.
 - 🚫 Indeed bloque les robots (Cloudflare, 403) et l'interdit : on ne le contourne pas. Offres Indeed : lien ou texte collé dans l'app.

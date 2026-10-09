@@ -1,17 +1,20 @@
-// Shared by the owner scripts: loads .env when there is one (your machine), otherwise uses the
+// Shared by the owner scripts: loads .env.local and .env when present (your machine), otherwise uses the
 // environment as is (a Claude cloud session gets the same variables from its environment settings),
 // and finds the owner's account (numeric GitHub id = OWNER_GITHUB_ID). Prints no secret.
 import { existsSync } from "node:fs";
 import { createClerkClient } from "@clerk/backend";
 
-if (existsSync(".env")) process.loadEnvFile(".env");
+// `.env.local` (written by `vercel env pull`) first, then `.env`: as in Next.js, the first file wins.
+for (const file of [".env.local", ".env"]) if (existsSync(file)) process.loadEnvFile(file);
 
-for (const name of ["DB_CONNECTION_STRING", "CLERK_SECRET_KEY", "OWNER_GITHUB_ID", "APP_ENCRYPTION_KEY"]) {
-  if (!process.env[name]) {
-    console.error(`${name} is not set: run \`stripe projects env --pull\` (your machine) or add it to the cloud environment.`);
-    process.exit(1);
-  }
+const missing = [
+  ...(process.env.DATABASE_URL || process.env.DB_CONNECTION_STRING ? [] : ["DATABASE_URL"]),
+  ...["CLERK_SECRET_KEY", "OWNER_GITHUB_ID", "APP_ENCRYPTION_KEY"].filter((name) => !process.env[name]),
+];
+for (const name of missing) {
+  console.error(`${name} is not set: run \`vercel env pull\` (your machine) or add it to the cloud environment.`);
 }
+if (missing.length) process.exit(1);
 
 /** True when this Clerk account is linked to the owner's GitHub account (same rule as lib/server/auth.ts). */
 export const isOwnerAccount = (user: { externalAccounts: { provider: string; providerUserId: string }[] }) =>

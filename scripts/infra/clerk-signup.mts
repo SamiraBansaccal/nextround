@@ -14,15 +14,16 @@
 //
 // Restrictions are free on a Clerk development instance (a paid feature on a production one). The e2e
 // tests are not affected: their test user is created through the Backend API, not by signing up.
-// Loads .env when there is one; prints no secret, and masks email addresses.
+// Loads .env.local and .env when present; prints no secret, and masks email addresses.
 import { existsSync } from "node:fs";
 import { randomBytes } from "node:crypto";
 import { createClerkClient } from "@clerk/backend";
 
-if (existsSync(".env")) process.loadEnvFile(".env");
+// `.env.local` (written by `vercel env pull`) first, then `.env`: as in Next.js, the first file wins.
+for (const file of [".env.local", ".env"]) if (existsSync(file)) process.loadEnvFile(file);
 for (const name of ["CLERK_SECRET_KEY", "NEXT_PUBLIC_CLERK_PUBLISHABLE_KEY", "OWNER_GITHUB_ID"]) {
   if (!process.env[name]) {
-    console.error(`${name} is not set: run \`stripe projects env --pull\` (your machine) or add it to the cloud environment.`);
+    console.error(`${name} is not set: run \`vercel env pull\` (your machine) or add it to the cloud environment.`);
     process.exit(1);
   }
 }
