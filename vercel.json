@@ -1,0 +1,5 @@
+{
+  "$schema": "https://openapi.vercel.sh/vercel.json",
+  "buildCommand": "node scripts/infra/migrate-on-build.mjs && npm run build",
+  "ignoreCommand": "[ \"$VERCEL_ENV\" != \"production\" ]"
+}

@@ -1,7 +1,7 @@
 import "server-only";
 import { neon } from "@neondatabase/serverless";
 import { drizzle } from "drizzle-orm/neon-http";
-import { serverEnv } from "@/lib/server/env";
+import { databaseUrl } from "@/lib/server/env";
 import * as schema from "./schema";
 
 // Neon's HTTP driver: one HTTPS request per query, well suited to serverless functions.
@@ -9,7 +9,7 @@ import * as schema from "./schema";
 let instance: ReturnType<typeof createDb> | undefined;
 
 function createDb() {
-  return drizzle(neon(serverEnv().DB_CONNECTION_STRING), { schema });
+  return drizzle(neon(databaseUrl()), { schema });
 }
 
 export function getDb() {

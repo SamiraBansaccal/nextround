@@ -6,7 +6,7 @@ import { isOwnerAccount } from "./owner.mjs";
 
 const clerk = createClerkClient({ secretKey: process.env.CLERK_SECRET_KEY });
 const { data: users } = await clerk.users.getUserList({ limit: 100 });
-const sql = neon(process.env.DB_CONNECTION_STRING!);
+const sql = neon((process.env.DATABASE_URL || process.env.DB_CONNECTION_STRING)!);
 for (const u of users) {
   const gh = u.externalAccounts.find((a) => a.provider.includes("github"))?.username ?? null;
   const [counts] = await sql`select

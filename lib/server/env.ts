@@ -1,14 +1,17 @@
 import "server-only";
 import { z } from "zod";
 
-// Server-side environment, validated once. Names come from Stripe Projects
-// (`stripe projects env --pull`) and from scripts/infra/setup-env.mjs; `.env.example` lists them all.
+// Server-side environment, validated once. `.env.example` lists every variable; on Vercel, the Neon and Clerk
+// integrations of the Marketplace set their own.
 
 /** An optional value: an empty line in `.env` ("NAME=") counts as not set, not as an empty string. */
 const optional = <T extends z.ZodTypeAny>(schema: T) => z.preprocess((v) => (v === "" ? undefined : v), schema.optional());
 
 const serverEnvSchema = z.object({
-  DB_CONNECTION_STRING: z.string().min(1),
+  // The Neon database. Installed from the Vercel Marketplace, it arrives as DATABASE_URL; DB_CONNECTION_STRING is
+  // the name older setups used, read when DATABASE_URL is not set. One of the two is required (checked below).
+  DATABASE_URL: optional(z.string()),
+  DB_CONNECTION_STRING: optional(z.string()),
   CLERK_SECRET_KEY: z.string().min(1),
   NEXT_PUBLIC_CLERK_PUBLISHABLE_KEY: z.string().min(1),
   APP_ENCRYPTION_KEY: z.string().min(1),
@@ -41,11 +44,16 @@ const serverEnvSchema = z.object({
 
 export type ServerEnv = z.infer<typeof serverEnvSchema>;
 
+const checkedSchema = serverEnvSchema.refine((env) => env.DATABASE_URL || env.DB_CONNECTION_STRING, {
+  path: ["DATABASE_URL"],
+  message: "Required",
+});
+
 let cached: ServerEnv | undefined;
 
 export function serverEnv(): ServerEnv {
   if (cached) return cached;
-  const parsed = serverEnvSchema.safeParse(process.env);
+  const parsed = checkedSchema.safeParse(process.env);
   if (!parsed.success) {
     // Names only, never values.
     const names = parsed.error.issues.map((i) => i.path.join(".")).join(", ");
@@ -53,4 +61,10 @@ export function serverEnv(): ServerEnv {
   }
   cached = parsed.data;
   return cached;
+}
+
+/** The database connection string, under whichever of its two names is set (DATABASE_URL first). */
+export function databaseUrl(): string {
+  const env = serverEnv();
+  return (env.DATABASE_URL ?? env.DB_CONNECTION_STRING)!;
 }
