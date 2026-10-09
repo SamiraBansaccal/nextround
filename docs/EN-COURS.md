@@ -18,13 +18,14 @@ Règle : chaque session a sa *branch*, s'inscrit ici, ouvre une PR, et met la li
 
 | *Branch* | Session | Sujet | PR |
 |---|---|---|---|
-| `claude/local-vercel-ready` | local | ▲ App prête pour Vercel : `DATABASE_URL` (Neon de la Marketplace) en plus de `DB_CONNECTION_STRING`, migrations au *build* de production (`vercel.json`, connexion directe), pas de *preview* (une seule base), scripts qui lisent `.env.local`. Fichiers : `lib/server/env.ts`, `lib/db/index.ts`, `drizzle.config.ts`, `vercel.json`, `scripts/infra/{migrate-on-build.mjs,clerk-signup.mts}`, `scripts/owner/{owner,whoami}.mts`, `.env.example`, `tests/server/` | [#35](https://github.com/SamiraBansaccal/nextround/pull/35) |
+| `claude/local-vercel-switch` | local | ▲ Bascule sur le nouveau compte Vercel : fonctions à Francfort (`fra1`, à côté de la base Neon `eu-central-1`), *skills* Neon et Clerk ajoutés par la Marketplace, suivi de la bascule. Fichiers : `vercel.json`, `skills-lock.json`, `.agents/skills/{clerk-*,neon*}`, `.claude/skills/{clerk-*,neon*}`, `docs/EN-COURS.md` | à venir |
 
 <details>
 <summary>📦 Branches déjà fusionnées</summary>
 
 | *Branch* | Session | Sujet | PR |
 |---|---|---|---|
+| `claude/local-vercel-ready` | local | ▲ App prête pour Vercel : `DATABASE_URL` (Neon de la Marketplace) en plus de `DB_CONNECTION_STRING`, migrations au *build* de production (`vercel.json`, connexion directe), pas de *preview* (une seule base), scripts qui lisent `.env.local`. Fichiers : `lib/server/env.ts`, `lib/db/index.ts`, `drizzle.config.ts`, `vercel.json`, `scripts/infra/{migrate-on-build.mjs,clerk-signup.mts}`, `scripts/owner/{owner,whoami}.mts`, `.env.example`, `tests/server/` | [#35](https://github.com/SamiraBansaccal/nextround/pull/35) |
 | `claude/local-readme-sans-stripe` | local | 🧭 README sans Stripe Projects : un paragraphe sur le changement de cap, installation à la main (Neon, Clerk, OpenRouter, Vercel). Fichiers : `README.md`, `README.fr.md`, `.env.example`, `docs/EN-COURS.md` | [#34](https://github.com/SamiraBansaccal/nextround/pull/34) |
 | `claude/local-revert-mail-tip` | local | ↩️ Retrait de l'astuce e-mails des README : le README général reste tel quel | [#33](https://github.com/SamiraBansaccal/nextround/pull/33) |
 | `claude/local-readme-mail-tip` | local | 📝 Astuce e-mails des fournisseurs dans les README (retirée par #33) | [#32](https://github.com/SamiraBansaccal/nextround/pull/32) |
@@ -202,7 +203,10 @@ Décision : [ADR 0023](fr/adr/0023-cles-de-l-instance-pour-la-proprietaire.md).
 
 ## 🚧 En cours
 
-- 🧭 **Bascule vers Vercel, sans Stripe** : l'app accepte `DATABASE_URL` (Neon installé depuis Vercel) et crée les tables au *build* de production, sans *preview* tant qu'il n'y a qu'une base. Audit de ce qui part sur le nouveau compte en cours : nouvelle base en Europe (l'ancienne est aux États-Unis), fonctions à Francfort, seulement les variables utiles. Puis : projet Vercel relié au repo, Neon et Clerk depuis la Marketplace, données réimportées. Ensuite : retirer les scripts Stripe (`bootstrap`, `setup-env`, renouvellement du *token*), `.projects/` et la section Stripe d'`AGENTS.md`, puis fermer les anciens comptes.
+- 🧭 **Bascule vers Vercel, sans Stripe** : l'app accepte `DATABASE_URL` (Neon installé depuis Vercel) et crée les tables au *build* de production, sans *preview* tant qu'il n'y a qu'une base.
+  - ✅ Fait (2026-10-09) : nouveau compte Vercel, projet `nextround` relié en local (`.vercel/`), **Neon** (Francfort, `eu-central-1`, Postgres 18) et **Clerk** installés depuis la Marketplace, `vercel env pull` → `.env.local`. Les 9 migrations sont passées : tables créées, **base vide**. Fonctions à Francfort (`fra1` dans `vercel.json`).
+  - ⏳ Reste : (1) mettre sur le projet Vercel les variables que la Marketplace n'apporte pas : `APP_ENCRYPTION_KEY` (**la même** qu'avant, sinon les clés d'IA sauvegardées ne se déchiffrent plus), `OWNER_GITHUB_ID`, `OPENROUTER_API_API_KEY`, `RESEND_API_KEY`, `APP_URL`, `ACCESS_MAIL_FROM` ; (2) relier le projet au repo GitHub ; (3) réimporter les données sauvegardées : le nouveau Clerk donne un **nouvel identifiant** à la propriétaire, il faut donc qu'elle se connecte une fois, puis remplacer l'ancien `user_id` par le nouveau à l'import ; (4) refaire la liste d'autorisation Clerk.
+  - Ensuite : retirer les scripts Stripe (`bootstrap`, `setup-env`, renouvellement du *token*), `.projects/` et la section Stripe d'`AGENTS.md`, puis fermer les anciens comptes.
 - 🔑 **Secrets absents du cloud** : sans eux, ni l'app ni les e2e ne tournent dans une session cloud. Liste : [guide local et cloud](fr/guides/local-et-cloud.md#-les-secrets-dans-le-cloud).
 - 💼 25 offres Actiris (Bruxelles, IT, accessibles à un junior) choisies le 2026-10-04 : **20 importées** sur le compte de la propriétaire (10 de plus le 2026-10-05, pour 19 appels d'IA : le modèle gratuit relance parfois). **Restent 5**, textes prêts dans `.local/offers/` : `npm run owner:import-offers -- .local/offers/{5945294,5962926,5966908,5869183,5869129}.txt` (environ 9 appels ; à lancer un jour où le quota de 40 n'est pas entamé). Si `.local/offers/` n'existe plus : `npm run offers:actiris -- fetch 5945294 5962926 5966908 5869183 5869129`.
 - 🚫 Indeed bloque les robots (Cloudflare, 403) et l'interdit : on ne le contourne pas. Offres Indeed : lien ou texte collé dans l'app.
