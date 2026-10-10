@@ -50,7 +50,7 @@ NextRound est un site web. Il ne tourne pas sur ton ordinateur : il tourne **dan
 |---|---|---|
 | ⏱️ Mise en route | 5 minutes : invitation, connexion, une clé d'IA à coller | 1 à 2 heures la première fois : quelques comptes à créer et des clés à recopier |
 | 💶 Coût | Gratuit (les modèles d'IA gratuits suffisent) | Gratuit avec les offres gratuites ; rien n'est facturé tant que tu ne passes pas toi-même un service en payant |
-| 👤 Comptes nécessaires | GitHub (ou Google) et un fournisseur d'IA (OpenRouter) | Les mêmes, plus des comptes **Vercel** et **Neon** (Neon gère aussi la connexion ; ElevenLabs et Firecrawl en option) |
+| 👤 Comptes nécessaires | GitHub (ou Google) et un fournisseur d'IA (OpenRouter) | Les mêmes, plus des comptes **Vercel**, **Neon** et **Clerk** (ElevenLabs, Firecrawl et Resend en option) |
 | 🔄 Mises à jour | **Automatiques** : les nouveautés arrivent dès que la propriétaire les met en ligne | **Aucune par défaut** : ta copie ne change que si tu récupères les changements de la propriétaire et que tu redéploies (voir [mettre à jour](#-mettre-à-jour-ta-copie-plus-tard)) |
 | 🗄️ Tes données | Dans la base de données **de la propriétaire** : elle l'administre et pourrait techniquement la lire, et elle peut la **supprimer ou la réinitialiser** à tout moment (c'est un projet perso, sans garantie) | Dans **ta** base de données : tu es seul·e à l'administrer |
 | 🚦 Limites | Les limites de ta propre clé d'IA ; les quotas gratuits d'hébergement et de base de données sont **partagés** par tous les utilisateurs de l'app | Tous les quotas gratuits sont pour toi |
@@ -61,15 +61,15 @@ NextRound est un site web. Il ne tourne pas sur ton ordinateur : il tourne **dan
 
 ### 1. Te faire inviter
 
-L'inscription se fait **sur invitation** : pour l'instant, seule la personne propriétaire du site peut se connecter. Pour demander une invitation, écris à l'adresse affichée sur la page d'accueil, s'il y en a une.
+L'inscription se fait **sur invitation**. Sur la page d'accueil, clique sur **No invitation yet? Request access** et donne l'**adresse e-mail de ton compte GitHub** (ou Google) avec lequel tu vas te connecter. La propriétaire est prévenue par e-mail et répond dans ses Réglages ; quand elle t'autorise, Clerk t'envoie une invitation par e-mail. Avant ça, Clerk refuse l'inscription avec « Access not allowed ».
 
 ### 2. Te connecter
 
 Ouvre https://nextround-gamma.vercel.app et clique sur **Continue with GitHub** (conseillé) ou **Continue with Google**.
 
 - 🐙 **GitHub est conseillé** : le profil peut importer automatiquement tes projets GitHub publics, à partir du compte avec lequel tu t'es connecté·e. Avec Google, ce bouton d'import reste désactivé (tu peux quand même ajouter tes CV).
-- 🔐 NextRound ne voit jamais ton mot de passe : c'est GitHub ou Google qui confirme qui tu es (ça s'appelle **OAuth**), et **Neon Auth**, le service de connexion de la base, garde ta session.
-- 🧪 L'écran de Google peut afficher le nom et le logo de **Neon** : l'app utilise les codes partagés de Neon, prévus pour le développement. Rien d'anormal.
+- 🔐 NextRound ne voit jamais ton mot de passe : c'est GitHub ou Google qui confirme qui tu es (ça s'appelle **OAuth**), et **Clerk**, le service de connexion, garde ta session.
+- 🧪 Les écrans de connexion peuvent afficher **« Development mode »** : l'app utilise la formule de développement gratuite de Clerk. Rien d'anormal.
 
 ### 3. Brancher ton IA (pour les retours, les offres et les CV)
 
@@ -109,7 +109,7 @@ Une fois en ligne, ta copie est faite de quelques services qui se parlent par In
      │  https://<ton-app>.vercel.app
      ▼
  Vercel ─────── hébergement : fait tourner l'app Next.js, page par page, requête par requête
-   ├── Neon Auth .... connexion avec GitHub ou Google, sessions (dans la base)
+   ├── Clerk ........ connexion avec GitHub ou Google, sessions
    ├── Neon ......... la base de données Postgres (profils, offres, entretiens)
    ├── OpenRouter ... l'IA (ta clé, pour ton compte)
    ├── ElevenLabs ... les voix (facultatif)
@@ -124,7 +124,7 @@ Une fois en ligne, ta copie est faite de quelques services qui se parlent par In
 | **Hébergement** (*hosting*) | Une entreprise qui fait tourner ton site sur ses ordinateurs, pour qu'il soit en ligne en permanence. Ici : **Vercel**. |
 | **Serverless** | Tu ne loues ni ne gères aucun serveur. Vercel lance ton code à chaque requête et l'arrête après ; Neon réveille la base quand il faut et l'endort après 5 minutes sans activité (le premier clic après une pause est un peu plus lent). |
 | **Base de données** | Là où les données sont gardées. Ici : **Postgres**, géré par **Neon** dans le cloud. |
-| **Auth** | La connexion : qui es-tu ? Ici : **Neon Auth**, avec GitHub ou Google. |
+| **Auth** | La connexion : qui es-tu ? Ici : **Clerk**, avec GitHub ou Google. |
 | **API** | Une porte qu'un service ouvre pour les programmes (pas pour les humains avec un navigateur). NextRound appelle l'API d'OpenRouter pour parler à un modèle d'IA. |
 | **Clé d'API** | Le badge qui ouvre cette porte : elle dit quel compte appelle, pour que le service le compte et le facture. Voir [les clés d'API, simplement](#-les-clés-dapi-simplement). |
 | **Variables d'environnement (`.env`)** | Des réglages donnés à l'app au démarrage, hors du code : clés, adresse de la base… Sur ton ordinateur, dans un fichier `.env` que git ignore ; sur Vercel, dans les réglages du projet. |
@@ -140,7 +140,7 @@ NextRound est né pendant un hackathon Stripe, où on a découvert **Stripe Proj
 ### 🧰 Ce qu'il te faut
 
 - 🐙 Un compte **GitHub**.
-- ▲ Des comptes gratuits chez **Vercel** (hébergement), **Neon** (base de données et connexion) et **OpenRouter** (IA). ElevenLabs et Firecrawl sont facultatifs.
+- ▲ Des comptes gratuits chez **Vercel** (hébergement), **Neon** (base de données), **Clerk** (connexion) et **OpenRouter** (IA). ElevenLabs, Firecrawl et Resend sont facultatifs.
 - 🟢 **Node.js** 20 ou plus récent (https://nodejs.org, la version « LTS ») et **Git** (https://git-scm.com).
 
 ### 🚀 Pas à pas
@@ -156,13 +156,19 @@ NextRound est né pendant un hackathon Stripe, où on a découvert **Stripe Proj
    ```
 3. **Crée tes services**, chacun sur son offre gratuite :
    - **Neon** : un projet, puis copie sa chaîne de connexion (`postgresql://…`) ;
-   - **Neon Auth**, la connexion, dans Neon ([pourquoi pas Clerk](docs/fr/adr/0028-neon-auth-et-une-base-a-londres.md)) : `npx neon neon-auth enable`, puis coupe l'e-mail et le mot de passe avec `npx neon neon-auth config email-password update --no-enabled` ; Google marche tout de suite. Pour **GitHub**, crée une *OAuth App* sur GitHub (*Settings → Developer settings → OAuth Apps*) dont l'adresse de retour est `<NEON_AUTH_BASE_URL>/callback/github`, puis ajoute-la avec `npx neon neon-auth oauth-provider add --provider-id github --oauth-client-id <id> --oauth-client-secret <secret>` ;
+   - **Clerk** : avec sa ligne de commande, pas depuis la Marketplace Vercel ([pourquoi](docs/fr/adr/0027-clerk-par-sa-cli-pas-par-la-marketplace.md)) : `npx clerk auth login`, puis `npx clerk apps create NextRound` ; active la connexion **GitHub** avec `npx clerk config patch --app <app_id> --instance dev --json '{"connection_oauth_github":{"enabled":true}}'` ; `npx clerk env pull --app <app_id>` écrit ses deux clés dans `.env.local` ;
    - **OpenRouter** : une clé d'API (voir l'[option A, étape 3](#3-brancher-ton-ia-pour-les-retours-les-offres-et-les-cv)).
 4. **Remplis ton `.env`** : copie [`.env.example`](.env.example) en `.env` et remplis chaque ligne ; le fichier explique d'où vient chaque valeur. Pour la clé de chiffrement : `openssl rand -base64 32`. Pour ton identifiant GitHub numérique : le champ `id` de `https://api.github.com/users/<ton-pseudo-github>`.
 5. **Crée les tables** de la base : `npm run db:migrate`.
 6. **Mets en ligne** : `npx vercel` crée ton projet Vercel. Ajoute les mêmes variables dans **Settings → Environment Variables** du projet, puis lance `npx vercel --prod`. À la fin, tu obtiens ton adresse : `https://<nom>.vercel.app`.
 7. **Ouvre ton app** et connecte-toi avec ton compte GitHub : tu es la ou le propriétaire, donc la clé OpenRouter de ton `.env` marche pour ton compte sans rien coller.
-8. **Qui peut se connecter.** Pour l'instant, toi seulement, la personne propriétaire (`OWNER_GITHUB_ID`), avec ton compte GitHub ; les autres voient « This site is by invitation ». Remplis `ACCESS_CONTACT_EMAIL` pour afficher une adresse où demander.
+8. **Décide qui peut s'inscrire.** Par défaut, tout le monde peut créer un compte (il lui faudra sa propre clé d'IA). Pour passer ton app sur invitation :
+   ```bash
+   npm run clerk:signup -- close             # toi seulement
+   npm run clerk:signup -- allow ami@example.com
+   npm run clerk:signup -- status            # qui est autorisé
+   ```
+   (Cette liste d'invités est gratuite avec la formule de développement de Clerk ; avec une formule de production, elle est payante.) Les gens peuvent aussi demander depuis ta page d'accueil : leurs demandes apparaissent dans **Réglages → Demandes d'accès**, où tu les autorises ou les refuses, et tu reçois un e-mail pour chacune si une clé Resend est configurée.
 
 ### 🔄 Mettre à jour ta copie plus tard
 
@@ -185,7 +191,7 @@ Si tu as modifié le code toi-même, la synchronisation peut te demander de rés
 |---|---|
 | ▲ Vercel (Hobby) | Usage personnel et non commercial ; 1 000 000 d'appels de fonctions, 4 heures de CPU actif et 360 Go-heures de mémoire par mois ; au-delà, la fonction est suspendue jusqu'à la fin de la période de 30 jours |
 | 🐘 Neon | 1 Go de stockage par projet, 100 heures de calcul par mois, mise en veille après 5 minutes sans activité |
-| 🔐 Neon Auth | Jusqu'à 60 000 utilisateurs actifs par mois |
+| 🔐 Clerk | Jusqu'à 50 000 utilisateurs retenus par application |
 | 🤖 OpenRouter | Modèles gratuits : 20 requêtes par minute et 50 par jour par compte (1 000 par jour après un achat unique de 10 $ de crédits) |
 | 🎧 ElevenLabs | 10 000 crédits par mois, usage non commercial |
 | 🕷️ Firecrawl | 1 000 pages par mois |
@@ -222,8 +228,8 @@ Chiffres vérifiés sur les pages de tarifs des fournisseurs le 2026-10-05 : ils
 **Ce qui tourne où.** Seul le code passe sur ton ordinateur. La base de données et la connexion restent dans le cloud : il n'y a pas de base de données sur ton ordinateur. Ton fichier `.env`, rempli à l'installation, dit à l'app où les trouver, et il donne les mêmes adresses que celles de ta copie en ligne ([ADR 0014](docs/fr/adr/0014-une-seule-base.md)) :
 
 ```
-En ligne      ton navigateur → Vercel fait tourner le code          → Neon (données et connexion) + OpenRouter (IA)
-npm run dev   ton navigateur → ton ordinateur fait tourner le code  → les mêmes Neon + OpenRouter
+En ligne      ton navigateur → Vercel fait tourner le code          → Neon (données) + Clerk (connexion) + OpenRouter (IA)
+npm run dev   ton navigateur → ton ordinateur fait tourner le code  → les mêmes Neon + Clerk + OpenRouter
 ```
 
 **Ce que ça veut dire pour toi :**
@@ -243,7 +249,7 @@ Il faut le fichier `.env` rempli à l'installation : sans lui, les pages affiche
 
 ### 🧱 Stack
 
-Next.js 16 (App Router) · TypeScript · Tailwind CSS 4 + shadcn/ui · Drizzle ORM sur Neon Postgres · Neon Auth (connexion GitHub et Google) · zod · Vitest + PGlite · Playwright.
+Next.js 16 (App Router) · TypeScript · Tailwind CSS 4 + shadcn/ui · Drizzle ORM sur Neon Postgres · Clerk (connexion GitHub et Google) · zod · Vitest + PGlite · Playwright.
 
 ### 🗂️ Organisation du repo
 
@@ -264,9 +270,10 @@ Visite complète : [docs/fr/guides/architecture.md](docs/fr/guides/architecture.
 ```bash
 npm run dev          # http://localhost:3000 (demande un .env)
 npm test             # tests unitaires, sans secret
-npm run e2e          # chaque écran dans un vrai navigateur, sur une branche Neon jetable (CLI Neon connectée)
+npm run e2e          # chaque écran dans un vrai navigateur (demande les clés Clerk et Neon)
 npm run build && E2E_PROD=1 npm run e2e   # les mêmes écrans sur le build de production (CSP plus stricte)
 npm run db:migrate   # appliquer les nouvelles migrations avant de déployer
+npm run clerk:signup -- status | close | open | allow <email> | disallow <email>
 ```
 
 ### 🔒 Sécurité
@@ -286,6 +293,6 @@ npm run db:migrate   # appliquer les nouvelles migrations avant de déployer
 
 - Les réponses à l'oral utilisent la reconnaissance vocale du navigateur (Chrome, Edge).
 - Les offres arrivent par lien ou texte collé ; Indeed bloque les robots, ses offres se collent.
-- La connexion Google utilise les codes partagés de Neon, prévus pour le développement (nom de Neon sur l'écran de Google) ; la connexion GitHub demande ta propre OAuth App.
+- Clerk tourne en instance de développement (badge « Development mode », identifiants GitHub/Google partagés).
 - Une seule base sert au développement local et à la production ([ADR 0014](docs/fr/adr/0014-une-seule-base.md)).
 - Les modèles gratuits peuvent être saturés ; un modèle de secours est configuré.

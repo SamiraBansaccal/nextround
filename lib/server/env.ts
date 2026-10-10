@@ -34,6 +34,14 @@ const serverEnvSchema = z.object({
   INSTANCE_LLM_FALLBACK_MODELS: optional(z.string()),
   // Where people without an invitation may write to ask for one, shown on the home page. Unset: no address shown.
   ACCESS_CONTACT_EMAIL: optional(z.email()),
+  // Resend, to email the owner (lib/access/notify.ts, kept ready for the invitations to rebuild, ADR 0028).
+  RESEND_API_KEY: optional(z.string()),
+  // The sender of that email; without a domain verified at Resend, only its test sender works.
+  ACCESS_MAIL_FROM: optional(z.string()),
+  // The site's public address for links in emails ("https://…"); on Vercel, its production domain is used by
+  // default (VERCEL_PROJECT_PRODUCTION_URL, set by Vercel). Never taken from a request's headers.
+  APP_URL: optional(z.url()),
+  VERCEL_PROJECT_PRODUCTION_URL: optional(z.string()),
   // Self-hosting only: allow any OpenAI-compatible base URL (e.g. Ollama on localhost).
   ALLOW_CUSTOM_LLM_BASE_URL: z.enum(["true", "false"]).default("false"),
 });
