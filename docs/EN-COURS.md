@@ -7,6 +7,7 @@ _Dernière mise à jour : 2026-10-09, session locale (Mac)._
 ## 🧭 Sommaire
 
 - [🌿 Branches en cours](#-branches-en-cours)
+- [🗺️ Plan de la bascule](#️-plan-de-la-bascule-stripe--vercel)
 - [✅ Fait récemment](#-fait-récemment)
 - [🚧 En cours](#-en-cours)
 - [🎬 Avatars animés](#-avatars-animés)
@@ -55,6 +56,49 @@ Règle : chaque session a sa *branch*, s'inscrit ici, ouvre une PR, et met la li
 | `claude/intelligent-einstein-58bqoh` | cloud | Traduction EN/FR de tout le site | [#6](https://github.com/SamiraBansaccal/nextround/pull/6), [#8](https://github.com/SamiraBansaccal/nextround/pull/8) |
 
 </details>
+
+## 🗺️ Plan de la bascule (Stripe → Vercel)
+
+Écrit le 2026-10-08 dans une session lancée depuis le dossier personnel (pas celui du projet), il n'avait jamais été recopié ici ; retrouvé et mis à jour le 2026-10-10. Depuis, le nouveau compte Stripe a été abandonné (le mode live exigeait un compte bancaire) au profit de Vercel et de comptes ouverts directement. **Règle d'or : on ne supprime rien tant que la nouvelle version n'est pas vérifiée.** 👤 = propriétaire, 🤖 = Claude.
+
+### 0. 📮 L'adresse dev
+- [x] 👤 Nouvelle adresse créée ; tous les nouveaux comptes l'utilisent.
+- [ ] 👤 La sécuriser : mot de passe fort, validation en deux étapes, Gmail en adresse de secours (à confirmer).
+
+### 1. 💾 Sauvegardes
+- [x] 🤖 Base exportée hors du repo (`.local/backup/2026-10-08`, puis `2026-10-09` : identiques) ; restauration prouvée.
+- [x] 👤 PDF des CV d'origine gardés (`.local/backup/2026-10-08/cv/`).
+- [x] 🤖 Ce qui ne bouge pas : GitHub, le repo, l'identifiant GitHub numérique, `.local/`.
+
+### 2. ~~💳 Un nouveau compte Stripe~~ (abandonné le 2026-10-08)
+- Le compte créé ce jour-là (`acct_1UOONg…`) garde un projet Stripe Projects « nextround » (2026-10-08, 23 h 10). Neon y a créé l'organisation « Stripe Projects: NextRound » (mail du 2026-10-10 sur l'ancienne adresse). À supprimer à l'étape 5.
+
+### 3. 🚀 La nouvelle installation (Vercel)
+- [x] 👤 Compte Vercel avec la nouvelle adresse ; 🤖 projet relié au repo, fonctions à Francfort (`fra1`).
+- [x] 🤖 Neon depuis la Marketplace (Francfort, offre Free), tables créées au *build*.
+- [x] 🤖 Clerk par sa CLI ([ADR 0027](en/adr/0027-clerk-from-its-cli-not-the-marketplace.md)) : GitHub et Google seulement (ni e-mail ni mot de passe), inscription sur invitation (la nouvelle adresse seule), demandes d'accès actives.
+- [x] 🤖 Données réimportées, comparées ligne par ligne à l'ancienne base, rattachées au compte de la nouvelle adresse (`.local/migration/import.mjs`, `move-owner.mjs`).
+- [x] 🤖 Clé ElevenLabs (compte gardé) sur Vercel et dans `.env`.
+- [ ] 👤 Se connecter une fois avec GitHub ; 🤖 vérifier le rôle de propriétaire et les données.
+- [ ] 👤 OpenRouter : compte avec la nouvelle adresse, puis une clé ; 🤖 la poser sur Vercel.
+- [ ] 👤 Resend : compte ouvert directement (clé « Sending access ») ou rien pour l'instant. La Marketplace exige un domaine acheté chez Vercel (payant).
+- [ ] 👤 Firecrawl : nouveau compte ou rien (à décider).
+- [ ] 🤖 Tout vérifier : tests de bout en bout, IA branchée, e-mail de demande d'accès.
+- [ ] 🤖 Mettre à jour le README (nouvelle adresse du site), EN-COURS et la mémoire.
+- [ ] 👤 Variables de l'environnement cloud de Claude : Claude donne la liste des noms, jamais les valeurs.
+- [ ] 🤖 Script de déploiement en une commande pour un non-dev, sans aucune donnée personnelle ; retirer les scripts Stripe.
+
+### 4. 🔍 Ta validation
+- [ ] 👤 Utiliser la nouvelle app un jour ou deux. L'ancienne (`nextround-gamma.vercel.app`) reste en ligne d'ici là.
+
+### 5. 🧹 Supprimer l'ancien (dans cet ordre)
+- [ ] 🤖 Projet Stripe Projects du 2e compte (`acct_1UOONg…`, celui connecté à la CLI) : supprimer ses ressources, dont l'organisation Neon « Stripe Projects: NextRound », depuis un dossier à part pour ne pas toucher au `.projects/` du repo.
+- [ ] 👤 `stripe login` avec l'**ancien** compte (`acct_1UMSsG…`) ; 🤖 supprimer ses ressources : projet Vercel, base Neon, app Clerk, clés OpenRouter, Firecrawl et Resend. **Pas ElevenLabs** (gardé, plan Creator).
+- [ ] 👤 ElevenLabs : avant de fermer Stripe, vérifier qu'on peut s'y connecter sans Stripe (`stripe projects open elevenlabs`, puis un mot de passe).
+- [ ] 👤 Fermer chaque ancien compte fournisseur, en y entrant par `stripe projects open <fournisseur>` **avant** de fermer Stripe : Vercel, Neon, Clerk, OpenRouter, Firecrawl, Resend. Sans bouton de suppression : écrire au support (RGPD, article 17).
+- [ ] 👤 GitHub → Settings → Applications → Authorized OAuth Apps : retirer les anciennes autorisations Clerk.
+- [ ] 👤 `stripe projects spend` une dernière fois, puis fermer les comptes Stripe : l'ancien, le 2e, et le « sandbox » du début.
+- [ ] 👤 `stripe logout` ; 🤖 retirer `.projects/`, `.env.stripe-old` et la section Stripe d'`AGENTS.md` ; désinstaller l'intégration Resend de la Marketplace si on ne s'en sert pas.
 
 ## ✅ Fait récemment
 
@@ -203,14 +247,7 @@ Décision : [ADR 0023](fr/adr/0023-cles-de-l-instance-pour-la-proprietaire.md).
 
 ## 🚧 En cours
 
-- 🧭 **Bascule vers Vercel, sans Stripe** : l'app accepte `DATABASE_URL` (Neon installé depuis Vercel) et crée les tables au *build* de production, sans *preview* tant qu'il n'y a qu'une base.
-  - ✅ Fait (2026-10-09) : nouveau compte Vercel (Hobby), projet `nextround` **relié au repo GitHub** (chaque fusion sur `main` part en production), adresse `nextround-seven.vercel.app`. **Neon** (Francfort, `eu-central-1`, Postgres 18) et **Clerk** (instance de développement) installés depuis la Marketplace, `vercel env pull` → `.env.local`. Le *build* de #35 a passé les 9 migrations : tables créées, **base encore vide**. Fonctions à Francfort (`fra1`, réglage du projet et `vercel.json`). Variables obligatoires en place sur Vercel, dont une **nouvelle** `APP_ENCRYPTION_KEY` (sans risque : aucune clé perso n'était enregistrée) et `OWNER_GITHUB_ID`. Liste d'autorisation Clerk active (les adresses de la propriétaire).
-  - ✅ Données réimportées (2026-10-09) : copie fraîche de l'ancienne base (identique à celle du 8), importée sous le **nouveau compte Clerk** de la propriétaire, créé avec la **nouvelle adresse** (l'ancienne retirée de la liste d'autorisation), puis comparée en direct à l'ancienne base, ligne par ligne : identique. Outil : `.local/migration/import.mjs`. Clé ElevenLabs (compte **gardé**) dans `.env` et sur Vercel. *Skills* OpenRouter et ElevenLabs complets.
-  - ✅ Clerk refait **par sa CLI** (2026-10-10, décision de la propriétaire, [ADR 0027](en/adr/0027-clerk-from-its-cli-not-the-marketplace.md)) : le Clerk de la Marketplace bloquait tout réglage par commande (rôle `managed_owner`, « no Platform API access »). Ressource et intégration Clerk retirées de Vercel, nouvelle app « NextRound » (`clerk apps create`) dans un espace Clerk normal, avec la nouvelle adresse ; GitHub et liste d'invitation activés par `clerk config patch` ; compte de la propriétaire créé avec la nouvelle adresse, données rattachées (`.local/migration/move-owner.mjs`) ; clés posées sur Vercel (secrète en *sensible* en production) ; production redéployée et vérifiée.
-  - ⏳ Reste, côté propriétaire : (1) se connecter avec **GitHub** sur https://nextround-seven.vercel.app, puis Claude vérifie le rôle de propriétaire ; (2) accepter les conditions de Resend (Marketplace, plan gratuit), puis `npx vercel integration add resend/resend-email --plan free --non-interactive` ; (3) compte OpenRouter avec la nouvelle adresse, clé dans `.env`, poussée sur Vercel.
-  - ⏳ Reste, côté Claude : **script de déploiement en une commande** pour qu'un non-dev déploie sur son propre Vercel, avec ces étapes testées (Clerk par sa CLI, clés vers Vercel, redéploiement) et **aucune donnée personnelle** : tout vient des comptes de la personne qui déploie. Reconnaître aussi le propriétaire par son e-mail (déployeur sans GitHub). Remplace les scripts Stripe.
-  - ⏸️ Anciens comptes : on les supprime **plus tard** (décision du 2026-10-09), sauf ElevenLabs, gardé.
-  - Ensuite : retirer les scripts Stripe (`bootstrap`, `setup-env`, renouvellement du *token*), `.projects/` et la section Stripe d'`AGENTS.md`, puis fermer les anciens comptes.
+- 🧭 **Bascule vers Vercel** : suivie case par case dans le [🗺️ Plan de la bascule](#️-plan-de-la-bascule-stripe--vercel). Les leçons sur Clerk sont dans l'[ADR 0027](en/adr/0027-clerk-from-its-cli-not-the-marketplace.md).
 - 🔑 **Secrets absents du cloud** : sans eux, ni l'app ni les e2e ne tournent dans une session cloud. Liste : [guide local et cloud](fr/guides/local-et-cloud.md#-les-secrets-dans-le-cloud).
 - 💼 25 offres Actiris (Bruxelles, IT, accessibles à un junior) choisies le 2026-10-04 : **20 importées** sur le compte de la propriétaire (10 de plus le 2026-10-05, pour 19 appels d'IA : le modèle gratuit relance parfois). **Restent 5**, textes prêts dans `.local/offers/` : `npm run owner:import-offers -- .local/offers/{5945294,5962926,5966908,5869183,5869129}.txt` (environ 9 appels ; à lancer un jour où le quota de 40 n'est pas entamé). Si `.local/offers/` n'existe plus : `npm run offers:actiris -- fetch 5945294 5962926 5966908 5869183 5869129`.
 - 🚫 Indeed bloque les robots (Cloudflare, 403) et l'interdit : on ne le contourne pas. Offres Indeed : lien ou texte collé dans l'app.
