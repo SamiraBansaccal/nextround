@@ -110,9 +110,10 @@ Règle : chaque session a sa *branch*, s'inscrit ici, ouvre une PR, et met la li
 Idée de la propriétaire : un service de moins si Neon Auth peut tout faire par commande. Test sur des branches Neon séparées (`auth-test`, `auth-test-2`), sans toucher à `main` ni au code de l'app (mini-app jetable hors du repo).
 - [x] La CLI Neon (`neon` 8.3) pilote le Neon de la Marketplace (organisation « Vercel: Sam »).
 - [x] Activer Neon Auth, couper e-mail et mot de passe, autoriser localhost : tout par commande. Google arrive d'office avec les codes partagés de Neon (développement seulement, logo Neon sur l'écran de Google) ; GitHub demande ses propres codes.
-- [ ] ❌ **Connexion Google cassée chez Neon** : le service renvoie une adresse de connexion en zone `c-6` alors que le serveur est en `c-8` → « endpoint not found ». Reproduit sur deux branches, vérifié par requêtes directes. Désactiver puis réactiver Neon Auth sur `auth-test` est ensuite refusé (« not enabled »). Le SDK `@neondatabase/auth` est en 0.5.0-beta.
-- [ ] Non testé : l'app GitHub créée en un clic (« App manifests »).
-- [ ] 👤 À décider : signaler le bug à Neon et garder Clerk en attendant, ou abandonner l'idée. Branches de test à supprimer ou à garder pour refaire le test.
+- [x] ❌ **À Francfort, la connexion casse chez Neon** : le service renvoie une adresse de connexion en zone `c-6` alors que les serveurs sont en `c-7`/`c-8` → « endpoint not found ». Reproduit sur deux branches et sur une ressource neuve de la Marketplace (Auth activé à la création), avec les codes partagés comme avec des codes « standard ». Désactiver puis réactiver Neon Auth sur une branche est ensuite refusé.
+- [x] ✅ **À Londres (`aws-eu-west-2`), ça marche de bout en bout** (ressource de test `auth-probe-lhr`, Marketplace, Auth activé à la création) : connexion Google (codes partagés de Neon), retour vers l'app, session posée par le proxy du SDK (`auth.middleware()` dans `proxy.ts`, Next 16), compte enregistré dans `neon_auth.user` et `neon_auth.account` (provider `google`). Mini-app jetable hors du repo.
+- [ ] Non testé : la connexion GitHub, qui demande nos propres codes (l'app GitHub créée en un clic par « App manifests »).
+- [ ] 👤 À décider : déplacer la base à Londres (Europe, Royaume-Uni) pour passer à Neon Auth, ou rester à Francfort en attendant que Neon corrige (bug à signaler). Ressources de test : branches `auth-test`, `auth-test-2` (Francfort) et ressource `auth-probe-lhr` (Londres), à supprimer ou à garder.
 
 ## ✅ Fait récemment
 
