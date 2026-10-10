@@ -106,6 +106,14 @@ Règle : chaque session a sa *branch*, s'inscrit ici, ouvre une PR, et met la li
 - [ ] 🤖 Clé de chiffrement : une phrase secrète tapée au déploiement plutôt qu'une clé aléatoire à générer.
 - [ ] 👤 Clé d'IA : chacun colle la sienne dans les Réglages (existe déjà) ; piste à vérifier : la passerelle IA de Vercel et son crédit gratuit mensuel.
 
+### 7. 🧪 Test : Neon Auth à la place de Clerk (2026-10-10)
+Idée de la propriétaire : un service de moins si Neon Auth peut tout faire par commande. Test sur des branches Neon séparées (`auth-test`, `auth-test-2`), sans toucher à `main` ni au code de l'app (mini-app jetable hors du repo).
+- [x] La CLI Neon (`neon` 8.3) pilote le Neon de la Marketplace (organisation « Vercel: Sam »).
+- [x] Activer Neon Auth, couper e-mail et mot de passe, autoriser localhost : tout par commande. Google arrive d'office avec les codes partagés de Neon (développement seulement, logo Neon sur l'écran de Google) ; GitHub demande ses propres codes.
+- [ ] ❌ **Connexion Google cassée chez Neon** : le service renvoie une adresse de connexion en zone `c-6` alors que le serveur est en `c-8` → « endpoint not found ». Reproduit sur deux branches, vérifié par requêtes directes. Désactiver puis réactiver Neon Auth sur `auth-test` est ensuite refusé (« not enabled »). Le SDK `@neondatabase/auth` est en 0.5.0-beta.
+- [ ] Non testé : l'app GitHub créée en un clic (« App manifests »).
+- [ ] 👤 À décider : signaler le bug à Neon et garder Clerk en attendant, ou abandonner l'idée. Branches de test à supprimer ou à garder pour refaire le test.
+
 ## ✅ Fait récemment
 
 ### 🧭 Fin de Stripe Projects (local, 2026-10-08 et 09)
