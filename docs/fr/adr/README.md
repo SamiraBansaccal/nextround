@@ -43,6 +43,7 @@ défaire sans savoir pourquoi il a été pris.
 | 🧭 [0024](0024-pas-de-tableau-de-bord.md) | Pas de tableau de bord : le profil est la page d'accueil | ✅ acceptée |
 | 🔁 [0025](0025-fusion-dates-et-phrases-de-la-candidate.md) | Doublons fusionnés pour de bon, une seule façon d'écrire les dates des CV, les phrases de la candidate rejoignent la base | ✅ acceptée |
 | 📨 [0026](0026-demandes-d-acces.md) | Demandes d'accès : la liste d'attente de Clerk, un e-mail à la propriétaire, une réponse dans les Réglages | ✅ acceptée |
+| 🔐 [0027](0027-clerk-par-sa-cli-pas-par-la-marketplace.md) | Clerk se crée avec sa propre CLI, pas depuis la Marketplace Vercel | ✅ acceptée |
 
 > 📌 **Lisez les statuts.** Un ADR n'est jamais effacé : quand une décision change, l'ancien reste
 > et indique où se trouve la suite. C'est ce qui permet de comprendre *pourquoi* une décision a

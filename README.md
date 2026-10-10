@@ -156,7 +156,7 @@ NextRound was born during a Stripe hackathon, where we discovered **Stripe Proje
    ```
 3. **Create your services**, each on its free plan:
    - **Neon**: a project, then copy its connection string (`postgresql://…`);
-   - **Clerk**: an application, turn on the **GitHub** sign-in in its *SSO connections*, then copy its two keys;
+   - **Clerk**: with its command line, not from the Vercel Marketplace ([why](docs/en/adr/0027-clerk-from-its-cli-not-the-marketplace.md)): `npx clerk auth login`, then `npx clerk apps create NextRound`; turn on the **GitHub** sign-in with `npx clerk config patch --app <app_id> --instance dev --json '{"connection_oauth_github":{"enabled":true}}'`; `npx clerk env pull --app <app_id>` writes its two keys to `.env.local`;
    - **OpenRouter**: an API key (see [option A, step 3](#3-connect-your-ai-needed-for-feedback-offers-and-cvs)).
 4. **Fill in your `.env`**: copy [`.env.example`](.env.example) to `.env` and fill each line; the file explains where each value comes from. For the encryption key: `openssl rand -base64 32`. For your numeric GitHub id: the `id` field of `https://api.github.com/users/<your-github-login>`.
 5. **Create the database tables**: `npm run db:migrate`.
