@@ -19,13 +19,14 @@ Règle : chaque session a sa *branch*, s'inscrit ici, ouvre une PR, et met la li
 
 | *Branch* | Session | Sujet | PR |
 |---|---|---|---|
-| `claude/local-sign-in-script` | local | 🔑 `npm run setup:sign-in` : la connexion Neon Auth d'un déploiement en quelques clics (site autorisé, mots de passe coupés, Google, GitHub par son *OAuth App*), pour les scripts d'installation. Fichiers : `scripts/infra/sign-in.mjs`, `package.json`, `.env.example`, `docs/EN-COURS.md` | à venir |
+| — | | Aucune *branch* en cours | |
 
 <details>
 <summary>📦 Branches déjà fusionnées</summary>
 
 | *Branch* | Session | Sujet | PR |
 |---|---|---|---|
+| `claude/local-sign-in-script` | local | 🔑 `npm run setup:sign-in` : la connexion Neon Auth d'un déploiement en quelques clics (site autorisé, mots de passe coupés, Google, GitHub par son *OAuth App*), pour les scripts d'installation. Fichiers : `scripts/infra/sign-in.mjs`, `package.json`, `.env.example`, `docs/EN-COURS.md` | [#39](https://github.com/SamiraBansaccal/nextround/pull/39) |
 | `claude/local-neon-auth` | local | 🔑 Bascule du code de Clerk à Neon Auth ([ADR 0028](en/adr/0028-neon-auth-and-a-london-database.md)) : connexion GitHub et Google, même module de session, propriétaire par GitHub (seule admise pour l'instant), lien e-mail à la place du formulaire de demande d'accès, module Resend gardé pour les invitations, retrait de Clerk | [#38](https://github.com/SamiraBansaccal/nextround/pull/38) |
 | `claude/local-ignore-step-fix` | local | 🔧 La règle qui saute les *previews* sautait aussi la production (fusion de #36 annulée : `VERCEL_ENV` absent à l'étape « Ignored Build Step ») ; elle ne saute plus un build sur `main`. Fichiers : `vercel.json`, `docs/EN-COURS.md` | [#37](https://github.com/SamiraBansaccal/nextround/pull/37) |
 | `claude/local-vercel-switch` | local | ▲ Bascule : base et fonctions à Londres, Neon Auth choisi ([ADR 0028](en/adr/0028-neon-auth-and-a-london-database.md), bug de zone de Francfort), ADR 0027, plan de la bascule, *skills* des fournisseurs | [#36](https://github.com/SamiraBansaccal/nextround/pull/36) |
