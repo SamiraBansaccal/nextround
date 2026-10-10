@@ -19,13 +19,13 @@ Règle : chaque session a sa *branch*, s'inscrit ici, ouvre une PR, et met la li
 
 | *Branch* | Session | Sujet | PR |
 |---|---|---|---|
-| `claude/local-ignore-step-fix` | local | 🔧 La règle qui saute les *previews* sautait aussi la production (fusion de #36 annulée : `VERCEL_ENV` absent à l'étape « Ignored Build Step ») ; elle ne saute plus un build sur `main`. Fichiers : `vercel.json`, `docs/EN-COURS.md` | à venir |
 
 <details>
 <summary>📦 Branches déjà fusionnées</summary>
 
 | *Branch* | Session | Sujet | PR |
 |---|---|---|---|
+| `claude/local-ignore-step-fix` | local | 🔧 La règle qui saute les *previews* sautait aussi la production (fusion de #36 annulée : `VERCEL_ENV` absent à l'étape « Ignored Build Step ») ; elle ne saute plus un build sur `main`. Fichiers : `vercel.json`, `docs/EN-COURS.md` | [#37](https://github.com/SamiraBansaccal/nextround/pull/37) |
 | `claude/local-vercel-switch` | local | ▲ Bascule : base et fonctions à Londres, Neon Auth choisi ([ADR 0028](en/adr/0028-neon-auth-and-a-london-database.md), bug de zone de Francfort), ADR 0027, plan de la bascule, *skills* des fournisseurs | [#36](https://github.com/SamiraBansaccal/nextround/pull/36) |
 | `claude/local-vercel-ready` | local | ▲ App prête pour Vercel : `DATABASE_URL` (Neon de la Marketplace) en plus de `DB_CONNECTION_STRING`, migrations au *build* de production (`vercel.json`, connexion directe), pas de *preview* (une seule base), scripts qui lisent `.env.local`. Fichiers : `lib/server/env.ts`, `lib/db/index.ts`, `drizzle.config.ts`, `vercel.json`, `scripts/infra/{migrate-on-build.mjs,clerk-signup.mts}`, `scripts/owner/{owner,whoami}.mts`, `.env.example`, `tests/server/` | [#35](https://github.com/SamiraBansaccal/nextround/pull/35) |
 | `claude/local-readme-sans-stripe` | local | 🧭 README sans Stripe Projects : un paragraphe sur le changement de cap, installation à la main (Neon, Clerk, OpenRouter, Vercel). Fichiers : `README.md`, `README.fr.md`, `.env.example`, `docs/EN-COURS.md` | [#34](https://github.com/SamiraBansaccal/nextround/pull/34) |
