@@ -1,4 +1,3 @@
-import { ClerkProvider } from "@clerk/nextjs";
 import type { Metadata } from "next";
 import { headers } from "next/headers";
 import { Geist_Mono, Lora, Nunito_Sans } from "next/font/google";
@@ -19,8 +18,8 @@ export const metadata: Metadata = {
 
 export default async function RootLayout({ children }: LayoutProps<"/">) {
   const lang = await getUiLang(); // the site's interface language (cookie, English by default)
-  // The nonce of this request's Content-Security-Policy (proxy.ts), for the theme's inline script; Clerk
-  // reads it itself when `dynamic` is set, and Next.js puts it on its own scripts.
+  // The nonce of this request's Content-Security-Policy (proxy.ts), for the theme's inline script; Next.js puts
+  // it on its own scripts.
   const nonce = (await headers()).get("x-nonce") ?? undefined;
   return (
     <html
@@ -29,11 +28,9 @@ export default async function RootLayout({ children }: LayoutProps<"/">) {
       className={`${lora.variable} ${nunito.variable} ${geistMono.variable} h-full antialiased`}
     >
       <body className="flex min-h-full flex-col bg-background font-sans text-foreground">
-        <ClerkProvider dynamic signInUrl="/sign-in" signUpUrl="/sign-up">
-          <ThemeProvider attribute="class" defaultTheme="light" enableSystem disableTransitionOnChange nonce={nonce}>
-            <TooltipProvider>{children}</TooltipProvider>
-          </ThemeProvider>
-        </ClerkProvider>
+        <ThemeProvider attribute="class" defaultTheme="light" enableSystem disableTransitionOnChange nonce={nonce}>
+          <TooltipProvider>{children}</TooltipProvider>
+        </ThemeProvider>
       </body>
     </html>
   );

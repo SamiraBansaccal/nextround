@@ -113,25 +113,6 @@ const en = {
   saveKeyFirst: "Save your API key first, then load the models.",
   notElevenLabs: "This does not look like an ElevenLabs key.",
   notFirecrawl: "This does not look like a Firecrawl key.",
-  // Access requests (owner only)
-  accessTitle: "Access requests",
-  accessIntro:
-    "Sign-up on this site is by invitation. People who ask for access from the home page appear here: allowing someone adds their address to the guest list, and Clerk emails them an invitation.",
-  accessMailOn: "You also get an email for each new request.",
-  accessMailOff: "No email for new requests: email sending is not set up on this server (`RESEND_API_KEY`). Look at this page from time to time.",
-  accessNone: "No request waiting.",
-  accessAsked: "asked on {date}",
-  accessAllow: "Allow",
-  accessDecline: "Decline",
-  accessAllowedDone: "{email} can now sign up: Clerk has emailed them an invitation.",
-  accessDeclinedDone: "Request declined.",
-  accessGuests: "Invited addresses",
-  accessGuestsHint: "They can create an account with the GitHub or Google account that uses the address. Removing an address does not delete an account already created.",
-  accessYou: "you",
-  accessRemove: "Remove",
-  accessRemovedDone: "Address removed from the guest list.",
-  accessOwnerOnly: "Only the owner of this site can answer access requests.",
-  accessFailed: "That did not work. Try again.",
 };
 
 export type SettingsCopy = typeof en;
@@ -241,24 +222,6 @@ const fr: SettingsCopy = {
   saveKeyFirst: "Enregistre d'abord ta clé d'API, puis charge les modèles.",
   notElevenLabs: "Ça ne ressemble pas à une clé ElevenLabs.",
   notFirecrawl: "Ça ne ressemble pas à une clé Firecrawl.",
-  accessTitle: "Demandes d'accès",
-  accessIntro:
-    "L'inscription sur ce site se fait sur invitation. Les personnes qui demandent l'accès depuis la page d'accueil apparaissent ici : autoriser quelqu'un ajoute son adresse à la liste des invités, et Clerk lui envoie une invitation par e-mail.",
-  accessMailOn: "Tu reçois aussi un e-mail pour chaque nouvelle demande.",
-  accessMailOff: "Pas d'e-mail pour les nouvelles demandes : l'envoi d'e-mails n'est pas configuré sur ce serveur (`RESEND_API_KEY`). Passe voir cette page de temps en temps.",
-  accessNone: "Aucune demande en attente.",
-  accessAsked: "demandé le {date}",
-  accessAllow: "Autoriser",
-  accessDecline: "Refuser",
-  accessAllowedDone: "{email} peut maintenant s'inscrire : Clerk lui a envoyé une invitation par e-mail.",
-  accessDeclinedDone: "Demande refusée.",
-  accessGuests: "Adresses invitées",
-  accessGuestsHint: "Elles peuvent créer un compte avec le compte GitHub ou Google qui utilise l'adresse. Retirer une adresse ne supprime pas un compte déjà créé.",
-  accessYou: "toi",
-  accessRemove: "Retirer",
-  accessRemovedDone: "Adresse retirée de la liste des invités.",
-  accessOwnerOnly: "Seule la personne propriétaire de ce site peut répondre aux demandes d'accès.",
-  accessFailed: "Ça n'a pas marché. Réessaie.",
 };
 
 export const SETTINGS_COPY: Record<UiLang, SettingsCopy> = { en, fr };

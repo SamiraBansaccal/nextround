@@ -1,6 +1,8 @@
 import "server-only";
 import { serverEnv } from "@/lib/server/env";
 
+// Kept ready for the invitations, which come back with Resend after the switch to Neon Auth (ADR 0028): not used
+// by any page until then; its texts will be updated then.
 // The email that tells the instance's owner about a new access request, sent with Resend (free plan) when a
 // key is set. Without one, requests still reach the owner's Settings: only the email is missing.
 // The text is plain (no HTML), since the name and the message come from a stranger.

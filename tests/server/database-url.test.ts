@@ -4,8 +4,8 @@ import { afterEach, describe, expect, it, vi } from "vitest";
 // DB_CONNECTION_STRING (older setups). An empty value counts as not set.
 async function loadEnv(database: { DATABASE_URL?: string; DB_CONNECTION_STRING?: string }) {
   vi.resetModules();
-  vi.stubEnv("CLERK_SECRET_KEY", "sk_test");
-  vi.stubEnv("NEXT_PUBLIC_CLERK_PUBLISHABLE_KEY", "pk_test");
+  vi.stubEnv("NEON_AUTH_BASE_URL", "https://auth.example.test/neondb/auth");
+  vi.stubEnv("NEON_AUTH_COOKIE_SECRET", "a-test-cookie-secret-of-32-characters!");
   vi.stubEnv("APP_ENCRYPTION_KEY", "key");
   vi.stubEnv("DATABASE_URL", database.DATABASE_URL ?? "");
   vi.stubEnv("DB_CONNECTION_STRING", database.DB_CONNECTION_STRING ?? "");

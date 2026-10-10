@@ -14,7 +14,6 @@
     "db:generate": "drizzle-kit generate",
     "db:migrate": "drizzle-kit migrate",
     "setup:env": "node scripts/infra/setup-env.mjs",
-    "clerk:signup": "tsx scripts/infra/clerk-signup.mts",
     "bootstrap": "node scripts/infra/bootstrap.mjs",
     "e2e": "node scripts/test/e2e.mjs",
     "avatars:plan": "tsx scripts/avatars/behaviours.mts",
@@ -26,7 +25,7 @@
   },
   "dependencies": {
     "@anthropic-ai/sdk": "^0.131.0",
-    "@clerk/nextjs": "^7.9.10",
+    "@neondatabase/auth": "0.5.0-beta",
     "@neondatabase/serverless": "^1.2.0",
     "class-variance-authority": "^0.7.1",
     "cn": "^0.4.0",
@@ -45,7 +44,6 @@
     "zod": "^4.6.5"
   },
   "devDependencies": {
-    "@clerk/testing": "^2.2.42",
     "@electric-sql/pglite": "^0.5.8",
     "@playwright/test": "^1.63.0",
     "@tailwindcss/postcss": "^4",

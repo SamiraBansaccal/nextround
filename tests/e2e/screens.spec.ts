@@ -1,21 +1,18 @@
-import { clerk, clerkSetup } from "@clerk/testing/playwright";
 import { expect, type Page, test } from "@playwright/test";
 
 // Captures every screen and MEASURES what the eye misses: horizontal overflow, missing title,
 // console errors. Screenshots go to e2e-screens/<project>/ (git-ignored) to be reviewed.
 // Run with `npm run e2e` (scripts/test/e2e.mjs), never directly: it seeds and cleans the test user.
 
-const E2E_EMAIL = "nextround-e2e+clerk_test@example.com";
+// The test user lives on the disposable branch only (tests/e2e/fixtures.mts), with the password of this run.
+const E2E_EMAIL = "nextround-e2e@example.com";
+const E2E_PASSWORD = process.env.E2E_PASSWORD ?? "";
 const ids = JSON.parse(process.env.E2E_IDS ?? "{}") as { offerId?: string; interviewId?: string; tailoredCvId?: string };
 
-// Known and harmless, development only: Clerk's development-keys notices, and next-themes, whose anti-flash
+// Known and harmless, development only: next-themes, whose anti-flash
 // <script> sits inside a component, which React 19 reports when the layout renders again in the browser
 // (the script already ran with the server render). Seen now and then on the mobile run.
-const KNOWN_CONSOLE_ERRORS = ["Clerk", "Encountered a script tag while rendering React component"];
-
-test.beforeAll(async () => {
-  await clerkSetup();
-});
+const KNOWN_CONSOLE_ERRORS = ["Encountered a script tag while rendering React component"];
 
 async function check(page: Page, name: string, projectName: string, theme: "light" | "dark" = "light") {
   if (theme === "dark") {
@@ -36,14 +33,12 @@ test("landing page (signed out)", async ({ page }, info) => {
   expect(scriptSrc).toContain("'strict-dynamic'");
   expect(scriptSrc).toMatch(/'nonce-[^']+'/);
   await check(page, "00-landing", info.project.name);
-  // Not invited yet: the request form opens on the landing page (not sent here: it would email the owner).
-  await page.getByRole("button", { name: "No invitation yet? Request access" }).click();
-  await expect(page.getByLabel("Email")).toBeVisible();
-  await check(page, "00b-request-access", info.project.name);
+  // Sign-up is by invitation (ADR 0028).
+  await expect(page.getByText("This site is by invitation.")).toBeVisible();
   if (info.project.name === "desktop") {
-    // Under that policy, the GitHub sign-in still starts: Clerk sends the browser to GitHub.
-    await page.getByRole("button", { name: "Continue with GitHub" }).click();
-    await page.waitForURL(/github\.com/, { timeout: 30_000 });
+    // Under that policy, the Google sign-in still starts: Neon Auth sends the browser on to Google.
+    await page.getByRole("button", { name: "Continue with Google" }).click();
+    await page.waitForURL(/accounts\.google\.com|neonauth/, { timeout: 30_000 });
   }
 });
 
@@ -53,8 +48,13 @@ test("every signed-in screen", async ({ page }, info) => {
     if (msg.type() === "error" && !KNOWN_CONSOLE_ERRORS.some((known) => msg.text().includes(known))) errors.push(msg.text());
   });
 
-  await page.goto("/");
-  await clerk.signIn({ page, emailAddress: E2E_EMAIL });
+  // Signs in through the app's own auth route (email and password exist on the test branch only); the session
+  // cookies land in this browser context.
+  const signedIn = await page.request.post("/api/auth/sign-in/email", {
+    data: { email: E2E_EMAIL, password: E2E_PASSWORD },
+    headers: { origin: "http://localhost:3100" },
+  });
+  expect(signedIn.ok(), `sign-in answered ${signedIn.status()}`).toBe(true);
   // No dashboard: the profile is the home page, and old /dashboard links land on it.
   await page.goto("/");
   await expect(page).toHaveURL(/\/profile$/);

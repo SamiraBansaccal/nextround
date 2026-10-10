@@ -21,6 +21,7 @@ const en = {
   expandMenu: "Expand menu",
   shellNote: "Every sentence NextRound writes points to a fact you validated.",
   siteLanguage: "Site language",
+  signOut: "Sign out",
   // Interviews list
   practiceTitle: "Interview practice",
   practiceIntro: "One-to-one video calls with the interviewer you choose: on a job offer, on a technology, or on HR questions.",
@@ -70,6 +71,7 @@ const fr: UiCopy = {
   expandMenu: "Déplier le menu",
   shellNote: "Chaque phrase écrite par NextRound renvoie à un fait que tu as validé.",
   siteLanguage: "Langue du site",
+  signOut: "Se déconnecter",
   practiceTitle: "Entraînement aux entretiens",
   practiceIntro: "Des appels vidéo en tête-à-tête avec l'intervieweur de ton choix : sur une offre d'emploi, une technologie ou des questions RH.",
   newInterview: "Nouvel entretien",

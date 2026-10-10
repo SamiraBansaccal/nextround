@@ -37,7 +37,7 @@ The `@/` import alias is the repository root: `@/lib/ai/client`, `@/components/u
 
 | Route | Folder |
 |---|---|
-| 🏠 Landing page, sign-in | `page.tsx`, `sign-in/`, `sign-up/`, `sso-callback/` |
+| 🏠 Landing page (sign-in with GitHub or Google), not invited, sign-in route | `page.tsx`, `not-invited/`, `api/auth/` (Neon Auth, ADR 0028) |
 | 🔒 Signed-in area (`(app)/` is not part of the URL) | `layout.tsx` (menu, EN/FR toggle), `ui-actions.ts` |
 | 👤 Profile (home page) · 💼 Offers · 🎙️ Interviews · ⚙️ Settings | `profile/`, `offers/` (+ `[id]/`, `[id]/cv/`), `interview/` (+ `new/`, `[id]/`, `[id]/summary/`), `settings/`; `/dashboard` redirects to `/profile` (`next.config.ts`, [ADR 0024](../adr/0024-no-dashboard.md)) |
 | 🔊 Text-to-speech | `api/tts/` |
@@ -50,7 +50,7 @@ Pages are server components: they read the session (`requireUserId()`), load dat
 |---|---|
 | `ui/` | shadcn components |
 | `layout/` | App shell, logo, page headings, theme |
-| `auth/` | Sign-in buttons |
+| `auth/` | Sign-in and sign-out buttons |
 | `shared/` | Small shared pieces (`with-code`) |
 | `offers/`, `documents/`, `profile/`, `interview/`, `settings/` | One folder per area of the app; `interview/media/` (camera, mic) and `interview/voice/` (speech) |
 
@@ -60,7 +60,8 @@ Components make no network calls and hold no business logic: data, actions and t
 
 | Folder | Role |
 |---|---|
-| `server/` | 🔐 `auth.ts` (session), `env.ts` (validated env vars), `crypto.ts` (key encryption) |
+| `server/` | 🔐 `auth.ts` (session, owner), `neon-auth.ts` (Neon Auth), `csp.ts` (Content-Security-Policy), `env.ts` (validated env vars), `crypto.ts` (key encryption) |
+| `auth/` | 🔑 Neon Auth's browser client (`client.ts`) |
 | `shared/` | 🧰 Pure helpers: `dates.ts`, `ids.ts`, `text.ts` |
 | `db/` | 🗄️ Schema (`user_id` on every table) and connection |
 | `data/` | 📦 Data access, **always filtered by `userId`** |
@@ -79,7 +80,7 @@ Only `types.ts` and `utils.ts` (shadcn's `cn()`, a path shadcn expects) stay at 
 
 ## 🧪 `tests/`
 
-`helpers/` (in-memory Postgres, server-only stub), then one folder per domain: `ai/`, `data/` (🧱 isolation between users), `interview/`, `offers/`, `profile/`, `documents/`, `ui/` (EN/FR copy parity), `voice/`, and `e2e/` (Playwright). `npm test` needs no secrets; `npm run e2e` needs the Clerk and Neon ones. `npm run build && E2E_PROD=1 npm run e2e` runs the same screens on the production build, where the CSP is stricter (no `'unsafe-eval'`) and Next.js prefetches links.
+`helpers/` (in-memory Postgres, server-only stub), then one folder per domain: `ai/`, `data/` (🧱 isolation between users), `interview/`, `offers/`, `profile/`, `documents/`, `ui/` (EN/FR copy parity), `voice/`, and `e2e/` (Playwright). `npm test` needs no secrets; `npm run e2e` runs on a disposable Neon branch, deleted at the end (needs the Neon CLI signed in). `npm run build && E2E_PROD=1 npm run e2e` runs the same screens on the production build, where the CSP is stricter (no `'unsafe-eval'`) and Next.js prefetches links.
 
 ## ⚙️ `scripts/`
 

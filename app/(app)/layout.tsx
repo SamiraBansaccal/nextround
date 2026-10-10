@@ -1,4 +1,4 @@
-import { UserButton } from "@clerk/nextjs";
+import { SignOutButton } from "@/components/auth/sign-out-button";
 import { AppShell } from "@/components/layout/app-shell";
 import { getUiCopy } from "@/lib/i18n/server";
 import { setUiLanguageAction } from "./ui-actions";
@@ -8,7 +8,7 @@ import { setUiLanguageAction } from "./ui-actions";
 export default async function AppLayout({ children }: LayoutProps<"/">) {
   const { lang, t } = await getUiCopy();
   return (
-    <AppShell userButton={<UserButton />} lang={lang} t={t} setLanguage={setUiLanguageAction}>
+    <AppShell userButton={<SignOutButton label={t.signOut} />} lang={lang} t={t} setLanguage={setUiLanguageAction}>
       {children}
     </AppShell>
   );

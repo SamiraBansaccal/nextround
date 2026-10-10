@@ -42,7 +42,7 @@ défaire sans savoir pourquoi il a été pris.
 | 🔐 [0023](0023-cles-de-l-instance-pour-la-proprietaire.md) | Les clés de l'instance ne servent qu'à la propriétaire ; inscription fermée pendant le dev | ✅ acceptée |
 | 🧭 [0024](0024-pas-de-tableau-de-bord.md) | Pas de tableau de bord : le profil est la page d'accueil | ✅ acceptée |
 | 🔁 [0025](0025-fusion-dates-et-phrases-de-la-candidate.md) | Doublons fusionnés pour de bon, une seule façon d'écrire les dates des CV, les phrases de la candidate rejoignent la base | ✅ acceptée |
-| 📨 [0026](0026-demandes-d-acces.md) | Demandes d'accès : la liste d'attente de Clerk, un e-mail à la propriétaire, une réponse dans les Réglages | ✅ acceptée |
+| 📨 [0026](0026-demandes-d-acces.md) | Demandes d'accès : la liste d'attente de Clerk, un e-mail à la propriétaire, une réponse dans les Réglages | ⛔ remplacée par la 0028 |
 | 🔐 [0027](0027-clerk-par-sa-cli-pas-par-la-marketplace.md) | Clerk se crée avec sa propre CLI, pas depuis la Marketplace Vercel | ⛔ remplacée par la 0028 |
 | 🔑 [0028](0028-neon-auth-et-une-base-a-londres.md) | La connexion avec Neon Auth, la base à Londres | ✅ acceptée |
 

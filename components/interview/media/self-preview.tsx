@@ -17,7 +17,7 @@ export function SelfPreview({ attach, live, me, size = "large" }: Props) {
       {!live && (
         <div className="absolute inset-0 grid place-items-center" aria-hidden="true">
           {me.imageUrl ? (
-            // eslint-disable-next-line @next/next/no-img-element -- remote avatar from Clerk
+            // eslint-disable-next-line @next/next/no-img-element -- remote avatar from the sign-in provider
             <img src={me.imageUrl} alt="" className={cn("rounded-full object-cover", size === "large" ? "size-24 sm:size-28" : "size-7 sm:size-10")} />
           ) : (
             <span

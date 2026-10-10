@@ -530,7 +530,7 @@ export function ProfileLibrary({ t, candidate, cvs, keptDocuments, categories, g
           <article className="overflow-hidden border border-earth/20 bg-card shadow-soft" aria-label={fill(t.baseOf, { name: candidate.name })}>
             <header className="flex items-center gap-4 bg-primary-soft/55 px-5 py-4 sm:px-8">
               {candidate.imageUrl && (
-                // eslint-disable-next-line @next/next/no-img-element -- remote avatar from Clerk
+                // eslint-disable-next-line @next/next/no-img-element -- remote avatar from the sign-in provider
                 <img src={candidate.imageUrl} width={56} height={56} alt="" className="aspect-square w-14 shrink-0 border-2 border-primary object-cover" />
               )}
               <div className="min-w-0">

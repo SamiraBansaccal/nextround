@@ -16,6 +16,34 @@ export type GithubRepo = z.infer<typeof repoSchema>;
 
 const LOGIN_RE = /^[a-z\d](?:[a-z\d-]{0,38})$/i;
 
+const ONE_DAY = 24 * 60 * 60_000;
+const loginCache = new Map<string, { at: number; login: string }>();
+
+/**
+ * The current username of a GitHub account, from its numeric id (public API, no token). The sign-in keeps the
+ * stable id; the username can change, so it is looked up and kept a day. Null when GitHub cannot answer (only
+ * answers are kept, never failures).
+ */
+export async function githubLoginForId(id: string): Promise<string | null> {
+  if (!/^\d+$/.test(id)) return null;
+  const hit = loginCache.get(id);
+  if (hit && Date.now() - hit.at < ONE_DAY) return hit.login;
+  try {
+    const response = await fetch(`https://api.github.com/user/${id}`, {
+      headers: { Accept: "application/vnd.github+json", "User-Agent": "NextRound" },
+      signal: AbortSignal.timeout(10_000),
+      cache: "no-store",
+    });
+    if (!response.ok) return hit?.login ?? null;
+    const parsed = z.object({ login: z.string().regex(LOGIN_RE) }).safeParse(await response.json());
+    if (!parsed.success) return hit?.login ?? null;
+    loginCache.set(id, { at: Date.now(), login: parsed.data.login });
+    return parsed.data.login;
+  } catch {
+    return hit?.login ?? null;
+  }
+}
+
 /** Relevant public repos of a user: not forks, not archived, most recently pushed first. */
 export async function fetchRelevantRepos(login: string, limit = 12): Promise<GithubRepo[]> {
   if (!LOGIN_RE.test(login)) throw new Error("Invalid GitHub username");

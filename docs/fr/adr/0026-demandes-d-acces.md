@@ -3,7 +3,7 @@
 > 🇬🇧 English version: [en/adr/0026](../../en/adr/0026-access-requests.md)
 
 - **Date :** 2026-10-05
-- **Statut :** ✅ acceptée
+- **Statut :** ⛔ remplacée par l'[ADR 0028](0028-neon-auth-et-une-base-a-londres.md) : le formulaire et la liste d'attente de Clerk sont partis avec Clerk ; un lien e-mail en attendant, les invitations à refaire avec Resend
 - **Fait suite à :** [ADR 0023](0023-cles-de-l-instance-pour-la-proprietaire.md) (inscription fermée pendant le dev)
 
 ## 🎯 Contexte
