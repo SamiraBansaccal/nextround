@@ -40,7 +40,8 @@ without knowing why it was made.
 | 🧭 [0024](0024-no-dashboard.md) | No dashboard: the profile is the home page | ✅ accepted |
 | 🔁 [0025](0025-merge-for-good-dates-and-own-words.md) | Duplicates merged for good, one way to write CV dates, the candidate's own sentences join the base | ✅ accepted |
 | 📨 [0026](0026-access-requests.md) | Access requests: Clerk's waitlist, an email to the owner, an answer in Settings | ✅ accepted |
-| 🔐 [0027](0027-clerk-from-its-cli-not-the-marketplace.md) | Clerk is created with its own CLI, not from the Vercel Marketplace | ✅ accepted |
+| 🔐 [0027](0027-clerk-from-its-cli-not-the-marketplace.md) | Clerk is created with its own CLI, not from the Vercel Marketplace | ⛔ superseded by 0028 |
+| 🔑 [0028](0028-neon-auth-and-a-london-database.md) | Sign-in with Neon Auth, the database in London | ✅ accepted |
 
 > 📌 **Read the statuses.** An ADR is never deleted: when a decision changes, the old record stays
 > and says where the next step is. That is how one understands *why* a decision changed, and not

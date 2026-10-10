@@ -3,7 +3,7 @@
 > 🇬🇧 English version: [en/adr/0027](../../en/adr/0027-clerk-from-its-cli-not-the-marketplace.md)
 
 - **Date :** 2026-10-10
-- **Statut :** ✅ acceptée
+- **Statut :** ⛔ remplacée par l'[ADR 0028](0028-neon-auth-et-une-base-a-londres.md) (connexion avec Neon Auth)
 - **Fait suite à :** [ADR 0002](0002-neon-et-clerk.md) (connexion GitHub activée avec `clerk config patch`), [ADR 0023](0023-cles-de-l-instance-pour-la-proprietaire.md) (inscription sur invitation, instance de développement)
 
 ## 🎯 Contexte

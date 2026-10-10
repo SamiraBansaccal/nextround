@@ -3,7 +3,7 @@
 > 🇫🇷 French version: [fr/adr/0027](../../fr/adr/0027-clerk-par-sa-cli-pas-par-la-marketplace.md)
 
 - **Date:** 2026-10-10
-- **Status:** ✅ accepted
+- **Status:** ⛔ superseded by [ADR 0028](0028-neon-auth-and-a-london-database.md) (sign-in with Neon Auth)
 - **Follows:** [ADR 0002](0002-neon-and-clerk.md) (GitHub sign-in switched on with `clerk config patch`), [ADR 0023](0023-instance-keys-for-the-owner-only.md) (invite-only, development instance)
 
 ## 🎯 Context
