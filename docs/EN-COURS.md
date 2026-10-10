@@ -19,6 +19,7 @@ Règle : chaque session a sa *branch*, s'inscrit ici, ouvre une PR, et met la li
 
 | *Branch* | Session | Sujet | PR |
 |---|---|---|---|
+| `claude/local-neon-auth` | local | 🔑 Bascule du code de Clerk à Neon Auth ([ADR 0028](en/adr/0028-neon-auth-and-a-london-database.md)) : connexion Google et GitHub, propriétaire, invitations et demandes d'accès dans nos tables, tests, CSP ; puis retrait de Clerk | à venir |
 
 <details>
 <summary>📦 Branches déjà fusionnées</summary>
@@ -121,7 +122,7 @@ Idée de la propriétaire : un service de moins si Neon Auth peut tout faire par
 - [x] 🤖 Données copiées depuis Francfort (`.local/backup/2026-10-10`) et comparées ligne par ligne : identiques.
 - [x] 🤖 Neon Auth réglé par commande : Google (codes partagés), e-mail et mot de passe coupés, domaine du site et localhost autorisés.
 - [x] 🤖 Projet basculé : Francfort débranchée, Londres branchée (`DATABASE_URL` + `NEON_AUTH_BASE_URL` posés par la Marketplace), production redéployée sur la base de Londres.
-- [ ] 👤 Fusionner la PR #36 : les fonctions passent à Londres (`"regions": ["lhr1"]`) ; le redéploiement a gardé `fra1`.
+- [x] 🤖 PR #36 fusionnée (et #37 : la règle qui sautait aussi la production) : fonctions à Londres (`lhr1`), vérifié sur le déploiement.
 - [ ] 🤖 Basculer le code de l'app de Clerk à Neon Auth : connexion, proxy, propriétaire (compte GitHub ou e-mail), invitations et demandes d'accès dans nos tables, tests de bout en bout, CSP ; puis rattacher les données au compte Neon Auth et retirer Clerk (clés Vercel, app Clerk).
 - [ ] 🤖 Connexion GitHub : nos propres codes (app GitHub créée en un clic, à construire).
 - [ ] 🤖 Après validation : supprimer la Neon de Francfort (`nextround-db`) et ses branches de test (`auth-test`, `auth-test-2`).
