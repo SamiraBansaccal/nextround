@@ -59,7 +59,7 @@ Règle : chaque session a sa *branch*, s'inscrit ici, ouvre une PR, et met la li
 
 ## 🗺️ Plan de la bascule (Stripe → Vercel)
 
-Écrit le 2026-10-08 dans une session lancée depuis le dossier personnel (pas celui du projet), il n'avait jamais été recopié ici ; retrouvé et mis à jour le 2026-10-10. Depuis, le nouveau compte Stripe a été abandonné (le mode live exigeait un compte bancaire) au profit de Vercel et de comptes ouverts directement. **Règle d'or : on ne supprime rien tant que la nouvelle version n'est pas vérifiée.** 👤 = propriétaire, 🤖 = Claude.
+Écrit le 2026-10-08 (étapes 0 à 5), complété le 2026-10-09 par le plan Vercel (étape 6), dans une session lancée depuis le dossier personnel (pas celui du projet) : jamais recopié ici, retrouvé et mis à jour le 2026-10-10. Depuis, le nouveau compte Stripe a été abandonné (le mode live exigeait un compte bancaire) au profit de Vercel et de comptes ouverts directement. **Règle d'or : on ne supprime rien tant que la nouvelle version n'est pas vérifiée.** 👤 = propriétaire, 🤖 = Claude.
 
 ### 0. 📮 L'adresse dev
 - [x] 👤 Nouvelle adresse créée ; tous les nouveaux comptes l'utilisent.
@@ -86,7 +86,6 @@ Règle : chaque session a sa *branch*, s'inscrit ici, ouvre une PR, et met la li
 - [ ] 🤖 Tout vérifier : tests de bout en bout, IA branchée, e-mail de demande d'accès.
 - [ ] 🤖 Mettre à jour le README (nouvelle adresse du site), EN-COURS et la mémoire.
 - [ ] 👤 Variables de l'environnement cloud de Claude : Claude donne la liste des noms, jamais les valeurs.
-- [ ] 🤖 Script de déploiement en une commande pour un non-dev, sans aucune donnée personnelle ; retirer les scripts Stripe.
 
 ### 4. 🔍 Ta validation
 - [ ] 👤 Utiliser la nouvelle app un jour ou deux. L'ancienne (`nextround-gamma.vercel.app`) reste en ligne d'ici là.
@@ -99,6 +98,13 @@ Règle : chaque session a sa *branch*, s'inscrit ici, ouvre une PR, et met la li
 - [ ] 👤 GitHub → Settings → Applications → Authorized OAuth Apps : retirer les anciennes autorisations Clerk.
 - [ ] 👤 `stripe projects spend` une dernière fois, puis fermer les comptes Stripe : l'ancien, le 2e, et le « sandbox » du début.
 - [ ] 👤 `stripe logout` ; 🤖 retirer `.projects/`, `.env.stripe-old` et la section Stripe d'`AGENTS.md` ; désinstaller l'intégration Resend de la Marketplace si on ne s'en sert pas.
+
+### 6. 📦 Partager : déployer sa propre copie (plan Vercel du 2026-10-09)
+- [ ] 👤 **À décider** : le 2026-10-09, la cible était un **bouton « Deploy »** dans le README (aucun terminal : Vercel copie le repo, crée Neon et Clerk par la Marketplace, demande les réglages). Le 2026-10-10, l'[ADR 0027](en/adr/0027-clerk-from-its-cli-not-the-marketplace.md) a choisi Clerk **par sa CLI**, donc un script dans un terminal. Les deux peuvent coexister (bouton avec le Clerk de la Marketplace et Google d'office, script pour qui a un terminal) ou on n'en garde qu'un.
+- [ ] 🤖 Script de déploiement en une commande, sans aucune donnée personnelle (tout vient des comptes de la personne qui déploie) ; retirer les scripts Stripe.
+- [ ] 🤖 Propriétaire sans identifiant GitHub numérique (un non-dev ne le connaît pas) : par exemple, le premier compte connecté devient propriétaire, ou son adresse e-mail.
+- [ ] 🤖 Clé de chiffrement : une phrase secrète tapée au déploiement plutôt qu'une clé aléatoire à générer.
+- [ ] 👤 Clé d'IA : chacun colle la sienne dans les Réglages (existe déjà) ; piste à vérifier : la passerelle IA de Vercel et son crédit gratuit mensuel.
 
 ## ✅ Fait récemment
 
