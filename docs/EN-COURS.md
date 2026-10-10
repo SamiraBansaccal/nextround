@@ -7,6 +7,7 @@ _Dernière mise à jour : 2026-10-09, session locale (Mac)._
 ## 🧭 Sommaire
 
 - [🌿 Branches en cours](#-branches-en-cours)
+- [🗺️ Plan de la bascule](#️-plan-de-la-bascule-stripe--vercel)
 - [✅ Fait récemment](#-fait-récemment)
 - [🚧 En cours](#-en-cours)
 - [🎬 Avatars animés](#-avatars-animés)
@@ -18,13 +19,14 @@ Règle : chaque session a sa *branch*, s'inscrit ici, ouvre une PR, et met la li
 
 | *Branch* | Session | Sujet | PR |
 |---|---|---|---|
-| `claude/local-vercel-ready` | local | ▲ App prête pour Vercel : `DATABASE_URL` (Neon de la Marketplace) en plus de `DB_CONNECTION_STRING`, migrations au *build* de production (`vercel.json`, connexion directe), pas de *preview* (une seule base), scripts qui lisent `.env.local`. Fichiers : `lib/server/env.ts`, `lib/db/index.ts`, `drizzle.config.ts`, `vercel.json`, `scripts/infra/{migrate-on-build.mjs,clerk-signup.mts}`, `scripts/owner/{owner,whoami}.mts`, `.env.example`, `tests/server/` | [#35](https://github.com/SamiraBansaccal/nextround/pull/35) |
 
 <details>
 <summary>📦 Branches déjà fusionnées</summary>
 
 | *Branch* | Session | Sujet | PR |
 |---|---|---|---|
+| `claude/local-vercel-switch` | local | ▲ Bascule : base et fonctions à Londres, Neon Auth choisi ([ADR 0028](en/adr/0028-neon-auth-and-a-london-database.md), bug de zone de Francfort), ADR 0027, plan de la bascule, *skills* des fournisseurs | [#36](https://github.com/SamiraBansaccal/nextround/pull/36) |
+| `claude/local-vercel-ready` | local | ▲ App prête pour Vercel : `DATABASE_URL` (Neon de la Marketplace) en plus de `DB_CONNECTION_STRING`, migrations au *build* de production (`vercel.json`, connexion directe), pas de *preview* (une seule base), scripts qui lisent `.env.local`. Fichiers : `lib/server/env.ts`, `lib/db/index.ts`, `drizzle.config.ts`, `vercel.json`, `scripts/infra/{migrate-on-build.mjs,clerk-signup.mts}`, `scripts/owner/{owner,whoami}.mts`, `.env.example`, `tests/server/` | [#35](https://github.com/SamiraBansaccal/nextround/pull/35) |
 | `claude/local-readme-sans-stripe` | local | 🧭 README sans Stripe Projects : un paragraphe sur le changement de cap, installation à la main (Neon, Clerk, OpenRouter, Vercel). Fichiers : `README.md`, `README.fr.md`, `.env.example`, `docs/EN-COURS.md` | [#34](https://github.com/SamiraBansaccal/nextround/pull/34) |
 | `claude/local-revert-mail-tip` | local | ↩️ Retrait de l'astuce e-mails des README : le README général reste tel quel | [#33](https://github.com/SamiraBansaccal/nextround/pull/33) |
 | `claude/local-readme-mail-tip` | local | 📝 Astuce e-mails des fournisseurs dans les README (retirée par #33) | [#32](https://github.com/SamiraBansaccal/nextround/pull/32) |
@@ -54,6 +56,74 @@ Règle : chaque session a sa *branch*, s'inscrit ici, ouvre une PR, et met la li
 | `claude/intelligent-einstein-58bqoh` | cloud | Traduction EN/FR de tout le site | [#6](https://github.com/SamiraBansaccal/nextround/pull/6), [#8](https://github.com/SamiraBansaccal/nextround/pull/8) |
 
 </details>
+
+## 🗺️ Plan de la bascule (Stripe → Vercel)
+
+Écrit le 2026-10-08 (étapes 0 à 5), complété le 2026-10-09 par le plan Vercel (étape 6), dans une session lancée depuis le dossier personnel (pas celui du projet) : jamais recopié ici, retrouvé et mis à jour le 2026-10-10. Depuis, le nouveau compte Stripe a été abandonné (le mode live exigeait un compte bancaire) au profit de Vercel et de comptes ouverts directement. **Règle d'or : on ne supprime rien tant que la nouvelle version n'est pas vérifiée.** 👤 = propriétaire, 🤖 = Claude.
+
+### 0. 📮 L'adresse dev
+- [x] 👤 Nouvelle adresse créée ; tous les nouveaux comptes l'utilisent.
+- [ ] 👤 La sécuriser : mot de passe fort, validation en deux étapes, Gmail en adresse de secours (à confirmer).
+
+### 1. 💾 Sauvegardes
+- [x] 🤖 Base exportée hors du repo (`.local/backup/2026-10-08`, puis `2026-10-09` : identiques) ; restauration prouvée.
+- [x] 👤 PDF des CV d'origine gardés (`.local/backup/2026-10-08/cv/`).
+- [x] 🤖 Ce qui ne bouge pas : GitHub, le repo, l'identifiant GitHub numérique, `.local/`.
+
+### 2. ~~💳 Un nouveau compte Stripe~~ (abandonné le 2026-10-08)
+- Le compte créé ce jour-là (`acct_1UOONg…`) garde un projet Stripe Projects « nextround » (2026-10-08, 23 h 10). Neon y a créé l'organisation « Stripe Projects: NextRound » (mail du 2026-10-10 sur l'ancienne adresse). À supprimer à l'étape 5.
+
+### 3. 🚀 La nouvelle installation (Vercel)
+- [x] 👤 Compte Vercel avec la nouvelle adresse ; 🤖 projet relié au repo, fonctions à Francfort (`fra1`).
+- [x] 🤖 Neon depuis la Marketplace (Francfort, offre Free), tables créées au *build*.
+- [x] 🤖 Clerk par sa CLI ([ADR 0027](en/adr/0027-clerk-from-its-cli-not-the-marketplace.md)) : GitHub et Google seulement (ni e-mail ni mot de passe), inscription sur invitation (la nouvelle adresse seule), demandes d'accès actives.
+- [x] 🤖 Données réimportées, comparées ligne par ligne à l'ancienne base, rattachées au compte de la nouvelle adresse (`.local/migration/import.mjs`, `move-owner.mjs`).
+- [x] 🤖 Clé ElevenLabs (compte gardé) sur Vercel et dans `.env`.
+- [ ] 👤 Se connecter une fois avec GitHub ; 🤖 vérifier le rôle de propriétaire et les données.
+- [ ] 👤 OpenRouter : compte avec la nouvelle adresse, puis une clé ; 🤖 la poser sur Vercel.
+- [ ] 👤 Resend : compte ouvert directement (clé « Sending access ») ou rien pour l'instant. La Marketplace exige un domaine acheté chez Vercel (payant).
+- [ ] 👤 Firecrawl : nouveau compte ou rien (à décider).
+- [ ] 🤖 Tout vérifier : tests de bout en bout, IA branchée, e-mail de demande d'accès.
+- [ ] 🤖 Mettre à jour le README (nouvelle adresse du site), EN-COURS et la mémoire.
+- [ ] 👤 Variables de l'environnement cloud de Claude : Claude donne la liste des noms, jamais les valeurs.
+
+### 4. 🔍 Ta validation
+- [ ] 👤 Utiliser la nouvelle app un jour ou deux. L'ancienne (`nextround-gamma.vercel.app`) reste en ligne d'ici là.
+
+### 5. 🧹 Supprimer l'ancien (dans cet ordre)
+- [ ] 🤖 Projet Stripe Projects du 2e compte (`acct_1UOONg…`, celui connecté à la CLI) : supprimer ses ressources, dont l'organisation Neon « Stripe Projects: NextRound », depuis un dossier à part pour ne pas toucher au `.projects/` du repo.
+- [ ] 👤 `stripe login` avec l'**ancien** compte (`acct_1UMSsG…`) ; 🤖 supprimer ses ressources : projet Vercel, base Neon, app Clerk, clés OpenRouter, Firecrawl et Resend. **Pas ElevenLabs** (gardé, plan Creator).
+- [ ] 👤 ElevenLabs : avant de fermer Stripe, vérifier qu'on peut s'y connecter sans Stripe (`stripe projects open elevenlabs`, puis un mot de passe).
+- [ ] 👤 Fermer chaque ancien compte fournisseur, en y entrant par `stripe projects open <fournisseur>` **avant** de fermer Stripe : Vercel, Neon, Clerk, OpenRouter, Firecrawl, Resend. Sans bouton de suppression : écrire au support (RGPD, article 17).
+- [ ] 👤 GitHub → Settings → Applications → Authorized OAuth Apps : retirer les anciennes autorisations Clerk.
+- [ ] 👤 `stripe projects spend` une dernière fois, puis fermer les comptes Stripe : l'ancien, le 2e, et le « sandbox » du début.
+- [ ] 👤 `stripe logout` ; 🤖 retirer `.projects/`, `.env.stripe-old` et la section Stripe d'`AGENTS.md` ; désinstaller l'intégration Resend de la Marketplace si on ne s'en sert pas.
+
+### 6. 📦 Partager : déployer sa propre copie (plan Vercel du 2026-10-09)
+- [ ] 👤 **À décider** : le 2026-10-09, la cible était un **bouton « Deploy »** dans le README (aucun terminal : Vercel copie le repo, crée Neon et Clerk par la Marketplace, demande les réglages). Le 2026-10-10, l'[ADR 0027](en/adr/0027-clerk-from-its-cli-not-the-marketplace.md) a choisi Clerk **par sa CLI**, donc un script dans un terminal. Les deux peuvent coexister (bouton avec le Clerk de la Marketplace et Google d'office, script pour qui a un terminal) ou on n'en garde qu'un.
+- [ ] 🤖 Script de déploiement en une commande, sans aucune donnée personnelle (tout vient des comptes de la personne qui déploie) ; retirer les scripts Stripe.
+- [ ] 🤖 Propriétaire sans identifiant GitHub numérique (un non-dev ne le connaît pas) : par exemple, le premier compte connecté devient propriétaire, ou son adresse e-mail.
+- [ ] 🤖 Clé de chiffrement : une phrase secrète tapée au déploiement plutôt qu'une clé aléatoire à générer.
+- [ ] 👤 Clé d'IA : chacun colle la sienne dans les Réglages (existe déjà) ; piste à vérifier : la passerelle IA de Vercel et son crédit gratuit mensuel.
+
+### 7. 🧪 Test : Neon Auth à la place de Clerk (2026-10-10)
+Idée de la propriétaire : un service de moins si Neon Auth peut tout faire par commande. Test sur des branches Neon séparées (`auth-test`, `auth-test-2`), sans toucher à `main` ni au code de l'app (mini-app jetable hors du repo).
+- [x] La CLI Neon (`neon` 8.3) pilote le Neon de la Marketplace (organisation « Vercel: Sam »).
+- [x] Activer Neon Auth, couper e-mail et mot de passe, autoriser localhost : tout par commande. Google arrive d'office avec les codes partagés de Neon (développement seulement, logo Neon sur l'écran de Google) ; GitHub demande ses propres codes.
+- [x] ❌ **À Francfort, la connexion casse chez Neon** : le service renvoie une adresse de connexion en zone `c-6` alors que les serveurs sont en `c-7`/`c-8` → « endpoint not found ». Reproduit sur deux branches et sur une ressource neuve de la Marketplace (Auth activé à la création), avec les codes partagés comme avec des codes « standard ». Désactiver puis réactiver Neon Auth sur une branche est ensuite refusé.
+- [x] ✅ **À Londres (`aws-eu-west-2`), ça marche de bout en bout** (ressource de test `auth-probe-lhr`, Marketplace, Auth activé à la création) : connexion Google (codes partagés de Neon), retour vers l'app, session posée par le proxy du SDK (`auth.middleware()` dans `proxy.ts`, Next 16), compte enregistré dans `neon_auth.user` et `neon_auth.account` (provider `google`). Mini-app jetable hors du repo.
+- [ ] Non testé : la connexion GitHub, qui demande nos propres codes (l'app GitHub créée en un clic par « App manifests »).
+- [x] 👤 Décidé le 2026-10-10 : Londres et Neon Auth ([ADR 0028](en/adr/0028-neon-auth-and-a-london-database.md)). Pas de signalement du bug à Neon.
+
+### 8. 🇬🇧 Déménagement à Londres et passage à Neon Auth ([ADR 0028](en/adr/0028-neon-auth-and-a-london-database.md))
+- [x] 🤖 Neon de Londres créée depuis la Marketplace (`nextround-db-london`, `aws-eu-west-2`, offre gratuite, Auth activé), tables créées (9 migrations).
+- [x] 🤖 Données copiées depuis Francfort (`.local/backup/2026-10-10`) et comparées ligne par ligne : identiques.
+- [x] 🤖 Neon Auth réglé par commande : Google (codes partagés), e-mail et mot de passe coupés, domaine du site et localhost autorisés.
+- [x] 🤖 Projet basculé : Francfort débranchée, Londres branchée (`DATABASE_URL` + `NEON_AUTH_BASE_URL` posés par la Marketplace), production redéployée sur la base de Londres.
+- [ ] 👤 Fusionner la PR #36 : les fonctions passent à Londres (`"regions": ["lhr1"]`) ; le redéploiement a gardé `fra1`.
+- [ ] 🤖 Basculer le code de l'app de Clerk à Neon Auth : connexion, proxy, propriétaire (compte GitHub ou e-mail), invitations et demandes d'accès dans nos tables, tests de bout en bout, CSP ; puis rattacher les données au compte Neon Auth et retirer Clerk (clés Vercel, app Clerk).
+- [ ] 🤖 Connexion GitHub : nos propres codes (app GitHub créée en un clic, à construire).
+- [ ] 🤖 Après validation : supprimer la Neon de Francfort (`nextround-db`) et ses branches de test (`auth-test`, `auth-test-2`).
 
 ## ✅ Fait récemment
 
@@ -202,7 +272,7 @@ Décision : [ADR 0023](fr/adr/0023-cles-de-l-instance-pour-la-proprietaire.md).
 
 ## 🚧 En cours
 
-- 🧭 **Bascule vers Vercel, sans Stripe** : l'app accepte `DATABASE_URL` (Neon installé depuis Vercel) et crée les tables au *build* de production, sans *preview* tant qu'il n'y a qu'une base. Audit de ce qui part sur le nouveau compte en cours : nouvelle base en Europe (l'ancienne est aux États-Unis), fonctions à Francfort, seulement les variables utiles. Puis : projet Vercel relié au repo, Neon et Clerk depuis la Marketplace, données réimportées. Ensuite : retirer les scripts Stripe (`bootstrap`, `setup-env`, renouvellement du *token*), `.projects/` et la section Stripe d'`AGENTS.md`, puis fermer les anciens comptes.
+- 🧭 **Bascule vers Vercel** : suivie case par case dans le [🗺️ Plan de la bascule](#️-plan-de-la-bascule-stripe--vercel). Les leçons sur Clerk sont dans l'[ADR 0027](en/adr/0027-clerk-from-its-cli-not-the-marketplace.md).
 - 🔑 **Secrets absents du cloud** : sans eux, ni l'app ni les e2e ne tournent dans une session cloud. Liste : [guide local et cloud](fr/guides/local-et-cloud.md#-les-secrets-dans-le-cloud).
 - 💼 25 offres Actiris (Bruxelles, IT, accessibles à un junior) choisies le 2026-10-04 : **20 importées** sur le compte de la propriétaire (10 de plus le 2026-10-05, pour 19 appels d'IA : le modèle gratuit relance parfois). **Restent 5**, textes prêts dans `.local/offers/` : `npm run owner:import-offers -- .local/offers/{5945294,5962926,5966908,5869183,5869129}.txt` (environ 9 appels ; à lancer un jour où le quota de 40 n'est pas entamé). Si `.local/offers/` n'existe plus : `npm run offers:actiris -- fetch 5945294 5962926 5966908 5869183 5869129`.
 - 🚫 Indeed bloque les robots (Cloudflare, 403) et l'interdit : on ne le contourne pas. Offres Indeed : lien ou texte collé dans l'app.
@@ -222,7 +292,6 @@ Décision : [ADR 0023](fr/adr/0023-cles-de-l-instance-pour-la-proprietaire.md).
 - 💼 Les 15 offres Actiris restantes (voir « En cours »).
 - 💬 Le chat de 5 questions du profil : à retravailler (demande du 2026-10-04).
 - 🔍 Audit du 2026-10-04 : tous les points sont fermés. Le refaire de temps en temps (`npm audit --omit=dev`, `/security-review`).
-- 🚀 Relier Vercel à GitHub pour *deploy* sans le Mac : le compte Vercel (créé par Stripe Projects) ne voit **aucun** compte GitHub (`/v1/integrations/git-namespaces` vide). Il faut que la propriétaire connecte GitHub une fois dans Vercel (un clic, OAuth) ; ensuite, relier le projet par l'API et ne lancer les migrations qu'au *build* de **production** (`VERCEL_ENV=production`), jamais sur une *preview* (une seule base, ADR 0014).
 - 🖼️ Logo Actiris : toujours le favicon de 16 px (le site n'a pas d'icône plus grande ; le logo complet est horizontal). Le Forem a maintenant son icône officielle en 64 px.
 - 🔐 Avant une instance Clerk de **production** : l'*allowlist* y est payante ; prévoir une barrière dans l'app, ou le plan payant (ADR 0023). Idée de la propriétaire, pas décidée : faire payer les autres utilisateurs via Stripe au lieu de leur demander leurs clés.
 - 🔊 Cache audio durable (Vercel Blob ou S3) quand ElevenLabs sera activé pour de bon.
