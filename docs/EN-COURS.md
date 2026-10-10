@@ -115,6 +115,16 @@ Idée de la propriétaire : un service de moins si Neon Auth peut tout faire par
 - [ ] Non testé : la connexion GitHub, qui demande nos propres codes (l'app GitHub créée en un clic par « App manifests »).
 - [ ] 👤 À décider : déplacer la base à Londres (Europe, Royaume-Uni) pour passer à Neon Auth, ou rester à Francfort en attendant que Neon corrige (bug à signaler). Ressources de test : branches `auth-test`, `auth-test-2` (Francfort) et ressource `auth-probe-lhr` (Londres), à supprimer ou à garder.
 
+### 8. 🇬🇧 Déménagement à Londres et passage à Neon Auth ([ADR 0028](en/adr/0028-neon-auth-and-a-london-database.md))
+- [x] 🤖 Neon de Londres créée depuis la Marketplace (`nextround-db-london`, `aws-eu-west-2`, offre gratuite, Auth activé), tables créées (9 migrations).
+- [x] 🤖 Données copiées depuis Francfort (`.local/backup/2026-10-10`) et comparées ligne par ligne : identiques.
+- [x] 🤖 Neon Auth réglé par commande : Google (codes partagés), e-mail et mot de passe coupés, domaine du site et localhost autorisés.
+- [x] 🤖 Projet basculé : Francfort débranchée, Londres branchée (`DATABASE_URL` + `NEON_AUTH_BASE_URL` posés par la Marketplace), production redéployée sur la base de Londres.
+- [ ] 👤 Fusionner la PR #36 : les fonctions passent à Londres (`"regions": ["lhr1"]`) ; le redéploiement a gardé `fra1`.
+- [ ] 🤖 Basculer le code de l'app de Clerk à Neon Auth : connexion, proxy, propriétaire (compte GitHub ou e-mail), invitations et demandes d'accès dans nos tables, tests de bout en bout, CSP ; puis rattacher les données au compte Neon Auth et retirer Clerk (clés Vercel, app Clerk).
+- [ ] 🤖 Connexion GitHub : nos propres codes (app GitHub créée en un clic, à construire).
+- [ ] 🤖 Après validation : supprimer la Neon de Francfort (`nextround-db`) et ses branches de test (`auth-test`, `auth-test-2`) ; signaler le bug de zone à Neon.
+
 ## ✅ Fait récemment
 
 ### 🧭 Fin de Stripe Projects (local, 2026-10-08 et 09)
