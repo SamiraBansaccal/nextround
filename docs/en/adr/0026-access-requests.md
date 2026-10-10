@@ -3,7 +3,7 @@
 > 🇫🇷 French version: [fr/adr/0026](../../fr/adr/0026-demandes-d-acces.md)
 
 - **Date:** 2026-10-05
-- **Status:** ✅ accepted
+- **Status:** ⛔ superseded by [ADR 0028](0028-neon-auth-and-a-london-database.md): the form and Clerk's waitlist are gone with Clerk; an email link meanwhile, invitations to rebuild with Resend
 - **Follows:** [ADR 0023](0023-instance-keys-for-the-owner-only.md) (sign-up closed during development)
 
 ## 🎯 Context

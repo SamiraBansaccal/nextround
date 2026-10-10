@@ -39,7 +39,7 @@ Le chemin d'import `@/` part de la racine : `@/lib/ai/client`, `@/components/ui/
 ```
 app/
 ├── page.tsx                  🏠 page d'accueil publique
-├── sign-in/ sign-up/ sso-callback/   🔑 connexion (Clerk)
+├── not-invited/ api/auth/    🔑 « sur invitation », connexion (Neon Auth)
 ├── (app)/                    🔒 zone connectée (le dossier entre parenthèses n'apparaît pas dans l'URL)
 │   ├── layout.tsx            menu, bouton de langue EN/FR, thème
 │   ├── ui-actions.ts         server action : changer la langue du site
@@ -52,7 +52,7 @@ app/
 
 - Chaque page est un *server component* : elle lit la session (`requireUserId()`), charge les données et les passe au composant.
 - Les **server actions** sont dans un `actions.ts` à côté de la page qui les utilise.
-- `proxy.ts` (à la racine) protège tout sauf l'accueil et la connexion ; le code serveur revérifie quand même la session.
+- `proxy.ts` (à la racine) échange le code de retour de Google ou GitHub contre la session, protège tout sauf l'accueil, la page « sur invitation » et les routes de Neon Auth, et pose le CSP ; le code serveur revérifie quand même la session.
 - Plus de tableau de bord : `/dashboard` renvoie vers `/profile` (`next.config.ts`, [ADR 0024](../adr/0024-pas-de-tableau-de-bord.md)).
 
 ## 🧩 `components/` : l'interface
@@ -63,7 +63,7 @@ Un dossier par **zone de l'app**, plus trois dossiers communs.
 |---|---|
 | `ui/` | Composants shadcn (button, card, input…). Générés par `shadcn add`, retouchés à la marge. |
 | `layout/` | La coquille de l'app (`app-shell`), le logo, les titres de page, le thème clair/sombre |
-| `auth/` | Les boutons « Continue with GitHub / Google » |
+| `auth/` | Les boutons « Continue with GitHub / Google » et « Se déconnecter » |
 | `shared/` | Petits composants utilisés partout (ex. `with-code` : du texte avec du `code`) |
 | `offers/` | Formulaire d'ajout, cartes rangées par parcours (`opportunities`), page d'offre, badges (statut, site, couvert/lacune) |
 | `documents/` | Page CV et lettre, rendu des documents écrits pour une offre |
@@ -77,7 +77,8 @@ Un dossier par **zone de l'app**, plus trois dossiers communs.
 
 | Dossier | Rôle | Fichiers clés |
 |---|---|---|
-| `server/` | 🔐 Socle serveur | `auth.ts` (session, `requireUserId`), `env.ts` (*env vars* validées), `crypto.ts` (chiffrement des clés) |
+| `server/` | 🔐 Socle serveur | `auth.ts` (session, `requireUserId`, propriétaire), `neon-auth.ts` (Neon Auth), `csp.ts` (Content-Security-Policy), `env.ts` (*env vars* validées), `crypto.ts` (chiffrement des clés) |
+| `auth/` | 🔑 Connexion côté navigateur | `client.ts` (client Neon Auth) |
 | `shared/` | 🧰 Utilitaires purs, client et serveur | `dates.ts`, `ids.ts`, `text.ts` |
 | `db/` | 🗄️ Schéma et connexion | `schema.ts` (chaque table a un `user_id`), `index.ts` |
 | `data/` | 📦 Accès aux données, **toujours filtré par `userId`** | `offers.ts`, `facts.ts`, `interviews.ts`, `documents.ts`… |
@@ -117,7 +118,7 @@ tests/
 ```
 
 - `npm test` lance Vitest (rapide, sans secret).
-- `npm run e2e` lance Playwright via `scripts/test/e2e.mjs` (a besoin des secrets Clerk et Neon). `npm run build && E2E_PROD=1 npm run e2e` fait la même chose sur le *build* de production, où la CSP est plus stricte (pas de `'unsafe-eval'`) et où Next.js précharge les liens.
+- `npm run e2e` lance Playwright via `scripts/test/e2e.mjs` (sur une branche Neon jetable, supprimée à la fin ; CLI Neon connectée). `npm run build && E2E_PROD=1 npm run e2e` fait la même chose sur le *build* de production, où la CSP est plus stricte (pas de `'unsafe-eval'`) et où Next.js précharge les liens.
 
 ## ⚙️ `scripts/` : les outils en ligne de commande
 

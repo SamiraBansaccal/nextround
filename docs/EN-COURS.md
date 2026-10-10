@@ -124,12 +124,14 @@ Idée de la propriétaire : un service de moins si Neon Auth peut tout faire par
 - [x] 🤖 Projet basculé : Francfort débranchée, Londres branchée (`DATABASE_URL` + `NEON_AUTH_BASE_URL` posés par la Marketplace), production redéployée sur la base de Londres.
 - [x] 🤖 PR #36 fusionnée (et #37 : la règle qui sautait aussi la production) : fonctions à Londres (`lhr1`), vérifié sur le déploiement.
 - [ ] 🤖 Basculer le code de Clerk à Neon Auth, **périmètre proportionné** (décidé le 2026-10-10 : une seule utilisatrice, aucun compte à migrer, seulement le code) :
-  - [ ] connexion : un écran avec GitHub et Google (Neon Auth) ;
-  - [ ] « qui est connecté » : le même module (`requireUserId()`), branché sur la session Neon Auth ; pages et requêtes inchangées ;
-  - [ ] propriétaire : reconnu par son compte GitHub (`OWNER_GITHUB_ID`), même règle qu'avant ;
-  - [ ] sur invitation : une simple liste d'adresses autorisées (pour l'instant la propriétaire seule) ; les autres voient « sur invitation » et un lien pour écrire par e-mail ;
+  - [x] connexion : un écran avec GitHub et Google (Neon Auth), retour sur `/profile` où le proxy pose la session ;
+  - [x] « qui est connecté » : le même module (`requireUserId()`), branché sur la session Neon Auth ; pages et requêtes inchangées ; CSP reconstruit (`lib/server/csp.ts`) ;
+  - [x] propriétaire : reconnu par son compte GitHub (`OWNER_GITHUB_ID`, lu dans `neon_auth.account`, jamais les jetons) ;
+  - [x] sur invitation : **la propriétaire seule** pour l'instant (pas de liste, simplifié le 2026-10-10) ; les autres arrivent sur `/not-invited`, sans aucune donnée ; adresse de contact optionnelle (`ACCESS_CONTACT_EMAIL`) ;
   - [ ] données rattachées au nouveau compte Neon Auth (`.local/migration/move-owner.mjs`, une commande) ;
-  - [ ] Clerk supprimé : code, dépendances, script `clerk:signup`, clés Vercel, app Clerk.
+  - [x] Clerk supprimé du code : pages, *provider*, paquets, script `clerk:signup` ; tests de bout en bout sur une **branche Neon jetable** (e-mail et mot de passe activés sur cette branche seulement, supprimée à la fin) : 4/4 verts.
+  - [ ] 👤 Créer l'*OAuth App* GitHub de NextRound (connexion GitHub), puis 🤖 l'ajouter à Neon Auth ; 🤖 `NEON_AUTH_COOKIE_SECRET` sur Vercel.
+  - [ ] 🤖 Fusionner, puis 👤 se connecter avec GitHub ; 🤖 rattacher les données ; 🤖 retirer les clés Clerk de Vercel et l'app Clerk.
   - Pas maintenant : la gestion des demandes d'accès dans les Réglages (le formulaire dépendait de la liste d'attente de Clerk), remplacée par le lien e-mail ; Resend plus tard.
 - [ ] 🤖 Connexion GitHub : nos propres codes (app GitHub créée en un clic, à construire).
 - [ ] 🤖 Après validation : supprimer la Neon de Francfort (`nextround-db`) et ses branches de test (`auth-test`, `auth-test-2`).
