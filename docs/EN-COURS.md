@@ -19,6 +19,7 @@ Règle : chaque session a sa *branch*, s'inscrit ici, ouvre une PR, et met la li
 
 | *Branch* | Session | Sujet | PR |
 |---|---|---|---|
+| `claude/local-ignore-step-fix` | local | 🔧 La règle qui saute les *previews* sautait aussi la production (fusion de #36 annulée : `VERCEL_ENV` absent à l'étape « Ignored Build Step ») ; elle ne saute plus un build sur `main`. Fichiers : `vercel.json`, `docs/EN-COURS.md` | à venir |
 
 <details>
 <summary>📦 Branches déjà fusionnées</summary>
