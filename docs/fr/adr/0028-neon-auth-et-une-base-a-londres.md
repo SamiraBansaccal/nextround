@@ -27,7 +27,7 @@ Testé le 2026-10-10 avec une mini-app jetable hors du repo (Next 16, `@neondata
 - **La base déménage à Londres** (`aws-eu-west-2`), créée depuis la Marketplace Vercel avec Auth activé, et les fonctions suivent (`lhr1`). On reste en Europe : le Royaume-Uni bénéficie d'une décision d'adéquation de l'UE pour les données personnelles.
 - **Google et GitHub seulement** : e-mail et mot de passe sont coupés par commande. GitHub demande les propres codes OAuth de la personne qui déploie, car Neon ne prête des codes partagés que pour Google, et seulement en développement.
 - **L'inscription sur invitation et les demandes d'accès passent dans l'app** (nos propres tables) : Neon Auth n'a pas de liste d'autorisation.
-- Revenir à Francfort pourra se reconsidérer quand Neon aura corrigé le bug de zone, à leur signaler.
+- Revenir à Francfort pourra se reconsidérer si Neon corrige le bug de zone.
 
 ## 📊 Conséquences
 

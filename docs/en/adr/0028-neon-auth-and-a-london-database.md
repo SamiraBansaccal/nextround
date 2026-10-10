@@ -27,7 +27,7 @@ Tested on 2026-10-10 with a throwaway app outside the repo (Next 16, `@neondatab
 - **The database moves to London** (`aws-eu-west-2`), created from the Vercel Marketplace with Auth on, and the functions follow (`lhr1`). It stays in Europe: the United Kingdom has an EU adequacy decision for personal data.
 - **Google and GitHub only**: email and password are turned off by command. GitHub needs the deployer's own OAuth credentials, because Neon lends shared keys for Google only, and only for development.
 - **Invite-only sign-up and access requests move into the app** (our own tables): Neon Auth has no allowlist.
-- Going back to Frankfurt can be reconsidered once Neon fixes the zone bug, which is to be reported to them.
+- Going back to Frankfurt can be reconsidered if Neon fixes the zone bug.
 
 ## 📊 Consequences
 

@@ -19,13 +19,13 @@ Règle : chaque session a sa *branch*, s'inscrit ici, ouvre une PR, et met la li
 
 | *Branch* | Session | Sujet | PR |
 |---|---|---|---|
-| `claude/local-vercel-switch` | local | ▲ Bascule sur le nouveau compte Vercel : fonctions à Francfort (`fra1`, à côté de la base Neon `eu-central-1`), *skills* Neon et Clerk ajoutés par la Marketplace, état de la bascule, données restaurées, Clerk refait par sa CLI (ADR 0027, README), *skills* OpenRouter et ElevenLabs complets. Fichiers : `vercel.json`, `skills-lock.json`, `.agents/skills/{clerk-*,neon*}`, `.claude/skills/{clerk-*,neon*}`, `docs/EN-COURS.md` | [#36](https://github.com/SamiraBansaccal/nextround/pull/36) |
 
 <details>
 <summary>📦 Branches déjà fusionnées</summary>
 
 | *Branch* | Session | Sujet | PR |
 |---|---|---|---|
+| `claude/local-vercel-switch` | local | ▲ Bascule : base et fonctions à Londres, Neon Auth choisi ([ADR 0028](en/adr/0028-neon-auth-and-a-london-database.md), bug de zone de Francfort), ADR 0027, plan de la bascule, *skills* des fournisseurs | [#36](https://github.com/SamiraBansaccal/nextround/pull/36) |
 | `claude/local-vercel-ready` | local | ▲ App prête pour Vercel : `DATABASE_URL` (Neon de la Marketplace) en plus de `DB_CONNECTION_STRING`, migrations au *build* de production (`vercel.json`, connexion directe), pas de *preview* (une seule base), scripts qui lisent `.env.local`. Fichiers : `lib/server/env.ts`, `lib/db/index.ts`, `drizzle.config.ts`, `vercel.json`, `scripts/infra/{migrate-on-build.mjs,clerk-signup.mts}`, `scripts/owner/{owner,whoami}.mts`, `.env.example`, `tests/server/` | [#35](https://github.com/SamiraBansaccal/nextround/pull/35) |
 | `claude/local-readme-sans-stripe` | local | 🧭 README sans Stripe Projects : un paragraphe sur le changement de cap, installation à la main (Neon, Clerk, OpenRouter, Vercel). Fichiers : `README.md`, `README.fr.md`, `.env.example`, `docs/EN-COURS.md` | [#34](https://github.com/SamiraBansaccal/nextround/pull/34) |
 | `claude/local-revert-mail-tip` | local | ↩️ Retrait de l'astuce e-mails des README : le README général reste tel quel | [#33](https://github.com/SamiraBansaccal/nextround/pull/33) |
@@ -113,7 +113,7 @@ Idée de la propriétaire : un service de moins si Neon Auth peut tout faire par
 - [x] ❌ **À Francfort, la connexion casse chez Neon** : le service renvoie une adresse de connexion en zone `c-6` alors que les serveurs sont en `c-7`/`c-8` → « endpoint not found ». Reproduit sur deux branches et sur une ressource neuve de la Marketplace (Auth activé à la création), avec les codes partagés comme avec des codes « standard ». Désactiver puis réactiver Neon Auth sur une branche est ensuite refusé.
 - [x] ✅ **À Londres (`aws-eu-west-2`), ça marche de bout en bout** (ressource de test `auth-probe-lhr`, Marketplace, Auth activé à la création) : connexion Google (codes partagés de Neon), retour vers l'app, session posée par le proxy du SDK (`auth.middleware()` dans `proxy.ts`, Next 16), compte enregistré dans `neon_auth.user` et `neon_auth.account` (provider `google`). Mini-app jetable hors du repo.
 - [ ] Non testé : la connexion GitHub, qui demande nos propres codes (l'app GitHub créée en un clic par « App manifests »).
-- [ ] 👤 À décider : déplacer la base à Londres (Europe, Royaume-Uni) pour passer à Neon Auth, ou rester à Francfort en attendant que Neon corrige (bug à signaler). Ressources de test : branches `auth-test`, `auth-test-2` (Francfort) et ressource `auth-probe-lhr` (Londres), à supprimer ou à garder.
+- [x] 👤 Décidé le 2026-10-10 : Londres et Neon Auth ([ADR 0028](en/adr/0028-neon-auth-and-a-london-database.md)). Pas de signalement du bug à Neon.
 
 ### 8. 🇬🇧 Déménagement à Londres et passage à Neon Auth ([ADR 0028](en/adr/0028-neon-auth-and-a-london-database.md))
 - [x] 🤖 Neon de Londres créée depuis la Marketplace (`nextround-db-london`, `aws-eu-west-2`, offre gratuite, Auth activé), tables créées (9 migrations).
@@ -123,7 +123,7 @@ Idée de la propriétaire : un service de moins si Neon Auth peut tout faire par
 - [ ] 👤 Fusionner la PR #36 : les fonctions passent à Londres (`"regions": ["lhr1"]`) ; le redéploiement a gardé `fra1`.
 - [ ] 🤖 Basculer le code de l'app de Clerk à Neon Auth : connexion, proxy, propriétaire (compte GitHub ou e-mail), invitations et demandes d'accès dans nos tables, tests de bout en bout, CSP ; puis rattacher les données au compte Neon Auth et retirer Clerk (clés Vercel, app Clerk).
 - [ ] 🤖 Connexion GitHub : nos propres codes (app GitHub créée en un clic, à construire).
-- [ ] 🤖 Après validation : supprimer la Neon de Francfort (`nextround-db`) et ses branches de test (`auth-test`, `auth-test-2`) ; signaler le bug de zone à Neon.
+- [ ] 🤖 Après validation : supprimer la Neon de Francfort (`nextround-db`) et ses branches de test (`auth-test`, `auth-test-2`).
 
 ## ✅ Fait récemment
 
