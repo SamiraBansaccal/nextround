@@ -62,7 +62,7 @@ export function CvDocumentView({ document, fallbackName, photoUrl, edit }: { doc
           )}
         </div>
         {photoUrl && (
-          // eslint-disable-next-line @next/next/no-img-element -- the avatar comes from Clerk's CDN
+          // eslint-disable-next-line @next/next/no-img-element -- the avatar comes from the sign-in provider (GitHub or Google)
           <img src={photoUrl} width={112} height={112} alt="" className="mx-auto aspect-square w-24 border-4 border-primary object-cover sm:w-28" />
         )}
       </header>

@@ -1,8 +1,8 @@
 import "server-only";
 import { z } from "zod";
 
-// Server-side environment, validated once. `.env.example` lists every variable; on Vercel, the Neon and Clerk
-// integrations of the Marketplace set their own.
+// Server-side environment, validated once. `.env.example` lists every variable; on Vercel, the Neon integration
+// of the Marketplace sets its own (DATABASE_URL, NEON_AUTH_BASE_URL…).
 
 /** An optional value: an empty line in `.env` ("NAME=") counts as not set, not as an empty string. */
 const optional = <T extends z.ZodTypeAny>(schema: T) => z.preprocess((v) => (v === "" ? undefined : v), schema.optional());
@@ -12,8 +12,10 @@ const serverEnvSchema = z.object({
   // the name older setups used, read when DATABASE_URL is not set. One of the two is required (checked below).
   DATABASE_URL: optional(z.string()),
   DB_CONNECTION_STRING: optional(z.string()),
-  CLERK_SECRET_KEY: z.string().min(1),
-  NEXT_PUBLIC_CLERK_PUBLISHABLE_KEY: z.string().min(1),
+  // Sign-in (Neon Auth, ADR 0028): the auth service of the Neon branch, set by the Marketplace integration, and the
+  // secret that signs the session cookies (32 characters or more, generated per deployment).
+  NEON_AUTH_BASE_URL: z.url(),
+  NEON_AUTH_COOKIE_SECRET: z.string().min(32),
   APP_ENCRYPTION_KEY: z.string().min(1),
   // The owner's NUMERIC GitHub id (api.github.com/users/<login> -> id): stable, unlike a username that can
   // be changed and then taken by someone else. Missing = nobody is the owner (fail closed).
@@ -30,14 +32,8 @@ const serverEnvSchema = z.object({
   // Instance model on OpenRouter (defaults in lib/ai/providers.ts); fallbacks are comma-separated.
   INSTANCE_LLM_MODEL: optional(z.string()),
   INSTANCE_LLM_FALLBACK_MODELS: optional(z.string()),
-  // Resend, to email the owner about access requests (free plan). Without it, requests still reach Settings.
-  RESEND_API_KEY: optional(z.string()),
-  // The sender of that email; without a domain verified at Resend, only its test sender works.
-  ACCESS_MAIL_FROM: optional(z.string()),
-  // The site's public address for links in emails ("https://…"); on Vercel, its production domain is used by
-  // default (VERCEL_PROJECT_PRODUCTION_URL, set by Vercel). Never taken from a request's headers.
-  APP_URL: optional(z.url()),
-  VERCEL_PROJECT_PRODUCTION_URL: optional(z.string()),
+  // Where people without an invitation may write to ask for one, shown on the home page. Unset: no address shown.
+  ACCESS_CONTACT_EMAIL: optional(z.email()),
   // Self-hosting only: allow any OpenAI-compatible base URL (e.g. Ollama on localhost).
   ALLOW_CUSTOM_LLM_BASE_URL: z.enum(["true", "false"]).default("false"),
 });

@@ -1,31 +1,41 @@
-// Visual-check fixtures: a dedicated Clerk TEST user ("+clerk_test" address of the dev instance)
-// and fictional sample data for it, so that every screen can be captured with realistic content.
-// Run through scripts/test/e2e.mjs, which ALWAYS calls cleanup at the end. Never touches other users:
-// every table has a user_id, so cleanup deletes exactly this user's rows.
+// Visual-check fixtures, on the DISPOSABLE Neon branch that scripts/test/e2e.mjs creates and deletes: a test user
+// signed up with email and password (enabled on that branch only, never on the live site), made the owner of that
+// branch through a GitHub link with the id the run passes as OWNER_GITHUB_ID, and fictional sample data for it,
+// so that every screen can be captured with realistic content. The live data is never touched.
 //
-// Usage: tsx --conditions=react-server tests/e2e/fixtures.mts seed|cleanup
+// Usage (through scripts/test/e2e.mjs only): tsx --conditions=react-server tests/e2e/fixtures.mts seed
 
-process.loadEnvFile(".env");
-
-import { createClerkClient } from "@clerk/backend";
+import { neon } from "@neondatabase/serverless";
 import type { SourcedSentence, TailoredCv } from "@/lib/types";
 
-export const E2E_EMAIL = "nextround-e2e+clerk_test@example.com";
-
-const clerk = createClerkClient({ secretKey: process.env.CLERK_SECRET_KEY });
-
-async function findUser() {
-  const { data } = await clerk.users.getUserList({ emailAddress: [E2E_EMAIL] });
-  return data[0] ?? null;
+// The run passes the branch's values (DATABASE_URL, NEON_AUTH_BASE_URL…); the other variables come from the env
+// files. A variable already set wins over the files.
+for (const file of [".env.local", ".env"]) {
+  try {
+    process.loadEnvFile(file);
+  } catch {
+    // No such file.
+  }
 }
 
-// Sign-up is closed on the instance (allowlist, scripts/infra/clerk-signup.mts), and Clerk applies it to
-// accounts created through the Backend API too: the test address is allowed only while the tests run.
-async function allowTestAddress(allow: boolean) {
-  const { data } = await clerk.allowlistIdentifiers.getAllowlistIdentifierList();
-  const entry = data.find((e) => e.identifier === E2E_EMAIL);
-  if (allow && !entry) await clerk.allowlistIdentifiers.createAllowlistIdentifier({ identifier: E2E_EMAIL, notify: false });
-  if (!allow && entry) await clerk.allowlistIdentifiers.deleteAllowlistIdentifier(entry.id);
+export const E2E_EMAIL = "nextround-e2e@example.com";
+
+/** Signs the test user up on the branch's Neon Auth (email and password are enabled there only). */
+async function createTestUser(): Promise<string> {
+  const response = await fetch(`${process.env.NEON_AUTH_BASE_URL}/sign-up/email`, {
+    method: "POST",
+    headers: { "Content-Type": "application/json", Origin: process.env.E2E_ORIGIN! },
+    body: JSON.stringify({ email: E2E_EMAIL, password: process.env.E2E_PASSWORD, name: "Alex Tester" }),
+  });
+  const body = (await response.json().catch(() => null)) as { user?: { id?: string } } | null;
+  if (!response.ok || !body?.user?.id) throw new Error(`The test user could not be created (${response.status}).`);
+  return body.user.id;
+}
+
+/** Makes the test user the owner of this branch only: a GitHub link whose id the run passes as OWNER_GITHUB_ID. */
+async function linkTestGithubAccount(userId: string) {
+  const sql = neon(process.env.DATABASE_URL!);
+  await sql`insert into neon_auth.account ("accountId", "providerId", "userId", "updatedAt") values (${process.env.E2E_GITHUB_ID!}, 'github', ${userId}, now())`;
 }
 
 const OFFER_TEXT = `Développeur·se Full Stack Junior (H/F) — Brussels Tech SRL
@@ -58,10 +68,8 @@ COMPÉTENCES
 React, TypeScript, Node.js, Git`;
 
 async function seed() {
-  await allowTestAddress(true);
-  const user = (await findUser()) ?? (await clerk.users.createUser({ emailAddress: [E2E_EMAIL], firstName: "Alex", lastName: "Tester", skipPasswordRequirement: true }));
-  const userId = user.id;
-  await cleanupData(userId); // start from a clean slate
+  const userId = await createTestUser();
+  await linkTestGithubAccount(userId);
 
   const { createFact } = await import("@/lib/data/facts");
   const { addSource, cvRef } = await import("@/lib/data/sources");
@@ -211,27 +219,5 @@ async function seed() {
   console.log(JSON.stringify({ userId, offerId: offer.id, interviewId, tailoredCvId: tailoredCv.id }));
 }
 
-async function cleanupData(userId: string) {
-  const { getDb } = await import("@/lib/db");
-  const schema = await import("@/lib/db/schema");
-  const { eq } = await import("drizzle-orm");
-  const db = getDb();
-  // Children first is not required (cascades), but every table is cleared explicitly by user_id.
-  for (const table of [schema.answers, schema.questions, schema.interviews, schema.documents, schema.offerContacts, schema.requirements, schema.offers, schema.profileFacts, schema.sources, schema.aiSettings, schema.usageCounters]) {
-    await db.delete(table).where(eq(table.userId, userId));
-  }
-}
-
-async function cleanup() {
-  await allowTestAddress(false);
-  const user = await findUser();
-  if (!user) return console.log("no e2e user (test address removed from the allowlist)");
-  await cleanupData(user.id);
-  await clerk.users.deleteUser(user.id);
-  console.log(`cleaned: ${user.id} (data and Clerk user deleted, test address removed from the allowlist)`);
-}
-
-const command = process.argv[2];
-if (command === "seed") await seed();
-else if (command === "cleanup") await cleanup();
-else throw new Error("usage: seed | cleanup");
+if (process.argv[2] === "seed") await seed();
+else throw new Error("usage: seed (the run deletes the whole branch afterwards)");

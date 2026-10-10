@@ -1,45 +1,38 @@
 "use client";
 
-import { useSignIn } from "@clerk/nextjs/legacy";
 import { useState } from "react";
 import { Button } from "@/components/ui/button";
+import { authClient } from "@/lib/auth/client";
 
-type Strategy = "oauth_github" | "oauth_google";
+type Provider = "github" | "google";
 
 export function SignInButtons() {
-  const { isLoaded, signIn } = useSignIn();
-  const [pending, setPending] = useState<Strategy | null>(null);
+  const [pending, setPending] = useState<Provider | null>(null);
   const [failed, setFailed] = useState(false);
 
-  async function start(strategy: Strategy) {
-    if (!isLoaded) return;
-    setPending(strategy);
+  async function start(provider: Provider) {
+    setPending(provider);
     setFailed(false);
-    try {
-      // Goes to GitHub/Google, comes back to /sso-callback (which also creates the account
-      // on first sign-in), then lands on the profile.
-      await signIn.authenticateWithRedirect({
-        strategy,
-        redirectUrl: "/sso-callback",
-        redirectUrlComplete: "/profile",
-      });
-    } catch {
+    // Goes to GitHub or Google, then back to the profile: the proxy (proxy.ts) exchanges the one-time verifier
+    // Neon sends back for the session cookies. The first sign-in creates the account.
+    const { error } = await authClient.signIn.social({ provider, callbackURL: "/profile" }).catch(() => ({ error: true }));
+    if (error) {
       setFailed(true);
       setPending(null);
     }
   }
 
-  const busy = !isLoaded || pending !== null;
+  const busy = pending !== null;
 
   return (
     <div className="flex w-full max-w-xs flex-col gap-3">
-      <Button size="lg" disabled={busy} onClick={() => start("oauth_github")}>
+      <Button size="lg" disabled={busy} onClick={() => start("github")}>
         <GitHubIcon />
-        {pending === "oauth_github" ? "Redirecting…" : "Continue with GitHub"}
+        {pending === "github" ? "Redirecting…" : "Continue with GitHub"}
       </Button>
-      <Button size="lg" variant="outline" disabled={busy} onClick={() => start("oauth_google")}>
+      <Button size="lg" variant="outline" disabled={busy} onClick={() => start("google")}>
         <GoogleIcon />
-        {pending === "oauth_google" ? "Redirecting…" : "Continue with Google"}
+        {pending === "google" ? "Redirecting…" : "Continue with Google"}
       </Button>
       {failed && (
         <p role="alert" className="text-sm text-destructive">

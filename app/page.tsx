@@ -1,12 +1,11 @@
-import { auth } from "@clerk/nextjs/server";
 import { Check, KeyRound, Link2, MessagesSquare, Quote, X } from "lucide-react";
 import Image from "next/image";
 import { redirect } from "next/navigation";
 import { Logo } from "@/components/layout/logo";
-import { RequestAccess } from "@/components/auth/request-access";
 import { SignInButtons } from "@/components/auth/sign-in-buttons";
 import { ThemeToggle } from "@/components/layout/theme-toggle";
-import { requestAccessAction } from "./actions";
+import { getAccess } from "@/lib/server/auth";
+import { serverEnv } from "@/lib/server/env";
 
 // Landing page (design from the Lovable prototype): the only page visible without signing in.
 const VALUE_PROPS = [
@@ -16,8 +15,8 @@ const VALUE_PROPS = [
 ];
 
 export default async function LandingPage() {
-  const { userId } = await auth();
-  if (userId) redirect("/profile");
+  if (await getAccess()) redirect("/profile");
+  const contact = serverEnv().ACCESS_CONTACT_EMAIL;
 
   return (
     <div className="min-h-screen">
@@ -32,7 +31,19 @@ export default async function LandingPage() {
           </h1>
           <div className="flex flex-col gap-4">
             <SignInButtons />
-            <RequestAccess request={requestAccessAction} />
+            <p className="max-w-xs text-sm text-muted-foreground">
+              This site is by invitation.
+              {contact && (
+                <>
+                  {" "}
+                  To ask for one, write to{" "}
+                  <a className="underline underline-offset-2" href={`mailto:${contact}?subject=NextRound%20invitation`}>
+                    {contact}
+                  </a>
+                  .
+                </>
+              )}
+            </p>
           </div>
         </div>
         <div className="overflow-hidden rounded-md border bg-card shadow-soft">

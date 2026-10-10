@@ -1,6 +1,6 @@
 // Database schema (Drizzle ORM -> Postgres on Neon).
 //
-// Isolation rule: EVERY table has a user_id column (the Clerk user id), including
+// Isolation rule: EVERY table has a user_id column (the Neon Auth user id), including
 // child tables such as requirements or answers. Every query in lib/data/ filters on it,
 // with the user id taken from the server-side session, never from the client.
 

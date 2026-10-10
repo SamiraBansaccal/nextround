@@ -16,8 +16,6 @@ import {
   type ServiceKey,
 } from "@/lib/data/ai-settings";
 import { serverEnv } from "@/lib/server/env";
-import { allowRequest, declineRequest, removeAllowedAddress } from "@/lib/access/requests";
-import { fill } from "@/lib/interview/copy";
 import { getUiLang } from "@/lib/i18n/server";
 import { SETTINGS_COPY } from "@/lib/i18n/settings";
 
@@ -152,40 +150,4 @@ export async function saveFirecrawlKeyAction(input: unknown): Promise<ActionResu
 
 export async function removeFirecrawlKeyAction(): Promise<ActionResult> {
   return removeKey("firecrawl");
-}
-
-// ---------- Access requests: the owner answers (lib/access/requests.ts) ----------
-
-const idSchema = z.string().trim().min(3).max(100);
-
-/** Runs an answer to an access request, for the owner only. */
-async function asOwner(input: unknown, answer: (id: string, t: (typeof SETTINGS_COPY)["en"]) => Promise<string | null>): Promise<ActionResult<string>> {
-  const account = await getAccount();
-  const { t } = await uiCopy();
-  if (!account.isOwner) return { ok: false, error: t.accessOwnerOnly };
-  const parsed = idSchema.safeParse(input);
-  if (!parsed.success) return { ok: false, error: t.accessFailed };
-  try {
-    const message = await answer(parsed.data, t);
-    if (!message) return { ok: false, error: t.accessFailed };
-    revalidatePath("/settings");
-    return { ok: true, data: message };
-  } catch {
-    return { ok: false, error: t.accessFailed };
-  }
-}
-
-export async function allowAccessAction(id: unknown): Promise<ActionResult<string>> {
-  return asOwner(id, async (requestId, t) => {
-    const email = await allowRequest(requestId);
-    return email && fill(t.accessAllowedDone, { email });
-  });
-}
-
-export async function declineAccessAction(id: unknown): Promise<ActionResult<string>> {
-  return asOwner(id, async (requestId, t) => ((await declineRequest(requestId)) ? t.accessDeclinedDone : null));
-}
-
-export async function removeGuestAction(id: unknown): Promise<ActionResult<string>> {
-  return asOwner(id, async (guestId, t) => ((await removeAllowedAddress(guestId)) ? t.accessRemovedDone : null));
 }
